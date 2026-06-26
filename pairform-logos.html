@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PairForm — 4 concepts de logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#080B12;--panel:#0E1421;--panel-2:#141C2D;--line:rgba(150,165,200,.14);
+  --text:#EAEEF7;--muted:#8B95AD;--accent:#46C2D8;--coach:#A9B6CC;
+  --ui:'Archivo',sans-serif;--disp:'Oswald',sans-serif;--mono:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(180deg,#0A0E17,#070A11);color:var(--text);font-family:var(--ui);
+  min-height:100vh;padding:48px clamp(16px,4vw,64px) 80px}
+.head{max-width:1100px;margin:0 auto 40px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.head h1{font-family:var(--disp);font-size:clamp(28px,5vw,46px);font-weight:600;letter-spacing:.01em;line-height:1.05}
+.head p{color:var(--muted);max-width:620px;margin-top:14px;font-size:15px;line-height:1.6}
+.grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.7)}
+.stage{height:240px;display:grid;place-items:center;position:relative;
+  background:radial-gradient(120% 120% at 50% 0%,#10182a,#0b1120)}
+.stage .num{position:absolute;top:16px;left:18px;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.lockup{display:flex;align-items:center;gap:16px}
+.wordmark{font-family:var(--disp);font-size:34px;font-weight:600;letter-spacing:.012em}
+.wordmark b{font-weight:700;color:var(--accent)}
+.meta{padding:20px 22px 24px;border-top:1px solid var(--line)}
+.meta h3{font-family:var(--disp);font-size:20px;font-weight:600;letter-spacing:.02em}
+.meta .tag{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin:4px 0 10px}
+.meta p{color:var(--muted);font-size:13.5px;line-height:1.6}
+.chips{display:flex;gap:10px;margin-top:16px;align-items:center}
+.chip{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line)}
+.chip.light{background:#F5F7FB}
+.chip.mono{background:var(--panel-2)}
+.foot{max-width:1100px;margin:34px auto 0;color:var(--muted);font-size:13px;font-family:var(--mono);letter-spacing:.04em;text-align:center}
+svg{display:block;overflow:visible}
+</style></head>
+<body>
+<div class="head">
+  <div class="kicker">PairForm · Identité visuelle</div>
+  <h1>4 concepts de logo</h1>
+  <p>Une seule idée par marque, géométrique et scalable. Le fil rouge&nbsp;: <b style="color:var(--text)">deux éléments — l'entraîneur et l'athlète — qui n'en forment qu'un, tourné vers la performance.</b> Choisis ton préféré (ou un mix), on l'affine ensuite et on le pose partout dans l'app.</p>
+</div>
+
+<div class="grid">
+
+  <!-- ============ 1. FORWARD PAIR ============ -->
+  <div class="card">
+    <div class="stage"><span class="num">01</span>
+      <div class="lockup">
+        <svg width="74" height="74" viewBox="0 0 88 88" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18,62 44,38 70,62" stroke="var(--coach)" stroke-width="9" opacity=".85"/>
+          <polyline points="18,48 44,24 70,48" stroke="var(--accent)" stroke-width="10"/>
+        </svg>
+        <div class="wordmark">Pair<b>Form</b></div>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>Forward Pair</h3>
+      <div class="tag">Double chevron · ascension</div>
+      <p>Deux chevrons qui montent ensemble — le coach (dessous) ouvre la voie, l'athlète (devant, accent) accélère. Lecture immédiate&nbsp;: vitesse, progression, allure. Le plus « sport pur », façon Nike/UA.</p>
+      <div class="chips">
+        <div class="chip mono"><svg width="26" height="26" viewBox="0 0 88 88" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18,62 44,38 70,62" stroke="var(--coach)" stroke-width="9"/><polyline points="18,48 44,24 70,48" stroke="var(--accent)" stroke-width="10"/></svg></div>
+        <div class="chip light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18,62 44,38 70,62" stroke="#2A3550" stroke-width="9"/><polyline points="18,48 44,24 70,48" stroke="#0E8FA8" stroke-width="10"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 2. PF LIGATURE ============ -->
+  <div class="card">
+    <div class="stage"><span class="num">02</span>
+      <div class="lockup">
+        <svg width="74" height="74" viewBox="0 0 88 88" fill="none">
+          <!-- shared spine = the pair -->
+          <rect x="22" y="20" width="11" height="48" rx="3" fill="var(--accent)"/>
+          <!-- P bowl -->
+          <path d="M33 22 H48 a14 14 0 0 1 0 28 H33" stroke="var(--accent)" stroke-width="11" fill="none"/>
+          <!-- F arm (coach tone) -->
+          <rect x="33" y="40" width="22" height="10" rx="3" fill="var(--coach)"/>
+        </svg>
+        <div class="wordmark">Pair<b>Form</b></div>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>PF Ligature</h3>
+      <div class="tag">Monogramme · spine partagée</div>
+      <p>Un <b style="color:var(--text)">P</b> et un <b style="color:var(--text)">F</b> qui partagent la même colonne&nbsp;: l'idée littérale de la paire qui ne fait qu'un. Le plus « marque premium / app » (codes Whoop, Oura) — ultra reconnaissable en favicon.</p>
+      <div class="chips">
+        <div class="chip mono"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><rect x="22" y="20" width="11" height="48" rx="3" fill="var(--accent)"/><path d="M33 22 H48 a14 14 0 0 1 0 28 H33" stroke="var(--accent)" stroke-width="11" fill="none"/><rect x="33" y="40" width="22" height="10" rx="3" fill="var(--coach)"/></svg></div>
+        <div class="chip light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><rect x="22" y="20" width="11" height="48" rx="3" fill="#0E8FA8"/><path d="M33 22 H48 a14 14 0 0 1 0 28 H33" stroke="#0E8FA8" stroke-width="11" fill="none"/><rect x="33" y="40" width="22" height="10" rx="3" fill="#2A3550"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 3. THE BOND ============ -->
+  <div class="card">
+    <div class="stage"><span class="num">03</span>
+      <div class="lockup">
+        <svg width="74" height="74" viewBox="0 0 88 88" fill="none" stroke-linecap="round">
+          <g transform="rotate(-12 44 44)">
+            <path d="M44,44 C44,26 18,26 18,44 C18,62 44,62 44,44 Z" stroke="var(--coach)" stroke-width="9" opacity=".9"/>
+            <path d="M44,44 C44,26 70,26 70,44 C70,62 44,62 44,44 Z" stroke="var(--accent)" stroke-width="10"/>
+          </g>
+        </svg>
+        <div class="wordmark">Pair<b>Form</b></div>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>The Bond</h3>
+      <div class="tag">Infini · piste d'athlétisme</div>
+      <p>Deux boucles liées = un infini, qui lit aussi comme une <b style="color:var(--text)">piste / un 8 d'endurance</b>. Légèrement inclinée pour la dynamique. Symbolise le lien continu coach↔athlète et la régularité dans l'effort.</p>
+      <div class="chips">
+        <div class="chip mono"><svg width="26" height="26" viewBox="0 0 88 88" fill="none" stroke-linecap="round"><g transform="rotate(-12 44 44)"><path d="M44,44 C44,26 18,26 18,44 C18,62 44,62 44,44 Z" stroke="var(--coach)" stroke-width="9"/><path d="M44,44 C44,26 70,26 70,44 C70,62 44,62 44,44 Z" stroke="var(--accent)" stroke-width="10"/></g></svg></div>
+        <div class="chip light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none" stroke-linecap="round"><g transform="rotate(-12 44 44)"><path d="M44,44 C44,26 18,26 18,44 C18,62 44,62 44,44 Z" stroke="#2A3550" stroke-width="9"/><path d="M44,44 C44,26 70,26 70,44 C70,62 44,62 44,44 Z" stroke="#0E8FA8" stroke-width="10"/></g></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 4. PARALLEL ASCENT ============ -->
+  <div class="card">
+    <div class="stage"><span class="num">04</span>
+      <div class="lockup">
+        <svg width="74" height="74" viewBox="0 0 88 88" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="66" x2="48" y2="30" stroke="var(--coach)" stroke-width="9" opacity=".85"/>
+          <line x1="36" y1="66" x2="62" y2="30" stroke="var(--accent)" stroke-width="10"/>
+          <polyline points="50,28 64,28 64,42" stroke="var(--accent)" stroke-width="10"/>
+        </svg>
+        <div class="wordmark">Pair<b>Form</b></div>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>Parallel Ascent</h3>
+      <div class="tag">Deux couloirs · flèche montante</div>
+      <p>Deux traits parallèles qui grimpent vers le haut-droite, coiffés d'une pointe de flèche&nbsp;: <b style="color:var(--text)">deux couloirs, une même trajectoire ascendante</b>. Le plus « data / performance » (codes Strava, Whoop). Parfait pour un produit d'analyse.</p>
+      <div class="chips">
+        <div class="chip mono"><svg width="26" height="26" viewBox="0 0 88 88" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="66" x2="48" y2="30" stroke="var(--coach)" stroke-width="9"/><line x1="36" y1="66" x2="62" y2="30" stroke="var(--accent)" stroke-width="10"/><polyline points="50,28 64,28 64,42" stroke="var(--accent)" stroke-width="10"/></svg></div>
+        <div class="chip light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="66" x2="48" y2="30" stroke="#2A3550" stroke-width="9"/><line x1="36" y1="66" x2="62" y2="30" stroke="#0E8FA8" stroke-width="10"/><polyline points="50,28 64,28 64,42" stroke="#0E8FA8" stroke-width="10"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="foot">Chaque mini-vignette montre le rendu en fond sombre et en fond clair (favicon / app icon).</div>
+</body></html>

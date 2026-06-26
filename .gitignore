@@ -1,0 +1,12 @@
+# Sauvegardes & fichiers temporaires (ne pas versionner)
+*.BACKUP.html
+*.PRE-BACKEND*.html
+*.PRE-CLUBREFONTE*.html
+*.PRE-STRIPEHOOK*.html
+__*.html
+.DS_Store
+
+# Secrets (sécurité — au cas où)
+.env
+.env.*
+!.env.example

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PairForm — Démo (front + back-end)</title>
+<style>
+  :root{--bg:#0b0e12;--card:#11151a;--line:#222a32;--muted:#8a949e;--ink:#e7edf3;--accent:#46C2D8;--good:#39e6a3;--bike:#ffb13d}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#13202a,#0b0e12);color:var(--ink);
+    font-family:system-ui,Segoe UI,sans-serif;line-height:1.5}
+  .wrap{max-width:1040px;margin:0 auto;padding:48px 22px 70px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#2b8fa6);
+    display:grid;place-items:center;font-weight:800;color:#06222a;font-size:20px}
+  h1{font-size:30px;margin:0;letter-spacing:.4px}
+  .tag{color:var(--muted);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+  .lead{color:var(--muted);max-width:680px;margin:14px 0 30px}
+  .grid{display:grid;gap:16px}
+  .apps{grid-template-columns:1fr 1fr;margin-bottom:34px}
+  @media(max-width:720px){.apps{grid-template-columns:1fr}}
+  .app{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:22px;transition:.15s}
+  .app:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .app h3{margin:0 0 6px;font-size:19px}
+  .app p{margin:0;color:var(--muted);font-size:13.5px}
+  .app .go{margin-top:14px;display:inline-block;background:var(--accent);color:#06222a;font-weight:700;
+    padding:9px 16px;border-radius:9px;font-size:13.5px}
+  .sec-title{display:flex;align-items:center;gap:10px;margin:34px 0 4px;font-size:13px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent)}
+  .sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  .cards{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:720px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 17px}
+  .card h4{margin:0 0 10px;font-size:14.5px}
+  .card ul{margin:0;padding-left:0;list-style:none;font-size:13px;color:var(--muted)}
+  .card li{padding:3px 0;border-bottom:1px dashed #1c242c}
+  .card li:last-child{border:0}
+  .card code{color:#cfe8ee;font-size:12px}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px}
+  .ok{background:rgba(57,230,163,.12);color:var(--good)}
+  .pend{background:rgba(255,177,61,.14);color:var(--bike)}
+  .flow{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    font-size:13px;color:var(--muted);overflow:auto}
+  .flow b{color:var(--ink)}
+  .arrow{color:var(--accent);padding:0 6px}
+  .stat{display:flex;gap:22px;flex-wrap:wrap;margin:6px 0 30px}
+  .stat div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 18px}
+  .stat .n{font-size:22px;font-weight:800;color:var(--accent)}
+  .stat .l{font-size:11.5px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+  footer{margin-top:40px;color:var(--muted);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">P</div>
+    <div>
+      <div class="tag">Coaching triathlon · Hyrox</div>
+      <h1>PairForm</h1>
+    </div>
+  </header>
+  <p class="lead">Plateforme de coaching pour les 3 rôles — <b>coach</b>, <b>athlète</b> et
+  <b>club</b> — avec synchronisation des montres connectées. Ci-dessous : l'application
+  (front) et l'architecture back-end, prêtes à présenter.</p>
+
+  <div class="stat">
+    <div><div class="n">16+</div><div class="l">tables Postgres (RLS)</div></div>
+    <div><div class="n">16</div><div class="l">edge functions</div></div>
+    <div><div class="n">3</div><div class="l">intégrations montres</div></div>
+    <div><div class="n">Stripe</div><div class="l">abonnements + à la carte</div></div>
+  </div>
+
+  <div class="sec-title">Le produit (front)</div>
+  <div class="grid apps">
+    <a class="app" href="./apex-tri-calendrier.html">
+      <h3>App coach &amp; athlète</h3>
+      <p>Calendrier d'entraînement, builder de séances, check-in de fraîcheur,
+      bibliothèque vidéo, espace club &amp; créneaux.</p>
+      <span class="go">Ouvrir l'app →</span>
+    </a>
+    <a class="app" href="./apex-tri-demo-testeurs.html">
+      <h3>Démo testeurs</h3>
+      <p>Même application, variante utilisée pour les retours testeurs.</p>
+      <span class="go">Ouvrir la démo →</span>
+    </a>
+  </div>
+  <p class="sub">Astuce démo : badge <b>☁︎</b> en haut à droite → crée un compte (coach /
+  athlète / club). Sans connexion, l'app tourne en <b>mode démo</b> avec des données d'exemple.</p>
+
+  <div class="sec-title">L'infrastructure (back-end Supabase)</div>
+  <p class="sub">Postgres + Auth + Storage + Edge Functions (Deno). Sécurité par Row-Level
+  Security ; les abonnements ont pour source de vérité le webhook Stripe.</p>
+  <div class="grid cards">
+    <div class="card">
+      <h4>📦 Données</h4>
+      <ul>
+        <li><code>profiles</code> · rôles</li>
+        <li><code>athlete_profiles</code> · refs physio</li>
+        <li><code>sessions</code> / <code>scheduled_sessions</code></li>
+        <li><code>checkins</code> · <code>records</code></li>
+        <li><code>clubs</code> / <code>groups</code> / <code>creneaux</code></li>
+        <li><code>device_connections</code> · <code>external_activities</code></li>
+        <li><code>subscriptions</code> (Stripe)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>⚙️ Edge Functions</h4>
+      <ul>
+        <li>stripe-checkout / portal / webhook</li>
+        <li>invite-athlete <span class="pill ok">email</span></li>
+        <li>creneau-checkout · video-url</li>
+        <li>device-connect · device-sync</li>
+        <li>strava-oauth-callback / webhook</li>
+        <li>coros / garmin -oauth + webhook</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>⌚ Montres connectées</h4>
+      <ul>
+        <li>Strava <span class="pill ok">prêt</span></li>
+        <li>Coros (OAuth2) <span class="pill pend">clés</span></li>
+        <li>Garmin (OAuth1.0a) <span class="pill pend">clés</span></li>
+        <li>Activités normalisées</li>
+        <li>Import auto (webhooks)</li>
+        <li>Lecture seule</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec-title">Flux de synchronisation Strava (live)</div>
+  <div class="flow">
+    <b>Athlète</b> <span class="arrow">→</span> « Se connecter avec Strava »
+    <span class="arrow">→</span> autorisation OAuth Strava
+    <span class="arrow">→</span> <b>strava-oauth-callback</b> (échange du code, stockage chiffré des jetons)
+    <span class="arrow">→</span> import des activités <span class="arrow">→</span>
+    <b>external_activities</b> <span class="arrow">→</span> affichage « Activités synchronisées ».<br>
+    Puis chaque nouvelle sortie est poussée en temps réel par <b>strava-webhook</b>.
+  </div>
+
+  <footer>
+    PairForm — démo locale. Détails de mise en ligne : <code>~/pairform-backend/DEPLOY.md</code>.
+  </footer>
+</div>
+</body>
+</html>
