@@ -83,6 +83,71 @@ export const PF = {
     const sub = await this.mySubscription();
     return !!sub && ["active", "trialing"].includes(sub.status);
   },
+  // ---- Add-on « Assistant IA » du coach (option payante séparée) ----
+  // Le coach a-t-il l'add-on IA actif ? (lecture directe de la table d'entitlement)
+  async hasAiAddon() {
+    // plusieurs lignes possibles (historique d'abos) → on prend la plus récente
+    const { data } = await sb.from("ai_addons")
+      .select("status, current_period_end")
+      .order("updated_at", { ascending: false }).limit(1).maybeSingle();
+    if (!data) return false;
+    const live = ["active", "trialing"].includes(data.status);
+    const notExpired = !data.current_period_end || new Date(data.current_period_end) > new Date();
+    return live && notExpired;
+  },
+  // Active l'add-on IA → redirige vers le checkout Stripe (produit PairForm).
+  async subscribeAiAddon() {
+    const { url } = await this._invoke("ai-addon-subscribe", {});
+    window.location.href = url;
+  },
+  // Génère (ou relit depuis le cache) le résumé IA d'une séance.
+  // payload : { session_key, bilan, athlete_id?, discipline?, objective?, force? }
+  // Renvoie { verdict, headline, bullets, recos, model, cached } ou {error:'add_on_required'}.
+  async summarizeSession(payload) {
+    return await this._invoke("session-summary", payload);
+  },
+  // Démarre l'onboarding Stripe Connect du COACH (pour facturer ses athlètes).
+  async connectCoachStripe() {
+    const { url } = await this._invoke("coach-connect", {});
+    window.location.href = url;
+  },
+  // Offre(s) de coaching d'un coach (par défaut : le coach connecté).
+  async getCoachOffers(coachId = this.user.id) {
+    const { data } = await sb.from("coach_offers").select("*").eq("coach_id", coachId);
+    return data ?? [];
+  },
+  // Met à jour l'offre de coaching du coach (idempotent : réutilise l'offre
+  // existante si aucun id n'est fourni, pour ne pas créer de doublons).
+  async saveCoachOffer({ id, name = "Suivi coaching", price }) {
+    if (!id) {
+      const { data: existing } = await sb.from("coach_offers")
+        .select("id").eq("coach_id", this.user.id).limit(1).maybeSingle();
+      if (existing) id = existing.id;
+    }
+    const row = { coach_id: this.user.id, name, price };
+    if (id) row.id = id;
+    const { data, error } = await sb.from("coach_offers").upsert(row).select().single();
+    if (error) throw error; return data;
+  },
+  // L'athlète s'abonne au suivi de son coach → redirige Stripe.
+  // coachId optionnel : si absent, on résout le coach actif de l'athlète.
+  async subscribeToCoach(coachId = null, offerId = null) {
+    if (!coachId) {
+      const { data } = await sb.from("coach_athlete")
+        .select("coach_id").eq("athlete_id", this.user.id).eq("status", "active").limit(1).maybeSingle();
+      coachId = data?.coach_id;
+      if (!coachId) throw new Error("Aucun coach actif pour cet athlète");
+    }
+    const body = { coach_id: coachId };
+    if (offerId) body.offer_id = offerId;
+    const { url } = await this._invoke("coach-subscribe", body);
+    window.location.href = url;
+  },
+  // Abonnements de coaching (coach : les siens ; athlète : les siens — via RLS).
+  async getCoachingSubscriptions() {
+    const { data } = await sb.from("coaching_subscriptions").select("*");
+    return data ?? [];
+  },
 
   // -------- DONNÉES ATHLÈTE --------
   async getAthleteRefs() {
@@ -252,10 +317,44 @@ export const PF = {
     if (error) throw error; return data;
   },
   // Paiement à la carte d'un créneau tarifé (Hyrox, price > 0) → redirige Stripe.
+  // = formule « À la séance » (dropin), paiement one-shot.
   async payCreneau(creneauId, memberId) {
     const { url } = await this._invoke("creneau-checkout", {
       creneau_id: creneauId, member_id: memberId,
     });
+    window.location.href = url;
+  },
+
+  // -------- CLUB : les 3 formules & encaissement (Stripe) --------
+  // Les tarifs des 3 formules (dropin/sub/coach), éditables par le club.
+  async getClubOffers(clubId) {
+    const { data } = await sb.from("club_offers").select("*").eq("club_id", clubId);
+    return data ?? [];
+  },
+  // Met à jour le tarif d'une formule (gérant du club).
+  async saveClubOffer(clubId, tier, price) {
+    const { data, error } = await sb.from("club_offers")
+      .upsert({ club_id: clubId, tier, price }, { onConflict: "club_id,tier" })
+      .select().single();
+    if (error) throw error; return data;
+  },
+  // Abonne un membre à une formule RÉCURRENTE ('sub' | 'coach') → redirige Stripe.
+  // ('dropin' = paiement à la séance via payCreneau.)
+  async subscribeToClubOffer(clubId, memberId, tier) {
+    const { url } = await this._invoke("club-subscribe", {
+      club_id: clubId, member_id: memberId, tier,
+    });
+    window.location.href = url;
+  },
+  // Adhésions du club (gérant : toutes ; membre : la sienne via RLS).
+  async getClubMemberships(clubId) {
+    const { data } = await sb.from("club_memberships").select("*").eq("club_id", clubId);
+    return data ?? [];
+  },
+  // Démarre l'onboarding Stripe Connect du club (gérant) → redirige Stripe.
+  // Tant que non complété, club-subscribe encaisse côté PairForm (fallback démo).
+  async connectClubStripe(clubId) {
+    const { url } = await this._invoke("club-connect", { club_id: clubId });
     window.location.href = url;
   },
 

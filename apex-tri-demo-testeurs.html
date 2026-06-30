@@ -28,6 +28,11 @@
   --strength:#8E7FD0;
   --good:#35C58C;
   --radius:14px; --radius-sm:10px; --radius-lg:20px;
+  /* Müller-Brockmann — grille modulaire (une seule source de vérité) */
+  --bl:8px;            /* unité baseline */
+  --lh:24px;           /* interligne = 3 × baseline */
+  --v-cols:12;         /* colonnes de la bibliothèque vidéo */
+  --v-gutter:24px;     /* gouttière = 3 × baseline */
   --shadow-1:0 1px 2px rgba(0,0,0,.45);
   --shadow-2:0 10px 30px -12px rgba(0,0,0,.6);
   --shadow-3:0 24px 60px -20px rgba(0,0,0,.7);
@@ -256,13 +261,22 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 
 /* ---------- Calendrier ---------- */
 .calendar{
+  position:relative;
   border:1px solid var(--line);border-radius:var(--radius);
   background:var(--panel);overflow:hidden;
 }
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 @media (max-width:980px){.cal-grid{grid-template-columns:1fr}}
+/* overlay grille du calendrier (7 colonnes = jours), révélé par body.grid-on */
+.cal-guides{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .26s ease;z-index:5}
+body.grid-on .cal-guides{opacity:1}
+.cal-guides .cg-cols{position:absolute;inset:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.cal-guides .cg-col{position:relative;box-shadow:inset 1px 0 0 rgba(70,194,216,.34)}
+.cal-guides .cg-col span{position:absolute;top:4px;left:0;right:0;text-align:center;font-family:var(--font-data);font-size:9px;color:var(--accent)}
+.cal-guides .cg-rows{position:absolute;inset:0;background-image:repeating-linear-gradient(to bottom,rgba(70,194,216,.12) 0 1px,transparent 1px var(--lh))}
+@media (max-width:980px){.cal-guides{display:none}}
 .day{
-  border-right:1px solid var(--line);min-height:380px;
+  border-right:1px solid var(--line);min-height:384px;
   display:flex;flex-direction:column;position:relative;
   transition:background .2s;
 }
@@ -272,17 +286,17 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .day.today .day-head{background:linear-gradient(180deg, rgba(47,217,255,.14), transparent)}
 .day.today .day-head .dnum{color:var(--swim)}
 .day-head{
-  padding:12px 12px 8px;border-bottom:1px solid var(--line);
+  padding:16px 12px 8px;border-bottom:1px solid var(--line);
   display:flex;align-items:baseline;gap:8px;
 }
 .day-head .dname{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .day-head .dnum{font-family:var(--font-data);font-size:18px;font-weight:700;margin-left:auto}
-.day-body{padding:9px;flex:1;display:flex;flex-direction:column;gap:8px}
+.day-body{padding:8px;flex:1;display:flex;flex-direction:column;gap:8px}
 
 .session{
   border:1px solid var(--line);border-left:3px solid var(--c);
   border-radius:10px;background:var(--panel-2);
-  padding:9px 10px;cursor:grab;user-select:none;position:relative;
+  padding:8px 12px;cursor:grab;user-select:none;position:relative;
   transition:transform .15s, box-shadow .2s, opacity .2s;
   animation:popIn .25s ease;
 }
@@ -375,8 +389,8 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 
 
 /* ---------- Prédicteur de chronos ---------- */
-.chrono-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 6px}
-@media (max-width:560px){.chrono-grid{grid-template-columns:repeat(2,1fr)}}
+.chrono-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 6px}
+@media (max-width:560px){.chrono-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .chrono{
   border:1px solid var(--line);border-radius:12px;padding:13px 10px;text-align:center;
   background:linear-gradient(180deg, rgba(255,84,112,.06), transparent);
@@ -580,13 +594,13 @@ body[data-athview="home"] .today-panel{display:block}
 .fb-block .k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--good);font-weight:700;margin-bottom:3px}
 
 /* ---------- Zones personnelles ---------- */
-.zones-grid{display:grid;grid-template-columns:120px repeat(3,1fr);gap:1px;background:var(--line);border-radius:12px;overflow:hidden;margin-top:12px;border:1px solid var(--line)}
+.zones-grid{display:grid;grid-template-columns:120px repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border-radius:12px;overflow:hidden;margin-top:12px;border:1px solid var(--line)}
 .zones-grid>div{background:var(--panel);padding:10px 12px;font-size:12px}
 .zones-grid .zh{background:var(--panel-2);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
 .zones-grid .zn{display:flex;align-items:center;gap:8px;font-weight:700}
 .zones-grid .zn i{width:9px;height:9px;border-radius:3px;flex:none}
 .zones-grid .zv{font-family:var(--font-data);font-size:12.5px}
-@media (max-width:640px){.zones-grid{grid-template-columns:90px repeat(3,1fr)}.zones-grid>div{padding:8px 7px;font-size:10.5px}.zones-grid .zv{font-size:10.5px}}
+@media (max-width:640px){.zones-grid{grid-template-columns:90px repeat(3,minmax(0,1fr))}.zones-grid>div{padding:8px 7px;font-size:10.5px}.zones-grid .zv{font-size:10.5px}}
 
 /* ---------- Courbe lactate ---------- */
 .lactate-legend{display:flex;gap:16px;flex-wrap:wrap;margin:2px 0 8px}
@@ -673,7 +687,7 @@ body[data-athview="home"] .today-panel{display:block}
   border-top:1px solid var(--line);padding-top:14px}
 
 /* ---------- Bibliothèque vidéo ---------- */
-.videolib{margin-top:30px;border:1px solid var(--line);border-radius:var(--radius);
+.videolib{position:relative;margin-top:32px;border:1px solid var(--line);border-radius:var(--radius);
   background:linear-gradient(180deg,var(--panel-2),var(--panel));padding:24px clamp(16px,3vw,26px)}
 .vl-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:16px}
 .vl-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-data);font-size:11px;
@@ -685,12 +699,18 @@ body[data-athview="home"] .today-panel{display:block}
 .vl-search input{width:min(280px,42vw);border:1px solid var(--line-strong);border-radius:10px;background:var(--panel);
   color:var(--text);font-family:var(--font-ui);font-size:13.5px;padding:10px 13px}
 .vl-search input:focus{outline:2px solid var(--swim);outline-offset:1px}
-.vl-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.vl-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
 .vl-filter{padding:8px 15px;border-radius:99px;border:1px solid var(--line-strong);background:var(--panel);
   color:var(--muted);font-weight:600;font-size:13px;transition:.18s}
 .vl-filter:hover{border-color:var(--swim);color:var(--text)}
 .vl-filter.active{background:linear-gradient(120deg,rgba(47,217,255,.16),rgba(157,123,255,.16));color:var(--text);border-color:transparent}
-.vl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+/* grille MODULAIRE : 12 colonnes, gouttière = 24px, interligne = 24px ; les cartes
+   occupent des modules entiers et tombent sur les MÊMES lignes que l'overlay. */
+.vl-grid{display:grid;grid-template-columns:repeat(var(--v-cols),minmax(0,1fr));column-gap:var(--v-gutter);row-gap:var(--lh);position:relative;z-index:1}
+.vl-grid .vcard{grid-column:span 3}
+@media (max-width:1040px){.vl-grid .vcard{grid-column:span 4}}
+@media (max-width:760px){.vl-grid .vcard{grid-column:span 6}}
+@media (max-width:480px){.vl-grid .vcard{grid-column:span 12}}
 .vcard{border:1px solid var(--line);border-radius:13px;background:var(--panel);overflow:hidden;cursor:pointer;
   transition:.2s;display:flex;flex-direction:column}
 .vcard:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 14px 34px color-mix(in srgb, var(--c) 22%, transparent)}
@@ -703,11 +723,31 @@ body[data-athview="home"] .today-panel{display:block}
 .vcard .thumb .dur{position:absolute;bottom:7px;right:7px;font-family:var(--font-data);font-size:10.5px;font-weight:700;
   background:rgba(7,9,15,.75);color:#fff;padding:2px 7px;border-radius:6px}
 .vcard .thumb .disc{position:absolute;top:7px;left:7px;font-size:14px}
-.vcard .vbody{padding:11px 12px}
+.vcard .vbody{padding:12px 16px}
 .vcard .vt{font-weight:700;font-size:13.5px;line-height:1.3}
-.vcard .vmeta{display:flex;gap:8px;margin-top:5px;font-size:11px;color:var(--muted);font-family:var(--font-data)}
+.vcard .vmeta{display:flex;gap:8px;margin-top:8px;font-size:11px;color:var(--muted);font-family:var(--font-data)}
 .vcard .lvl{padding:1px 7px;border-radius:99px;border:1px solid var(--c);color:var(--c);font-weight:700}
-.vl-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13.5px;padding:30px}
+.vl-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13.5px;padding:32px}
+/* — Müller-Brockmann : numéral (data set large), toggle grille, overlay même boîte — */
+.vl-count{display:flex;align-items:baseline;gap:9px;margin-top:8px;font-family:var(--font-data);font-size:12px;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.vl-count b{font-family:var(--font-display);font-weight:700;font-size:40px;line-height:48px;color:var(--text);letter-spacing:.01em}
+.vl-grid-toggle{align-self:flex-end;display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line-strong);
+  color:var(--muted);cursor:pointer;font-family:var(--font-data);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:8px 13px;border-radius:99px;transition:.18s}
+.vl-grid-toggle:hover{color:var(--text);border-color:var(--accent)}
+.vl-grid-toggle .gt-dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+body.grid-on .vl-grid-toggle{background:var(--accent);color:#06222a;border-color:transparent}
+body.grid-on .vl-grid-toggle .gt-dot{background:#06222a}
+.vl-guides{position:absolute;left:clamp(16px,3vw,26px);right:clamp(16px,3vw,26px);top:24px;bottom:24px;
+  pointer-events:none;opacity:0;transition:opacity .26s ease;z-index:0}
+body.grid-on .vl-guides{opacity:1}
+.vl-guides .vg-cols{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--v-cols),minmax(0,1fr));column-gap:var(--v-gutter)}
+.vl-guides .vg-col{background:rgba(70,194,216,.06);position:relative;
+  box-shadow:inset 1px 0 0 rgba(70,194,216,.32),inset -1px 0 0 rgba(70,194,216,.32)}
+.vl-guides .vg-col span{position:absolute;top:4px;left:0;right:0;text-align:center;font-family:var(--font-data);font-size:9px;color:var(--accent)}
+.vl-guides .vg-rows{position:absolute;inset:0;
+  background-image:repeating-linear-gradient(to bottom,rgba(70,194,216,.16) 0 1px,transparent 1px var(--lh))}
 
 /* lien vidéo dans une séance */
 .has-video{cursor:pointer}
@@ -793,9 +833,9 @@ body[data-clubview] .ath-tabs{display:none}
 .club-stat .v{font-family:var(--font-data);font-size:22px;font-weight:700;color:var(--strength)}
 .club-stat .k{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:2px}
 /* --- Refonte club : tableau de bord / facturation / offres --- */
-.cdash-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
-.cdash-kpis.cols3{grid-template-columns:repeat(3,1fr)}
-@media(max-width:760px){.cdash-kpis,.cdash-kpis.cols3{grid-template-columns:repeat(2,1fr)}}
+.cdash-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:16px}
+.cdash-kpis.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:760px){.cdash-kpis,.cdash-kpis.cols3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cdash-kpi{border:1px solid var(--line);border-radius:13px;background:var(--panel-2);padding:14px 15px}
 .cdash-kpi .v{font-family:var(--font-data);font-size:25px;font-weight:700;line-height:1}
 .cdash-kpi .v.acc{color:var(--accent)}.cdash-kpi .v.good{color:var(--good)}.cdash-kpi .v.str{color:var(--strength)}
@@ -827,7 +867,7 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .cpay{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px}
 .cpay.ok{background:rgba(53,197,140,.14);color:var(--good)}
 .cpay.wait{background:rgba(217,150,47,.16);color:var(--bike)}
-.coffers{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.coffers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
 @media(max-width:760px){.coffers{grid-template-columns:1fr}}
 .coffer{border:1px solid var(--line);border-radius:14px;background:var(--panel-2);padding:16px 17px;position:relative}
 .coffer.feat{border-color:rgba(217,150,47,.5);box-shadow:0 0 0 1px rgba(217,150,47,.16)}
@@ -1534,6 +1574,7 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
 
     <section class="calendar" aria-label="Calendrier d'entraînement">
       <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-guides" aria-hidden="true"><div class="cg-cols" id="calCols"></div><div class="cg-rows"></div></div>
     </section>
   </div>
 
@@ -1543,21 +1584,23 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
       <div>
         <div class="vl-eyebrow"><span class="vl-dot"></span>Technique</div>
         <h2>Bibliothèque <span>vidéo</span></h2>
-        <p class="vl-sub">Éducatifs, gammes et gestes techniques. Les vidéos liées à tes séances apparaissent au survol dans ton programme.</p>
+        <p class="vl-sub">Éducatifs, gammes et gestes techniques, filtrés par sport. Les vidéos liées à tes séances apparaissent au survol dans ton programme.</p>
+        <div class="vl-count"><b id="vlCount">0</b> vidéos · <span id="vlCountDisc">Natation</span></div>
       </div>
       <div class="vl-search">
         <input type="search" id="vlSearch" placeholder="Rechercher (rattrapé, gammes, squat…)" aria-label="Rechercher une vidéo">
       </div>
+      <button class="vl-grid-toggle" id="vlGridToggle" aria-pressed="false" title="Afficher la grille modulaire (Müller-Brockmann)"><span class="gt-dot"></span>Grille</button>
     </div>
     <div class="vl-filters" id="vlFilters" role="tablist" aria-label="Filtrer par sport">
-      <button class="vl-filter active" data-f="all" role="tab" aria-selected="true">Tout</button>
-      <button class="vl-filter" data-f="swim" role="tab"><i class="ic ic-waves"></i>Natation</button>
+      <button class="vl-filter active" data-f="swim" role="tab" aria-selected="true"><i class="ic ic-waves"></i>Natation</button>
       <button class="vl-filter" data-f="bike" role="tab"><i class="ic ic-bike"></i>Vélo</button>
       <button class="vl-filter" data-f="run" role="tab"><i class="ic ic-run"></i>Course</button>
       <button class="vl-filter" data-f="strength" role="tab"><i class="ic ic-dumbbell"></i>Renfo</button>
       <button class="vl-filter" data-f="hyrox" role="tab"><i class="ic ic-dumbbell"></i>Hyrox</button>
     </div>
     <div class="vl-grid" id="vlGrid"></div>
+    <div class="vl-guides" aria-hidden="true"><div class="vg-cols" id="vlCols"></div><div class="vg-rows"></div></div>
   </section>
 
   <!-- ===================== PRÉPA MENTALE ===================== -->
@@ -2005,6 +2048,16 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
       <div class="an-sec-head"><h4>Profil d'altitude · D+</h4></div>
       <svg id="anElev" viewBox="0 0 720 150" role="img" aria-label="Profil d'altitude"></svg>
     </div>
+    <div class="an-section" id="anDecoupleWrap">
+      <div class="an-sec-head"><h4>Découplage <span class="an-hint" id="anDecoupleHint">efficacité cardiaque sur la durée</span></h4></div>
+      <div class="an-dc-kpi" id="anDecoupleKpi"></div>
+      <svg id="anDecouple" viewBox="0 0 720 170" role="img" aria-label="Courbe de découplage"></svg>
+      <div class="an-dc-trend" id="anDecoupleTrend"></div>
+    </div>
+    <div class="an-section" id="anAiWrap">
+      <div class="an-sec-head"><h4>🧠 Assistant IA <span class="an-hint">résumé &amp; recommandations</span></h4></div>
+      <div id="anAiBody"></div>
+    </div>
     <div class="an-section">
       <div class="an-sec-head"><h4>Détail par lap</h4><span class="an-hint" id="anLapHint"></span></div>
       <div class="an-laps" id="anLaps"></div>
@@ -2030,6 +2083,14 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
           <button data-d="strength">💪</button>
           <button data-d="hyrox" title="Hyrox">🦾</button>
         </div>
+        <select id="bObjectif" title="Objectif de la séance — sert à l'analyse IA" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:10px;padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
+          <option value="">🎯 Objectif : auto</option>
+          <option value="endurance|Z2">Endurance fondamentale (Z2)</option>
+          <option value="seuil|Z3">Seuil aérobie · LT1 (Z3)</option>
+          <option value="seuil|Z4">Seuil · LT2 (Z4)</option>
+          <option value="vo2|Z5">VMA · VO2max (Z5)</option>
+          <option value="recup|Z1">Récupération (Z1)</option>
+        </select>
       </div>
       <div class="b-refs-row">
         <span class="b-refs-lbl">Références affichées :</span>
@@ -2107,6 +2168,7 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
 
 <div class="tooltip" id="tooltip"></div>
 
+<script src="./pairform-fit.js"></script>
 <script>
 /* ============================================================
    PairForm — logique
@@ -2864,7 +2926,9 @@ function renderStravaCard(){
       <div class="dev-more">
         <button class="dev-mini" data-p="garmin">⌚ Garmin</button>
         <button class="dev-mini" data-p="coros">⌚ Coros</button>
+        <button class="dev-mini" id="importFitBtn" title="Importer un fichier .TCX/.GPX exporté de ta montre">⬆️ Importer un fichier</button>
       </div>
+      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ Tes données <b>Strava</b> restent personnelles (conditions Strava). Pour les partager avec ton coach : <b>Garmin/Coros</b> ou <b>import de fichier</b>.</p>
       <div class="strava-powered">Strava · Garmin · Coros — données en lecture seule</div>`;
     document.getElementById('stravaConnectBtn').onclick=connectStrava;
     box.querySelectorAll('.dev-mini').forEach(b=> b.onclick=()=> connectProvider(b.dataset.p));
@@ -2882,9 +2946,11 @@ function renderStravaCard(){
         <div class="smeta">Dernière synchro : ${stravaActivities.length?'à l\'instant':'jamais'}</div>
         <button class="strava-sync" id="stravaSyncBtn">${stravaLogo} Synchroniser mes dernières activités</button>
         <button class="strava-disconnect" id="stravaDisconnectBtn">Déconnecter</button>
+        <button class="dev-mini" id="importFitBtn" title="Importer un fichier .TCX/.GPX">⬆️ Importer un fichier (.TCX/.GPX)</button>
       </div>
       ${(!window.PF?.user)?`<div class="demo-pick"><span class="dp-lbl">Profil démo</span>${Object.keys(STRAVA_DEMO_SETS).map(k=>`<button class="dp-chip${k===stravaDemoSet?' on':''}" data-set="${k}">${DEMO_SET_LABELS[k]}</button>`).join('')}</div>`:''}
       ${actsHtml}
+      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ Les activités <b>Strava</b> restent personnelles à l'athlète (conditions Strava) et ne sont pas partagées au coach. Canaux partageables : <b>Garmin/Coros</b> ou <b>import .FIT/.TCX/.GPX</b>.</p>
       <div class="strava-powered">Powered by Strava · Garmin · Coros</div>`;
     document.getElementById('stravaSyncBtn').onclick=syncStrava;
     box.querySelectorAll('.dp-chip').forEach(b=> b.onclick=()=>{ stravaDemoSet=b.dataset.set; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); });
@@ -2893,6 +2959,34 @@ function renderStravaCard(){
       else { stravaConnected=false; stravaActivities=[]; renderStravaCard(); toast('Strava déconnecté'); }
     };
   }
+  const ib=document.getElementById('importFitBtn'); if(ib) ib.onclick=()=>ensureFitInput().click();
+}
+
+// Import manuel d'un fichier d'activité (.TCX/.GPX) — voie SANS homologation
+// (la sync API coach Garmin/Coros nécessite une homologation longue). Le fichier
+// est parsé côté navigateur (window.PFFit) en la même structure que genSessionData,
+// puis ouvert dans le modal d'analyse → découplage + IA tournent sur du RÉEL.
+function ensureFitInput(){
+  let inp=document.getElementById('fitFileInput');
+  if(!inp){ inp=document.createElement('input'); inp.type='file'; inp.id='fitFileInput'; inp.accept='.tcx,.gpx';
+    inp.style.display='none'; document.body.appendChild(inp);
+    inp.addEventListener('change', e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(f) importActivityFile(f); }); }
+  return inp;
+}
+function importActivityFile(file){
+  if(typeof PFFit==='undefined'){ toast('Module d\'import indisponible'); return; }
+  const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
+  toast('Lecture du fichier…');
+  PFFit.parseFile(file, {ftp}).then(res=>{
+    if(!res.ok){ toast('Import : '+res.error); return; }
+    const s=res.summary;
+    stravaConnected=true;
+    stravaActivities.unshift({disc:s.disc, name:s.title, dur:s.durMin, dist:+(+s.dist).toFixed(1), date:'importé', src:'upload'});
+    renderStravaCard();
+    openAnalysis({id:'imp'+Date.now(), disc:s.disc, title:s.title, dur:s.durMin, zone:'Z2', _realData:res.data});
+    toast('Activité importée ✓');
+    // PROD : PF.saveActivity(res.summary, res.data) → table external_activities (à câbler).
+  });
 }
 
 function connectStrava(){
@@ -3966,7 +4060,7 @@ const ZONES = [
 /* ============================================================
    BIBLIOTHÈQUE VIDÉO — rendu, filtres, lecteur, popover
    ============================================================ */
-let vlFilter='all', vlQuery='';
+let vlFilter='swim', vlQuery='';
 function renderVideoGrid(){
   const grid=document.getElementById('vlGrid');
   if(!grid) return;
@@ -3976,6 +4070,11 @@ function renderVideoGrid(){
     const okQ = !q || (v.title+' '+v.desc+' '+v.tags.join(' ')).toLowerCase().includes(q);
     return okF && okQ;
   });
+  // numéral (data set large) : nombre de vidéos du sport filtré
+  const cEl=document.getElementById('vlCount'), dEl=document.getElementById('vlCountDisc');
+  if(cEl) cEl.textContent=String(list.length).padStart(2,'0');
+  if(dEl) dEl.textContent=(DISC[vlFilter]&&DISC[vlFilter].label)||'Toutes';
+  if(window.__pf_vlOptical) window.__pf_vlOptical();
   if(!list.length){ grid.innerHTML=`<div class="vl-empty">Aucune vidéo ne correspond. Essaie un autre mot-clé.</div>`; return; }
   grid.innerHTML=list.map(v=>{
     const D=DISC[v.disc];
@@ -4001,6 +4100,45 @@ document.querySelectorAll('.vl-filter').forEach(b=>{
   });
 });
 document.getElementById('vlSearch').addEventListener('input', e=>{ vlQuery=e.target.value; renderVideoGrid(); });
+/* ---- Müller-Brockmann : overlay de grille (même boîte que le contenu) + alignement optique ----
+   Colonnes numérotées qui PROUVENT que les cartes tombent sur les lignes ;
+   le numéral (display) est nudgé pour que son ENCRE soit sur la ligne, pas sa boîte. */
+(function(){
+  const cols=document.getElementById('vlCols');
+  if(cols && !cols.children.length){
+    const n=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--v-cols'))||12;
+    for(let i=1;i<=n;i++){ const c=document.createElement('div'); c.className='vg-col';
+      const s=document.createElement('span'); s.textContent=i; c.appendChild(s); cols.appendChild(c); }
+  }
+  // toggle GLOBAL de la grille : un seul état body.grid-on pilote tous les overlays
+  // (bibliothèque + calendrier + sections à venir). Bouton « Grille » + touche G.
+  const tg=document.getElementById('vlGridToggle');
+  function setGrid(on){ document.body.classList.toggle('grid-on',on); if(tg) tg.setAttribute('aria-pressed',on?'true':'false'); }
+  if(tg) tg.addEventListener('click',function(){ setGrid(!document.body.classList.contains('grid-on')); });
+  document.addEventListener('keydown',function(e){
+    if((e.key==='g'||e.key==='G')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+      const t=e.target; if(t&&/^(input|textarea|select)$/i.test(t.tagName||'')) return;
+      setGrid(!document.body.classList.contains('grid-on'));
+    }
+  });
+  // colonnes de l'overlay calendrier (7 jours)
+  const ccols=document.getElementById('calCols');
+  if(ccols && !ccols.children.length){ for(let i=1;i<=7;i++){ const c=document.createElement('div'); c.className='cg-col';
+    const s=document.createElement('span'); s.textContent=i; c.appendChild(s); ccols.appendChild(c); } }
+  // alignement optique du numéral (Oswald, grande taille → side-bearing visible)
+  const cvs=document.createElement('canvas'), ctx=cvs.getContext('2d');
+  window.__pf_vlOptical=function(){
+    document.querySelectorAll('.vl-count b').forEach(function(el){
+      el.style.marginLeft='0px';
+      const cs=getComputedStyle(el), ch=(el.textContent||'').trim().charAt(0); if(!ch) return;
+      ctx.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily; ctx.textAlign='left';
+      const abl=ctx.measureText(ch).actualBoundingBoxLeft;
+      if(isFinite(abl)&&Math.abs(abl)<24) el.style.marginLeft=abl.toFixed(2)+'px';
+    });
+  };
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(window.__pf_vlOptical);
+  let t; window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(window.__pf_vlOptical,120);});
+})();
 renderVideoGrid();
 
 // lecteur modal
@@ -4182,7 +4320,11 @@ function openBuilder(dateKey, existing){
       targetDate: dateKey||null
     };
   }
+  // objectif de séance (pour l'analyse IA) — normalisé en chaîne "type|zone"
+  if(builderState.objectif && typeof builderState.objectif==='object'){ builderState.objectif = builderState.objectif.type ? builderState.objectif.type+'|'+builderState.objectif.zone : ''; }
+  if(builderState.objectif==null) builderState.objectif = (existing&&existing.objectif&&existing.objectif.type) ? existing.objectif.type+'|'+existing.objectif.zone : '';
   document.getElementById('bTitle').value = builderState.title||'';
+  document.getElementById('bObjectif').value = builderState.objectif||'';
   document.getElementById('builderBadge').textContent = existing ? 'Modifier la séance' : 'Nouvelle séance';
   document.querySelectorAll('#bDiscPick button').forEach(b=> b.classList.toggle('active', b.dataset.d===builderState.disc));
   renderRefs();
@@ -4519,6 +4661,7 @@ function builderToSession(){
     title: builderState.title || document.getElementById('bTitle').value || 'Séance personnalisée',
     dur: min, tss, zone: domZone,
     desc: builderToText(),
+    objectif: builderState.objectif ? {type:builderState.objectif.split('|')[0], zone:builderState.objectif.split('|')[1]} : null,
     blocksV2: JSON.parse(JSON.stringify(builderState)),
     done:false, id:'s'+(uid++)
   };
@@ -4557,6 +4700,7 @@ function initBuilderNutrition(existing){
 document.getElementById('builderClose').addEventListener('click', closeBuilder);
 document.getElementById('builderOverlay').addEventListener('click', e=>{ if(e.target.id==='builderOverlay') closeBuilder(); });
 document.getElementById('bTitle').addEventListener('input', e=>{ builderState.title=e.target.value; });
+document.getElementById('bObjectif').addEventListener('change', e=>{ builderState.objectif=e.target.value; });
 document.querySelectorAll('#bDiscPick button').forEach(b=>{
   b.addEventListener('click', ()=>{
     document.querySelectorAll('#bDiscPick button').forEach(x=>x.classList.remove('active'));
@@ -4811,7 +4955,7 @@ function openAnalysis(s){
   // ---- cas HYROX : stations + saisie manuelle ----
   if(s.disc==='hyrox'){ openHyroxAnalysis(s); analysisOverlay.classList.add('open'); return; }
 
-  const data=genSessionData(s);
+  const data=s._realData||genSessionData(s);
   const isSwim=s.disc==='swim';
   // restaure les sections (au cas où une analyse Hyrox les a masquées)
   document.getElementById('anSpeedTitle').parentElement.parentElement.style.display='';
@@ -4824,7 +4968,7 @@ function openAnalysis(s){
   const spTitle = s.disc==='bike'?'Vitesse (km/h)' : s.disc==='run'?'Allure (min/km)' : 'Allure (/100m)';
   document.getElementById('anSpeedTitle').textContent = spTitle;
   // réinitialise le registre des graphes (curseur)
-  AN_CHARTS.speed=AN_CHARTS.hr=AN_CHARTS.elev=AN_CHARTS.power=null;
+  AN_CHARTS.speed=AN_CHARTS.hr=AN_CHARTS.elev=AN_CHARTS.power=AN_CHARTS.decouple=null;
   // graphiques séparés
   drawSpeed(data);
   document.getElementById('anPowerWrap').style.display = s.disc==='bike'?'':'none';
@@ -4839,6 +4983,10 @@ function openAnalysis(s){
   renderImpact(s, data);
   // séances similaires (comparateur — vélo & course)
   renderSimilar(s.disc, sessionType(s), currentSimMetrics(s, data));
+  // découplage (Pw:Hr vélo · Pa:Hr course) — coach only, endurance/seuil
+  renderDecouple(s, data);
+  // assistant IA (résumé + recos) — coach only, gaté par l'add-on
+  renderAi(s, data);
 
   analysisOverlay.classList.add('open');
 }
@@ -5023,14 +5171,14 @@ function drawPower(data){
 
 /* ===== Comparateur de séances similaires (vélo · course · Hyrox) ===== */
 const SESSION_HISTORY = [
-  {disc:'bike', type:'seuil', date:'12 mai', np:262, ifv:0.95, avgHr:166, dist:38.5},
-  {disc:'bike', type:'seuil', date:'28 avr', np:255, ifv:0.92, avgHr:163, dist:41.2},
+  {disc:'bike', type:'seuil', date:'12 mai', np:262, ifv:0.95, avgHr:166, dist:38.5, dec:6.4},
+  {disc:'bike', type:'seuil', date:'28 avr', np:255, ifv:0.92, avgHr:163, dist:41.2, dec:7.3},
   {disc:'bike', type:'vo2',   date:'5 mai',  np:288, ifv:1.06, avgHr:174, dist:33.0},
-  {disc:'bike', type:'endurance', date:'9 mai', np:198, ifv:0.72, avgHr:142, dist:92.0},
-  {disc:'run',  type:'seuil', date:'10 mai', pace:228, avgHr:168, dist:12.4},
-  {disc:'run',  type:'seuil', date:'26 avr', pace:233, avgHr:166, dist:11.0},
+  {disc:'bike', type:'endurance', date:'9 mai', np:198, ifv:0.72, avgHr:142, dist:92.0, dec:3.1},
+  {disc:'run',  type:'seuil', date:'10 mai', pace:228, avgHr:168, dist:12.4, dec:5.6},
+  {disc:'run',  type:'seuil', date:'26 avr', pace:233, avgHr:166, dist:11.0, dec:6.8},
   {disc:'run',  type:'vo2',   date:'3 mai',  pace:198, avgHr:176, dist:9.5},
-  {disc:'run',  type:'endurance', date:'7 mai', pace:300, avgHr:148, dist:21.0},
+  {disc:'run',  type:'endurance', date:'7 mai', pace:300, avgHr:148, dist:21.0, dec:2.7},
   {disc:'hyrox',type:'hyrox', date:'15 mai', total:4020, wbtime:218, avgHr:165},
   {disc:'hyrox',type:'hyrox', date:'1 mai',  total:4185, wbtime:245, avgHr:162},
 ];
@@ -5098,6 +5246,283 @@ function renderSimilar(disc, type, cur){
   box.innerHTML=`<div class="sim-table" style="--ncols:${matches.length}">${head}${rows}</div>`;
 }
 
+/* ============================================================
+   DÉCOUPLAGE (aerobic decoupling — Pw:Hr vélo · Pa:Hr course)
+   ------------------------------------------------------------
+   Mesure la dérive du couple "effort produit / coût cardiaque"
+   au fil de l'effort. On exclut l'échauffement, on coupe le
+   corps de séance en 2 moitiés égales, et on compare le ratio
+   d'efficacité de chaque moitié :
+     vélo  : ratio = Puissance / FC          (Pw:Hr)
+     course: ratio = allure corrigée pente / FC  (Pa:Hr, via gap)
+   Découplage % = (ratio 1ʳᵉ moitié − ratio 2ᵉ moitié) / ratio 1ʳᵉ × 100
+   < 5 % = aérobie solide ; 5-10 % = dérive modérée ; > 10 % = forte dérive.
+   Affiché côté COACH uniquement, sur séances endurance/seuil.
+   ============================================================ */
+function decoupleRelevant(disc, type){ return (disc==='bike'||disc==='run') && (type==='endurance'||type==='seuil'); }
+function effRatio(p, disc){ if(!p.hr) return 0; return disc==='bike' ? p.pw/p.hr : p.gap/p.hr; }
+function computeDecouple(data, disc){
+  const pts=data.pts; if(!pts||pts.length<8) return null;
+  const totalT=pts[pts.length-1].t;
+  const warm=Math.min(10, totalT*0.15);                 // échauffement exclu (~10 min ou 15%)
+  const body=pts.filter(p=>p.t>=warm && p.hr>0 && (disc!=='bike'||p.pw>0));
+  if(body.length<6) return null;
+  const tStart=body[0].t, tEnd=body[body.length-1].t, mid=(tStart+tEnd)/2;
+  const h1=body.filter(p=>p.t<mid), h2=body.filter(p=>p.t>=mid);
+  if(h1.length<2||h2.length<2) return null;
+  const avg=(arr,f)=>arr.reduce((a,p)=>a+f(p),0)/arr.length;
+  const r1=avg(h1,p=>effRatio(p,disc)), r2=avg(h2,p=>effRatio(p,disc));
+  if(!r1) return null;
+  return {pct:(r1-r2)/r1*100, r1, r2, warm, mid};
+}
+function decoupleVerdict(pct){
+  if(pct<5)  return {c:'var(--good)', lbl:'Aérobie solide'};
+  if(pct<=10) return {c:'var(--bike)', lbl:'Dérive modérée'};
+  return {c:'var(--run)', lbl:'Forte dérive'};
+}
+function decoupleInterp(type, pct, disc){
+  if(type==='endurance'){
+    if(pct<5)  return "Allure bien tenue en zone aérobie : le cœur ne dérive pas, l'endurance fondamentale est au rendez-vous.";
+    if(pct<=10) return "Légère dérive cardiaque : l'allure était un peu haute pour du Z2 (ou fatigue/chaleur). À surveiller.";
+    return "Forte dérive : ce footing n'est pas resté aérobie. Ralentir l'allure pour rester en Z2.";
+  }
+  // seuil / LT1
+  if(pct<5)  return "Effort soutenable : tu es resté sous le seuil, c'est la bonne zone de travail.";
+  if(pct<=10) return "Dérive modérée : tu étais à la limite haute du seuil.";
+  return "Dérive trop forte : l'intensité dépassait le seuil aérobie. Recaler la zone un cran plus bas.";
+}
+function injectDecoupleCss(){
+  if(document.getElementById('pf-dc-css')) return;
+  const st=document.createElement('style'); st.id='pf-dc-css';
+  st.textContent=`
+  #anDecoupleKpi{display:flex;align-items:center;gap:16px;margin:2px 0 12px;flex-wrap:wrap}
+  .an-dc-big{font-family:var(--font-data);font-size:32px;font-weight:700;line-height:1;color:var(--dcv,var(--good))}
+  .an-dc-pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:99px;background:color-mix(in srgb,var(--dcv,var(--good)) 14%,transparent);color:var(--dcv,var(--good));border:1px solid color-mix(in srgb,var(--dcv,var(--good)) 42%,transparent)}
+  .an-dc-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--dcv,var(--good));box-shadow:0 0 8px var(--dcv,var(--good))}
+  .an-dc-txt{font-size:12.5px;color:var(--soft);max-width:430px;line-height:1.45}
+  .an-dc-trend{display:flex;align-items:flex-end;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .an-dc-tlabel{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;align-self:center}
+  .an-dc-bar{display:flex;flex-direction:column;align-items:center;gap:5px;font-family:var(--font-data);font-size:9.5px;color:var(--muted)}
+  .an-dc-bar i{display:block;width:28px;border-radius:5px 5px 0 0;background:var(--bc,var(--muted));opacity:.85}
+  .an-dc-bar.cur i{opacity:1;outline:1px solid var(--accent);outline-offset:1px}`;
+  document.head.appendChild(st);
+}
+function drawDecouple(data, disc, dc){
+  const svg=document.getElementById('anDecouple'); if(!svg) return; svg.innerHTML='';
+  const W=720,H=170,P={l:54,r:16,t:14,b:24};
+  const pts=data.pts;
+  const xs=i=>P.l+i/(pts.length-1)*(W-P.l-P.r);
+  // ratio d'efficacité lissé (fenêtre glissante) stocké sur chaque point
+  const raw=pts.map(p=>effRatio(p,disc));
+  const win=Math.max(2,Math.round(pts.length/14));
+  pts.forEach((p,i)=>{ let s=0,n=0; for(let j=Math.max(0,i-win);j<=Math.min(pts.length-1,i+win);j++){ if(raw[j]>0){s+=raw[j];n++;} } p._dr=n?s/n:0; });
+  const vals=pts.map(p=>p._dr).filter(v=>v>0);
+  const vMax=Math.max(...vals)*1.06, vMin=Math.min(...vals)*0.94;
+  const y=v=>H-P.b-(v-vMin)/(vMax-vMin)*(H-P.t-P.b);
+  for(let g=0;g<=3;g++){ const yv=P.t+g/3*(H-P.t-P.b); svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${yv}" y2="${yv}" stroke="rgba(148,163,196,.1)"/>`); }
+  // bande d'échauffement grisée
+  const warmI=pts.findIndex(p=>p.t>=dc.warm);
+  const warmX=xs(warmI<1?0:warmI);
+  if(warmI>0){ svg.insertAdjacentHTML('beforeend',`<rect x="${P.l}" y="${P.t}" width="${warmX-P.l}" height="${H-P.t-P.b}" fill="rgba(148,163,196,.06)"/><text x="${(P.l+warmX)/2}" y="${P.t+11}" fill="var(--muted)" font-size="8" text-anchor="middle" font-family="var(--font-data)">échauf.</text>`); }
+  // ligne de séparation des 2 moitiés
+  let midI=pts.findIndex(p=>p.t>=dc.mid); if(midI<0) midI=Math.floor(pts.length/2);
+  const mx=xs(midI), endX=xs(pts.length-1);
+  svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${mx}" y1="${P.t}" y2="${H-P.b}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3" opacity=".6"/>`);
+  // segments moyens de chaque moitié
+  if(dc.r1>=vMin&&dc.r1<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${warmX}" x2="${mx}" y1="${y(dc.r1)}" y2="${y(dc.r1)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${warmX+4}" y="${y(dc.r1)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)">1ʳᵉ ½</text>`);
+  if(dc.r2>=vMin&&dc.r2<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${endX}" y1="${y(dc.r2)}" y2="${y(dc.r2)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${endX-4}" y="${y(dc.r2)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)" text-anchor="end">2ᵉ ½</text>`);
+  // courbe lissée
+  let path='';
+  pts.forEach((p,i)=>{ const x=xs(i),yy=y(p._dr); path+=(i?'L':'M')+x+' '+yy; });
+  svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/>`);
+  const fmtR=v=>disc==='bike'?v.toFixed(2):v.toFixed(3);
+  [vMin,(vMin+vMax)/2,vMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--accent)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${fmtR(v)}</text>`); });
+  svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${disc==='bike'?'W/bpm':'km·h⁻¹/bpm'}</text>`);
+  AN_CHARTS.decouple={svg,pts,W,H,P,xs,y:(p)=>y(p._dr),color:'var(--accent)',label:(p)=>fmtR(p._dr)};
+  attachCursor('decouple');
+}
+function renderDecoupleTrend(disc, type, curPct){
+  const box=document.getElementById('anDecoupleTrend'); if(!box) return;
+  const hist=SESSION_HISTORY.filter(h=>h.disc===disc&&h.type===type&&h.dec!=null).slice(0,3).reverse();
+  const all=[...hist.map(h=>({date:h.date,dec:h.dec,cur:false})),{date:'Cette séance',dec:curPct,cur:true}];
+  if(all.length<2){ box.style.display='none'; return; }
+  box.style.display='';
+  const maxV=Math.max(...all.map(a=>Math.abs(a.dec)),6);
+  box.innerHTML=`<span class="an-dc-tlabel">Tendance</span>`+all.map(a=>{
+    const v=decoupleVerdict(a.dec), h=Math.max(6,Math.abs(a.dec)/maxV*52);
+    return `<div class="an-dc-bar ${a.cur?'cur':''}"><b style="color:${v.c}">${a.dec.toFixed(1)}%</b><i style="height:${h}px;--bc:${v.c}"></i><span>${a.date}</span></div>`;
+  }).join('');
+}
+function renderDecouple(s, data){
+  const wrap=document.getElementById('anDecoupleWrap'); if(!wrap) return;
+  const type=(s.objectif&&s.objectif.type)||sessionType(s);
+  if(mode!=='coach' || !decoupleRelevant(s.disc,type)){ wrap.style.display='none'; AN_CHARTS.decouple=null; return; }
+  const dc=computeDecouple(data, s.disc);
+  if(!dc){ wrap.style.display='none'; AN_CHARTS.decouple=null; return; }
+  wrap.style.display=''; injectDecoupleCss();
+  const v=decoupleVerdict(dc.pct);
+  const kpi=document.getElementById('anDecoupleKpi');
+  kpi.style.setProperty('--dcv', v.c);
+  kpi.innerHTML=`<span class="an-dc-big">${dc.pct>=0?'':'−'}${Math.abs(dc.pct).toFixed(1)}%</span>`+
+    `<span class="an-dc-pill"><span class="dot"></span>${v.lbl}</span>`+
+    `<span class="an-dc-txt">${decoupleInterp(type, dc.pct, s.disc)}</span>`;
+  document.getElementById('anDecoupleHint').textContent = s.disc==='bike'?'Puissance / FC (Pw:Hr)':'Allure corrigée / FC (Pa:Hr)';
+  drawDecouple(data, s.disc, dc);
+  renderDecoupleTrend(s.disc, type, dc.pct);
+}
+
+/* ============================================================
+   ASSISTANT IA — Résumé & recommandations par séance (add-on)
+   ------------------------------------------------------------
+   1. computeSessionBilan : couche DÉTERMINISTE qui lit les vraies
+      données (zones FC, %FCmax, temps en zone cible, découplage,
+      pics par intervalle). Aucun "deviné".
+   2. aiSummary : moteur de RUBRIQUES qui juge la séance PAR RAPPORT
+      À SON OBJECTIF et rend verdict + recommandations actionnables.
+   En prod : l’edge function `session-summary` envoie ce bilan chiffré
+   à Claude (prompt caching) qui rédige le texte. En démo, le moteur
+   local ci-dessous produit le même type de sortie, marqué « démo ».
+   Réservé COACH + add-on payant (gate aiUnlocked()).
+   ============================================================ */
+const AI_ADDON_PRICE = 12;          // €/mois — voir plan financier
+function aiUnlocked(){ return window.__pf_aiAddon===true || window.__pf_aiDemo===true; }
+function aiFcMax(){ return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:190; }
+function aiHrZone(hr, fcMax){ const p=hr/fcMax*100; if(p<60)return'Z1'; if(p<70)return'Z2'; if(p<80)return'Z3'; if(p<90)return'Z4'; return'Z5'; }
+function aiTargetZone(type, objectif){ if(objectif&&objectif.zone) return objectif.zone; return {endurance:'Z2', seuil:'Z4', vo2:'Z5'}[type]||'Z3'; }
+function computeSessionBilan(s, data){
+  const objectif=s.objectif||null, type=(objectif&&objectif.type)||sessionType(s), fcMax=aiFcMax(), target=aiTargetZone(type, objectif);
+  const pts=data.pts, n=pts.length||1;
+  const zc={Z1:0,Z2:0,Z3:0,Z4:0,Z5:0};
+  pts.forEach(p=>{ zc[aiHrZone(p.hr,fcMax)]++; });
+  const zonePct={}; Object.keys(zc).forEach(z=>zonePct[z]=Math.round(zc[z]/n*100));
+  const dc=computeDecouple(data, s.disc);
+  const hardReps=(data.laps||[]).filter(l=>l.hard).map(l=>({
+    n:l.n, peakPct:Math.round(l.maxHr/fcMax*100), avgPct:Math.round(l.avgHr/fcMax*100),
+    avgSpeed:l.avgSpeed, avgPower:l.avgPower, paceSec:Math.round(3600/Math.max(l.avgSpeed,1)) }));
+  return { type, disc:s.disc, objectif, target,
+    dur:Math.round(pts[pts.length-1].t), dist:+(data.dist||0).toFixed(1),
+    avgHr:data.avgHr, maxHr:data.maxHr, fcMax,
+    pctFcMax:Math.round(data.maxHr/fcMax*100), avgPctFcMax:Math.round(data.avgHr/fcMax*100),
+    zonePct, timeInTarget:zonePct[target]||0, decouple:dc?+dc.pct.toFixed(1):null,
+    hardReps, np:(s.disc==='bike'?((currentSimMetrics(s,data)||{}).np||0):0) };
+}
+function aiSummary(s, b){
+  const recos=[], bullets=[]; let tenu='partiel', headline='';
+  if(b.type==='endurance'){
+    const okDec=b.decouple!=null && b.decouple<5, okZone=b.timeInTarget>=60;
+    bullets.push({s:okZone?'ok':'warn', t:`${b.timeInTarget}% du temps en ${b.target} (objectif : rester en zone aérobie)`});
+    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:`Découplage ${b.decouple}% ${okDec?'— le cœur ne dérive pas, séance bien aérobie':'— dérive cardiaque, allure trop haute'}`});
+    bullets.push({s:b.pctFcMax<88?'ok':'warn', t:`Pic FC à ${b.pctFcMax}% FCmax`});
+    if(okZone&&okDec){ tenu='oui'; headline='Objectif tenu : la séance est bien restée en zone aérobie.'; }
+    else { tenu=(okZone||okDec)?'partiel':'non'; headline='Zone aérobie partiellement tenue.';
+      if(!okDec) recos.push('Ralentir d’environ 10–15 s/km (ou ~5 bpm) pour contenir la dérive et rester franchement en Z2.');
+      if(!okZone) recos.push(`Trop de temps hors Z2 (${100-b.timeInTarget}%). Brider l’intensité, surtout dans les bosses.`); }
+  }
+  else if(b.type==='vo2'){
+    const peaks=b.hardReps.map(r=>r.peakPct), maxPeak=peaks.length?Math.max(...peaks):b.pctFcMax, reach=maxPeak>=90;
+    bullets.push({s:reach?'ok':'bad', t:`Pic FC sur les séries : ${maxPeak}% FCmax (cible ≥ 90–95%)`});
+    if(b.hardReps.length){ const f=b.hardReps[0], l=b.hardReps[b.hardReps.length-1], drift=l.paceSec-f.paceSec;
+      bullets.push({s:Math.abs(drift)<8?'ok':'warn', t:`Allure des séries : ${fmtPace(f.paceSec)} → ${fmtPace(l.paceSec)}/km ${drift>8?'(dégradation)':drift<-8?'(négatif split)':'(stable)'}`}); }
+    if(reach){ tenu='oui'; headline='Objectif atteint : les zones hautes sont bien touchées.'; }
+    else { tenu='non'; headline='Zone cible VO2max pas atteinte sur cette séance.';
+      recos.push(`Pics à ${maxPeak}% FCmax seulement : rallonger les intervalles (+30 à 60 s) ou raccourcir la récup pour faire monter le cœur dans la zone VO2max.`); }
+    if(b.hardReps.length){ const f=b.hardReps[0], l=b.hardReps[b.hardReps.length-1];
+      if(l.paceSec-f.paceSec>10) recos.push('Forte dégradation d’allure sur les dernières séries : retirer 1–2 répétitions pour tenir la cible sur l’ensemble.'); }
+  }
+  else if(b.type==='seuil'){
+    const okDec=b.decouple==null||b.decouple<8;
+    bullets.push({s:b.timeInTarget>=40?'ok':'warn', t:`${b.timeInTarget}% du temps en ${b.target}`});
+    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:`Découplage ${b.decouple}% ${okDec?'— effort soutenable, bonne zone de seuil':'— dérive trop forte, au-dessus du seuil'}`});
+    bullets.push({s:'ok', t:`FC moyenne à ${b.avgPctFcMax}% FCmax`});
+    if(okDec){ tenu='oui'; headline='Séance de seuil bien calibrée.'; }
+    else { tenu='non'; headline='Intensité au-dessus du seuil aérobie.';
+      recos.push('Découplage élevé : l’allure dépassait le seuil. Recaler la zone cible un cran plus bas (≈ −10 s/km ou −10 W).'); }
+  }
+  else {
+    bullets.push({s:'ok', t:`${b.dur} min · FC moyenne ${b.avgHr} bpm (${b.avgPctFcMax}% FCmax)`});
+    bullets.push({s:'ok', t:`Répartition FC : Z2 ${b.zonePct.Z2}% · Z3 ${b.zonePct.Z3}% · Z4 ${b.zonePct.Z4}% · Z5 ${b.zonePct.Z5}%`});
+    tenu='oui'; headline='Séance enregistrée — synthèse des zones ci-dessous.';
+  }
+  return {headline, tenu, bullets, recos};
+}
+function aiVerdictMeta(tenu){ return tenu==='oui'?{c:'var(--good)',l:'Objectif tenu'}:tenu==='partiel'?{c:'var(--bike)',l:'Partiellement tenu'}:{c:'var(--run)',l:'Objectif manqué'}; }
+function injectAiCss(){
+  if(document.getElementById('pf-ai-css')) return;
+  const st=document.createElement('style'); st.id='pf-ai-css';
+  st.textContent=`
+  .ai-pay{border:1px solid var(--line-strong);border-radius:14px;padding:18px;background:linear-gradient(180deg,rgba(70,194,216,.07),transparent)}
+  .ai-pay h5{font-family:var(--font-display);font-size:16px;margin:0 0 3px}
+  .ai-pay .ai-sub{color:var(--muted);font-size:12px;margin-bottom:12px}
+  .ai-feat{display:flex;flex-direction:column;gap:8px;margin:12px 0;font-size:13px}
+  .ai-feat div{display:flex;gap:9px;align-items:flex-start;color:var(--soft);line-height:1.4}
+  .ai-feat .ck{color:var(--accent);flex:none}
+  .ai-price{font-family:var(--font-data);font-size:26px;font-weight:700;color:var(--ink)}
+  .ai-price small{font-size:13px;color:var(--muted);font-weight:400}
+  .ai-cta{margin-top:12px;background:var(--accent);color:#04222a;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:13.5px;cursor:pointer;width:100%}
+  .ai-cta:hover{filter:brightness(1.08)}
+  .ai-loading{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;padding:14px 0}
+  .ai-result{border-left:3px solid var(--av,var(--good));padding-left:14px}
+  .ai-verdict{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:12px;color:var(--av);background:color-mix(in srgb,var(--av) 14%,transparent);border:1px solid color-mix(in srgb,var(--av) 40%,transparent);padding:4px 11px;border-radius:99px;margin-bottom:9px}
+  .ai-headline{font-size:14.5px;font-weight:600;color:var(--soft);margin-bottom:12px;line-height:1.4}
+  .ai-bul{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+  .ai-bul>div{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--soft);line-height:1.4}
+  .ai-ico{flex:none;width:14px;font-weight:700}
+  .ai-recobox{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:4px}
+  .ai-recobox h6{margin:0 0 7px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .ai-recobox ul{margin:0;padding-left:18px}
+  .ai-recobox li{font-size:13px;color:var(--soft);margin-bottom:5px;line-height:1.45}
+  .ai-foot{margin-top:10px;font-size:10.5px;color:var(--muted);font-style:italic}
+  .ai-badge-demo{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:99px;padding:2px 7px}`;
+  document.head.appendChild(st);
+}
+function aiPaywallHtml(){
+  return `<div class="ai-pay">
+    <h5>🧠 Assistant IA — résumé & recommandations par séance</h5>
+    <div class="ai-sub">Add-on coach · analyse automatique de chaque activité</div>
+    <div class="ai-feat">
+      <div><span class="ck">✦</span><span>Résumé clair de chaque séance : zones FC, allure/puissance, découplage.</span></div>
+      <div><span class="ck">✦</span><span>Verdict par rapport à l’objectif (Z2 tenu ? zone VO2max atteinte ?).</span></div>
+      <div><span class="ck">✦</span><span>Recommandations actionnables (rallonger les intervalles, recaler la zone…).</span></div>
+    </div>
+    <div class="ai-price">${AI_ADDON_PRICE}€<small> / mois</small></div>
+    <button class="ai-cta" id="aiActivate">Activer l’assistant IA</button>
+  </div>`;
+}
+function aiResultHtml(s, b, r){
+  const v=aiVerdictMeta(r.tenu);
+  const ico=st=>st==='ok'?'<span style="color:var(--good)">✓</span>':st==='warn'?'<span style="color:var(--bike)">!</span>':'<span style="color:var(--run)">✕</span>';
+  const bul=r.bullets.map(x=>`<div><span class="ai-ico">${ico(x.s)}</span><span>${x.t}</span></div>`).join('');
+  const recos=r.recos.length?`<div class="ai-recobox"><h6>Recommandations</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
+  return `<div class="ai-result" style="--av:${v.c}">
+    <div class="ai-verdict">${v.l} <span class="ai-badge-demo">démo</span></div>
+    <div class="ai-headline">${r.headline}</div>
+    <div class="ai-bul">${bul}</div>
+    ${recos}
+    <div class="ai-foot">Généré à partir des données réelles de la séance (zones FC, découplage, pics). En production : rédigé par Claude via l’add-on IA.</div>
+  </div>`;
+}
+function renderAi(s, data){
+  const wrap=document.getElementById('anAiWrap'); if(!wrap) return;
+  if(mode!=='coach'){ wrap.style.display='none'; return; }
+  wrap.style.display=''; injectAiCss();
+  const body=document.getElementById('anAiBody'); if(!body) return;
+  if(!aiUnlocked()){
+    body.innerHTML=aiPaywallHtml();
+    const btn=document.getElementById('aiActivate');
+    if(btn) btn.onclick=()=>{
+      // En prod (connecté) : vrai checkout Stripe de l'add-on. En démo : déverrouillage immédiat.
+      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>console.warn('[PF] ai-addon:',e)); return; }
+      window.__pf_aiDemo=true; renderAi(s, data); toast('Assistant IA activé (démo) 🧠');
+    };
+    return;
+  }
+  body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> Analyse de la séance en cours…</div>`;
+  setTimeout(()=>{
+    const b=computeSessionBilan(s, data), r=aiSummary(s, b);
+    body.innerHTML=aiResultHtml(s, b, r);
+  }, 450);
+}
+
 /* ---- curseur interactif : valeur exacte au survol ---- */
 function fmtClock(min){ const s=Math.round(min*60); const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
   return (h?h+':':'')+String(m).padStart(h?2:1,'0')+':'+String(ss).padStart(2,'0'); }
@@ -5140,7 +5565,7 @@ function attachCursor(key){
 
 /* synchronise le curseur vertical sur les 3 graphes à l'index i */
 function syncCursor(i){
-  ['speed','hr','elev','power'].forEach(k=>{
+  ['speed','hr','elev','power','decouple'].forEach(k=>{
     const C=AN_CHARTS[k]; if(!C||!C.line) return;
     const x=C.xs(i), p=C.pts[i];
     C.line.setAttribute('x1',x); C.line.setAttribute('x2',x); C.line.style.opacity='1';
@@ -5148,7 +5573,7 @@ function syncCursor(i){
   });
 }
 function hideAnCursor(){
-  ['speed','hr','elev','power'].forEach(k=>{ const C=AN_CHARTS[k]; if(C&&C.line){ C.line.style.opacity='0'; C.dot.style.opacity='0'; } });
+  ['speed','hr','elev','power','decouple'].forEach(k=>{ const C=AN_CHARTS[k]; if(C&&C.line){ C.line.style.opacity='0'; C.dot.style.opacity='0'; } });
   const tip=document.getElementById('anTip'); if(tip) tip.style.opacity='0';
 }
 /* tooltip avec toutes les valeurs au point i (temps exact + vitesse + FC + alt) */
@@ -5165,6 +5590,7 @@ function showAnTip(evt, i){
   if(pw) html+=`<div style="color:var(--bike);font-weight:700">${pw.label(p)}</div>`;
   if(hr) html+=`<div style="color:var(--run);font-weight:700">${hr.label(p)}</div>`;
   if(el) html+=`<div style="color:var(--bike)">${Math.round(p.alt)} m · pente ${p.grade>0?'+':''}${p.grade.toFixed(1)}%</div>`;
+  const dcc=AN_CHARTS.decouple; if(dcc&&p._dr) html+=`<div style="color:var(--accent)">éff. ${dcc.label(p)}</div>`;
   tip.innerHTML=html;
   const x=(evt.clientX!==undefined?evt.clientX:evt.touches[0].clientX)+14;
   const y=(evt.clientY!==undefined?evt.clientY:evt.touches[0].clientY)+14;
@@ -5754,7 +6180,7 @@ function injectLoadHxCss(){
   if(document.getElementById('pf-loadhx-css')) return;
   const st=document.createElement('style'); st.id='pf-loadhx-css';
   st.textContent=`
-  .lm-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .lm-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
   .lm-kpis .v{font-family:var(--font-data);font-size:22px;font-weight:700;line-height:1}
   .lm-kpis .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
   .lm-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:12.5px}

@@ -17,7 +17,7 @@
   .tag{color:var(--muted);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
   .lead{color:var(--muted);max-width:680px;margin:14px 0 30px}
   .grid{display:grid;gap:16px}
-  .apps{grid-template-columns:1fr 1fr;margin-bottom:34px}
+  .apps{grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:34px}
   @media(max-width:720px){.apps{grid-template-columns:1fr}}
   .app{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);
     border-radius:16px;padding:22px;transition:.15s}
@@ -30,7 +30,7 @@
     text-transform:uppercase;color:var(--accent)}
   .sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
   .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
-  .cards{grid-template-columns:repeat(3,1fr)}
+  .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
   @media(max-width:720px){.cards{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 17px}
   .card h4{margin:0 0 10px;font-size:14.5px}
