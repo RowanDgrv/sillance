@@ -2,297 +2,198 @@
 <html lang="fr"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PairForm — L'entraînement autrement</title>
-<meta name="description" content="PairForm — le coaching triathlon, club et athlète qui voit tout : découplage, assistant IA, charge d'entraînement. L'entraînement autrement.">
+<meta name="description" content="PairForm — une plateforme unique pour planifier, analyser et faire progresser. Coachs, clubs et athlètes. Triathlon, Hyrox, multisport.">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Müller-Brockmann — grille modulaire (une seule source de vérité) */
-  --cols:12; --bl:8px; --lh:24px; --gutter:24px;
-  --margin:clamp(20px,5vw,72px); --maxw:1200px;
-  /* identité PairForm (cockpit sombre) */
-  --paper:#0E1421; --panel:#141C2D; --panel-2:#1a2336;
-  --ink:#EAEEF7; --soft:#C3CADB; --muted:#8B95AD;
-  --line:rgba(150,165,200,.14); --line-strong:rgba(150,165,200,.26);
-  --accent:#46C2D8; --bike:#FFC400; --run:#9B6BFF; --good:#35C58C;
-  --font-display:'Oswald',sans-serif; --font-ui:'Archivo',sans-serif; --font-mono:'JetBrains Mono',monospace;
-  /* overlay grille */
-  --g-col:rgba(70,194,216,.06); --g-edge:rgba(70,194,216,.34);
-  --g-base:rgba(70,194,216,.20); --g-base-min:rgba(70,194,216,.07);
+  --cols:12; --gutter:24px; --margin:clamp(22px,5vw,72px); --maxw:1240px; --lh:24px;
+  --paper:#0B1120; --panel:#121A2B; --panel-2:#18213400;
+  --ink:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8;
+  --line:rgba(150,165,200,.14); --line-strong:rgba(150,165,200,.28);
+  --accent:#46C2D8;
+  --display:'Oswald',sans-serif; --ui:'Archivo',sans-serif; --mono:'JetBrains Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:16px;line-height:var(--lh);
-  -webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:var(--lh);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--margin)}
 
-/* ---- structure : une boîte, une grille, un overlay (même boîte) ---- */
-.wrap{position:relative;max-width:var(--maxw);margin:0 auto;padding:0 var(--margin)}
-.grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));column-gap:var(--gutter);row-gap:var(--lh)}
-.band{grid-column:1 / -1;display:grid;grid-template-columns:subgrid;column-gap:var(--gutter);row-gap:var(--lh);align-items:start}
-@supports not (grid-template-columns:subgrid){.band{grid-template-columns:repeat(var(--cols),minmax(0,1fr))}}
+/* ---------- fond vidéo immersif ---------- */
+.bgfx{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0B1120}
+.bgfx video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42}
+/* dégradé/halo de secours (visible tant qu'aucune vidéo n'est fournie, et posé par-dessus pour la lisibilité) */
+.bgfx::after{content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(900px 600px at 78% 12%, rgba(70,194,216,.18), transparent 60%),
+    radial-gradient(800px 600px at 12% 88%, rgba(70,194,216,.10), transparent 60%),
+    linear-gradient(180deg, rgba(11,17,32,.55), rgba(11,17,32,.82) 60%, var(--paper) 100%)}
+@keyframes drift{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-2%,0)}100%{transform:translate3d(0,0,0)}}
+.bgfx{animation:drift 18s ease-in-out infinite}
+main,.nav,footer{position:relative;z-index:1}
 
-/* ---- nav ---- */
-.nav{position:sticky;top:0;z-index:100;background:rgba(14,20,33,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav .wrap{display:flex;align-items:center;height:64px;gap:18px}
-.brand{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:.01em}
-.brand .orb{width:13px;height:13px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
-.brand b{color:var(--accent);font-weight:700}
-.nav-links{display:flex;gap:24px;margin-left:24px;font-size:14px;color:var(--muted)}
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:20;background:rgba(11,17,32,.55);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;height:66px;gap:18px}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:700;font-size:22px}
+.brand .orb{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.brand b{color:var(--accent)}
+.nav-links{display:flex;gap:26px;margin-left:28px;font-size:14px;color:var(--soft)}
 .nav-links a:hover{color:var(--ink)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-.btn{font-family:var(--font-ui);font-weight:600;font-size:14px;padding:11px 20px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:8px;line-height:1}
-.btn.primary{background:var(--accent);color:#06222a}
-.btn.primary:hover{filter:brightness(1.08)}
+.btn{font-family:var(--ui);font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:9px;line-height:1}
+.btn.primary{background:var(--accent);color:#062028}
+.btn.primary:hover{filter:brightness(1.07)}
 .btn.ghost{border-color:var(--line-strong);color:var(--soft)}
 .btn.ghost:hover{border-color:var(--accent);color:var(--ink)}
-@media(max-width:720px){.nav-links{display:none}}
+@media(max-width:760px){.nav-links{display:none}}
 
-/* ---- kickers / type ---- */
-.kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
-  display:inline-flex;align-items:center;gap:10px}
-.kicker .ln{width:34px;height:1px;background:var(--accent);opacity:.6}
-.masthead{font-family:var(--font-display);font-weight:700;font-size:clamp(46px,9vw,104px);line-height:88px;letter-spacing:-.01em;text-transform:uppercase}
-.masthead em{font-style:normal;color:var(--accent)}
-.lede{font-size:clamp(16px,1.6vw,19px);color:var(--soft);line-height:32px;max-width:46ch;font-weight:300}
-.h2b{font-family:var(--font-display);font-weight:600;font-size:clamp(28px,4vw,44px);line-height:48px;text-transform:uppercase;letter-spacing:-.005em}
-.numeral{font-family:var(--font-display);font-weight:700;font-size:64px;line-height:72px;color:var(--accent)}
+/* ---------- type ---------- */
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent)}
+.h1{font-family:var(--display);font-weight:700;font-size:clamp(48px,9vw,112px);line-height:.96;letter-spacing:-.01em;text-transform:uppercase}
+.h1 .alt{color:var(--accent)}
+.lede{font-family:var(--ui);font-weight:300;font-size:clamp(17px,1.7vw,21px);line-height:1.6;color:var(--soft);max-width:52ch}
+.h2{font-family:var(--display);font-weight:600;font-size:clamp(28px,4vw,46px);line-height:1.05;text-transform:uppercase;letter-spacing:-.005em}
 
-/* ---- hero ---- */
-.hero{padding-top:96px;padding-bottom:96px}
-.hero .htext{grid-column:1 / 8}
-.hero .hcard{grid-column:8 / 13;align-self:center}
-@media(max-width:900px){.hero{padding-top:64px;padding-bottom:64px}.hero .htext{grid-column:1/-1}.hero .hcard{grid-column:1/-1;margin-top:24px}}
-.hero .kicker{margin-bottom:24px}
-.hero .lede{margin:24px 0 32px}
+/* ---------- hero immersif ---------- */
+.hero{min-height:92vh;display:flex;align-items:center;padding:120px 0 80px}
+.hero .kicker{display:block;margin-bottom:26px}
+.hero .lede{margin:28px 0 36px}
 .cta-row{display:flex;gap:14px;flex-wrap:wrap}
-.trust{margin-top:32px;font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-.trust b{color:var(--soft)}
+.scrollcue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px}
+.scrollcue .ln{width:1px;height:34px;background:linear-gradient(var(--accent),transparent)}
 
-/* carte cockpit (aperçu produit) */
-.cockpit{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line-strong);border-radius:16px;
-  padding:24px;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)}
-.cockpit .cp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.cockpit .cp-tag{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.cockpit .cp-dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good)}
-.cockpit .cp-verdict{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--good);
-  background:rgba(53,197,140,.14);border:1px solid rgba(53,197,140,.4);padding:4px 11px;border-radius:99px;margin-bottom:14px}
-.cockpit h3{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:24px;margin-bottom:4px}
-.cockpit .cp-sub{color:var(--muted);font-size:13px;margin-bottom:18px}
-.cp-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:16px}
-.cp-kpi .v{font-family:var(--font-mono);font-weight:700;font-size:22px;color:var(--ink)}
-.cp-kpi .v.acc{color:var(--accent)} .cp-kpi .v.good{color:var(--good)}
-.cp-kpi .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+/* ---------- sections ---------- */
+.section{padding:96px 0;border-top:1px solid var(--line);background:var(--paper)}
+.sec-head{margin-bottom:48px;max-width:64ch}
+.sec-head .kicker{display:block;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));column-gap:var(--gutter);row-gap:40px}
 
-/* ---- sections ---- */
-.section{padding:80px 0}
-.section.alt{background:linear-gradient(180deg,var(--panel),var(--paper))}
-.sec-head{grid-column:1 / -1;margin-bottom:8px}
-.sec-head .kicker{margin-bottom:16px}
+/* rôles */
+.role{grid-column:span 4;display:flex;flex-direction:column;gap:14px;padding-top:24px;border-top:2px solid var(--accent)}
+.role .rk{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.role h3{font-family:var(--display);font-weight:600;font-size:30px;text-transform:uppercase}
+.role p{color:var(--soft);font-size:15px;line-height:1.6;font-weight:300}
+.role a{margin-top:auto;font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:6px}
+.role a:hover{text-decoration:underline}
+@media(max-width:880px){.role{grid-column:span 12}}
 
-/* 3 portes d'entrée */
-.door{grid-column:span 4;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px 24px;
-  transition:.18s;border-top:3px solid var(--dc,var(--accent))}
-.door:hover{transform:translateY(-4px);border-color:var(--line-strong);box-shadow:0 20px 50px -24px rgba(0,0,0,.7)}
-.door .di{font-size:30px;margin-bottom:14px}
-.door h3{font-family:var(--font-display);font-weight:600;font-size:24px;text-transform:uppercase;margin-bottom:8px}
-.door p{color:var(--muted);font-size:14px;line-height:24px;margin-bottom:18px}
-.door .go{font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
-@media(max-width:820px){.door{grid-column:1/-1}}
+/* data — features numérotées (data set large, sobre) */
+.feat{grid-column:span 6;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;padding:28px 0;border-top:1px solid var(--line)}
+.feat .num{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.feat h4{font-family:var(--display);font-weight:600;font-size:21px;text-transform:uppercase;margin-bottom:8px}
+.feat p{color:var(--soft);font-size:14.5px;line-height:1.6;font-weight:300}
+@media(max-width:680px){.feat{grid-column:span 12}}
 
-/* features (data set large) */
-.feat{grid-column:span 3;padding-top:24px;border-top:1px solid var(--line)}
-.feat .numeral{margin-bottom:8px}
-.feat h4{font-family:var(--font-display);font-weight:600;font-size:18px;text-transform:uppercase;margin-bottom:6px}
-.feat p{color:var(--muted);font-size:13.5px;line-height:22px}
-@media(max-width:900px){.feat{grid-column:span 6}}
-@media(max-width:560px){.feat{grid-column:1/-1}}
+/* cta */
+.cta{padding:110px 0;border-top:1px solid var(--line);text-align:center;background:var(--paper)}
+.cta .h2{margin-bottom:16px}
+.cta p{color:var(--soft);font-weight:300;max-width:52ch;margin:0 auto 32px}
+.cta .cta-row{justify-content:center}
 
-/* cta finale */
-.cta-band{grid-column:1 / -1;background:linear-gradient(120deg,rgba(70,194,216,.12),transparent);border:1px solid var(--line-strong);
-  border-radius:18px;padding:clamp(32px,5vw,56px);text-align:center}
-.cta-band .h2b{margin-bottom:12px}
-.cta-band p{color:var(--soft);margin-bottom:28px;max-width:48ch;margin-left:auto;margin-right:auto}
-.cta-band .cta-row{justify-content:center}
-
-/* footer */
-footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13px}
+footer{border-top:1px solid var(--line);padding:44px 0;color:var(--muted);font-size:13px;background:var(--paper)}
 footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
-footer .fmono{font-family:var(--font-mono);letter-spacing:.04em}
-
-/* ---- overlay de grille (même boîte que le contenu) ---- */
-.guides{position:absolute;inset:0;pointer-events:none;z-index:90;opacity:0;transition:opacity .26s ease}
-body.grid-on .guides{opacity:1}
-.guides .cols{position:absolute;top:0;bottom:0;left:var(--margin);right:var(--margin);
-  display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));column-gap:var(--gutter)}
-.guides .col{background:var(--g-col);box-shadow:inset 1px 0 0 var(--g-edge),inset -1px 0 0 var(--g-edge);position:relative}
-.guides .col span{position:absolute;top:10px;left:0;right:0;text-align:center;font-family:var(--font-mono);font-size:9px;color:var(--accent)}
-.guides .rows{position:absolute;left:var(--margin);right:var(--margin);top:0;bottom:0;
-  background-image:repeating-linear-gradient(to bottom,var(--g-base) 0 1px,transparent 1px var(--lh)),
-   repeating-linear-gradient(to bottom,var(--g-base-min) 0 1px,transparent 1px var(--bl))}
-.guides .mline{position:absolute;top:0;bottom:0;width:1px;background:var(--g-edge)}
-.guides .mline.l{left:var(--margin)} .guides .mline.r{right:var(--margin)}
-
-.gridtoggle{display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line-strong);color:var(--muted);
-  cursor:pointer;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:10px 13px;border-radius:99px}
-.gridtoggle:hover{color:var(--ink);border-color:var(--accent)}
-.gridtoggle .gt-dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
-body.grid-on .gridtoggle{background:var(--accent);color:#06222a;border-color:transparent}
-body.grid-on .gridtoggle .gt-dot{background:#06222a}
-@media(max-width:720px){.gridtoggle{display:none}}
+footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 </style></head>
 <body>
 
-<!-- NAV -->
+<!-- FOND VIDÉO IMMERSIF — déposer un fichier `fond.mp4` (paysage, sans interface) dans ce dossier -->
+<div class="bgfx" aria-hidden="true">
+  <video autoplay muted loop playsinline preload="auto">
+    <source src="./fond.mp4" type="video/mp4">
+  </video>
+</div>
+
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#top"><span class="orb"></span>Pair<b>Form</b></a>
   <div class="nav-links">
-    <a href="#portes">Pour qui</a>
-    <a href="#data">La data</a>
-    <a href="./pairform-demo.html">Démo</a>
+    <a href="#roles">Pour qui</a>
+    <a href="#data">La plateforme</a>
   </div>
   <div class="nav-right">
-    <button class="gridtoggle" id="gridToggle" aria-pressed="false" title="Afficher la grille (touche G)"><span class="gt-dot"></span>Grille</button>
     <a class="btn ghost" href="./apex-tri-demo-testeurs.html">Connexion</a>
-    <a class="btn primary" href="./apex-tri-demo-testeurs.html">Voir la démo</a>
+    <a class="btn primary" href="./apex-tri-demo-testeurs.html">Découvrir la démo</a>
   </div>
 </div></nav>
 
 <main id="top">
-<section class="hero"><div class="wrap"><div class="grid">
-  <div class="band">
-    <div class="htext">
-      <span class="kicker"><span class="ln"></span>Coaching triathlon · club · athlète</span>
-      <h1 class="masthead">L'entraînement <em>autrement</em></h1>
-      <p class="lede">La plateforme de coaching qui voit tout : découplage, assistant IA, charge d'entraînement. La data qui fait vraiment progresser — pour le coach, le club et l'athlète.</p>
-      <div class="cta-row">
-        <a class="btn primary" href="./apex-tri-demo-testeurs.html">Voir la démo →</a>
-        <a class="btn ghost" href="#portes">Découvrir</a>
-      </div>
-      <div class="trust">Triathlon · Hyrox · Multi-sport — <b>une paire coach + athlète qui performe.</b></div>
-    </div>
-    <div class="hcard">
-      <div class="cockpit">
-        <div class="cp-head"><span class="cp-tag">Analyse de séance</span><span class="cp-dot"></span></div>
-        <div class="cp-verdict">● Objectif tenu</div>
-        <h3>Endurance fondamentale Z2</h3>
-        <div class="cp-sub">1h15 · 18,4 km · Zone aérobie maintenue</div>
-        <div class="cp-kpis">
-          <div class="cp-kpi"><div class="v acc">1.7%</div><div class="l">Découplage</div></div>
-          <div class="cp-kpi"><div class="v">142</div><div class="l">FC moy</div></div>
-          <div class="cp-kpi"><div class="v good">94%</div><div class="l">Temps Z2</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div></div></section>
-
-<!-- 3 PORTES -->
-<section class="section alt" id="portes"><div class="wrap"><div class="grid">
-  <div class="sec-head">
-    <span class="kicker"><span class="ln"></span>Pour qui</span>
-    <h2 class="h2b">Trois entrées, une même exigence</h2>
-  </div>
-  <div class="band">
-    <a class="door" style="--dc:var(--accent)" href="./apex-tri-demo-testeurs.html">
-      <div class="di">🎯</div><h3>Coach</h3>
-      <p>Planifie, suis tes athlètes et lis leurs vraies données : découplage, zones, charge. L'assistant IA résume chaque séance et recommande la suite.</p>
-      <span class="go">Espace coach →</span>
-    </a>
-    <a class="door" style="--dc:var(--bike)" href="./pairform-club.html">
-      <div class="di">🏟️</div><h3>Club</h3>
-      <p>Gère créneaux, adhérents, présences et facturation. Trois formules, de la séance à la carte au Coaching +. Pensé pour les box Hyrox.</p>
-      <span class="go">Espace club →</span>
-    </a>
-    <a class="door" style="--dc:var(--run)" href="./apex-tri-demo-testeurs.html">
-      <div class="di">📈</div><h3>Athlète</h3>
-      <p>Ton programme, tes records, ta forme. Importe tes séances (.TCX/.GPX) et visualise ce que ton coach voit. Progresse, simplement.</p>
-      <span class="go">Espace athlète →</span>
-    </a>
-  </div>
-</div></div></section>
-
-<!-- LA DATA -->
-<section class="section" id="data"><div class="wrap"><div class="grid">
-  <div class="sec-head">
-    <span class="kicker"><span class="ln"></span>La data qui compte</span>
-    <h2 class="h2b">Ce que les autres ne montrent pas</h2>
-  </div>
-  <div class="band">
-    <div class="feat"><div class="numeral">&lt;5%</div><h4>Découplage</h4><p>La dérive cardiaque qui dit si l'allure est restée aérobie. Le vrai juge de l'endurance fondamentale.</p></div>
-    <div class="feat"><div class="numeral">IA</div><h4>Assistant</h4><p>Un résumé clair de chaque séance + des recommandations actionnables, jugés par rapport à l'objectif.</p></div>
-    <div class="feat"><div class="numeral">PMC</div><h4>Charge</h4><p>Forme, fatigue et fraîcheur sur une monnaie commune à tous les sports — vélo, course, nat, renfo, Hyrox.</p></div>
-    <div class="feat"><div class="numeral">.FIT</div><h4>Tes capteurs</h4><p>Import de tes fichiers de montre, sans dépendre d'un seul écosystème. Tes données restent les tiennes.</p></div>
-  </div>
-</div></div></section>
-
-<!-- CTA -->
-<section class="section alt"><div class="wrap"><div class="grid">
-  <div class="cta-band">
-    <h2 class="h2b">Prêt à t'entraîner autrement ?</h2>
-    <p>Explore la démo testeur — coach, club et athlète — sans inscription.</p>
+  <!-- HERO -->
+  <section class="hero"><div class="wrap">
+    <span class="kicker">Coaching · Club · Athlète — Triathlon, Hyrox, multisport</span>
+    <h1 class="h1">L'entraînement<br><span class="alt">autrement</span></h1>
+    <p class="lede">Une plateforme unique pour planifier, analyser et faire progresser. Du coach à l'athlète, en passant par le club — autour de la donnée qui compte vraiment.</p>
     <div class="cta-row">
-      <a class="btn primary" href="./apex-tri-demo-testeurs.html">Lancer la démo →</a>
-      <a class="btn ghost" href="./pairform-club.html">Voir l'espace club</a>
+      <a class="btn primary" href="./apex-tri-demo-testeurs.html">Découvrir la démo</a>
+      <a class="btn ghost" href="#roles">En savoir plus</a>
     </div>
-  </div>
-</div></div></section>
+    <div class="scrollcue"><span>Défiler</span><span class="ln"></span></div>
+  </div></section>
+
+  <!-- RÔLES -->
+  <section class="section" id="roles"><div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Pour qui</span>
+      <h2 class="h2">Trois rôles, une même plateforme</h2>
+    </div>
+    <div class="grid">
+      <div class="role">
+        <span class="rk">Coachs</span>
+        <h3>Coach</h3>
+        <p>Planifiez les séances, suivez vos athlètes et analysez leurs données réelles. L'assistant IA synthétise chaque séance et oriente la suite du plan.</p>
+        <a href="./apex-tri-demo-testeurs.html">Voir l'espace coach</a>
+      </div>
+      <div class="role">
+        <span class="rk">Clubs &amp; box</span>
+        <h3>Club</h3>
+        <p>Créneaux, adhérents, présences et facturation réunis au même endroit. Trois formules, de la séance à la carte au suivi premium. Conçu pour les structures et les box Hyrox.</p>
+        <a href="./pairform-club.html">Voir l'espace club</a>
+      </div>
+      <div class="role">
+        <span class="rk">Athlètes</span>
+        <h3>Athlète</h3>
+        <p>Votre programme, vos données, votre progression. Importez vos séances et accédez à la même lecture que votre coach.</p>
+        <a href="./apex-tri-demo-testeurs.html">Voir l'espace athlète</a>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- DATA -->
+  <section class="section" id="data"><div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">La donnée qui compte</span>
+      <h2 class="h2">Une lecture au-delà des chiffres bruts</h2>
+    </div>
+    <div class="grid">
+      <div class="feat"><div class="num">01</div><div><h4>Découplage cardiaque</h4><p>La dérive entre l'effort produit et le coût cardiaque au fil de la séance — le marqueur de référence de l'endurance aérobie.</p></div></div>
+      <div class="feat"><div class="num">02</div><div><h4>Assistant IA</h4><p>Une synthèse claire de chaque séance et des recommandations concrètes, évaluées au regard de l'objectif fixé.</p></div></div>
+      <div class="feat"><div class="num">03</div><div><h4>Charge d'entraînement</h4><p>Forme, fatigue et fraîcheur réunies sur une métrique commune à toutes les disciplines.</p></div></div>
+      <div class="feat"><div class="num">04</div><div><h4>Multi-capteurs</h4><p>L'import de vos fichiers de séance, indépendamment de l'écosystème de votre montre.</p></div></div>
+    </div>
+  </div></section>
+
+  <!-- CTA -->
+  <section class="cta"><div class="wrap">
+    <h2 class="h2">Prêt à passer à l'entraînement autrement ?</h2>
+    <p>Explorez la démonstration — coach, club et athlète — sans inscription.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="./apex-tri-demo-testeurs.html">Découvrir la démo</a>
+      <a class="btn ghost" href="./pairform-club.html">Espace club</a>
+    </div>
+  </div></section>
 </main>
 
 <footer><div class="wrap">
   <div class="brand" style="font-size:18px"><span class="orb"></span>Pair<b>Form</b></div>
-  <div class="fmono">L'entraînement autrement · Triathlon · Hyrox</div>
+  <div class="fmono">L'entraînement autrement — Triathlon · Hyrox</div>
   <div class="fmono">© 2026 PairForm</div>
 </div></footer>
 
-<!-- OVERLAY DE GRILLE (calé sur la même boîte .wrap que le contenu) -->
-<div class="guides" id="pageGuides" aria-hidden="true">
-  <div class="cols" id="gCols"></div><div class="rows"></div>
-  <div class="mline l"></div><div class="mline r"></div>
-</div>
-
 <script>
-(function(){
-  // overlay calé pile sur .wrap (max-width + marge) → ses colonnes = celles du contenu
-  function syncGuides(){
-    const g=document.getElementById('pageGuides'), w=document.querySelector('.wrap'); if(!g||!w) return;
-    const r=w.getBoundingClientRect();
-    g.style.position='absolute'; g.style.top='0'; g.style.height=document.documentElement.scrollHeight+'px';
-    g.style.left=(r.left+window.scrollX)+'px'; g.style.width=r.width+'px';
-    // l'overlay est posé sur la boîte .wrap (marge incluse) ; les .cols gardent donc
-    // leur inset var(--margin) (défini en CSS) → leurs colonnes = celles du .grid.
-  }
-  const cols=document.getElementById('gCols');
-  if(cols){ const n=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cols'))||12;
-    for(let i=1;i<=n;i++){ const c=document.createElement('div'); c.className='col';
-      const s=document.createElement('span'); s.textContent=i; c.appendChild(s); cols.appendChild(c);} }
-
-  const tg=document.getElementById('gridToggle');
-  function setGrid(on){ document.body.classList.toggle('grid-on',on); if(tg) tg.setAttribute('aria-pressed',on?'true':'false'); if(on) syncGuides(); }
-  if(tg) tg.addEventListener('click',()=>setGrid(!document.body.classList.contains('grid-on')));
-  document.addEventListener('keydown',e=>{ if((e.key==='g'||e.key==='G')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
-    const t=e.target; if(t&&/^(input|textarea|select)$/i.test(t.tagName||'')) return; setGrid(!document.body.classList.contains('grid-on')); }});
-  window.addEventListener('resize',()=>{ if(document.body.classList.contains('grid-on')) syncGuides(); });
-  // positionne l'overlay dès le chargement (robuste même si .grid-on est préposé)
-  syncGuides(); window.addEventListener('load',syncGuides);
-  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncGuides);
-
-  /* OPTICAL ALIGNMENT — l'encre du gros titre / des numéraux sur la ligne (pas leur boîte) */
-  const cvs=document.createElement('canvas'), ctx=cvs.getContext('2d');
-  function optical(){
-    document.querySelectorAll('.masthead, .numeral, .h2b').forEach(function(el){
-      el.style.marginLeft='0px';
-      const cs=getComputedStyle(el); let ch=(el.textContent||'').trim().charAt(0); if(!ch) return;
-      if(cs.textTransform==='uppercase') ch=ch.toUpperCase();
-      ctx.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily; ctx.textAlign='left';
-      const abl=ctx.measureText(ch).actualBoundingBoxLeft;
-      if(isFinite(abl)&&Math.abs(abl)<30) el.style.marginLeft=abl.toFixed(2)+'px';
-    });
-  }
-  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(optical);
-  optical();
-  let t; window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(optical,120);});
-})();
+// lecture du fond vidéo (relance si le navigateur bloque l'autoplay)
+(function(){var v=document.querySelector('.bgfx video');if(v){v.play().catch(function(){
+  document.addEventListener('click',function o(){v.play().catch(function(){});document.removeEventListener('click',o);},{once:true});});}})();
 </script>
 </body></html>
