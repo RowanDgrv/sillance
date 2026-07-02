@@ -1701,13 +1701,6 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
         <div class="lt-thresholds" id="ltBikeTh"></div>
       </div>
 
-      <div class="chart-card c7 predictor">
-        <h3>Chronos estimés — course à pied</h3>
-        <div class="sub">calculés sur les séances réalisées · indice VDOT <b id="vdotVal" style="color:var(--run)">52.4</b> <span style="color:var(--good)">▲ +1.8 / 8 sem.</span></div>
-        <div class="chrono-grid" id="chronoGrid"></div>
-        <svg id="vdotSpark" viewBox="0 0 640 56" preserveAspectRatio="none" aria-label="Progression de l'indice de forme"></svg>
-      </div>
-
       <div class="chart-card c6">
         <h3>FTP & PMA estimées — vélo</h3>
         <div class="sub">8 dernières semaines · watts</div>
@@ -1809,7 +1802,6 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
 
     <div class="rec-tabs" id="recTabs">
       <button class="rec-tab active" data-rt="bike"><i class="ic ic-bike"></i>Puissance vélo</button>
-      <button class="rec-tab" data-rt="swim"><i class="ic ic-waves"></i>Vitesse natation</button>
       <button class="rec-tab" data-rt="run"><i class="ic ic-run"></i>Allure course</button>
     </div>
     <div class="rec-grid" id="recGrid"></div>
@@ -5851,37 +5843,6 @@ function smoothPath(pts){
 }
 function pacefmt(v){ const m=Math.floor(v), s=Math.round((v-m)*60); return `${m}'${String(s).padStart(2,'0')}"` } /* utile pour vos futurs graphiques d'allure */
 
-/* ---- 1a. Prédicteur de chronos + sparkline VDOT ---- */
-(function chronoPredictor(){
-  const grid = document.getElementById('chronoGrid');
-  STRAVA_DEMO.predictions.forEach(p=>{
-    const c = document.createElement('div');
-    c.className='chrono';
-    c.innerHTML = `<div class="d">${p.d}</div><div class="c">${p.time}</div>
-                   <div class="delta ${p.up?'up':'down'}">${p.up?'▲':'▼'} ${p.delta} / 8 sem.</div>`;
-    c.addEventListener('mousemove',e=>tipShow(e,`<b>${p.d}</b> · estimation basée sur tes séances réalisées`));
-    c.addEventListener('mouseleave',tipHide);
-    grid.appendChild(c);
-  });
-  document.getElementById('vdotVal').textContent = STRAVA_DEMO.vdot.at(-1).toFixed(1);
-
-  /* sparkline de l'indice de forme */
-  const svg = document.getElementById('vdotSpark');
-  const W=640,H=56,P=8;
-  const d = STRAVA_DEMO.vdot;
-  const min=Math.min(...d)-.2, max=Math.max(...d)+.2;
-  const x=i=>P+i*(W-2*P)/(d.length-1);
-  const y=v=>H-P-(v-min)/(max-min)*(H-2*P);
-  const defs=el('defs',{},svg);
-  const lg=el('linearGradient',{id:'vdotFill',x1:0,y1:0,x2:0,y2:1},defs);
-  el('stop',{offset:0,'stop-color':'#FF5470','stop-opacity':.3},lg);
-  el('stop',{offset:1,'stop-color':'#FF5470','stop-opacity':0},lg);
-  const pts=d.map((v,i)=>[x(i),y(v)]);
-  const path=smoothPath(pts);
-  el('path',{d:path+` L${x(d.length-1)},${H} L${x(0)},${H} Z`,fill:'url(#vdotFill)'},svg);
-  el('path',{d:path,class:'glow-line draw',stroke:'#FF5470','stroke-width':2},svg);
-})();
-
 /* ---- 1b. FTP & PMA — double courbe watts ---- */
 (function ftpChart(){
   const svg = document.getElementById('ftpChart');
@@ -6286,7 +6247,6 @@ mmpChart(); durabChart(); renderLoadMix(); renderHyrox();
 (function chartToggles(){
   const REG = [
     {key:'lactate', label:'Lactate', a:'lactateBike'},
-    {key:'chrono',  label:'Chronos course', a:'chronoGrid'},
     {key:'ftp',     label:'FTP & PMA', a:'ftpChart'},
     {key:'hr',      label:'Zones FC', a:'hrChart'},
     {key:'dist',    label:'Distance hebdo', a:'distChart'},
@@ -6376,9 +6336,8 @@ const REC_DURATIONS = [
   {k:'4h',s:14400},{k:'5h',s:18000},{k:'6h',s:21600},{k:'7h',s:25200},{k:'8h',s:28800}
 ];
 const REC_RUN_DIST = [
-  {k:'100 m',m:100},{k:'500 m',m:500},{k:'1000 m',m:1000},{k:'2000 m',m:2000},
-  {k:'3000 m',m:3000},{k:'5 km',m:5000},{k:'10 km',m:10000},{k:'Semi',m:21097},
-  {k:'Marathon',m:42195}
+  {k:'5 km',m:5000},{k:'10 km',m:10000},{k:'21 km',m:21097},
+  {k:'35 km',m:35000},{k:'42 km',m:42195}
 ];
 // dates fictives pour donner vie aux records (démo)
 const REC_DATES = ['12 juin','3 mai','21 avr.','8 mars','17 fév.','29 janv.','5 janv.','14 déc.'];
@@ -6454,13 +6413,6 @@ function renderRecords(){
     html = REC_DURATIONS.map((d,i)=>{
       const w=powerForDuration(d.s);
       return recCard(d.k, w, 'W', recDate(i), 'var(--bike)', (w/70).toFixed(1)+' W/kg');
-    }).join('');
-  } else if(recTab==='swim'){
-    grid.style.setProperty('--rc','var(--swim)');
-    html = REC_SWIM_DIST.map((d,i)=>{
-      const pace=swimPaceForDistance(d.m);     // s/100m
-      const totalSec=pace*d.m/100;             // temps total sur la distance
-      return recCard(d.k, fmtSwim(pace), '/100m', recDate(i), 'var(--swim)', fmtClock(totalSec/60)+' au total');
     }).join('');
   } else {
     grid.style.setProperty('--rc','var(--run)');
@@ -6927,7 +6879,7 @@ document.getElementById('lactestSend').addEventListener('click', ()=>{
    ============================================================ */
 window.loadStravaData = function(data){
   Object.assign(STRAVA_DEMO, data);
-  ['chronoGrid','vdotSpark','ftpChart','hrChart','distChart','loadChart'].forEach(id=>{
+  ['ftpChart','hrChart','distChart','loadChart'].forEach(id=>{
     document.getElementById(id).innerHTML='';
   });
   // NB : pour une intégration propre, factorisez les IIFE ci-dessus
