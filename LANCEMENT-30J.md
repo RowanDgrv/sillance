@@ -63,7 +63,7 @@ Légende effort : 🟢 court (≤1j) · 🟡 moyen (2-3j) · 🔴 lourd (4j+) ·
 
 ### B. Hébergement du front 🟡
 - [ ] Choisir un hébergeur statique (Netlify / Vercel / Cloudflare Pages) — HTTPS auto.
-- [ ] Structurer le site : **landing → inscription → app** (aujourd'hui = fichiers épars : `index.html`, `apex-tri-calendrier.html`, `sillance-club.html`…).
+- [ ] Structurer le site : **landing → inscription → app** (aujourd'hui = fichiers épars : `index.html`, `sillance-calendrier.html`, `sillance-club.html`…).
 - [ ] Déployer + vérifier que les modules ES (`sillance-client.js`, `sillance-integration.js`) chargent en prod.
 - [ ] Renommer les fichiers `apex-tri-*` (legacy) en URLs propres.
 

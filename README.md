@@ -7,8 +7,8 @@ Plateforme de coaching **triathlon / Hyrox / clubs**. Ce dépôt contient le **f
 
 | Fichier | Rôle |
 |---|---|
-| `apex-tri-calendrier.html` | L'app complète — coach / athlète / club (calendrier, builder de séances, analyse, club & créneaux) |
-| `apex-tri-demo-testeurs.html` | Même app, variante « testeurs » |
+| `sillance-calendrier.html` | L'app complète — coach / athlète / club (calendrier, builder de séances, analyse, club & créneaux) |
+| `sillance-app.html` | Même app, variante « testeurs » |
 | `sillance-review.html` | Version **autonome** (sans couche cloud), ouvrable au double-clic |
 | `sillance-club.html` | Interface **box Hyrox** (réservations). Gabarit de prospection : `?box=Nom&ville=Ville` |
 | `sillance-demo.html` | Page de présentation |
