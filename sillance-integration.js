@@ -130,9 +130,11 @@ async function section(name, fn) {
 function injectStyles() {
   if (document.getElementById("pf-auth-style")) return;
   const css = `
-  #pf-cloud-badge{position:fixed;top:10px;right:12px;z-index:9998;font:600 12px/1 system-ui;
-    padding:6px 10px;border-radius:99px;background:#161a1f;color:#8a949e;border:1px solid #2a2f37;cursor:pointer}
-  #pf-cloud-badge.on{color:#39e6a3;border-color:#235}
+  #pf-cloud-badge{position:fixed;top:12px;right:14px;z-index:9998;font:700 13px/1 'Archivo',system-ui;
+    padding:9px 15px;border-radius:99px;background:#46C2D8;color:#06222a;border:1px solid #46C2D8;cursor:pointer;
+    box-shadow:0 6px 18px -6px rgba(70,194,216,.6);transition:filter .15s,transform .15s}
+  #pf-cloud-badge:hover{filter:brightness(1.06);transform:translateY(-1px)}
+  #pf-cloud-badge.on{background:#12171d;color:#39e6a3;border-color:#274;box-shadow:none;font-weight:600}
   #pf-auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);
     display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
   #pf-auth-overlay.open{display:flex}
