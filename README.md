@@ -1,7 +1,14 @@
 # Sillance — site (front)
 
 Plateforme de coaching **triathlon / Hyrox / clubs**. Ce dépôt contient le **front**
-(HTML + JS autonomes). Le back-end (Supabase + Stripe) vit dans un dépôt séparé.
+(HTML + JS autonomes). Le back-end (Supabase + Stripe) vit dans un dépôt séparé :
+[**RowanDgrv/pairform-backend**](https://github.com/RowanDgrv/pairform-backend).
+
+## 🔗 Démo en ligne
+
+👉 **https://rowandgrv.github.io/Pairform/** — l'app tourne en **mode démonstration**
+(données fictives), aucun compte requis. Pour l'app complète : ouvrir
+[`/sillance-review.html`](https://rowandgrv.github.io/Pairform/sillance-review.html).
 
 ## Pages
 
