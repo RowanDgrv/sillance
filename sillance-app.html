@@ -399,9 +399,6 @@ body.grid-on .cal-guides{opacity:1}
 .ic-clipboard{--i:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%228%22%20y%3D%222%22%20width%3D%228%22%20height%3D%224%22%20rx%3D%221%22/%3E%3Cpath%20d%3D%22M16%204h2a2%202%200%200%201%202%202v14a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2h2%22/%3E%3C/svg%3E")}
 
 
-/* ---------- Prédicteur de chronos ---------- */
-.chrono-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 6px}
-@media (max-width:560px){.chrono-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .chrono{
   border:1px solid var(--line);border-radius:12px;padding:13px 10px;text-align:center;
   background:linear-gradient(180deg, rgba(255,84,112,.06), transparent);
@@ -529,26 +526,6 @@ body[data-athview="home"] .today-panel{display:block}
 .today-foot{margin-top:14px;font-size:12.5px;color:var(--soft,#C4CCDE);background:rgba(47,217,255,.06);
   border:1px solid rgba(47,217,255,.16);border-radius:10px;padding:10px 13px;line-height:1.5}
 
-/* ---------- Prévisions de performance ---------- */
-.forecast{margin-top:26px}
-.fc-intro{font-size:13px;color:var(--muted);margin:6px 0 16px;line-height:1.6;max-width:680px}
-.fc-trend{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-data);font-size:12.5px;font-weight:700;
-  padding:6px 12px;border-radius:99px;margin-bottom:18px}
-.fc-trend.up{background:rgba(57,230,163,.12);color:var(--good)}
-.fc-trend.flat{background:rgba(255,177,61,.12);color:var(--bike)}
-.fc-trend.down{background:rgba(255,84,112,.12);color:var(--run)}
-.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px}
-.fc-card{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:15px 16px}
-.fc-card-h{font-weight:700;font-size:14px;margin-bottom:13px;display:flex;align-items:center;gap:8px}
-.fc-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px}
-.fc-row+.fc-row{border-top:1px solid var(--line)}
-.fc-row .fc-when{color:var(--muted);font-size:11.5px}
-.fc-row .fc-val{font-family:var(--font-data);font-weight:700}
-.fc-row.now .fc-val{color:var(--text)}
-.fc-row.proj .fc-val{color:var(--good)}
-.fc-delta{font-size:10.5px;color:var(--good);font-family:var(--font-data);margin-left:6px}
-.fc-disclaimer{font-size:11.5px;color:var(--muted);font-style:italic;margin-top:16px;line-height:1.5;
-  border-top:1px dashed var(--line);padding-top:12px}
 
 /* ---------- Records personnels ---------- */
 .records{margin-top:26px}
@@ -1783,14 +1760,6 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
     <div class="gear-list" id="gearList"></div>
   </section>
 
-  <!-- ===================== PRÉVISIONS ===================== -->
-  <section class="forecast" id="forecast">
-    <div class="analytics-head">
-      <h2>Prévisions <span>de performance</span></h2>
-      <span class="src">projection · tendance de charge</span>
-    </div>
-    <div id="forecastBody"></div>
-  </section>
 
   <!-- ===================== RECORDS (en bas de page) ===================== -->
   <section class="records" id="records">
@@ -1801,7 +1770,7 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
     <p class="sub">Tes meilleures performances par durée et par distance, détectées automatiquement à partir de tes activités.</p>
 
     <div class="rec-tabs" id="recTabs">
-      <button class="rec-tab active" data-rt="bike"><i class="ic ic-bike"></i>Puissance vélo</button>
+      <button class="rec-tab active" data-rt="bike"><i class="ic ic-bike"></i>Vélo</button>
       <button class="rec-tab" data-rt="run"><i class="ic ic-run"></i>Allure course</button>
     </div>
     <div class="rec-grid" id="recGrid"></div>
@@ -3346,10 +3315,13 @@ document.querySelectorAll('.ath-tab').forEach(b=>{
   const icon=document.getElementById('themeIcon');
   function apply(light){
     document.body.classList.toggle('light', light);
-    icon.textContent = light ? '☀️' : '🌙';
-    btn.title = light ? 'Passer en mode sombre' : 'Passer en mode clair';
+    if(icon) icon.textContent = light ? '☀️' : '🌙';
+    if(btn) btn.title = light ? 'Passer en mode sombre' : 'Passer en mode clair';
     if(typeof rebuildCharts==='function') rebuildCharts();
   }
+  // Thème auto selon l'heure : mode jour (clair) de 7h00 à 18h59, mode nuit (sombre) de 19h00 à 6h59.
+  const h = new Date().getHours();
+  apply(h>=7 && h<19);
   if(btn) btn.addEventListener('click', ()=> apply(!document.body.classList.contains('light')));
 })();
 
@@ -6331,23 +6303,18 @@ function rebuildCharts(){
    via des modèles de décroissance réalistes. En production : ces
    records seraient extraits des vraies activités (Strava streams).
    ============================================================ */
-const REC_DURATIONS = [
-  {k:'1s',s:1},{k:'3s',s:3},{k:'5s',s:5},{k:'10s',s:10},{k:'15s',s:15},{k:'30s',s:30},
-  {k:'1min',s:60},{k:'2min',s:120},{k:'3min',s:180},{k:'5min',s:300},{k:'10min',s:600},
-  {k:'15min',s:900},{k:'30min',s:1800},{k:'1h',s:3600},{k:'2h',s:7200},{k:'3h',s:10800},
-  {k:'4h',s:14400},{k:'5h',s:18000},{k:'6h',s:21600},{k:'7h',s:25200},{k:'8h',s:28800}
+const REC_BIKE_DIST = [
+  {k:'20 km',km:20},{k:'30 km',km:30},{k:'40 km',km:40},
+  {k:'80 km',km:80},{k:'90 km',km:90},{k:'100 km',km:100},
+  {k:'180 km',km:180},{k:'200 km',km:200},{k:'300 km',km:300}
 ];
 const REC_RUN_DIST = [
-  {k:'5 km',m:5000},{k:'10 km',m:10000},{k:'21 km',m:21097},
-  {k:'35 km',m:35000},{k:'42 km',m:42195}
+  {k:'1 km',m:1000},{k:'3 km',m:3000},{k:'5 km',m:5000},
+  {k:'10 km',m:10000},{k:'21 km',m:21097},{k:'42 km',m:42195}
 ];
 // dates fictives pour donner vie aux records (démo)
 const REC_DATES = ['12 juin','3 mai','21 avr.','8 mars','17 fév.','29 janv.','5 janv.','14 déc.'];
 function recDate(i){ return REC_DATES[i % REC_DATES.length]; }
-// distances de natation classiques (bassin)
-const REC_SWIM_DIST = [
-  {k:'50 m',m:50},{k:'100 m',m:100},{k:'200 m',m:200},{k:'400 m',m:400},{k:'800 m',m:800},{k:'1500 m',m:1500}
-];
 
 /* — Puissance vélo (W) selon la durée — modèle plausible autour du FTP/PMA — */
 function powerForDuration(sec){
@@ -6378,17 +6345,13 @@ function swimPaceForDuration(sec){
   if(sec<=1800) return css*(0.98 + (sec-300)/(1800-300)*0.06); // →1.04
   return css*(1.04 + Math.min(0.18,(sec-1800)/3600*0.05));  // dérive longue
 }
-/* — Natation : allure au 100m (sec) selon la DISTANCE — autour du CSS — */
-function swimPaceForDistance(m){
-  const css=ATHLETE_REF.css; // s/100m au seuil
-  let f;
-  if(m<=50) f=0.82;
-  else if(m<=100) f=0.86;
-  else if(m<=200) f=0.91;
-  else if(m<=400) f=0.97;
-  else if(m<=800) f=1.02;
-  else f=1.06;            // 1500m
-  return css*f;          // s/100m
+/* — Vélo : vitesse moyenne (km/h) soutenable selon la distance — décroît avec la distance — */
+function bikeSpeedForDistance(km){
+  if(km<=20) return 42;
+  if(km<=40) return 42 - (km-20)/(40-20)*(42-40);      // 42→40
+  if(km<=100) return 40 - (km-40)/(100-40)*(40-36);    // 40→36
+  if(km<=200) return 36 - (km-100)/(200-100)*(36-32);  // 36→32
+  return 32 - Math.min(3,(km-200)/100*3);              // →29 @300km
 }
 
 function runPaceForDistance(m){
@@ -6412,9 +6375,10 @@ function renderRecords(){
   let html='';
   if(recTab==='bike'){
     grid.style.setProperty('--rc','var(--bike)');
-    html = REC_DURATIONS.map((d,i)=>{
-      const w=powerForDuration(d.s);
-      return recCard(d.k, w, 'W', recDate(i), 'var(--bike)', (w/70).toFixed(1)+' W/kg');
+    html = REC_BIKE_DIST.map((d,i)=>{
+      const kmh=bikeSpeedForDistance(d.km);
+      const totalMin=d.km/kmh*60;
+      return recCard(d.k, kmh.toFixed(1), 'km/h', recDate(i), 'var(--bike)', fmtClock(totalMin)+' au total');
     }).join('');
   } else {
     grid.style.setProperty('--rc','var(--run)');
@@ -6653,64 +6617,8 @@ function todayAdvice(fr, risque, s){
 }
 renderToday();
 
-/* ============================================================
-   PRÉVISIONS DE PERFORMANCE
-   ------------------------------------------------------------
-   Projection simple et transparente : on regarde la tendance de
-   CTL (forme de fond / fitness) sur les dernières semaines. Si la
-   charge progresse régulièrement, on extrapole un gain de forme et
-   on traduit ça en chronos cibles à 4 et 8 semaines.
-   ⚠️ Estimation indicative, pas une garantie de résultat.
-   ============================================================ */
-function renderForecast(){
-  const box=document.getElementById('forecastBody'); if(!box) return;
-  const ctl = STRAVA_DEMO.ctl || [];
-  if(ctl.length<2){ box.innerHTML='<p class="fc-intro">Pas encore assez de données pour une projection.</p>'; return; }
-
-  // tendance hebdo de CTL (pente moyenne sur les dernières semaines)
-  const recent = ctl.slice(-6);
-  const slope = (recent.at(-1) - recent[0]) / (recent.length-1); // gain CTL / semaine
-  const ctlNow = ctl.at(-1);
-  // gain de forme projeté (on plafonne : la forme ne progresse pas linéairement à l'infini)
-  const proj4 = ctlNow + slope*4*0.8;
-  const proj8 = ctlNow + slope*8*0.62;
-  // % d'amélioration de forme → amélioration de perfo (atténuée : ~1/4 du gain de CTL relatif)
-  const gain4 = Math.max(0, (proj4-ctlNow)/Math.max(ctlNow,1)) * 0.25;
-  const gain8 = Math.max(0, (proj8-ctlNow)/Math.max(ctlNow,1)) * 0.25;
-
-  // tendance
-  let trendCls, trendTxt;
-  if(slope>0.6){ trendCls='up'; trendTxt='📈 Forme en progression'; }
-  else if(slope>-0.4){ trendCls='flat'; trendTxt='➡️ Forme stable'; }
-  else { trendCls='down'; trendTxt='📉 Forme en baisse — phase de récup ?'; }
-
-  // chronos actuels de référence (perfs réelles de l'athlète)
-  const refs = [
-    {label:'10 km', base:31*60+45},     // 31:45
-    {label:'Semi',  base:68*60+52},     // 1:08:52
-    {label:'5 km',  base:15*60+18}      // estimé
-  ];
-  const fmtT=(sec)=>{ sec=Math.round(sec); const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;
-    return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0'); };
-
-  const cards = refs.map(r=>{
-    const t4 = r.base*(1-gain4), t8=r.base*(1-gain8);
-    const d4 = r.base-t4, d8=r.base-t8;
-    return `<div class="fc-card">
-      <div class="fc-card-h">🏃 ${r.label}</div>
-      <div class="fc-row now"><span class="fc-when">Estimé aujourd'hui</span><span class="fc-val">${fmtT(r.base)}</span></div>
-      <div class="fc-row proj"><span class="fc-when">Dans 4 semaines</span><span class="fc-val">${fmtT(t4)}${d4>1?`<span class="fc-delta">-${Math.round(d4)}s</span>`:''}</span></div>
-      <div class="fc-row proj"><span class="fc-when">Dans 8 semaines</span><span class="fc-val">${fmtT(t8)}${d8>1?`<span class="fc-delta">-${Math.round(d8)}s</span>`:''}</span></div>
-    </div>`;
-  }).join('');
-
-  box.innerHTML = `
-    <p class="fc-intro">Projection basée sur l'évolution de ta forme de fond (CTL) au fil de tes séances. Plus ta charge progresse régulièrement, plus la projection est favorable.</p>
-    <div class="fc-trend ${trendCls}">${trendTxt} · CTL ${ctlNow.toFixed(0)} (${slope>=0?'+':''}${slope.toFixed(1)}/sem)</div>
-    <div class="fc-grid">${cards}</div>
-    <p class="fc-disclaimer">⚠️ Estimations indicatives, fondées sur ta tendance de charge actuelle. Les vraies performances dépendent aussi de l'affûtage, de la météo, du parcours, du sommeil et de la nutrition. À utiliser comme repère de motivation, pas comme une promesse.</p>`;
-}
-renderForecast();
+/* Prévisions de performance (estimation de chronos selon la charge) retirées :
+   projection non fiable scientifiquement — supprimée à la demande. */
 
 /* ============================================================
    MATÉRIEL — suivi d'usure des chaussures et vélos
