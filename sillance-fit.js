@@ -21,11 +21,21 @@
   const NEUTRAL_COND = { temp: 15, humidity: 50, wind: 0, windHead: false };
 
   function parseFile(file, opts) {
+    const isFit = /\.fit$/i.test(file.name || "");
     return new Promise((resolve) => {
       const r = new FileReader();
-      r.onload = () => resolve(parse(String(r.result || ""), file.name || "", opts));
-      r.onerror = () => resolve({ ok: false, error: "Lecture du fichier impossible." });
-      r.readAsText(file);
+      if (isFit) {
+        r.onload = () => {
+          try { resolve(parseFitBuffer(r.result, file.name || "", opts)); }
+          catch (e) { resolve({ ok: false, error: "Erreur de lecture .FIT : " + (e && e.message ? e.message : e) }); }
+        };
+        r.onerror = () => resolve({ ok: false, error: "Lecture du fichier impossible." });
+        r.readAsArrayBuffer(file);
+      } else {
+        r.onload = () => resolve(parse(String(r.result || ""), file.name || "", opts));
+        r.onerror = () => resolve({ ok: false, error: "Lecture du fichier impossible." });
+        r.readAsText(file);
+      }
     });
   }
 
@@ -47,24 +57,42 @@
       if (disc == null) disc = guessDiscFromName(name);
       if (!raw || raw.length < 4) return { ok: false, error: "Pas assez de points GPS/capteur dans le fichier." };
 
-      const data = buildData(raw, disc, lapsRaw, opts);
-      const summary = {
-        provider: "upload",
-        source: isTcx ? "TCX" : "GPX",
-        disc,
-        title: titleFor(disc, data),
-        date: raw[0].time ? new Date(raw[0].time) : null,
-        durMin: Math.round(data.pts[data.pts.length - 1].t),
-        dist: +data.dist.toFixed(2),
-        avgHr: data.avgHr, maxHr: data.maxHr,
-        avgSpeed: +data.avgSpeed.toFixed(2),
-        dplus: data.dplus,
-        hasPower: data.pts.some((p) => p.pw > 0),
-        hasHr: data.pts.some((p) => p.hr > 0),
-      };
-      return { ok: true, summary, data };
+      return finalize(raw, disc, lapsRaw, isTcx ? "TCX" : "GPX", opts);
     } catch (e) {
       return { ok: false, error: "Erreur de lecture : " + (e && e.message ? e.message : e) };
+    }
+  }
+
+  // Construction commune du résumé + de `data` (partagée TCX/GPX/FIT).
+  function finalize(raw, disc, lapsRaw, source, opts) {
+    const data = buildData(raw, disc, lapsRaw, opts);
+    const summary = {
+      provider: "upload",
+      source,
+      disc,
+      title: titleFor(disc, data),
+      date: raw[0].time ? new Date(raw[0].time) : null,
+      durMin: Math.round(data.pts[data.pts.length - 1].t),
+      dist: +data.dist.toFixed(2),
+      avgHr: data.avgHr, maxHr: data.maxHr,
+      avgSpeed: +data.avgSpeed.toFixed(2),
+      dplus: data.dplus,
+      hasPower: data.pts.some((p) => p.pw > 0),
+      hasHr: data.pts.some((p) => p.hr > 0),
+    };
+    return { ok: true, summary, data };
+  }
+
+  function parseFitBuffer(buf, filename, opts) {
+    opts = opts || {};
+    try {
+      const name = (filename || "").toLowerCase();
+      const { raw, disc: fitDisc } = readFit(buf);
+      const disc = fitDisc != null ? fitDisc : guessDiscFromName(name);
+      if (!raw || raw.length < 4) return { ok: false, error: "Pas assez de points GPS/capteur dans le fichier." };
+      return finalize(raw, disc, [], "FIT", opts);
+    } catch (e) {
+      return { ok: false, error: "Erreur de lecture .FIT : " + (e && e.message ? e.message : e) };
     }
   }
 
@@ -157,6 +185,140 @@
     let disc = null;
     const t = doc.getElementsByTagName("type")[0];
     if (t) disc = mapSport(t.textContent || "");
+    return { raw, disc };
+  }
+
+  /* ---------- FIT (binaire — Garmin/Coros/Wahoo) ----------
+     Implémentation minimale du protocole FIT : lit les messages
+     "record" (le flux de points, mesg global #20) et le sport déclaré
+     dans "session"/"sport" (mesg #18/#12). Suffit à alimenter le même
+     pipeline que TCX/GPX (buildData). Ce qui n'est PAS géré : les
+     champs "developer data" (juste sautés proprement), les mesgs
+     autres que record/session/sport (ignorés), le multi-activité
+     (on lit tout le fichier comme une seule activité).
+     ⚠️ Écrit à partir de la doc du protocole FIT (pas de lib externe,
+     zéro dépendance) ; à valider sur un vrai export Garmin/Coros avant
+     de considérer le format aussi éprouvé que TCX/GPX. */
+  const FIT_EPOCH_MS = 631065600000; // 1989-12-31T00:00:00Z, en ms depuis l'epoch Unix
+
+  // base_type (byte complet, avec le bit 5 "endian-sensitive" déjà inclus) -> { taille en octets, lecture }
+  const FIT_BASE_TYPES = {
+    0x00: { size: 1, read: (dv, o) => dv.getUint8(o) },                    // enum
+    0x01: { size: 1, read: (dv, o) => dv.getInt8(o) },                     // sint8
+    0x02: { size: 1, read: (dv, o) => dv.getUint8(o) },                    // uint8
+    0x83: { size: 2, read: (dv, o, le) => dv.getInt16(o, le) },            // sint16
+    0x84: { size: 2, read: (dv, o, le) => dv.getUint16(o, le) },           // uint16
+    0x85: { size: 4, read: (dv, o, le) => dv.getInt32(o, le) },            // sint32
+    0x86: { size: 4, read: (dv, o, le) => dv.getUint32(o, le) },           // uint32
+    0x07: { size: 1, read: (dv, o) => dv.getUint8(o) },                    // string (octet par octet)
+    0x88: { size: 4, read: (dv, o, le) => dv.getFloat32(o, le) },          // float32
+    0x89: { size: 8, read: (dv, o, le) => dv.getFloat64(o, le) },          // float64
+    0x0A: { size: 1, read: (dv, o) => dv.getUint8(o) },                    // uint8z
+    0x8B: { size: 2, read: (dv, o, le) => dv.getUint16(o, le) },           // uint16z
+    0x8C: { size: 4, read: (dv, o, le) => dv.getUint32(o, le) },           // uint32z
+    0x0D: { size: 1, read: (dv, o) => dv.getUint8(o) },                    // byte
+  };
+  const FIT_SPORT_MAP = { 1: "run", 2: "bike", 21: "bike", 5: "swim" }; // enum FIT sport -> discipline app
+
+  function readFit(buf) {
+    const dv = new DataView(buf);
+    if (dv.byteLength < 14) throw new Error("Fichier trop court pour être un .FIT valide.");
+    const headerSize = dv.getUint8(0);
+    const sig = String.fromCharCode(dv.getUint8(8), dv.getUint8(9), dv.getUint8(10), dv.getUint8(11));
+    if (sig !== ".FIT") throw new Error("Signature .FIT absente — fichier invalide ou corrompu.");
+    const dataSize = dv.getUint32(4, true);
+    const end = Math.min(headerSize + dataSize, dv.byteLength);
+
+    const defs = {};        // local message type (0-15) -> définition
+    const raw = [];
+    let disc = null;
+    let lastTimestamp = null; // dernier timestamp complet lu (secondes FIT), pour les en-têtes compressés
+
+    let offset = headerSize;
+    while (offset < end) {
+      const recHeader = dv.getUint8(offset); offset += 1;
+      const isDefinition = !!(recHeader & 0x40);
+      const isCompressedTs = !!(recHeader & 0x80);
+
+      if (isDefinition) {
+        const localType = recHeader & 0x0F;
+        offset += 1; // octet réservé
+        const archByte = dv.getUint8(offset); offset += 1;
+        const littleEndian = archByte === 0;
+        const globalNum = dv.getUint16(offset, littleEndian); offset += 2;
+        const numFields = dv.getUint8(offset); offset += 1;
+        const fields = [];
+        for (let i = 0; i < numFields; i++) {
+          const num = dv.getUint8(offset), size = dv.getUint8(offset + 1), baseType = dv.getUint8(offset + 2);
+          fields.push({ num, size, baseType });
+          offset += 3;
+        }
+        let devFields = [];
+        const hasDevFields = !!(recHeader & 0x20);
+        if (hasDevFields) {
+          const numDev = dv.getUint8(offset); offset += 1;
+          for (let i = 0; i < numDev; i++) {
+            devFields.push({ size: dv.getUint8(offset + 1) });
+            offset += 3; // field_num(1) + size(1) + dev_data_index(1) — non résolus, juste sautés
+          }
+        }
+        defs[localType] = { globalNum, littleEndian, fields, devFields };
+        continue;
+      }
+
+      // message de données
+      let localType, timeOffset = null;
+      if (isCompressedTs) {
+        localType = (recHeader >> 5) & 0x03;   // 2 bits seulement (0-3) pour l'en-tête compressé
+        timeOffset = recHeader & 0x1F;         // décalage en secondes (0-31) depuis le dernier timestamp complet
+      } else {
+        localType = recHeader & 0x0F;
+      }
+      const def = defs[localType];
+      if (!def) throw new Error("Message de données sans définition connue (fichier .FIT malformé).");
+
+      const values = {};
+      for (const f of def.fields) {
+        const bt = FIT_BASE_TYPES[f.baseType];
+        // Champ tableau/composite (taille déclarée > taille du type de base) : on ne lit que le
+        // 1er élément, le reste est sauté par l'avance systématique d'offset ci-dessous.
+        if (bt && f.size >= bt.size) values[f.num] = bt.read(dv, offset, def.littleEndian);
+        offset += f.size;
+      }
+      for (const df of def.devFields) offset += df.size; // champs "developer" : sautés (taille connue, valeur ignorée)
+
+      if (def.globalNum === 20) { // "record" : un point du flux
+        let tsSec = null;
+        if (isCompressedTs && lastTimestamp != null) {
+          const lastOffset = lastTimestamp & 0x1F;
+          let ts = (lastTimestamp - lastOffset) + timeOffset;
+          if (timeOffset < lastOffset) ts += 32; // rollover sur 5 bits
+          tsSec = ts;
+        } else if (values[253] != null) {
+          tsSec = values[253];
+        }
+        if (tsSec != null) lastTimestamp = tsSec;
+
+        const alt = values[78] != null ? (values[78] / 5 - 500) : (values[2] != null ? (values[2] / 5 - 500) : null);
+        const spd = values[73] != null ? (values[73] / 1000) : (values[6] != null ? (values[6] / 1000) : null);
+        raw.push({
+          time: tsSec != null ? FIT_EPOCH_MS + tsSec * 1000 : null,
+          lat: values[0] != null ? values[0] * (180 / 2147483648) : null,
+          lon: values[1] != null ? values[1] * (180 / 2147483648) : null,
+          alt,
+          distM: values[5] != null ? values[5] / 100 : null,
+          hr: values[3] != null ? values[3] : 0,
+          cad: values[4] != null ? values[4] : 0,
+          pw: values[7] != null ? values[7] : 0,
+          spdMs: spd,
+        });
+      } else if (def.globalNum === 18 && disc == null && values[5] != null) { // "session" : sport
+        disc = FIT_SPORT_MAP[values[5]] || null;
+      } else if (def.globalNum === 12 && disc == null && values[0] != null) { // "sport" (fallback)
+        disc = FIT_SPORT_MAP[values[0]] || null;
+      }
+    }
+
     return { raw, disc };
   }
 
