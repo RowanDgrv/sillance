@@ -443,6 +443,36 @@ export const PF = {
     const { data } = await q;
     return data ?? [];
   },
+  // Persiste un import manuel .TCX/.GPX (window.PFFit.parseFile → { summary, data }).
+  // Upsert sur (provider, provider_activity_id) : ré-importer le même fichier ne duplique pas.
+  async saveActivity(summary, data) {
+    const avgPowerPts = (data?.pts || []).filter((p) => p.pw > 0).map((p) => p.pw);
+    const avgPower = avgPowerPts.length
+      ? Math.round(avgPowerPts.reduce((a, b) => a + b, 0) / avgPowerPts.length)
+      : null;
+    const startTime = summary.date ? new Date(summary.date) : new Date();
+    const row = {
+      user_id: this.user.id,
+      provider: "upload",
+      provider_activity_id: `${summary.source}-${startTime.getTime()}-${Math.round((summary.dist || 0) * 1000)}`,
+      disc: summary.disc,
+      name: summary.title,
+      start_time: startTime.toISOString(),
+      duration_s: Math.round((summary.durMin || 0) * 60),
+      distance_m: Math.round((summary.dist || 0) * 1000),
+      elevation_m: summary.dplus ?? null,
+      avg_hr: summary.avgHr || null,
+      max_hr: summary.maxHr || null,
+      avg_power: avgPower,
+      avg_speed: summary.avgSpeed ?? null,
+      raw: data ?? null,
+    };
+    const { data: saved, error } = await sb.from("external_activities")
+      .upsert(row, { onConflict: "provider,provider_activity_id" })
+      .select().single();
+    if (error) { console.warn("saveActivity:", error.message); return null; }
+    return saved;
+  },
 
   // -------- interne --------
   async _invoke(fn, body) {

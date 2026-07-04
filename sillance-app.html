@@ -3037,7 +3037,9 @@ function importActivityFile(file){
     renderStravaCard();
     openAnalysis({id:'imp'+Date.now(), disc:s.disc, title:s.title, dur:s.durMin, zone:'Z2', _realData:res.data});
     toast('Activité importée');
-    // PROD : PF.saveActivity(res.summary, res.data) → table external_activities (à câbler).
+    if(window.PF?.user){
+      PF.saveActivity(res.summary, res.data).catch(e=>console.warn('[PF] saveActivity échoué :', e));
+    }
   });
 }
 
