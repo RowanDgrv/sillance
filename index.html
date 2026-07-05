@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sillance — L'entraînement autrement</title>
-<meta name="description" content="Sillance — une plateforme unique pour planifier, analyser et faire progresser. Coachs, clubs et athlètes. Triathlon, Hyrox, multisport.">
+<title>Sillance, entre dans le sillage</title>
+<meta name="description" content="Sillance, la plateforme de coaching qui met ton entraînement dans le sillage de ton coach. Triathlon, Hyrox, course à pied.">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sillance">
-<meta property="og:title" content="Sillance — L'entraînement autrement">
-<meta property="og:description" content="La plateforme qui fait progresser coach & athlète — dans le sillage l'un de l'autre. Triathlon, Hyrox, multisport.">
+<meta property="og:title" content="Sillance, entre dans le sillage">
+<meta property="og:description" content="La plateforme qui fait progresser coach et athlète, dans le sillage l'un de l'autre. Triathlon, Hyrox, course à pied.">
 <meta property="og:image" content="__SITE_URL__/og-image.png">
 <meta property="og:url" content="__SITE_URL__/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Sillance — L'entraînement autrement">
-<meta name="twitter:description" content="La plateforme qui fait progresser coach & athlète. Triathlon, Hyrox, multisport.">
+<meta name="twitter:title" content="Sillance, entre dans le sillage">
+<meta name="twitter:description" content="La plateforme qui fait progresser coach et athlète. Triathlon, Hyrox, course à pied.">
 <meta name="twitter:image" content="__SITE_URL__/og-image.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -23,6 +23,7 @@
   --ink:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8;
   --line:rgba(150,165,200,.14); --line-strong:rgba(150,165,200,.28);
   --accent:#46C2D8;
+  --accent2:#FF9A3D;
   --display:'Oswald',sans-serif; --ui:'Archivo',sans-serif; --mono:'JetBrains Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -32,18 +33,14 @@ body{background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--margin)}
 
-/* ---------- fond vidéo immersif ---------- */
-.bgfx{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0B1120}
-.bgfx video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42}
-/* dégradé/halo de secours (visible tant qu'aucune vidéo n'est fournie, et posé par-dessus pour la lisibilité) */
-.bgfx::after{content:"";position:absolute;inset:0;
-  background:
-    radial-gradient(900px 600px at 78% 12%, rgba(70,194,216,.18), transparent 60%),
-    radial-gradient(800px 600px at 12% 88%, rgba(70,194,216,.10), transparent 60%),
-    linear-gradient(180deg, rgba(11,17,32,.55), rgba(11,17,32,.82) 60%, var(--paper) 100%)}
-@keyframes drift{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-2%,0)}100%{transform:translate3d(0,0,0)}}
-.bgfx{animation:drift 18s ease-in-out infinite}
 main,.nav,footer{position:relative;z-index:1}
+
+/* ---------- fond du hero : blob 3D généré en WebGL (sillage) ---------- */
+.hero-canvas{position:absolute;inset:0;z-index:0;width:100%;height:100%;display:block}
+.hero-fallback{position:absolute;inset:0;z-index:0;background:
+    radial-gradient(circle at 62% 46%, rgba(70,194,216,.22), transparent 55%),
+    radial-gradient(circle at 38% 62%, rgba(255,154,61,.14), transparent 60%),
+    var(--paper)}
 
 /* ---------- nav ---------- */
 .nav{position:sticky;top:0;z-index:20;background:rgba(11,17,32,.55);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
@@ -65,17 +62,20 @@ main,.nav,footer{position:relative;z-index:1}
 .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent)}
 .h1{font-family:var(--display);font-weight:700;font-size:clamp(48px,9vw,112px);line-height:.96;letter-spacing:-.01em;text-transform:uppercase}
 .h1 .alt{color:var(--accent)}
+.h1 .alt2{color:var(--accent2)}
 .lede{font-family:var(--ui);font-weight:300;font-size:clamp(17px,1.7vw,21px);line-height:1.6;color:var(--soft);max-width:52ch}
 .h2{font-family:var(--display);font-weight:600;font-size:clamp(28px,4vw,46px);line-height:1.05;text-transform:uppercase;letter-spacing:-.005em}
 
 /* ---------- hero immersif ---------- */
-.hero{min-height:92vh;display:flex;align-items:center;padding:120px 0 80px}
+.hero{position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:center;padding:120px 0 80px}
+.hero .wrap{position:relative;z-index:1}
 .hero .kicker{display:block;margin-bottom:26px}
 .hero .lede{margin:28px 0 36px}
 .cta-row{display:flex;gap:14px;flex-wrap:wrap}
 .scrollcue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;
   letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px}
 .scrollcue .ln{width:1px;height:34px;background:linear-gradient(var(--accent),transparent)}
+@media(max-width:640px){.scrollcue{display:none}}
 
 /* ---------- sections ---------- */
 .section{padding:96px 0;border-top:1px solid var(--line);background:var(--paper)}
@@ -111,13 +111,6 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 </style></head>
 <body>
 
-<!-- FOND VIDÉO IMMERSIF — déposer un fichier `fond.mp4` (paysage, sans interface) dans ce dossier -->
-<div class="bgfx" aria-hidden="true">
-  <video autoplay muted loop playsinline preload="auto">
-    <source src="./fond.mp4" type="video/mp4">
-  </video>
-</div>
-
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#top"><svg class="brandmark" width="24" height="16" viewBox="0 0 96 96" fill="none" aria-hidden="true" style="vertical-align:middle"><path d="M74 48 L22 26" stroke="#A9B6CC" stroke-width="8" stroke-linecap="round" opacity=".55"/><path d="M74 48 L22 70" stroke="#A9B6CC" stroke-width="8" stroke-linecap="round" opacity=".55"/><path d="M74 48 L36 37" stroke="#46C2D8" stroke-width="8" stroke-linecap="round"/><path d="M74 48 L36 59" stroke="#46C2D8" stroke-width="8" stroke-linecap="round"/><circle cx="74" cy="48" r="9" fill="#46C2D8"/></svg><span class="wm">Sill<b>ance</b></span></a>
   <div class="nav-links">
@@ -132,10 +125,13 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 
 <main id="top">
   <!-- HERO -->
-  <section class="hero"><div class="wrap">
-    <span class="kicker">Coaching · Club · Athlète — Triathlon, Hyrox, multisport</span>
-    <h1 class="h1">L'entraînement<br><span class="alt">autrement</span></h1>
-    <p class="lede">Une plateforme unique pour planifier, analyser et faire progresser. Du coach à l'athlète, en passant par le club — autour de la donnée qui compte vraiment.</p>
+  <section class="hero">
+    <div class="hero-fallback" id="heroFallback" aria-hidden="true"></div>
+    <canvas class="hero-canvas" id="heroGl" aria-hidden="true"></canvas>
+    <div class="wrap">
+    <span class="kicker">Triathlon · Hyrox · Course à pied</span>
+    <h1 class="h1">Sillance<br>ton <span class="alt2">sillage</span></h1>
+    <p class="lede">Dans l'eau, dans une roue, le sillage porte l'effort à ta place. Ton coach fait de même avec ton entraînement&nbsp;: il calcule la charge, gère la récupération, ajuste la suite, et il ne te reste qu'à suivre le plan.</p>
     <div class="cta-row">
       <a class="btn primary" href="./sillance-app.html">Découvrir la démo</a>
       <a class="btn ghost" href="#roles">En savoir plus</a>
@@ -187,7 +183,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 
   <!-- CTA -->
   <section class="cta"><div class="wrap">
-    <h2 class="h2">Prêt à passer à l'entraînement autrement ?</h2>
+    <h2 class="h2">Prêt à trouver ton sillage ?</h2>
     <p>Explorez la démonstration — coach, club et athlète — sans inscription.</p>
     <div class="cta-row">
       <a class="btn primary" href="./sillance-app.html">Découvrir la démo</a>
@@ -198,13 +194,166 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 
 <footer><div class="wrap">
   <div class="brand" style="font-size:18px"><svg class="brandmark" width="24" height="16" viewBox="0 0 96 96" fill="none" aria-hidden="true" style="vertical-align:middle"><path d="M74 48 L22 26" stroke="#A9B6CC" stroke-width="8" stroke-linecap="round" opacity=".55"/><path d="M74 48 L22 70" stroke="#A9B6CC" stroke-width="8" stroke-linecap="round" opacity=".55"/><path d="M74 48 L36 37" stroke="#46C2D8" stroke-width="8" stroke-linecap="round"/><path d="M74 48 L36 59" stroke="#46C2D8" stroke-width="8" stroke-linecap="round"/><circle cx="74" cy="48" r="9" fill="#46C2D8"/></svg><span class="wm">Sill<b>ance</b></span></div>
-  <div class="fmono">L'entraînement autrement — Triathlon · Hyrox</div>
+  <div class="fmono">Entre dans le sillage — Triathlon · Hyrox · Course à pied</div>
   <div class="fmono">© 2026 Sillance</div>
 </div></footer>
 
 <script>
-// lecture du fond vidéo (relance si le navigateur bloque l'autoplay)
-(function(){var v=document.querySelector('.bgfx video');if(v){v.play().catch(function(){
-  document.addEventListener('click',function o(){v.play().catch(function(){});document.removeEventListener('click',o);},{once:true});});}})();
+/* ---------- Hero : blob 3D strié en WebGL (sillage) ---------- */
+(function(){
+  var canvas = document.getElementById('heroGl');
+  var fallback = document.getElementById('heroFallback');
+  if(!canvas) return;
+  var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if(!gl){ return; } // le dégradé de repli reste visible
+  fallback.style.display = 'none';
+
+  var lost = false;
+  canvas.addEventListener('webglcontextlost', function(e){
+    e.preventDefault();
+    lost = true;
+    canvas.style.display = 'none';
+    fallback.style.display = 'block';
+  });
+
+  var vsSrc = "attribute vec2 aPos; void main(){ gl_Position = vec4(aPos,0.0,1.0); }";
+  var fsSrc = [
+"precision highp float;",
+"uniform vec2 uRes;",
+"uniform float uTime;",
+"mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }",
+"float sph(vec3 p, vec3 c, float r){ return length(p-c)-r; }",
+"float smin(float a, float b, float k){",
+"  float h = clamp(0.5+0.5*(b-a)/k, 0.0, 1.0);",
+"  return mix(b,a,h) - k*h*(1.0-h);",
+"}",
+"float map(vec3 p){",
+"  vec3 q = p;",
+"  q.xz *= rot(uTime*0.1);",
+"  float t = uTime*0.5;",
+"  float d = sph(q, vec3(sin(t*0.9)*0.30, cos(t*0.7)*0.24, sin(t*1.1)*0.18), 0.40);",
+"  d = smin(d, sph(q, vec3(cos(t*1.2)*0.42, sin(t*0.8)*0.30-0.10, cos(t*0.6)*0.22), 0.32), 0.34);",
+"  d = smin(d, sph(q, vec3(sin(t*0.5)*0.16, cos(t*1.3)*0.38+0.16, sin(t*0.8)*0.32), 0.28), 0.32);",
+"  d = smin(d, sph(q, vec3(cos(t*0.8)*0.40, sin(t*0.5)*0.16-0.22, cos(t*1.0)*0.16), 0.26), 0.32);",
+"  d = smin(d, sph(q, vec3(sin(t*1.4)*0.22-0.16, cos(t*0.9)*0.26+0.18, sin(t*0.6)*0.30), 0.24), 0.30);",
+"  d = smin(d, sph(q, vec3(cos(t*0.65)*0.10, sin(t*1.1)*0.40-0.30, cos(t*0.9)*0.12), 0.22), 0.30);",
+"  return d;",
+"}",
+"vec3 calcNormal(vec3 p){",
+"  vec2 e = vec2(0.0015,0.0);",
+"  return normalize(vec3(",
+"    map(p+e.xyy)-map(p-e.xyy),",
+"    map(p+e.yxy)-map(p-e.yxy),",
+"    map(p+e.yyx)-map(p-e.yyx)",
+"  ));",
+"}",
+"float hash(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,45.164)))*43758.5453); }",
+"float vnoise(vec3 p){",
+"  vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);",
+"  float n000=hash(i+vec3(0.0,0.0,0.0)), n100=hash(i+vec3(1.0,0.0,0.0));",
+"  float n010=hash(i+vec3(0.0,1.0,0.0)), n110=hash(i+vec3(1.0,1.0,0.0));",
+"  float n001=hash(i+vec3(0.0,0.0,1.0)), n101=hash(i+vec3(1.0,0.0,1.0));",
+"  float n011=hash(i+vec3(0.0,1.0,1.0)), n111=hash(i+vec3(1.0,1.0,1.0));",
+"  return mix(mix(mix(n000,n100,f.x), mix(n010,n110,f.x), f.y), mix(mix(n001,n101,f.x), mix(n011,n111,f.x), f.y), f.z);",
+"}",
+"void main(){",
+"  vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;",
+"  vec3 ro = vec3(0.0, 0.0, 2.6);",
+"  vec2 uvRay = uv; uvRay.x -= 0.55;",
+"  vec3 rd = normalize(vec3(uvRay, -1.4));",
+"  float t = 0.0; float hitF = 0.0; vec3 p = ro; float steps = 0.0;",
+"  for(int i=0;i<64;i++){",
+"    p = ro + rd*t;",
+"    float d = map(p);",
+"    steps += 1.0;",
+"    if(d < 0.002){ hitF = 1.0; break; }",
+"    if(t > 7.0){ break; }",
+"    t += d*0.85;",
+"  }",
+"  vec2 gc = uv - vec2(0.6,-0.06);",
+"  float glow = smoothstep(0.85, 0.0, length(gc));",
+"  vec3 bg = mix(vec3(0.006,0.010,0.016), vec3(0.03,0.10,0.15), glow*glow);",
+"  vec3 col = bg;",
+"  if(hitF > 0.5){",
+"    vec3 n = calcNormal(p);",
+"    vec3 lightDir = normalize(vec3(0.35,0.55,0.7));",
+"    float diff = clamp(dot(n,lightDir), 0.0, 1.0);",
+"    float fres = pow(1.0 - clamp(dot(n,-rd),0.0,1.0), 2.4);",
+"    float warp = vnoise(p*2.4 + vec3(0.0,uTime*0.04,0.0))*1.1;",
+"    float bands = sin((dot(p, vec3(1.0,0.72,0.9)))*130.0 + warp);",
+"    float stripe = smoothstep(-0.06, 0.06, bands);",
+"    float ao = clamp(1.0 - steps/64.0*1.35, 0.0, 1.0);",
+"    vec3 base = mix(vec3(0.02), vec3(0.90), stripe) * mix(0.45, 1.0, diff);",
+"    base *= mix(0.3, 1.0, ao);",
+"    float fresTight = pow(1.0 - clamp(dot(n,-rd),0.0,1.0), 4.0);",
+"    float crevice = pow(1.0-ao, 2.6);",
+"    vec3 rimGlow = vec3(0.25,0.75,1.0) * fresTight*2.2;",
+"    vec3 coreGlow = vec3(1.0,0.55,0.18) * crevice*0.85;",
+"    col = base + rimGlow + coreGlow;",
+"  } else {",
+"    col += vec3(0.2,0.55,0.85) * glow * 0.14;",
+"  }",
+"  float vig = smoothstep(1.4, 0.2, length(uv));",
+"  col *= vig;",
+"  col = pow(max(col,0.0), vec3(0.82));",
+"  gl_FragColor = vec4(col, 1.0);",
+"}"
+  ].join("\n");
+
+  function compile(type, src){
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+      console.error(gl.getShaderInfoLog(s));
+      return null;
+    }
+    return s;
+  }
+  var vs = compile(gl.VERTEX_SHADER, vsSrc);
+  var fs = compile(gl.FRAGMENT_SHADER, fsSrc);
+  if(!vs || !fs){ fallback.style.display = 'block'; return; }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    console.error(gl.getProgramInfoLog(prog));
+    fallback.style.display = 'block'; return;
+  }
+  gl.useProgram(prog);
+
+  var quad = new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]);
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+  var aPos = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  var uRes = gl.getUniformLocation(prog, 'uRes');
+  var uTime = gl.getUniformLocation(prog, 'uTime');
+
+  function resize(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = Math.floor(w*dpr); canvas.height = Math.floor(h*dpr);
+    gl.viewport(0,0,canvas.width, canvas.height);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var start = performance.now();
+  var frozen = reduceMotion;
+  function frame(now){
+    if(lost) return;
+    var t = frozen ? 0.6 : (now - start) / 1000;
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uTime, t);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    if(!frozen) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body></html>
