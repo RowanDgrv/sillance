@@ -1,0 +1,10 @@
+# Sillance — https://rowandgrv.github.io/sillance/
+User-agent: *
+Allow: /
+
+# Vues applicatives (interface, non pertinentes pour l'indexation)
+Disallow: /sillance-app.html
+Disallow: /sillance-calendrier.html
+Disallow: /sillance-review.html
+
+Sitemap: https://rowandgrv.github.io/sillance/sitemap.xml

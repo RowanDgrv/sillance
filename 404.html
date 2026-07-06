@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
+<meta name="robots" content="noindex">
+<title>Page introuvable — Sillance</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Archivo:wght@300;400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#0B1120;--ink:#F3F6FC;--soft:#C7D0E0;--muted:#8A93A8;--accent:#46C2D8;--accent2:#FF9A3D;
+    --line-strong:rgba(150,165,200,.30);--display:'Oswald',sans-serif;--ui:'Archivo',sans-serif;--mono:'JetBrains Mono',monospace}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;background:
+      radial-gradient(700px 460px at 78% 22%, rgba(70,194,216,.16), transparent 60%),
+      radial-gradient(560px 440px at 20% 96%, rgba(255,154,61,.10), transparent 62%),
+      var(--paper);
+    color:var(--soft);font-family:var(--ui);display:flex;align-items:center;justify-content:center;padding:40px 22px;-webkit-font-smoothing:antialiased}
+  .box{max-width:560px;text-align:center}
+  .code{font-family:var(--mono);font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:22px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,9vw,80px);line-height:.95;text-transform:uppercase;color:var(--ink);letter-spacing:-.01em}
+  h1 .o{color:var(--accent2)}
+  p{font-size:17px;font-weight:300;line-height:1.6;margin:20px 0 32px;color:var(--soft)}
+  .cta{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  a.btn{font-weight:600;font-size:14px;padding:13px 24px;border-radius:8px;text-decoration:none;transition:.16s;display:inline-block}
+  a.primary{background:var(--accent);color:#062028}
+  a.primary:hover{filter:brightness(1.07)}
+  a.ghost{border:1px solid var(--line-strong);color:var(--soft)}
+  a.ghost:hover{border-color:var(--accent);color:var(--ink)}
+</style></head>
+<body>
+  <div class="box">
+    <div class="code">Erreur 404</div>
+    <h1>Hors du <span class="o">sillage</span></h1>
+    <p>Cette page n'existe pas ou a été déplacée. Reviens dans le courant.</p>
+    <div class="cta">
+      <a class="btn primary" href="./index.html">Retour à l'accueil</a>
+      <a class="btn ghost" href="./sillance-app.html">Découvrir la démo</a>
+    </div>
+  </div>
+</body></html>
