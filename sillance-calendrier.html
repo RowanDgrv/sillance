@@ -200,10 +200,38 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
   font-weight:600;font-size:13px;letter-spacing:.03em;transition:.2s;
 }
 .mode button.active{background:linear-gradient(120deg, rgba(47,217,255,.16), rgba(157,123,255,.16));color:var(--text)}
-.plan-athlete-select{
-  border:1px solid var(--line-strong);border-radius:10px;background:var(--panel);color:var(--text);
-  font-weight:600;font-size:12.5px;padding:8px 10px;max-width:170px;
+/* ---------- Sélecteur d'athlète (mode coach) ---------- */
+.ath-picker{position:relative}
+.ap-btn{
+  display:flex;align-items:center;gap:9px;border:1px solid var(--line-strong);border-radius:12px;
+  background:var(--panel);color:var(--text);font-weight:600;font-size:13px;padding:7px 12px 7px 8px;
+  cursor:pointer;transition:border-color .15s;
 }
+.ap-btn:hover{border-color:var(--swim)}
+.ap-av{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:700;font-size:10.5px;color:#08131c;background:var(--ac,var(--swim))}
+.ap-forme{font-family:var(--font-data);font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;
+  background:color-mix(in srgb,var(--fc,var(--good)) 15%,transparent);color:var(--fc,var(--good))}
+.ap-chev{width:8px;height:8px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);
+  transform:rotate(45deg) translateY(-2px);flex:none}
+.ap-menu{
+  position:absolute;top:calc(100% + 8px);right:0;z-index:60;width:330px;
+  background:var(--panel);border:1px solid var(--line-strong);border-radius:14px;padding:8px;
+  box-shadow:0 18px 50px rgba(0,0,0,.55);
+}
+.ap-head{font-family:var(--font-data);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);padding:6px 10px 8px}
+.ap-row{
+  display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;width:100%;text-align:left;
+  background:transparent;border:none;border-radius:10px;padding:9px 10px;cursor:pointer;color:var(--text);transition:.12s;
+}
+.ap-row:hover{background:var(--panel-2)}
+.ap-row.sel{background:rgba(47,217,255,.08)}
+.ap-row .ap-av{width:32px;height:32px;font-size:12px}
+.ap-n{font-weight:700;font-size:13.5px}
+.ap-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.ap-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.ap-note{font-size:10px;font-weight:600;color:var(--fc,var(--muted))}
 
 /* ---------- Bandeau stats + ECG ---------- */
 .pulse-strip{
@@ -1489,9 +1517,10 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
       <button id="modeAthlete" role="tab" aria-selected="false"><i class="ic ic-user"></i>Athlète</button>
       <button id="modeClub" role="tab" aria-selected="false"><i class="ic ic-landmark"></i>Club</button>
     </div>
-    <select id="planAthleteSelect" class="plan-athlete-select" aria-label="Planifier pour" hidden>
-      <option value="">Moi-même</option>
-    </select>
+    <div class="ath-picker" id="athPicker" hidden>
+      <button class="ap-btn" id="apBtn" aria-haspopup="listbox" aria-expanded="false"></button>
+      <div class="ap-menu" id="apMenu" role="listbox" hidden></div>
+    </div>
     <button class="icon-btn theme-btn" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre">
       <span id="themeIcon"><i class="ic ic-moon"></i></span>
     </button>
@@ -1545,7 +1574,7 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
     <div class="stat">
       <div class="k">Prochaine course</div>
       <div class="v" id="raceCountdown">J–22</div>
-      <div class="trend flat">Gorillaman · Montauban</div>
+      <div class="trend flat" id="raceName">Gorillaman · Sprint</div>
     </div>
     <div class="stat stat-tech">
       <div class="k">Charge semaine</div>
@@ -2445,20 +2474,50 @@ let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
 function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${String(m).padStart(2,'0')}`:`${m}min`; }
 
-/* ---- Coach : pour quel athlète planifie-t-on ? (défaut : pour soi-même) ---- */
-let COACH_ATHLETES = [];       // [{id, name}] — rempli par l'intégration Supabase
-let currentAthleteId = null;   // null = "Moi-même" (comportement historique)
+/* ============================================================
+   COACH — roster d'athlètes suivis (sélecteur riche, style Nolio/iDO)
+   ------------------------------------------------------------
+   Le coach choisit QUEL athlète il regarde : le calendrier, la charge
+   et la fraîcheur affichés sont ceux de l'athlète sélectionné.
+   Chaque entrée montre la forme du check-in DU MATIN + la prochaine
+   course : le coach repère d'un coup d'œil qui a besoin d'un
+   allègement avant même d'ouvrir son plan.
+   En démo : 6 athlètes fictifs, plans dérivés du plan de base avec
+   une assiduité propre à chacun. Connecté : le roster réel (Supabase)
+   remplace la démo via setCoachAthletes().
+   ============================================================ */
+const COACH_ROSTER = [
+ {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8}, race:{name:'Gorillaman · Sprint',   days:22}, drop:0,    comp:1.0},
+ {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55},
+ {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8}, race:{name:'HYROX Bordeaux',        days:35}, drop:0.10, comp:0.95},
+ {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6}, race:{name:'Semi de Blagnac',       days:14}, drop:0.25, comp:0.70},
+ {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9}, race:{name:'70.3 Aix-en-Provence',  days:98}, drop:0.30, comp:1.0},
+ {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35},
+];
+let ROSTER = COACH_ROSTER;     // remplacé par le roster réel une fois connecté
+let rosterIsReal = false;
+let selectedAthleteIdx = 0;
+let currentAthleteId = null;   // id Supabase (mode réel uniquement)
+
+function athForme(a){ return a.checkin ? Math.round((a.checkin.sommeil + (10-a.checkin.fatigue) + a.checkin.motivation)/30*100) : null; }
+function athFormeColor(s){ return s==null ? 'var(--muted)' : s>=75 ? 'var(--good)' : s>=55 ? 'var(--bike)' : 'var(--run)'; }
+function athNote(s){ return s==null ? '' : s>=75 ? 'Prêt pour la qualité' : s>=55 ? 'À surveiller' : 'Allègement conseillé'; }
+
 function setCoachAthletes(list, defaultId){
-  COACH_ATHLETES = list || [];
-  const sel = document.getElementById('planAthleteSelect'); if(!sel) return;
-  sel.innerHTML = '<option value="">Moi-même</option>' +
-    COACH_ATHLETES.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
-  if(defaultId){ sel.value = defaultId; currentAthleteId = defaultId; }
+  if(list && list.length){
+    ROSTER = list.map(a=>({ id:a.id, name:a.name,
+      ini:(a.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+      color:'#46C2D8', checkin:null, race:null }));
+    rosterIsReal = true;
+    selectedAthleteIdx = Math.max(0, ROSTER.findIndex(a=>a.id===defaultId));
+    currentAthleteId = defaultId || ROSTER[0].id;
+  }
+  renderAthPicker();
   updatePlanAthleteVisibility();
 }
 function updatePlanAthleteVisibility(){
-  const sel = document.getElementById('planAthleteSelect'); if(!sel) return;
-  sel.hidden = !(mode==='coach' && COACH_ATHLETES.length);
+  const el = document.getElementById('athPicker'); if(!el) return;
+  el.hidden = mode!=='coach';
 }
 // Compte confirmé sans la moindre activité réelle : masque l'analyse et les
 // records de démo plutôt que de les présenter comme si c'était les siens.
@@ -3346,11 +3405,88 @@ function setActiveMode(btn){ [mc,ma,mcl].forEach(b=>b.classList.remove('active')
 mc.onclick = ()=>{ mode='coach'; setActiveMode(mc); renderSidebar(); render(); updateVideolibVisibility(); updatePlanAthleteVisibility(); };
 ma.onclick = ()=>{ mode='athlete'; setActiveMode(ma); renderSidebar(); render(); updateVideolibVisibility(); updatePlanAthleteVisibility(); };
 mcl.onclick = ()=>{ mode='club'; setActiveMode(mcl); updateVideolibVisibility(); renderClub(); updatePlanAthleteVisibility(); };
-document.getElementById('planAthleteSelect').addEventListener('change', e=>{
-  currentAthleteId = e.target.value || null;
-  if(typeof window.__pf_loadPlanningFor==='function') window.__pf_loadPlanningFor(currentAthleteId);
-  else { renderSidebar(); render(); }
-});
+/* ---- Sélecteur d'athlète : rendu + bascule ---- */
+let BASE_PLANNING = null;   // plan de référence (celui de l'athlète 1), figé au 1er changement
+function mulberry(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+function apRowHtml(a, i){
+  const forme = athForme(a), fc = athFormeColor(forme);
+  const sub = a.race ? `${a.race.name} · J–${a.race.days}` : 'Athlète suivi';
+  return `<button class="ap-row ${i===selectedAthleteIdx?'sel':''}" data-idx="${i}" role="option" aria-selected="${i===selectedAthleteIdx}">
+    <span class="ap-av" style="--ac:${a.color}">${a.ini}</span>
+    <span><span class="ap-n">${a.name}</span><span class="ap-sub" style="display:block">${sub}</span></span>
+    <span class="ap-right">
+      <span class="ap-forme" style="--fc:${fc}">${forme==null?'—':forme+'%'}</span>
+      ${forme!=null?`<span class="ap-note" style="--fc:${fc}">${athNote(forme)}</span>`:''}
+    </span>
+  </button>`;
+}
+function renderAthPicker(){
+  const btn=document.getElementById('apBtn'), menu=document.getElementById('apMenu');
+  if(!btn || !menu) return;
+  const a = ROSTER[selectedAthleteIdx];
+  const forme = athForme(a);
+  btn.innerHTML = `<span class="ap-av" style="--ac:${a.color}">${a.ini}</span>
+    <span>${a.name}</span>
+    <span class="ap-forme" style="--fc:${athFormeColor(forme)}">${forme==null?'—':forme+'%'}</span>
+    <span class="ap-chev"></span>`;
+  menu.innerHTML = `<div class="ap-head">Mes athlètes · forme du check-in de ce matin</div>` +
+    ROSTER.map((x,i)=>apRowHtml(x,i)).join('');
+  menu.querySelectorAll('.ap-row').forEach(r=> r.onclick=()=>selectAthlete(+r.dataset.idx));
+}
+function selectAthlete(i){
+  selectedAthleteIdx = i;
+  const a = ROSTER[i];
+  document.getElementById('apMenu').hidden = true;
+  document.getElementById('apBtn').setAttribute('aria-expanded','false');
+  if(rosterIsReal){
+    currentAthleteId = a.id;
+    if(typeof window.__pf_loadPlanningFor==='function') window.__pf_loadPlanningFor(currentAthleteId);
+  } else {
+    applyDemoAthlete(i);
+  }
+  renderAthPicker();
+}
+/* Reconstruit le planning affiché pour l'athlète démo i : même trame que le
+   plan de base, mais assiduité (done/rpe) et volume propres à chacun. */
+function applyDemoAthlete(i){
+  const a = COACH_ROSTER[i];
+  if(!BASE_PLANNING) BASE_PLANNING = JSON.parse(JSON.stringify(planning));
+  for(const k of Object.keys(planning)) delete planning[k];
+  const rnd = mulberry(1000 + i*77);
+  const todayK = iso(new Date());
+  for(const k of Object.keys(BASE_PLANNING)){
+    for(const s of BASE_PLANNING[k]){
+      if(i>0 && rnd() < a.drop) continue;
+      const c = {...s};
+      if(i>0 && k < todayK && c.done){
+        c.done = rnd() < a.comp;
+        if(c.done){ c.rpe = Math.max(2, Math.min(10, (s.rpe||5) + Math.round((rnd()-0.5)*2))); }
+        else { c.rpe = null; }
+      }
+      (planning[k] ||= []).push(c);
+    }
+  }
+  Object.assign(checkin, a.checkin);
+  const rc = document.getElementById('raceCountdown'); if(rc) rc.textContent = 'J–'+a.race.days;
+  const rn = document.getElementById('raceName'); if(rn) rn.textContent = a.race.name;
+  renderSidebar(); render();
+}
+(function initAthPicker(){
+  const btn=document.getElementById('apBtn'), menu=document.getElementById('apMenu');
+  if(!btn) return;
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const open = menu.hidden;
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', e=>{
+    if(!menu.hidden && !menu.contains(e.target)){ menu.hidden = true; btn.setAttribute('aria-expanded','false'); }
+  });
+  renderAthPicker();
+  updatePlanAthleteVisibility();
+})();
 let athView = 'home';   // 'home' | 'stats'
 function updateVideolibVisibility(){
   // mode club : panneau club via attribut body ; sinon onglets athlète
