@@ -34,7 +34,7 @@ Le site est du HTML statique (aucun build). Options, du plus simple au plus « p
 
 1. **Netlify Drop** (le plus rapide, 0 config) : glisser le dossier `~/Downloads/files_extracted` sur app.netlify.com/drop → URL live en 20 s.
 2. **Cloudflare Pages / Vercel** (connecté au repo GitHub) : brancher `RowanDgrv/Pairform`, dossier racine, pas de build. ⚠️ nécessite de **merger `rebrand-sillance` → `main`** d'abord (sinon c'est l'ancien site qui sort).
-3. **GitHub Pages** : activer Pages sur la branche → `https://rowandgrv.github.io/Pairform/` (merger sur main d'abord).
+3. **GitHub Pages** : activer Pages sur la branche → `https://rowandgrv.github.io/sillance/` (merger sur main d'abord).
 
 **Après déploiement**, 2 réglages (je peux les faire via le token) :
 - Ajouter l'URL de prod dans **Auth → Site URL + Redirect URLs**.

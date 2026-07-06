@@ -6,9 +6,9 @@ Plateforme de coaching **triathlon / Hyrox / clubs**. Ce dépôt contient le **f
 
 ## 🔗 Démo en ligne
 
-👉 **https://rowandgrv.github.io/Pairform/** — l'app tourne en **mode démonstration**
+👉 **https://rowandgrv.github.io/sillance/** — l'app tourne en **mode démonstration**
 (données fictives), aucun compte requis. Pour l'app complète : ouvrir
-[`/sillance-review.html`](https://rowandgrv.github.io/Pairform/sillance-review.html).
+[`/sillance-review.html`](https://rowandgrv.github.io/sillance/sillance-review.html).
 
 ## Pages
 
