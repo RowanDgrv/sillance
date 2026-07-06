@@ -1188,6 +1188,15 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .club-ath-vid{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   cursor:pointer;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);user-select:none}
 .club-ath-vid.on{background:rgba(70,194,216,.14);color:var(--accent);border-color:rgba(70,194,216,.5)}
+.club-ath-minor{display:inline-block;margin-top:5px;margin-left:6px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+  border:1px solid var(--line-strong);color:var(--muted);cursor:pointer}
+.club-ath-minor.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
+.club-ath-minor.ok{background:rgba(57,230,163,.12);color:var(--good);border-color:rgba(57,230,163,.4)}
+.consent-note{font-size:12px;line-height:1.5;color:var(--soft);background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin:4px 0 2px}
+.consent-check{display:flex;gap:9px;align-items:flex-start;width:100%;font-size:12.5px;line-height:1.45;color:var(--soft);cursor:pointer;margin-top:8px}
+.consent-check input[type="checkbox"]{width:auto;flex:none;margin-top:2px}
+.consent-check span{flex:1;min-width:0}
+#consentFields[hidden]{display:none}
 
 /* présences */
 .presence-summary{display:flex;flex-direction:column;gap:12px}
@@ -2081,6 +2090,25 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
       </div>
     </div>
     <button class="btn" id="grpSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer le groupe</button>
+  </div>
+</div>
+
+<!-- Modal consentement parental (membre mineur) -->
+<div class="overlay" id="consentOverlay" role="dialog" aria-modal="true" aria-label="Consentement parental">
+  <div class="modal group-modal">
+    <button class="close" id="consentClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--run)"><i class="ic ic-shield"></i> Protection des mineurs</span>
+    <h3>Consentement parental — <span id="consentAthName"></span></h3>
+    <div class="cr-form">
+      <label class="consent-check"><input type="checkbox" id="consentIsMinor"> <span>Cet athlète est <b>mineur</b> (moins de 18 ans)</span></label>
+      <div id="consentFields" hidden>
+        <p class="consent-note">En France, le traitement des données d'un mineur suppose l'autorisation de son représentant légal (données de santé incluses). Renseigne son contact et atteste avoir recueilli son autorisation.</p>
+        <div class="b-fld"><label>Nom du représentant légal</label><input type="text" id="consentGuardianName" placeholder="Ex. Claire Rousseau"></div>
+        <div class="b-fld"><label>E-mail du représentant légal</label><input type="email" id="consentGuardianEmail" placeholder="parent@exemple.fr"></div>
+        <label class="consent-check"><input type="checkbox" id="consentAttest"> <span>J'atteste avoir recueilli l'autorisation écrite du représentant légal pour le traitement des données personnelles (dont données de santé) de ce mineur, conformément à la <a href="./legal/confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>.</span></label>
+      </div>
+    </div>
+    <button class="btn" id="consentSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
   </div>
 </div>
 
@@ -3748,11 +3776,11 @@ document.querySelectorAll('.ath-tab').forEach(b=>{
    ============================================================ */
 const CLUB_ATHLETES = [
   {id:'a1', name:'Romain Dubois', disc:'tri', since:'2023', group:'g3', offer:'coach', coach:'Éric'},
-  {id:'a2', name:'Léa Martin', disc:'tri', since:'2024', group:'g4', offer:'sub'},
+  {id:'a2', name:'Léa Martin', disc:'tri', since:'2024', group:'g4', offer:'sub', minor:true},
   {id:'a3', name:'Karim Benali', disc:'hyrox', since:'2025', group:'g6', offer:'coach', coach:'Karim'},
   {id:'a4', name:'Sophie Laurent', disc:'tri', since:'2022', group:'g5', offer:'sub'},
   {id:'a5', name:'Tom Variable', disc:'hyrox', since:'2025', group:'g6', offer:'dropin'},
-  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub'},
+  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12'},
   {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie'},
   {id:'a8', name:'Marie Girard', disc:'hyrox', since:'2025', group:'g6', offer:'dropin'}
 ];
@@ -4057,6 +4085,7 @@ function renderClubAthletes(filter){
         ${g?`<span class="club-ath-grp" style="background:${g.color}">${g.name}</span>`:''}
         <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="Cliquer pour changer de formule">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
         <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="Débloquer les vidéos d'exercices pour cet athlète (facturé par athlète)"><i class="ic ic-film"></i> Vidéos${a.videos?' <i class="ic ic-check"></i>':''}</span>
+        ${minorChip(a)}
       </div>
       <span class="club-ath-tag ${a.disc==='hyrox'?'hyrox':''}">${a.disc==='hyrox'?'Hyrox':'Tri'}</span>
     </div>`;
@@ -4080,7 +4109,74 @@ function renderClubAthletes(filter){
       PF.setAthleteVideos(a.id, a.videos).catch(e=>{console.warn('videos',e);toast('Option vidéos indisponible (démo)');});
     }
   });
+  box.querySelectorAll('.club-ath-minor').forEach(el=>el.onclick=()=> openConsent(el.dataset.maid, filter));
 }
+
+/* Chip « mineur / consentement parental » sur chaque fiche athlète club. */
+function minorConsentOk(a){ return !!(a.consentAt || a.guardian_consent_at); }
+function minorChip(a){
+  if(a.minor){
+    return minorConsentOk(a)
+      ? `<span class="club-ath-minor ok" data-maid="${a.id}" title="Autorisation parentale recueillie — cliquer pour voir/modifier"><i class="ic ic-check"></i> Mineur · consentement OK</span>`
+      : `<span class="club-ath-minor warn" data-maid="${a.id}" title="Athlète mineur : autorisation parentale à recueillir"><i class="ic ic-alert-triangle"></i> Mineur · consentement requis</span>`;
+  }
+  return `<span class="club-ath-minor" data-maid="${a.id}" title="Marquer comme mineur (déclenche le consentement parental)">Mineur ?</span>`;
+}
+
+/* ---- Modal de consentement parental ---- */
+let consentAthId = null, consentFilter = null;
+function openConsent(aid, filter){
+  const a = CLUB_ATHLETES.find(x=>x.id===aid); if(!a) return;
+  consentAthId = aid; consentFilter = filter;
+  const ov=document.getElementById('consentOverlay');
+  document.getElementById('consentAthName').textContent = a.name;
+  const isMinor=document.getElementById('consentIsMinor');
+  const gName=document.getElementById('consentGuardianName');
+  const gMail=document.getElementById('consentGuardianEmail');
+  const attest=document.getElementById('consentAttest');
+  isMinor.checked = !!a.minor;
+  gName.value = a.guardian?.name || '';
+  gMail.value = a.guardian?.email || '';
+  attest.checked = minorConsentOk(a);
+  updateConsentUI();
+  ov.classList.add('open');
+}
+function updateConsentUI(){
+  const on=document.getElementById('consentIsMinor').checked;
+  document.getElementById('consentFields').hidden = !on;
+  const attest=document.getElementById('consentAttest').checked;
+  const gName=document.getElementById('consentGuardianName').value.trim();
+  const gMail=document.getElementById('consentGuardianEmail').value.trim();
+  // enregistrable si : pas mineur, OU mineur + tuteur renseigné + attestation cochée
+  document.getElementById('consentSave').disabled = on && !(gName && gMail && attest);
+}
+function saveConsent(){
+  const a = CLUB_ATHLETES.find(x=>x.id===consentAthId); if(!a) return;
+  const on=document.getElementById('consentIsMinor').checked;
+  const gName=document.getElementById('consentGuardianName').value.trim();
+  const gMail=document.getElementById('consentGuardianEmail').value.trim();
+  const attest=document.getElementById('consentAttest').checked;
+  a.minor = on;
+  if(on){ a.guardian={name:gName,email:gMail}; a.consentAt = attest ? new Date().toISOString().slice(0,10) : null; }
+  else { delete a.guardian; delete a.consentAt; }
+  document.getElementById('consentOverlay').classList.remove('open');
+  renderClubAthletes(consentFilter);
+  toast(on ? (attest?`Consentement parental enregistré pour ${a.name}`:`${a.name} marqué mineur`) : `${a.name} : statut mineur retiré`);
+  if(window.PF?.user){
+    PF.setParentalConsent(a.id, {is_minor:on, guardian_name:gName, guardian_email:gMail, consent:attest})
+      .catch(e=>{console.warn('consent',e); toast('Enregistrement indisponible (démo)');});
+  }
+}
+(function initConsent(){
+  const ov=document.getElementById('consentOverlay'); if(!ov) return;
+  document.getElementById('consentIsMinor').addEventListener('change', updateConsentUI);
+  document.getElementById('consentAttest').addEventListener('change', updateConsentUI);
+  document.getElementById('consentGuardianName').addEventListener('input', updateConsentUI);
+  document.getElementById('consentGuardianEmail').addEventListener('input', updateConsentUI);
+  document.getElementById('consentSave').addEventListener('click', saveConsent);
+  document.getElementById('consentClose').addEventListener('click', ()=> ov.classList.remove('open'));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+})();
 
 /* ---- Demandes d'adhésion (via le lien d'invitation) ---- */
 function renderJoinRequests(){
