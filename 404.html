@@ -29,7 +29,8 @@
   a.ghost:hover{border-color:var(--accent);color:var(--ink)}
 </style></head>
 <body>
-  <div class="box">
+  <canvas id="flow404" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1" aria-hidden="true"></canvas>
+  <div class="box" style="position:relative">
     <div class="code">Erreur 404</div>
     <h1>Hors du <span class="o">sillage</span></h1>
     <p>Cette page n'existe pas ou a été déplacée. Reviens dans le courant.</p>
@@ -38,4 +39,12 @@
       <a class="btn ghost" href="./sillance-app.html">Découvrir la démo</a>
     </div>
   </div>
+<script src="./sillance-flow.js"></script>
+<script>
+/* fond flux partagé (soufflerie / torpille) — le dégradé CSS reste en fallback */
+(function(){
+  var c=document.getElementById('flow404');
+  if(c && window.SillanceFlow) SillanceFlow.attach(c,{src:[0.55,0.05],dim:[0,0]});
+})();
+</script>
 </body></html>

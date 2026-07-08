@@ -64,9 +64,11 @@
 </style>
 </head>
 <body>
+<canvas id="demoFlow" style="position:fixed;inset:0;width:100%;height:100%;z-index:-2" aria-hidden="true"></canvas>
+<div style="position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,14,18,.42),rgba(11,14,18,.86) 55%)" aria-hidden="true"></div>
 <div class="wrap">
   <header>
-    <div class="logo">P</div>
+    <div class="logo">S</div>
     <div>
       <div class="tag">Coaching triathlon · Hyrox</div>
       <h1>Sillance</h1>
@@ -154,5 +156,13 @@
     Sillance — démo locale. Détails de mise en ligne : <code>~/pairform-backend/DEPLOY.md</code>.
   </footer>
 </div>
+<script src="./sillance-flow.js"></script>
+<script>
+/* fond flux partagé (soufflerie / torpille), voilé par le dégradé au-dessus */
+(function(){
+  var c=document.getElementById('demoFlow');
+  if(c && window.SillanceFlow) SillanceFlow.attach(c,{src:[0.55,0.22],dim:null});
+})();
+</script>
 </body>
 </html>
