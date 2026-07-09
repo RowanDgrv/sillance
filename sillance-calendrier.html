@@ -446,6 +446,24 @@ body.grid-on .cal-guides{opacity:1}
   pointer-events:none;
 }
 .session.done .sess-profile{filter:saturate(.35);opacity:.7}
+
+/* Répartition des intensités de la semaine — prévu vs réalisé (vue coach) */
+.wk-int{padding:12px 16px;border-bottom:1px solid var(--line)}
+.wk-int-head{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.wk-int-head span{font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px}
+.wk-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.wk-lbl{flex:none;width:54px;font-size:11px;font-weight:700;color:var(--soft)}
+.wk-bar{flex:1;display:flex;height:14px;border-radius:5px;overflow:hidden;background:var(--panel-2)}
+.wk-bar i{height:100%;min-width:2px}
+.wk-bar i+i{box-shadow:inset 1px 0 0 rgba(0,0,0,.25)}
+.wk-tot{flex:none;min-width:158px;text-align:right;font-family:var(--font-data);font-size:11px;color:var(--muted)}
+.wk-legend{display:flex;gap:12px;margin-top:7px;flex-wrap:wrap}
+.wk-legend span{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:var(--font-data)}
+.wk-legend i{width:9px;height:9px;border-radius:2px}
+.wk-alert{margin-top:9px;font-size:12px;padding:8px 11px;border-radius:9px;display:flex;gap:8px;align-items:center;line-height:1.4}
+.wk-alert.hard{color:#FFC69A;background:rgba(255,138,61,.1);border:1px solid rgba(255,138,61,.35)}
+.wk-alert.easy{color:#A9EFD2;background:rgba(57,230,163,.08);border:1px solid rgba(57,230,163,.3)}
+@media(max-width:980px){.wk-tot{min-width:0}}
 .session .del{
   position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:6px;
   border:none;background:transparent;color:var(--muted);font-size:11px;line-height:1;
@@ -1788,6 +1806,7 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
     </aside>
 
     <section class="calendar" aria-label="Calendrier d'entraînement">
+      <div class="wk-int" id="weekIntensity" hidden></div>
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-guides" aria-hidden="true"><div class="cg-cols" id="calCols"></div><div class="cg-rows"></div></div>
     </section>
@@ -3895,6 +3914,7 @@ function render(){
   document.getElementById('weekHours').innerHTML = `${(totalMin/60).toFixed(1).replace('.',',')}<em>h</em>`;
   document.getElementById('weekCount').textContent = `${count} séances`;
   document.getElementById('compliance').innerHTML = `${count?Math.round(doneCount/count*100):0}<em>%</em>`;
+  renderWeekIntensity(mon);
   if(typeof wireSessionVideos==='function') wireSessionVideos();
 }
 
@@ -3990,6 +4010,60 @@ function sessionProfileHTML(s){
     bars+=`<i style="height:${Math.round(p/125*100)}%;background:${intensityColor(p)}"></i>`;
   }
   return `<div class="sess-profile" aria-hidden="true"><span class="thr"></span>${bars}</div>`;
+}
+
+/* ============================================================
+   RÉPARTITION DES INTENSITÉS DE LA SEMAINE — prévu vs réalisé
+   ------------------------------------------------------------
+   Deux barres empilées par zone (mêmes couleurs que les profils) :
+   ce qui était planifié vs ce que l'athlète a réellement fait.
+   Si les RPE des séances faites dépassent nettement ce qu'on
+   attend des zones prévues, une alerte suggère d'adapter la
+   charge. Vue coach uniquement.
+   ============================================================ */
+function sessionZoneMinutes(s){
+  const out={Z1:0,Z2:0,Z3:0,Z4:0,Z5:0};
+  profileSegments(s).forEach(seg=>{ out['Z'+zoneFromPct(seg.pct)]+=seg.min; });
+  return out;
+}
+function renderWeekIntensity(mon){
+  const el=document.getElementById('weekIntensity'); if(!el) return;
+  if(mode!=='coach'){ el.hidden=true; return; }
+  const Z=['Z1','Z2','Z3','Z4','Z5'];
+  const plan={Z1:0,Z2:0,Z3:0,Z4:0,Z5:0}, real={Z1:0,Z2:0,Z3:0,Z4:0,Z5:0};
+  let planMin=0, realMin=0, planTss=0, realTss=0;
+  let rpeSum=0, rpeExpSum=0, rpeN=0;
+  const EXP_RPE={1:2,2:3.5,3:5.5,4:7.5,5:9}; // RPE « normal » attendu par zone dominante
+  for(let i=0;i<7;i++){
+    (planning[iso(addDays(mon,i))]||[]).forEach(s=>{
+      const zm=sessionZoneMinutes(s);
+      Z.forEach(z=>{ plan[z]+=zm[z]; if(s.done) real[z]+=zm[z]; });
+      planMin+=s.dur||0; planTss+=s.tss||0;
+      if(s.done){
+        realMin+=s.dur||0; realTss+=s.tss||0;
+        if(s.rpe){
+          const m=String(s.zone||'').match(/Z(\d)/);
+          rpeSum+=s.rpe; rpeExpSum+=EXP_RPE[m?+m[1]:3]||5.5; rpeN++;
+        }
+      }
+    });
+  }
+  if(!planMin){ el.hidden=true; return; }
+  el.hidden=false;
+  const maxMin=Math.max(planMin, realMin, 1);
+  const bar=dist=> Z.map(z=> dist[z]>0.5?`<i style="width:${(dist[z]/maxMin*100).toFixed(2)}%;background:${ZONE_COLORS[z]}" title="${z} · ${fmtDur(Math.round(dist[z]))}"></i>`:'').join('');
+  let alert='';
+  if(rpeN>=2){
+    const d=(rpeSum-rpeExpSum)/rpeN, avg=(rpeSum/rpeN).toFixed(1);
+    if(d>=1.5) alert=`<div class="wk-alert hard"><i class="ic ic-alert-triangle"></i> RPE moyen ${avg} — la semaine est plus éprouvante que prévu : pense à alléger les prochaines séances.</div>`;
+    else if(d<=-1.5) alert=`<div class="wk-alert easy"><i class="ic ic-check"></i> RPE moyen ${avg} — la semaine passe mieux que prévu : la charge peut être maintenue, voire montée.</div>`;
+  }
+  el.innerHTML=`
+    <div class="wk-int-head">Intensités de la semaine <span>prévu vs réalisé — pour adapter la charge</span></div>
+    <div class="wk-row"><span class="wk-lbl">Prévu</span><div class="wk-bar">${bar(plan)}</div><span class="wk-tot">${fmtDur(Math.round(planMin))} · ${planTss} TSS</span></div>
+    <div class="wk-row"><span class="wk-lbl">Réalisé</span><div class="wk-bar">${realMin?bar(real):''}</div><span class="wk-tot">${realMin?`${fmtDur(Math.round(realMin))} · ${realTss} TSS (${planTss?Math.round(realTss/planTss*100):0}%)`:'—'}</span></div>
+    <div class="wk-legend">${Z.map(z=>`<span><i style="background:${ZONE_COLORS[z]}"></i>${z}</span>`).join('')}</div>
+    ${alert}`;
 }
 
 function sessionCard(s, dateKey){
