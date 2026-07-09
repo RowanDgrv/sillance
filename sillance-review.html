@@ -313,6 +313,40 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .tpl-group summary em{font-style:normal;margin-left:auto;font-family:var(--font-data);font-size:10px}
 .tpl-group .tpl{margin-top:7px}
 .lib-empty{margin-top:12px;font-size:12px;color:var(--muted);text-align:center;padding:10px}
+
+/* ---------- Cycles (programmes multi-semaines) ---------- */
+.cycle-card{position:relative}
+.cycle-card .cy-del{position:absolute;top:6px;right:6px;width:18px;height:18px;border:none;background:transparent;color:var(--muted);opacity:0;transition:.15s;font-size:11px}
+.cycle-card:hover .cy-del{opacity:1}
+.cycle-card .cy-del:hover{color:var(--run)}
+.cycle-card .cy-apply{margin-top:7px;width:100%;padding:5px;border-radius:7px;font-size:11px;font-weight:600;border:1px solid var(--line-strong);background:transparent;color:var(--muted);transition:.2s}
+.cycle-card .cy-apply:hover{border-color:var(--accent);color:var(--accent)}
+.cycle-modal{width:min(1080px,100%)}
+.cy-meta{display:flex;gap:10px;margin-bottom:10px}
+.cy-meta input{flex:1}
+.cy-hint{font-size:12px;color:var(--muted);margin-bottom:14px;display:flex;gap:6px;align-items:center}
+.cy-week{margin-bottom:12px}
+.cy-week-t{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;align-items:center}
+.cy-week-t em{font-style:normal;font-family:var(--font-data);font-size:10px;margin-left:auto}
+.cy-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cy-day{border:1px dashed var(--line-strong);border-radius:10px;min-height:78px;padding:5px;display:flex;flex-direction:column;gap:4px;background:var(--panel-2)}
+.cy-day .d{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center}
+.cy-chip{font-size:10px;font-weight:600;line-height:1.25;padding:3px 6px;border-radius:6px;border-left:2px solid var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);cursor:pointer}
+.cy-chip:hover{text-decoration:line-through}
+.cy-add-btn{border:1px dashed var(--line-strong);background:transparent;color:var(--muted);border-radius:6px;font-size:13px;padding:2px;margin-top:auto;cursor:pointer}
+.cy-add-btn:hover{color:var(--accent);border-color:var(--accent)}
+.cy-foot{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+.cy-start{font-size:12.5px;color:var(--soft);display:flex;align-items:center;gap:8px}
+.cy-start input{background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px}
+.cy-actions{margin-left:auto;display:flex;gap:9px}
+.btn.cy-ghost{background:transparent;color:var(--text);border:1px solid var(--line-strong);box-shadow:none}
+#cyPicker{position:fixed;z-index:80;width:250px;max-height:280px;overflow-y:auto;background:var(--panel-2);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow-2);padding:6px}
+#cyPicker .g{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:7px 8px 3px}
+#cyPicker .it{padding:6px 8px;border-radius:7px;font-size:12px;cursor:pointer;display:flex;gap:6px;align-items:center}
+#cyPicker .it::before{content:'';width:7px;height:7px;border-radius:2px;background:var(--c);flex:none}
+#cyPicker .it:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+#cyPicker .it small{margin-left:auto;color:var(--muted);font-family:var(--font-data);font-size:10px}
+@media(max-width:760px){.cy-days{grid-template-columns:repeat(2,1fr)}.cy-actions{margin-left:0}}
 .lib-note{
   margin-top:14px;padding:11px 12px;border-radius:10px;
   background:rgba(57,230,163,.07);border:1px dashed rgba(57,230,163,.35);
@@ -2235,6 +2269,33 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
   </div>
 </div>
 
+<!-- ===== Éditeur de cycle (programme complet multi-semaines) ===== -->
+<div class="overlay" id="cycleOverlay" role="dialog" aria-modal="true" aria-label="Création de cycle">
+  <div class="modal cycle-modal">
+    <button class="close" id="cycleClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" id="cycleBadge">Nouveau cycle</span>
+    <div class="cy-meta">
+      <input type="text" id="cyName" class="b-title-input" placeholder="Nom du cycle (ex. Endurance hiver, Affûtage course A…)">
+      <select id="cyWeeks" class="b-disc-select" aria-label="Durée du cycle">
+        <option value="3">3 semaines</option>
+        <option value="4" selected>4 semaines</option>
+        <option value="5">5 semaines</option>
+        <option value="6">6 semaines</option>
+      </select>
+    </div>
+    <p class="cy-hint"><i class="ic ic-lightbulb"></i> Clique sur le + d'un jour pour y ajouter des séances de ta bibliothèque (clique sur une séance pour la retirer). Les allures seront recalculées avec les références de l'athlète.</p>
+    <div id="cyGrid"></div>
+    <div class="cy-foot">
+      <label class="cy-start">Semaine de départ : <input type="date" id="cyStart"></label>
+      <div class="cy-actions">
+        <button class="btn cy-ghost" id="cySave"><i class="ic ic-check"></i> Enregistrer le cycle</button>
+        <button class="btn" id="cyApply"><i class="ic ic-calendar"></i> Ajouter à l'athlète</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="cyPicker" hidden></div>
+
 <div class="overlay" id="builderOverlay" role="dialog" aria-modal="true" aria-label="Création de séance">
   <div class="modal builder-modal">
     <button class="close" id="builderClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
@@ -2798,6 +2859,10 @@ function renderSidebar(){
       <p class="hint">Glissez une séance sur un jour →</p>
       <button class="create-btn" id="createSessionBtn">+ Créer une séance</button>
       <div id="tplList" style="margin-top:12px"></div>
+      <h2 style="margin-top:20px">Cycles</h2>
+      <p class="hint">Un programme complet posé en un clic</p>
+      <button class="create-btn" id="createCycleBtn">+ Créer un cycle</button>
+      <div id="cycleList" style="margin-top:12px"></div>
       <div class="lib-note"><i class="ic ic-lightbulb"></i> <b>Astuce coach</b> — déplacez aussi les séances d'un jour à l'autre directement dans le calendrier.</div>
       <div class="readiness" style="margin-top:14px">
         <div class="lbl">Fraîcheur athlète (check-in du jour)</div>
@@ -2820,6 +2885,8 @@ function renderSidebar(){
       </div>`;
     buildTemplates(document.getElementById('tplList'));
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
+    buildCycles(document.getElementById('cycleList'));
+    document.getElementById('createCycleBtn').addEventListener('click', ()=> openCycleBuilder(null));
     const ccb=document.getElementById('coachConnectBtn');
     if(ccb) ccb.onclick=()=>{
       if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast('Stripe indisponible');});
@@ -3417,6 +3484,161 @@ function tplCard(t, z){
   el.addEventListener('click', ()=> openModal({...t, id:null}, null));
   return el;
 }
+
+/* ============================================================
+   CYCLES — programmes complets multi-semaines
+   ------------------------------------------------------------
+   Le coach compose un cycle (3 à 6 semaines de séances de la
+   bibliothèque) et le pose en un clic sur le calendrier de
+   l'athlète suivi. Les cibles restant exprimées en % des
+   références, les allures s'adaptent au niveau de chaque athlète.
+   Backend : persister CYCLES par coach (table cycles) ; la pose
+   passe déjà par PF.scheduleSession séance par séance.
+   ============================================================ */
+const CYCLES = [
+  {id:'c1', name:'Endurance — 4 semaines', weeks:4,
+   plan:(()=>{ const p={}; for(let w=0;w<4;w++){ p[w+'-0']=['t1']; p[w+'-1']=['t5']; p[w+'-3']=['t8']; p[w+'-5']=['t3']; p[w+'-6']=['t17']; } delete p['3-5']; return p; })()}
+];
+let cycleState=null, cycleUid=10;
+
+function cycleCount(c){ return Object.values(c.plan).reduce((a,x)=>a+x.length,0); }
+function nextMonday(){ return addDays(mondayOf(0),7); }
+
+function buildCycles(container){
+  container.innerHTML='';
+  if(!CYCLES.length){ container.innerHTML='<div class="lib-empty">Aucun cycle — crée ton premier programme.</div>'; return; }
+  CYCLES.forEach(c=>{
+    const el=document.createElement('div');
+    el.className='tpl cycle-card';
+    el.style.setProperty('--c','var(--accent)');
+    el.innerHTML=`<div class="t">${c.name}</div>
+      <div class="m">${c.weeks} semaines · ${cycleCount(c)} séances</div>
+      <button class="cy-apply"><i class="ic ic-calendar"></i> Ajouter à l'athlète</button>
+      <button class="cy-del" aria-label="Supprimer le cycle"><i class="ic ic-x"></i></button>`;
+    el.querySelector('.cy-apply').addEventListener('click', e=>{ e.stopPropagation(); applyCycle(c, null); });
+    el.querySelector('.cy-del').addEventListener('click', e=>{
+      e.stopPropagation();
+      const i=CYCLES.findIndex(x=>x.id===c.id); if(i>-1) CYCLES.splice(i,1);
+      buildCycles(container); toast('Cycle supprimé');
+    });
+    el.addEventListener('click', ()=> openCycleBuilder(c));
+    container.appendChild(el);
+  });
+}
+
+/* pose le cycle sur le calendrier de l'athlète, à partir du lundi
+   de la semaine choisie (défaut : lundi prochain) */
+function applyCycle(c, startIso){
+  const start = startIso ? new Date(startIso+'T00:00:00') : nextMonday();
+  const mon = addDays(start, -((start.getDay()+6)%7));
+  let n=0;
+  for(let w=0; w<c.weeks; w++) for(let d=0; d<7; d++){
+    (c.plan[w+'-'+d]||[]).forEach(tid=>{
+      const t = TEMPLATES.find(x=>x.id===tid); if(!t) return;
+      const key = iso(addDays(mon, w*7+d));
+      const s = {...t, id:'s'+(uid++), done:false};
+      (planning[key] ||= []).push(s); n++;
+      if(window.PF?.user){
+        PF.scheduleSession(currentAthleteId || PF.user.id, key, { disc:s.disc, title:s.title, dur:s.dur,
+          dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
+          .then(saved=>{ if(saved) s.id=saved.id; })
+          .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
+      }
+    });
+  }
+  weekOffset = Math.round((mon - mondayOf(0))/(7*864e5));
+  render();
+  toast(`Cycle « ${c.name} » posé : ${n} séances sur ${c.weeks} semaines`);
+}
+
+function openCycleBuilder(existing){
+  cycleState = existing ? JSON.parse(JSON.stringify(existing))
+                        : {id:'c'+(cycleUid++), name:'', weeks:4, plan:{}};
+  document.getElementById('cyName').value = cycleState.name||'';
+  document.getElementById('cyWeeks').value = String(cycleState.weeks);
+  document.getElementById('cycleBadge').textContent = existing ? 'Modifier le cycle' : 'Nouveau cycle';
+  document.getElementById('cyStart').value = iso(nextMonday());
+  renderCycleGrid();
+  document.getElementById('cycleOverlay').classList.add('open');
+}
+function renderCycleGrid(){
+  const wrap=document.getElementById('cyGrid');
+  let html='';
+  for(let w=0; w<cycleState.weeks; w++){
+    const wk = Array.from({length:7},(_,d)=> (cycleState.plan[w+'-'+d]||[]));
+    const wkTss = wk.flat().reduce((a,tid)=>{ const t=TEMPLATES.find(x=>x.id===tid); return a+(t?t.tss:0); },0);
+    html += `<div class="cy-week">
+      <div class="cy-week-t">Semaine ${w+1} <em>${wkTss} TSS</em></div>
+      <div class="cy-days">${wk.map((cell,d)=>`
+        <div class="cy-day" data-w="${w}" data-d="${d}">
+          <span class="d">${DAYS[d]}</span>
+          ${cell.map((tid,i)=>{ const t=TEMPLATES.find(x=>x.id===tid); if(!t) return '';
+            return `<span class="cy-chip" style="--c:${DISC[t.disc].color}" data-i="${i}" title="Cliquer pour retirer">${t.title}</span>`; }).join('')}
+          <button class="cy-add-btn" aria-label="Ajouter une séance ce jour">+</button>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('.cy-add-btn').forEach(b=> b.addEventListener('click', e=>{
+    const cell=e.target.closest('.cy-day');
+    openCyPicker(e, +cell.dataset.w, +cell.dataset.d);
+  }));
+  wrap.querySelectorAll('.cy-chip').forEach(ch=> ch.addEventListener('click', ()=>{
+    const cell=ch.closest('.cy-day');
+    const k=cell.dataset.w+'-'+cell.dataset.d;
+    cycleState.plan[k].splice(+ch.dataset.i,1);
+    if(!cycleState.plan[k].length) delete cycleState.plan[k];
+    renderCycleGrid();
+  }));
+}
+/* petit menu flottant : bibliothèque groupée par sport */
+function openCyPicker(e, w, d){
+  const pk=document.getElementById('cyPicker');
+  pk.innerHTML = Object.entries(DISC).map(([k,D])=>{
+    const its=TEMPLATES.filter(t=>t.disc===k);
+    if(!its.length) return '';
+    return `<div class="g">${D.label}</div>` + its.map(t=>
+      `<div class="it" style="--c:${D.color}" data-id="${t.id}">${t.title}<small>${t.dur}min</small></div>`).join('');
+  }).join('');
+  pk.hidden=false;
+  pk.style.left=Math.min(e.clientX, innerWidth-270)+'px';
+  pk.style.top=Math.min(e.clientY, innerHeight-300)+'px';
+  pk.querySelectorAll('.it').forEach(it=> it.addEventListener('click', ()=>{
+    (cycleState.plan[w+'-'+d] ||= []).push(it.dataset.id);
+    pk.hidden=true; renderCycleGrid();
+  }));
+  setTimeout(()=> document.addEventListener('click', function close(ev){
+    if(!pk.contains(ev.target)){ pk.hidden=true; document.removeEventListener('click', close); }
+  }), 0);
+}
+function saveCycleFromModal(){
+  cycleState.name = document.getElementById('cyName').value.trim() || 'Cycle sans nom';
+  cycleState.weeks = +document.getElementById('cyWeeks').value;
+  const clean = {id:cycleState.id, name:cycleState.name, weeks:cycleState.weeks, plan:cycleState.plan};
+  const i=CYCLES.findIndex(x=>x.id===clean.id);
+  if(i>-1) CYCLES[i]=clean; else CYCLES.push(clean);
+  if(mode==='coach') renderSidebar();
+  return clean;
+}
+document.getElementById('cycleClose').addEventListener('click', ()=> document.getElementById('cycleOverlay').classList.remove('open'));
+document.getElementById('cycleOverlay').addEventListener('click', e=>{ if(e.target.id==='cycleOverlay') document.getElementById('cycleOverlay').classList.remove('open'); });
+document.getElementById('cyName').addEventListener('input', e=>{ cycleState.name=e.target.value; });
+document.getElementById('cyWeeks').addEventListener('change', e=>{
+  cycleState.weeks=+e.target.value;
+  Object.keys(cycleState.plan).forEach(k=>{ if(+k.split('-')[0]>=cycleState.weeks) delete cycleState.plan[k]; });
+  renderCycleGrid();
+});
+document.getElementById('cySave').addEventListener('click', ()=>{
+  saveCycleFromModal();
+  document.getElementById('cycleOverlay').classList.remove('open');
+  toast('Cycle enregistré');
+});
+document.getElementById('cyApply').addEventListener('click', ()=>{
+  const c=saveCycleFromModal();
+  document.getElementById('cycleOverlay').classList.remove('open');
+  applyCycle(c, document.getElementById('cyStart').value);
+});
 
 /* ---- rendu calendrier ---- */
 const calGrid = document.getElementById('calGrid');
