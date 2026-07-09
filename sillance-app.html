@@ -2938,6 +2938,7 @@ function readinessAdvice(s){
 }
 
 /* ---- sidebar dynamique selon le mode ---- */
+const AI_ADDON_PRICE = 12; // €/mois — add-on Assistant IA (voir plan financier)
 const sidebarContent = document.getElementById('sidebarContent');
 function renderSidebar(){
   if(mode==='coach'){
@@ -2965,6 +2966,16 @@ function renderSidebar(){
              <button class="cc-btn" id="coachSubscribeBtn">S'abonner à Sillance</button>`}
       </div>
       <div class="coach-connect" style="margin-top:14px">
+        <div class="cc-t"><b><i class="ic ic-brain"></i> Assistant IA coach</b></div>
+        ${aiUnlocked()
+          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> Actif — chaque séance réalisée est analysée : respect du plan, dérive cardiaque, découplage FC, zones.</div>
+             <button class="cc-btn" id="aiManageBtn">Gérer / révoquer l'accès</button>`
+          : `<div class="cc-s">Vérifie automatiquement que chaque séance réalisée respecte ce qui était prévu : zones cibles, dérive cardiaque, découplage FC.</div>
+             <div class="cc-price"><b>Essai 14 jours</b><small> puis ${AI_ADDON_PRICE} €/mois</small></div>
+             <button class="cc-btn" id="aiTrialBtn">Commencer l'essai 14 jours</button>
+             <div class="cc-s" style="font-size:10.5px;opacity:.75;margin-top:6px">Débit automatique à la fin de l'essai, sauf révocation de l'accès.</div>`}
+      </div>
+      <div class="coach-connect" style="margin-top:14px">
         <div class="cc-t"><b><i class="ic ic-credit-card"></i> Fais-toi payer</b></div>
         <div class="cc-s">Relie ton compte Stripe pour facturer tes athlètes.</div>
         <div class="cc-price">Tarif du suivi : <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/mois</small> · <a href="#" id="coachPriceEdit">modifier</a></div>
@@ -2974,6 +2985,17 @@ function renderSidebar(){
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
     buildCycles(document.getElementById('cycleList'));
     document.getElementById('createCycleBtn').addEventListener('click', ()=> openCycleBuilder(null));
+    /* Assistant IA — essai 14 jours (checkout Stripe connecté, déverrouillage en démo) */
+    const aiT=document.getElementById('aiTrialBtn');
+    if(aiT) aiT.onclick=()=>{
+      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>{console.warn('[PF] ai-addon:',e); toast('Stripe indisponible');}); return; }
+      window.__pf_aiDemo=true; renderSidebar(); toast('Assistant IA activé — essai 14 jours (démo)');
+    };
+    const aiM=document.getElementById('aiManageBtn');
+    if(aiM) aiM.onclick=()=>{
+      if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast('Portail de facturation indisponible')); return; }
+      window.__pf_aiDemo=false; renderSidebar(); toast('Accès à l\'assistant IA révoqué (démo)');
+    };
     const ccb=document.getElementById('coachConnectBtn');
     if(ccb) ccb.onclick=()=>{
       if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast('Stripe indisponible');});
@@ -6379,7 +6401,7 @@ function renderDecouple(s, data){
    local ci-dessous produit le même type de sortie, marqué « démo ».
    Réservé COACH + add-on payant (gate aiUnlocked()).
    ============================================================ */
-const AI_ADDON_PRICE = 12;          // €/mois — voir plan financier
+// (AI_ADDON_PRICE déclaré plus haut, avant le premier renderSidebar)
 function aiUnlocked(){ return window.__pf_aiAddon===true || window.__pf_aiDemo===true; }
 function aiFcMax(){ return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:190; }
 function aiHrZone(hr, fcMax){ const p=hr/fcMax*100; if(p<60)return'Z1'; if(p<70)return'Z2'; if(p<80)return'Z3'; if(p<90)return'Z4'; return'Z5'; }
@@ -6394,7 +6416,12 @@ function computeSessionBilan(s, data){
   const hardReps=(data.laps||[]).filter(l=>l.hard).map(l=>({
     n:l.n, peakPct:Math.round(l.maxHr/fcMax*100), avgPct:Math.round(l.avgHr/fcMax*100),
     avgSpeed:l.avgSpeed, avgPower:l.avgPower, paceSec:Math.round(3600/Math.max(l.avgSpeed,1)) }));
+  // dérive cardiaque : FC moyenne de la 2ᵉ moitié vs la 1ʳᵉ (en bpm)
+  const half=Math.floor(n/2);
+  const hr1=pts.slice(0,half).reduce((a,p)=>a+p.hr,0)/Math.max(half,1);
+  const hr2=pts.slice(half).reduce((a,p)=>a+p.hr,0)/Math.max(n-half,1);
   return { type, disc:s.disc, objectif, target,
+    plannedDur:s.dur||null, plannedTss:s.tss||null, hrDrift:+(hr2-hr1).toFixed(1),
     dur:Math.round(pts[pts.length-1].t), dist:+(data.dist||0).toFixed(1),
     avgHr:data.avgHr, maxHr:data.maxHr, fcMax,
     pctFcMax:Math.round(data.maxHr/fcMax*100), avgPctFcMax:Math.round(data.avgHr/fcMax*100),
@@ -6403,6 +6430,15 @@ function computeSessionBilan(s, data){
 }
 function aiSummary(s, b){
   const recos=[], bullets=[]; let tenu='partiel', headline='';
+  // conformité au plan : la séance réalisée correspond-elle à la séance prévue ?
+  if(b.plannedDur){
+    const ecart=Math.round((b.dur-b.plannedDur)/b.plannedDur*100);
+    bullets.push({s:Math.abs(ecart)<=15?'ok':'warn', t:`Prévu ${fmtDur(b.plannedDur)} — réalisé ${fmtDur(b.dur)} (${ecart>=0?'+':''}${ecart}%)`});
+    if(ecart<-15) recos.push('Séance écourtée par rapport au plan : vérifier fatigue ou contrainte horaire, replanifier le volume manquant si besoin.');
+    if(ecart>15) recos.push('Séance nettement rallongée : attention au volume non prévu qui alourdit la charge de la semaine.');
+  }
+  if(b.hrDrift!=null) bullets.push({s:b.hrDrift<5?'ok':(b.hrDrift<8?'warn':'bad'),
+    t:`Dérive cardiaque : ${b.hrDrift>=0?'+':''}${b.hrDrift} bpm entre la 1ʳᵉ et la 2ᵉ moitié`});
   if(b.type==='endurance'){
     const okDec=b.decouple!=null && b.decouple<5, okZone=b.timeInTarget>=60;
     bullets.push({s:okZone?'ok':'warn', t:`${b.timeInTarget}% du temps en ${b.target} (objectif : rester en zone aérobie)`});
@@ -6467,7 +6503,9 @@ function injectAiCss(){
   .ai-recobox ul{margin:0;padding-left:18px}
   .ai-recobox li{font-size:13px;color:var(--soft);margin-bottom:5px;line-height:1.45}
   .ai-foot{margin-top:10px;font-size:10.5px;color:var(--muted);font-style:italic}
-  .ai-badge-demo{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:99px;padding:2px 7px}`;
+  .ai-badge-demo{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:99px;padding:2px 7px}
+  .ai-trial{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent);border:1px solid color-mix(in srgb,var(--good) 40%,transparent);border-radius:99px;padding:3px 10px;margin-bottom:8px}
+  .ai-legal{margin-top:9px;font-size:10.5px;color:var(--muted);line-height:1.45}`;
   document.head.appendChild(st);
 }
 function aiPaywallHtml(){
@@ -6479,8 +6517,10 @@ function aiPaywallHtml(){
       <div><span class="ck"><i class="ic ic-check"></i></span><span>Verdict par rapport à l’objectif (Z2 tenu ? zone VO2max atteinte ?).</span></div>
       <div><span class="ck"><i class="ic ic-check"></i></span><span>Recommandations actionnables (rallonger les intervalles, recaler la zone…).</span></div>
     </div>
-    <div class="ai-price">${AI_ADDON_PRICE}€<small> / mois</small></div>
-    <button class="ai-cta" id="aiActivate">Activer l’assistant IA</button>
+    <div class="ai-trial">Essai gratuit 14 jours</div>
+    <div class="ai-price">0€<small> pendant 14 jours, puis ${AI_ADDON_PRICE} €/mois</small></div>
+    <button class="ai-cta" id="aiActivate">Commencer l’essai 14 jours</button>
+    <div class="ai-legal">Carte enregistrée à l’activation. Débit automatique de ${AI_ADDON_PRICE} €/mois à la fin de l’essai, sauf révocation de l’accès avant — résiliable à tout moment depuis « Gérer / révoquer l’accès ».</div>
   </div>`;
 }
 function aiResultHtml(s, b, r, isDemo){
