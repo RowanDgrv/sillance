@@ -9,6 +9,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co wss://onbsgohvqejccowfnrbs.supabase.co https://esm.sh; frame-src https://calendly.com; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
 <title>Sillance — Coaching triathlon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -113,6 +114,9 @@ button{font-family:inherit;cursor:pointer}
 .icon-btn:focus-visible,.mode button:focus-visible,.btn:focus-visible{outline:2px solid var(--swim);outline-offset:2px}
 
 /* ---------- Rappel du matin ---------- */
+.morning-time select{flex:1;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px;cursor:pointer}
+.morning-help{display:block;margin-top:8px;font-size:11px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;text-align:center}
+.morning-help:hover{color:var(--accent)}
 .morning-card{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
 .morning-card h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px}
 .morning-pre{border:1px solid var(--line);border-radius:12px;background:var(--panel-2);padding:13px 14px;margin-bottom:12px}
@@ -3043,9 +3047,18 @@ function renderSidebar(){
         <div class="morning-pre" id="morningPre"></div>
         <div class="morning-time">
           <label for="morningHour">Heure d'envoi</label>
-          <input type="time" id="morningHour" value="07:00">
+          <input type="time" id="morningHour" value="07:00" step="900">
+        </div>
+        <div class="morning-time">
+          <label for="morningChannel">Je veux recevoir</label>
+          <select id="morningChannel">
+            <option value="push">Notification (téléphone / PC)</option>
+            <option value="email">Email</option>
+            <option value="both">Les deux</option>
+          </select>
         </div>
         <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> Activer le rappel</button>
+        <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">Comment recevoir ma notification&nbsp;?</a>
       </div>`;
     sidebarContent.querySelectorAll('input[type=range]').forEach(inp=>{
       inp.addEventListener('input', ()=>{
@@ -3233,6 +3246,34 @@ function buildMorningMessage(dateKey){
     gear
   };
 }
+/* ============================================================
+   NOTIFICATION DU MATIN — inscription Web Push du navigateur
+   ------------------------------------------------------------
+   Permission → service worker → abonnement push (clé VAPID) →
+   enregistré en base (un par appareil). L'envoi quotidien est
+   fait côté serveur (edge function morning-digest via cron).
+   iPhone : nécessite d'ajouter le site à l'écran d'accueil
+   (voir notification-tuto.pdf).
+   ============================================================ */
+const VAPID_PUBLIC_KEY = 'BDzIjqD-XIv4SqdtjPUm8hoiyPStpNT6sJI3w_URQNvvylfsIBj7aByCsUGSFEv7cfTbuBGEdDIn1T_s4kx-ynk';
+function urlB64ToUint8(s){
+  const pad = '='.repeat((4 - s.length % 4) % 4);
+  const raw = atob((s + pad).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+async function enableMorningPush(){
+  if(!('serviceWorker' in navigator) || !('Notification' in window))
+    throw new Error("Navigateur sans notifications — choisis le canal Email");
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted') throw new Error('Notifications refusées — autorise-les dans les réglages du navigateur');
+  const reg = await navigator.serviceWorker.register('./sillance-sw.js');
+  await navigator.serviceWorker.ready;
+  if(!reg.pushManager) throw new Error("Push indisponible — sur iPhone, ajoute d'abord le site à l'écran d'accueil (voir le tuto)");
+  const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8(VAPID_PUBLIC_KEY) });
+  if(window.PF?.user && PF.savePushSubscription) await PF.savePushSubscription(sub.toJSON());
+  return reg;
+}
+
 function buildMorningPreview(){
   const box = document.getElementById('morningPre');
   if(!box) return;
@@ -3253,16 +3294,32 @@ function buildMorningPreview(){
     <button class="mp-sync" id="syncActivityBtn"><i class="ic ic-refresh"></i> J'ai fini — synchroniser mon activité</button>`;
 
   const btn = document.getElementById('morningBtn');
-  if(btn){
-    btn.addEventListener('click', ()=>{
+  if(btn && !btn._wired){
+    btn._wired = true;
+    btn.addEventListener('click', async ()=>{
       const h = document.getElementById('morningHour').value || '07:00';
-      btn.textContent = `Rappel activé à ${h}`;
-      btn.classList.add('on');
-      if('Notification' in window){
-        Notification.requestPermission().then(p=>{
-          if(p==='granted'){ new Notification('Sillance — '+m.title, {body:m.gear.join(', ')}); }
-        });
-      }
+      const channel = document.getElementById('morningChannel').value || 'push';
+      const [hh, mm] = h.split(':').map(Number);
+      btn.disabled = true;
+      try{
+        if(channel !== 'email'){
+          const reg = await enableMorningPush();
+          // notification de test immédiate pour valider le canal
+          reg.showNotification('Sillance — '+m.title, {body:'À prévoir : '+m.gear.join(', '), icon:'./icon-192.png', tag:'sillance-test'});
+        }
+        if(window.PF?.user && PF.saveNotifPrefs){
+          await PF.saveNotifPrefs({ hour:hh, minute:mm - (mm % 15),
+            tz: Intl.DateTimeFormat().resolvedOptions().timeZone, channel });
+        }
+        btn.innerHTML = `<i class="ic ic-check"></i> Rappel activé à ${h}`;
+        btn.classList.add('on');
+        toast(channel==='email' ? 'Rappel email activé à '+h
+             : channel==='both' ? 'Notification + email activés à '+h
+             : 'Notifications activées à '+h+' — test envoyé');
+      }catch(e){
+        console.warn('[notif]', e);
+        toast(e && e.message ? e.message : 'Activation impossible sur ce navigateur');
+      }finally{ btn.disabled = false; }
     });
   }
   // synchro activité → notification nutrition post-effort
