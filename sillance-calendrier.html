@@ -3390,10 +3390,12 @@ function buildTemplates(container){
     container.insertAdjacentHTML('beforeend','<div class="lib-empty">Aucune séance — modifie les filtres ou crée-en une.</div>');
     return;
   }
+  // filtres actifs → groupes ouverts ; sinon tout replié pour rester compact
+  const filtered = libSport!=='all' || libZone!=='all';
   ZONE_CATS.forEach(([v,label])=>{
     const items=list.filter(x=>x.z===v);
     if(!items.length) return;
-    const grp=document.createElement('details'); grp.className='tpl-group'; grp.open=true;
+    const grp=document.createElement('details'); grp.className='tpl-group'; grp.open=filtered;
     const sum=document.createElement('summary');
     sum.innerHTML=`${label} <em>${items.length}</em>`;
     grp.appendChild(sum);
