@@ -100,15 +100,32 @@ main,.nav,footer{position:relative;z-index:1}
 .role a:hover{text-decoration:underline}
 @media(max-width:880px){.role{grid-column:span 12}}
 
-/* data — features numérotées (data set large, sobre) */
-.feat{grid-column:span 6;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;padding:28px 0;border-top:1px solid var(--line)}
-.feat .num{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
-.feat h4{font-family:var(--display);font-weight:600;font-size:21px;text-transform:uppercase;margin-bottom:8px}
+/* data — features numérotées en cartes 3D (tilt au survol, halo sous le curseur) */
+.feat{grid-column:span 6;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;
+  padding:28px 26px;border:1px solid var(--line);border-radius:16px;position:relative;
+  background:linear-gradient(180deg,var(--panel),rgba(18,26,43,.35));
+  transform-style:preserve-3d;will-change:transform;--gx:50%;--gy:50%;
+  transition:transform .16s ease,border-color .2s,box-shadow .2s}
+.feat::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s;
+  background:radial-gradient(260px 200px at var(--gx) var(--gy), rgba(255,255,255,.08), transparent 62%)}
+.feat:hover{border-color:var(--line-strong);box-shadow:0 22px 48px rgba(0,0,0,.35)}
+.feat:hover::after{opacity:1}
+.feat .num{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;transform:translateZ(28px)}
+.feat h4{font-family:var(--display);font-weight:600;font-size:21px;text-transform:uppercase;margin-bottom:8px;transform:translateZ(18px)}
 .feat p{color:var(--soft);font-size:14.5px;line-height:1.6;font-weight:300}
 @media(max-width:680px){.feat{grid-column:span 12}}
 
-/* cta */
-.cta{padding:110px 0;border-top:1px solid var(--line);text-align:center;background:var(--paper)}
+/* cta — dégradé animé eau -> air (drift lent, coupé si reduced-motion) */
+.cta{padding:110px 0;border-top:1px solid var(--line);text-align:center;background:var(--paper);position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;inset:-45%;z-index:0;filter:blur(46px);
+  background:
+    radial-gradient(36% 44% at 30% 42%, rgba(70,194,216,.28), transparent 70%),
+    radial-gradient(40% 50% at 72% 58%, rgba(255,154,61,.20), transparent 70%),
+    radial-gradient(46% 56% at 52% 30%, rgba(37,99,235,.22), transparent 72%);
+  animation:ctaDrift 19s ease-in-out infinite alternate}
+@keyframes ctaDrift{from{transform:rotate(0deg) scale(1)}to{transform:rotate(16deg) scale(1.18)}}
+@media (prefers-reduced-motion: reduce){.cta::before{animation:none}}
+.cta .wrap{position:relative;z-index:1}
 .cta .h2{margin-bottom:16px}
 .cta p{color:var(--soft);font-weight:300;max-width:52ch;margin:0 auto 32px}
 .cta .cta-row{justify-content:center}
@@ -233,6 +250,21 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
   fallback.style.display = 'none';
   // debug : figer a un instant precis (capture d'ecran)
   window._freeze = function(t){ flow.freeze(t); };
+})();
+
+/* Cartes data : tilt 3D + halo qui suit le curseur */
+(function(){
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.feat').forEach(function(c){
+    c.addEventListener('pointermove', function(e){
+      var r = c.getBoundingClientRect();
+      var x = (e.clientX - r.left)/r.width, y = (e.clientY - r.top)/r.height;
+      c.style.transform = 'perspective(900px) rotateY('+((x-.5)*6).toFixed(2)+'deg) rotateX('+((.5-y)*6).toFixed(2)+'deg) translateY(-2px)';
+      c.style.setProperty('--gx',(x*100).toFixed(1)+'%');
+      c.style.setProperty('--gy',(y*100).toFixed(1)+'%');
+    });
+    c.addEventListener('pointerleave', function(){ c.style.transform=''; });
+  });
 })();
 </script>
 </body></html>
