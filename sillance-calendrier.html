@@ -3319,9 +3319,13 @@ function buildMorningPreview(){
         }
         btn.innerHTML = `<i class="ic ic-check"></i> Rappel activé à ${h}`;
         btn.classList.add('on');
-        toast(channel==='email' ? 'Rappel email activé à '+h
-             : channel==='both' ? 'Notification + email activés à '+h
-             : 'Notifications activées à '+h+' — test envoyé');
+        if(!window.PF?.user){
+          toast('Test envoyé (démo) — connecte-toi pour recevoir le rappel chaque matin');
+        } else {
+          toast(channel==='email' ? 'Rappel email activé à '+h
+               : channel==='both' ? 'Notification + email activés à '+h
+               : 'Notifications activées à '+h+' — test envoyé');
+        }
       }catch(e){
         console.warn('[notif]', e);
         toast(e && e.message ? e.message : 'Activation impossible sur ce navigateur');
