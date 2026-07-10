@@ -3357,8 +3357,18 @@ function urlB64ToUint8(s){
 async function enableMorningPush(){
   if(!('serviceWorker' in navigator) || !('Notification' in window))
     throw new Error("Navigateur sans notifications — choisis le canal Email");
-  const perm = await Notification.requestPermission();
-  if(perm !== 'granted') throw new Error('Notifications refusées — autorise-les dans les réglages du navigateur');
+  if(Notification.permission === 'denied')
+    throw new Error('Notifications bloquées pour ce site — clique sur l\'icône à gauche de l\'adresse (ou ⚙ Réglages du site) → Notifications → Autoriser, puis réessaie');
+  if(Notification.permission !== 'granted')
+    toast('Chrome demande la permission : clique « Autoriser » (parfois juste une petite cloche dans la barre d\'adresse)');
+  // certains navigateurs n'affichent qu'une icône discrète et la promesse reste
+  // en attente : on borne à 25 s pour ne jamais laisser le bouton muet
+  const perm = await Promise.race([
+    Notification.requestPermission(),
+    new Promise(res=> setTimeout(()=>res('timeout'), 25000)),
+  ]);
+  if(perm === 'timeout') throw new Error('Pas de réponse — cherche la petite cloche barrée dans la barre d\'adresse de Chrome, clique-la et choisis « Autoriser »');
+  if(perm !== 'granted') throw new Error('Notifications refusées — autorise-les dans les réglages du site puis réessaie');
   const reg = await navigator.serviceWorker.register('./sillance-sw.js');
   await navigator.serviceWorker.ready;
   if(!reg.pushManager) throw new Error("Push indisponible — sur iPhone, ajoute d'abord le site à l'écran d'accueil (voir le tuto)");
