@@ -70,6 +70,8 @@ body.light{
   --shadow-3:0 24px 60px -22px rgba(20,30,60,.22);
 }
 body.light{ background-image:none; }
+/* mode jour : voile d'overlay clair (le voile sombre rendait tout le site noir) */
+body.light .overlay{background:rgba(36,48,76,.32)}
 body.light ::selection{background:rgba(14,143,168,.18)}
 body{
   background:var(--ink);
@@ -117,6 +119,8 @@ button{font-family:inherit;cursor:pointer}
 .morning-time select{flex:1;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px;cursor:pointer}
 .morning-help{display:block;margin-top:8px;font-size:11px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;text-align:center}
 .morning-help:hover{color:var(--accent)}
+.ln-pct .pvn{width:3.6em;background:var(--panel);border:1px solid var(--line-strong);color:var(--text);border-radius:6px;padding:3px 4px;font-family:var(--font-data);font-size:11.5px;text-align:center}
+.ln-pct .pv-unit{font-family:var(--font-data);font-size:11px;color:var(--muted)}
 .morning-card{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
 .morning-card h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px}
 .morning-pre{border:1px solid var(--line);border-radius:12px;background:var(--panel-2);padding:13px 14px;margin-bottom:12px}
@@ -525,7 +529,7 @@ body.grid-on .cal-guides{opacity:1}
 .modal .cell{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
 .modal .cell .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .modal .cell .v{font-family:var(--font-data);font-size:17px;font-weight:700;margin-top:2px}
-.modal .desc{font-size:14px;color:#C4CCDE;border-left:2px solid var(--c);padding-left:14px;margin-bottom:18px}
+.modal .desc{font-size:14px;color:var(--soft);border-left:2px solid var(--c);padding-left:14px;margin-bottom:18px}
 .modal .close{
   position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:9px;
   border:1px solid var(--line);background:transparent;color:var(--muted);font-size:14px;
@@ -1308,6 +1312,17 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .club-ath-vid{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   cursor:pointer;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);user-select:none}
 .club-ath-vid.on{background:rgba(70,194,216,.14);color:var(--accent);border-color:rgba(70,194,216,.5)}
+.club-ath-cal{display:inline-block;margin-top:5px;margin-left:6px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+  cursor:pointer;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);user-select:none}
+.club-ath-cal:hover{color:var(--accent);border-color:rgba(70,194,216,.5)}
+/* créneaux : contenu de séance, groupe, invitations */
+#crDesc{width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical}
+.cr-invite{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--soft);cursor:pointer;height:100%;padding-top:16px}
+.cr-invite input{accent-color:var(--accent)}
+.cr-grp{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:color-mix(in srgb,var(--gc) 15%,transparent);color:var(--gc);border:1px solid color-mix(in srgb,var(--gc) 45%,transparent);margin-top:7px}
+.cr-desc{margin-top:7px;font-size:12px;color:var(--soft);background:var(--panel-2);border-left:2px solid var(--cc);border-radius:0 8px 8px 0;padding:7px 10px;line-height:1.5}
+.cr-desc.locked{color:var(--muted);font-style:italic;border-left-color:var(--line-strong)}
+.cr-pending{font-size:10.5px;color:var(--bike);margin-top:5px}
 .club-ath-minor{display:inline-block;margin-top:5px;margin-left:6px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   border:1px solid var(--line-strong);color:var(--muted);cursor:pointer}
 .club-ath-minor.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
@@ -2151,6 +2166,12 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
         <div class="b-fld"><label>Coach</label><input type="text" id="crCoach" placeholder="Nom du coach"></div>
         <div class="b-fld"><label>Tarif séance (€)</label><input type="number" id="crPrice" value="0" min="0" step="0.5"></div>
       </div>
+      <div class="b-fld"><label>Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage — visible par les inscrits"></textarea></div>
+      <div class="cr-row">
+        <div class="b-fld"><label>Groupe (contenu réservé)</label><select id="crGroup"><option value="">Tout le club</option></select></div>
+        <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> Inviter tout le groupe</label></div>
+      </div>
+      <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres — ils n'ont qu'à confirmer leur présence.</p>
       <p class="cr-note" id="crPriceNote">Mets 0 pour un créneau inclus dans l'adhésion. Un tarif &gt; 0 active la séance « à la carte » (utile pour les salles Hyrox).</p>
     </div>
     <button class="btn" id="crSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Publier le créneau</button>
@@ -4764,15 +4785,26 @@ function renderCreneaux(){
       </div>
       <div class="cr-meta">
         <span><b>${CLUB_DAYS[c.day]}</b> ${c.time}</span>
+        <span title="Se répète chaque semaine"><i class="ic ic-refresh"></i> hebdo</span>
         <span>${fmtDur(c.dur)}</span>
         <span><i class="ic ic-pin"></i> ${c.place}</span>
         <span><i class="ic ic-user"></i> ${c.coach}</span>
       </div>
+      ${(()=>{ const g=c.group?clubGroup(c.group):null;
+        const me=CLUB_ATHLETES.find(a=>a.id===ME_CLUB_ID);
+        const canSee=!g || (me && me.group===c.group);
+        const chip=g?`<span class="cr-grp" style="--gc:${g.color}">${g.name}</span>`:'';
+        const body=c.desc ? (canSee?`<div class="cr-desc">${c.desc}</div>`
+          :`<div class="cr-desc locked"><i class="ic ic-lock"></i> Contenu réservé au groupe ${g.name}</div>`) : '';
+        const pend=(c.invited&&c.invited.length)?`<div class="cr-pending">${c.invited.length} invité${c.invited.length>1?'s':''} du groupe — en attente de confirmation</div>`:'';
+        return chip+body+pend; })()}
       <div class="cr-fill"><i style="width:${fillPct}%"></i></div>
       <div class="cr-fillrow"><span>${c.attendees.length}/${c.cap} inscrits</span><span>${c.cap-c.attendees.length} places restantes</span></div>
       <div class="cr-attendees">${avatars||'<span class="cr-roster">Aucun inscrit pour l\'instant</span>'}</div>
       <div class="cr-cta">
-        <button class="cr-join ${inIt?'in':''}" data-act="join">${inIt?'<i class="ic ic-check"></i> Inscrit':(c.price>0?`S'inscrire · ${c.price}€`:'S\'inscrire')}</button>
+        ${(c.invited||[]).includes(ME_CLUB_ID)
+          ? `<button class="cr-join" data-act="confirm"><i class="ic ic-check"></i> Confirmer ma présence</button>`
+          : `<button class="cr-join ${inIt?'in':''}" data-act="join">${inIt?'<i class="ic ic-check"></i> Inscrit':(c.price>0?`S'inscrire · ${c.price}€`:'S\'inscrire')}</button>`}
         <button data-act="roster">Liste</button>
       </div>
     </div>`;
@@ -4780,7 +4812,15 @@ function renderCreneaux(){
   // wiring
   box.querySelectorAll('.creneau-card').forEach(card=>{
     const c=CRENEAUX.find(x=>x.id===card.dataset.id);
-    card.querySelector('[data-act="join"]').onclick=()=>{
+    const cf=card.querySelector('[data-act="confirm"]');
+    if(cf) cf.onclick=()=>{
+      const i=(c.invited||[]).indexOf(ME_CLUB_ID);
+      if(i>-1){ c.invited.splice(i,1); if(!c.attendees.includes(ME_CLUB_ID)) c.attendees.push(ME_CLUB_ID); }
+      toast('Présence confirmée');
+      renderCreneaux(); renderClubStats(); if(typeof renderPresence==='function') renderPresence();
+    };
+    const jb=card.querySelector('[data-act="join"]');
+    if(jb) jb.onclick=()=>{
       const i=c.attendees.indexOf(ME_CLUB_ID);
       if(i>-1){ c.attendees.splice(i,1); toast('Inscription annulée'); }
       else {
@@ -4794,6 +4834,22 @@ function renderCreneaux(){
   });
 }
 
+
+/* Ouvre le calendrier d'entraînement d'un adhérent du club (vue coach).
+   Démo : plan dérivé stable propre à ce membre ; connecté : nécessitera le
+   lien coach_athlete réel (les ids du roster réel remplaceront la dérivation). */
+function openClubAthleteCalendar(a){
+  mode='coach'; setActiveMode(mc);
+  if(!rosterIsReal){
+    const idx = Math.abs(String(a.id).split('').reduce((x,c)=>x+c.charCodeAt(0),0)) % COACH_ROSTER.length;
+    selectedAthleteIdx = idx; applyDemoAthlete(idx); renderAthPicker();
+  }
+  renderSidebar(); render(); updateVideolibVisibility(); updatePlanAthleteVisibility();
+  if(typeof renderCoachBand==='function') renderCoachBand();
+  if(typeof renderGear==='function') renderGear();
+  window.scrollTo({top:0, behavior:'smooth'});
+  toast(`Calendrier de ${a.name}` + (rosterIsReal?'':' — démo : plan type du club'));
+}
 function renderClubAthletes(filter){
   renderJoinRequests();
   const box=document.getElementById('clubAthletesList');
@@ -4810,6 +4866,7 @@ function renderClubAthletes(filter){
         ${g?`<span class="club-ath-grp" style="background:${g.color}">${g.name}</span>`:''}
         <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="Cliquer pour changer de formule">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
         <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="Débloquer les vidéos d'exercices pour cet athlète (facturé par athlète)"><i class="ic ic-film"></i> Vidéos${a.videos?' <i class="ic ic-check"></i>':''}</span>
+        <span class="club-ath-cal" data-caid="${a.id}" title="Ouvrir le calendrier d'entraînement de cet athlète"><i class="ic ic-calendar"></i> Calendrier</span>
         ${minorChip(a)}
       </div>
       <span class="club-ath-tag ${a.disc==='hyrox'?'hyrox':''}">${a.disc==='hyrox'?'Hyrox':'Tri'}</span>
@@ -4835,6 +4892,9 @@ function renderClubAthletes(filter){
     }
   });
   box.querySelectorAll('.club-ath-minor').forEach(el=>el.onclick=()=> openConsent(el.dataset.maid, filter));
+  box.querySelectorAll('.club-ath-cal').forEach(el=>el.onclick=()=>{
+    const a=CLUB_ATHLETES.find(x=>x.id===el.dataset.caid); if(a) openClubAthleteCalendar(a);
+  });
 }
 
 /* Chip « mineur / consentement parental » sur chaque fiche athlète club. */
@@ -5111,6 +5171,7 @@ document.getElementById('grpSave').onclick=()=>{
 const creneauOverlay=document.getElementById('creneauOverlay');
 document.getElementById('clubAddCreneau').onclick=()=>{
   const sel=document.getElementById('crDay'); sel.innerHTML=CLUB_DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
+  document.getElementById('crGroup').innerHTML='<option value="">Tout le club</option>'+CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
   creneauOverlay.classList.add('open');
 };
 document.getElementById('creneauClose').onclick=()=> creneauOverlay.classList.remove('open');
@@ -5130,14 +5191,22 @@ document.getElementById('crSave').onclick=()=>{
     cap:+document.getElementById('crCap').value,
     coach:document.getElementById('crCoach').value||'Coach',
     price:+document.getElementById('crPrice').value,
+    desc:document.getElementById('crDesc').value.trim(),
+    group:document.getElementById('crGroup').value||null,
+    invited:[],
     attendees:[]
   };
+  // « Inviter tout le groupe » : les membres du groupe sont pré-invités,
+  // ils n'ont plus qu'à confirmer leur présence sur la carte du créneau
+  if(c.group && document.getElementById('crInviteGroup').checked){
+    c.invited = CLUB_ATHLETES.filter(a=>a.group===c.group).map(a=>a.id);
+  }
   CRENEAUX.push(c);
   // Persistance backend (si connecté à un club) — récupère l'id DB.
   if(window.PF?.user && window.__pf_clubId){
     PF.saveCreneau({ club_id:window.__pf_clubId, disc:c.disc, title:c.title, day:c.day,
       time:c.time, dur:c.dur, place:c.place, cap:c.cap, coach:c.coach, price:c.price,
-      group_id:c.group||null })
+      description:c.desc||'', group_id:c.group||null })
       .then(saved=>{ if(saved) c.id = saved.id; })
       .catch(e=> console.warn('[PF] saveCreneau échoué :', e));
   }
@@ -5509,9 +5578,9 @@ function exactDefault(disc){
 }
 /* options de type de cible exacte par sport */
 function exactKinds(disc){
-  if(disc==='bike') return [['power','Watts'],['pace','Allure /km'],['speed','km/h']];
-  if(disc==='run')  return [['pace','Allure /km'],['speed','km/h'],['time','Temps total']];
-  if(disc==='swim') return [['time100','Temps /100m'],['pace','Allure /100m'],['time','Temps total']];
+  if(disc==='bike') return [['power','Watts'],['pace','Allure /km'],['speed','km/h'],['rpe','RPE (sans capteur)']];
+  if(disc==='run')  return [['pace','Allure /km'],['speed','km/h'],['time','Temps total'],['rpe','RPE (sans capteur)']];
+  if(disc==='swim') return [['time100','Temps /100m'],['pace','Allure /100m'],['time','Temps total'],['rpe','RPE (sans capteur)']];
   return [['rpe','RPE']];
 }
 function defaultBlockNew(disc){
@@ -5668,7 +5737,7 @@ function lineHTML(blk, ln){
     intHTML = `
       <div class="ln-zone-row">
         <select class="ln-zone" data-f="model" title="Référence de calcul">${models.map(k=>`<option value="${k}" ${k===ln.model?'selected':''}>${REF_LABEL[k]}</option>`).join('')}</select>
-        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><span class="pv">${ln.pct}%</span></div>
+        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="Intensité en %"><span class="pv-unit">%</span></div>
       </div>
       <div class="ln-targets">${targets}<span class="zn">${zn}</span></div>`;
   } else {
@@ -5766,10 +5835,22 @@ function wireBlocks(){
         inp.addEventListener(ev,()=>{
           if(f==='type'){ ln.type=inp.value; renderBlocks(); }
           else if(f==='model'){ ln.model=inp.value; renderBlocks(); }
-          else if(f==='pct'){ ln.pct=+inp.value; ln.rpe=rpeFromPct(ln.pct); renderBlocks(); }
+          else if(f==='pct'){
+            // maj EN PLACE pendant le drag — re-render seulement au relâchement,
+            // sinon le slider est détruit sous le doigt et le réglage fin est impossible
+            ln.pct=+inp.value; ln.rpe=rpeFromPct(ln.pct);
+            const nn=lnEl.querySelector('[data-f="pctn"]'); if(nn && document.activeElement!==nn) nn.value=ln.pct;
+            updateBuilderSummary();
+          }
+          else if(f==='pctn'){
+            ln.pct=Math.max(40,Math.min(130,+inp.value||40)); ln.rpe=rpeFromPct(ln.pct);
+            const rg=lnEl.querySelector('[data-f="pct"]'); if(rg) rg.value=ln.pct;
+            updateBuilderSummary();
+          }
           else if(f==='durm'){ ln.dur.m=+inp.value; updateBuilderSummary(); }
           else if(f==='dist'){ ln.dist=+inp.value||0; updateBuilderSummary(); }
         });
+        if(f==='pct'||f==='pctn') inp.addEventListener('change', ()=> renderBlocks());
       });
       // champs valeur exacte
       lnEl.querySelectorAll('[data-x]').forEach(inp=>{
