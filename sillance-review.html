@@ -1143,6 +1143,31 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .coffer li{padding:4px 0;display:flex;gap:7px}
 .coffer li::before{content:"›";color:var(--accent);font-weight:800}
 .co-who{font-size:11px;color:var(--muted);margin-top:10px;border-top:1px dashed var(--line);padding-top:9px}
+/* Abonnement Sillance côté club (ce que le club paie à la plateforme) */
+.csub{border:1px solid rgba(70,194,216,.35);background:linear-gradient(135deg,rgba(70,194,216,.09),rgba(157,123,255,.06));border-radius:14px;padding:16px 17px;margin-bottom:18px}
+.csub-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.csub-t{font-family:var(--font-display);font-size:16px;font-weight:700}
+.csub-s{font-size:11.5px;color:var(--muted);margin-top:3px;max-width:520px}
+.csub-toggle{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.csub-toggle b{color:var(--bike)}
+.csub-body{display:flex;gap:16px;align-items:stretch;margin-top:14px;flex-wrap:wrap}
+.csub-count{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:124px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);padding:12px}
+.csub-n{font-family:var(--font-data);font-size:40px;font-weight:700;color:var(--accent);line-height:1}
+.csub-nl{font-size:11px;color:var(--text);font-weight:700;text-align:center;margin-top:6px}
+.csub-nl span{display:block;font-weight:400;color:var(--muted);font-size:10px;margin-top:2px}
+.csub-tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;flex:1;min-width:280px}
+.csub-tier{border:1px solid var(--line);border-radius:11px;background:var(--panel-2);padding:11px 12px;position:relative}
+.csub-tier.cur{border-color:var(--accent);box-shadow:0 0 0 1px rgba(70,194,216,.3)}
+.csub-badge{position:absolute;top:-8px;left:11px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--accent);color:#04121a;padding:2px 7px;border-radius:99px}
+.csub-name{font-family:var(--font-display);font-size:14px;font-weight:600}
+.csub-cap{font-size:10.5px;color:var(--muted);margin-top:1px}
+.csub-price{font-family:var(--font-data);font-size:20px;font-weight:700;margin-top:7px}
+.csub-price s{font-size:13px;color:var(--muted);font-weight:400}
+.csub-price small{font-size:11px;color:var(--muted);font-weight:400}
+.csub-per{font-size:10.5px;color:var(--accent);margin-top:1px}
+.csub-foot{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.csub-terms{font-size:11px;color:var(--muted);max-width:560px;display:flex;gap:7px;align-items:flex-start}
+@media(max-width:760px){.csub-tiers{grid-template-columns:1fr}}
 .club-ath-offer{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-top:4px;margin-left:6px;cursor:pointer;border:1px solid var(--line-strong);color:var(--muted)}
 .club-ath-offer.co-dropin{color:var(--bike)}
 .club-ath-offer.co-sub{color:var(--good)}
@@ -4638,6 +4663,66 @@ const CLUB_OFFERS = [
 const clubOffer = id => CLUB_OFFERS.find(o=>o.id===id) || CLUB_OFFERS[0];
 const COACH_OFFER = { name:'Suivi coaching', price:99 };
 
+/* Abonnement Sillance du CLUB (ce que le club paie à la plateforme).
+   Assiette = « athlètes activés » = adhérents placés dans un groupe.
+   Facturation à la saison, par virement (pas de carte) → cette carte est
+   informative + retient la formule ; l'encaissement réel se fait hors app. */
+const CLUB_TIERS = [
+  {id:'club',  name:'Club',          cap:"jusqu'à 50 athlètes",  max:50,       price:600,  perM:'0,99 €'},
+  {id:'grand', name:'Grand club',    cap:"jusqu'à 150 athlètes", max:150,      price:1350, perM:'0,75 €'},
+  {id:'illim', name:'Club illimité', cap:'athlètes illimités',   max:Infinity, price:1800, perM:'0,50 €'}
+];
+let clubFounder = true; // démo : on présente le tarif « club fondateur » (−50 %)
+function clubActivated(){ return CLUB_ATHLETES.filter(a=>a.group).length; }
+function clubTierFor(n){ return CLUB_TIERS.find(t=>n<=t.max) || CLUB_TIERS[CLUB_TIERS.length-1]; }
+function clubTierPrice(t){ return clubFounder ? Math.round(t.price/2) : t.price; }
+
+function clubSillanceCardHTML(){
+  const n=clubActivated(), tier=clubTierFor(n);
+  return `
+  <div class="csub">
+    <div class="csub-head">
+      <div>
+        <div class="csub-t"><i class="ic ic-star"></i> Abonnement Sillance</div>
+        <div class="csub-s">Ce que le club paie pour la plateforme — distinct de ce que tu factures à tes adhérents ci-dessous.</div>
+      </div>
+      <label class="csub-toggle"><input type="checkbox" id="clubFounderTgl" ${clubFounder?'checked':''}> Tarif club fondateur <b>−50 %</b></label>
+    </div>
+    <div class="csub-body">
+      <div class="csub-count">
+        <div class="csub-n">${n}</div>
+        <div class="csub-nl">athlètes activés<span>placés dans un groupe</span></div>
+      </div>
+      <div class="csub-tiers">
+        ${CLUB_TIERS.map(t=>{
+          const cur=t.id===tier.id, fnd=Math.round(t.price/2);
+          return `<div class="csub-tier ${cur?'cur':''}">
+            ${cur?'<span class="csub-badge">Ta formule</span>':''}
+            <div class="csub-name">${t.name}</div>
+            <div class="csub-cap">${t.cap}</div>
+            <div class="csub-price">${clubFounder?`<s>${t.price} €</s> ${fnd} €`:`${t.price} €`}<small>/saison</small></div>
+            <div class="csub-per">${t.perM} /mois/athlète</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="csub-foot">
+      <div class="csub-terms"><i class="ic ic-calendar"></i><span>Facturé à la saison (sept. → août), une facture en septembre, par virement. Tu démarres aujourd'hui — la facture ne part qu'à la rentrée.</span></div>
+      <button class="cc-btn" id="clubChooseBtn">Choisir la formule ${tier.name}</button>
+    </div>
+  </div>`;
+}
+function wireClubSillance(){
+  const tgl=document.getElementById('clubFounderTgl');
+  if(tgl) tgl.onchange=()=>{ clubFounder=tgl.checked; renderClubBill(); };
+  const btn=document.getElementById('clubChooseBtn');
+  if(btn) btn.onclick=()=>{
+    const t=clubTierFor(clubActivated()), p=clubTierPrice(t);
+    toast(`Formule ${t.name} retenue — ${p} €/saison${clubFounder?' (fondateur)':''}. Facture envoyée en septembre.`);
+    if(window.PF?.user && window.__pf_clubId && PF.saveClubPlan) PF.saveClubPlan(window.__pf_clubId, t.id, clubFounder).catch(e=>console.warn('saveClubPlan',e));
+  };
+}
+
 /* facturation dérivée de l'état réel (formules + à la carte) — reste cohérente
    quand on change la formule d'un adhérent ou un tarif de créneau. */
 function clubBills(){
@@ -4695,7 +4780,8 @@ function renderClubBill(){
   const tot=bills.filter(b=>b.ok).reduce((a,b)=>a+b.amt,0);
   const wait=bills.filter(b=>!b.ok).reduce((a,b)=>a+b.amt,0);
   const rec=bills.filter(b=>b.type==='sub'&&b.ok).length;
-  box.innerHTML=`
+  box.innerHTML=clubSillanceCardHTML()+`
+    <p class="club-hint" style="margin:0 0 12px"><b>Revenus des adhérents</b> — ce que le club encaisse (distinct de l'abonnement Sillance ci-dessus).</p>
     <div class="cdash-kpis cols3">
       <div class="cdash-kpi"><div class="v good">${tot} €</div><div class="k">Encaissé ce mois</div></div>
       <div class="cdash-kpi"><div class="v" style="color:var(--bike)">${wait} €</div><div class="k">En attente</div></div>
@@ -4705,6 +4791,7 @@ function renderClubBill(){
     <table class="cbill"><thead><tr><th>Adhérent</th><th>Motif</th><th>Type</th><th>Montant</th><th>Statut</th></tr></thead><tbody>
     ${bills.map(b=>{const a=CLUB_ATHLETES.find(x=>x.id===b.m);return `<tr><td><span class="cbav">${a?initials(a.name):'?'}</span>${a?a.name:'—'}</td><td>${b.why}</td><td>${b.type==='sub'?'Abonnement':'À la carte'}</td><td><b>${b.amt} €</b></td><td>${b.ok?'<span class="cpay ok">payé</span>':'<span class="cpay wait">en attente</span>'}</td></tr>`;}).join('')}
     </tbody></table>`;
+  wireClubSillance();
 }
 
 function renderClubOffres(){
