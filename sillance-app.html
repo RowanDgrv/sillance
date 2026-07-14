@@ -1198,6 +1198,31 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .sg-steps li b{color:var(--text);font-weight:600}
 .sg-cta{width:100%;background:var(--accent);color:#04121a;border:none;border-radius:8px;padding:9px;font-weight:700;font-size:12.5px;cursor:pointer}
 .sg-cta:hover{filter:brightness(1.06)}
+/* poids dans le check-in */
+.ck-weight label{display:flex;justify-content:space-between;align-items:center}
+.ck-wrow{display:flex;align-items:center;gap:10px;margin-top:6px}
+.ck-wrow input{flex:1;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-data)}
+.ck-wkg{font-family:var(--font-data);font-size:13px;color:var(--accent);white-space:nowrap}
+/* table d'adhérence (suivi de mes athlètes) */
+.adh-open-btn{width:100%;margin-bottom:16px;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px}
+.adh-open-btn:hover{border-color:var(--accent)}
+.adh-overlay{position:fixed;inset:0;z-index:9000;background:rgba(4,8,18,.66);display:flex;align-items:safe center;justify-content:center;padding:20px;opacity:0;transition:opacity .16s;overflow-y:auto}
+.adh-overlay.open{opacity:1}
+.adh-modal{background:var(--panel);border:1px solid var(--line-strong);border-radius:16px;padding:22px 24px;max-width:720px;width:100%;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.adh-close{position:absolute;top:14px;right:14px;background:transparent;border:none;color:var(--muted);font-size:16px;cursor:pointer}
+.adh-close:hover{color:var(--text)}
+.adh-modal h3{font-family:var(--font-display);font-size:21px;font-weight:600}
+.adh-sub{font-size:12.5px;color:var(--muted);margin:4px 0 16px;max-width:540px}
+.adh-scroll{overflow-x:auto}
+.adh-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.adh-tbl th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--line)}
+.adh-tbl td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.adh-tbl tr:last-child td{border-bottom:none}
+.adh-av{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:color-mix(in srgb,var(--ac) 22%,transparent);color:var(--ac);font-size:10px;font-weight:700;margin-right:9px;vertical-align:middle}
+.adh-bar{display:inline-block;width:84px;height:7px;border-radius:99px;background:var(--panel-2);overflow:hidden;vertical-align:middle;margin-right:8px}
+.adh-bar i{display:block;height:100%;border-radius:99px}
+.adh-pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid;white-space:nowrap}
+@media(max-width:560px){.adh-sub{max-width:none}}
 .coach-connect .cc-s{font-size:11px;color:var(--muted);margin:3px 0 7px}
 .coach-connect .cc-price{font-size:11.5px;color:var(--soft);margin-bottom:9px}
 .coach-connect .cc-price small{color:var(--muted)}
@@ -3102,7 +3127,7 @@ const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const fmt = new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
-const checkin = { sommeil:7, fatigue:4, motivation:8 };
+const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70 };
 const RECORDS = [
   {d:'10 km', v:'31:45', isNew:true},
   {d:'Semi', v:'1:08:52', isNew:true},
@@ -3139,6 +3164,7 @@ function coachGuideHTML(){
 function renderSidebar(){
   if(mode==='coach'){
     sidebarContent.innerHTML = coachGuideHTML() + `
+      <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> Suivi de mes athlètes</button>
       <h2>Bibliothèque</h2>
       <p class="hint">Glissez une séance sur un jour →</p>
       <button class="create-btn" id="createSessionBtn">+ Créer une séance</button>
@@ -3181,6 +3207,7 @@ function renderSidebar(){
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
     var _sgCta=document.getElementById('sgCta'); if(_sgCta) _sgCta.onclick=function(){ openBuilder(null,null); };
+    var _adhOpen=document.getElementById('adhOpen'); if(_adhOpen) _adhOpen.onclick=openAdherence;
     buildCycles(document.getElementById('cycleList'));
     document.getElementById('createCycleBtn').addEventListener('click', ()=> openCycleBuilder(null));
     /* Assistant IA — essai 14 jours (checkout Stripe connecté, déverrouillage en démo) */
@@ -3225,6 +3252,13 @@ function renderSidebar(){
           <label><i class="ic ${ic}"></i> ${l}<span class="val" id="val-${k}">${checkin[k]}/10</span></label>
           <input type="range" min="1" max="10" value="${checkin[k]}" data-k="${k}" aria-label="${l}">
         </div>`).join('')}
+        <div class="row ck-weight">
+          <label>Poids<span class="val" id="val-poids">${checkin.poids} kg</span></label>
+          <div class="ck-wrow">
+            <input type="number" min="30" max="150" step="0.1" value="${checkin.poids}" id="ckPoids" aria-label="Poids en kilogrammes">
+            <span class="ck-wkg" id="ckWkg">${ATHLETE_REF.ftp?(ATHLETE_REF.ftp/checkin.poids).toFixed(2)+' W/kg':''}</span>
+          </div>
+        </div>
         <div class="readiness">
           <div class="lbl">Fraîcheur</div>
           <div class="score" id="readyScore" style="color:${adv.c}">${s}%</div>
@@ -3282,6 +3316,7 @@ function renderSidebar(){
         if(typeof renderReadiness==='function') renderReadiness();
       });
     });
+    (function(){ var wp=document.getElementById('ckPoids'); if(wp) wp.addEventListener('input',function(){ var v=parseFloat(wp.value); if(!v||v<30||v>150) return; checkin.poids=v; var vl=document.getElementById('val-poids'); if(vl) vl.textContent=v+' kg'; var w=document.getElementById('ckWkg'); if(w&&ATHLETE_REF.ftp) w.textContent=(ATHLETE_REF.ftp/v).toFixed(2)+' W/kg'; }); })();
     buildMorningPreview();
     renderStravaCard();
     const csb=document.getElementById('coachSubBtn');
@@ -4524,6 +4559,38 @@ function apRowHtml(a, i){
       ${forme!=null?`<span class="ap-note" style="--fc:${fc}">${athNote(forme)}</span>`:''}
     </span>
   </button>`;
+}
+function openAdherence(){
+  const rows = ROSTER.map(a=>{
+    const forme=athForme(a);
+    const comp = (a.comp!=null ? Math.round(a.comp*100) : null);
+    const cc = comp==null?'var(--muted)': comp>=85?'var(--good)': comp>=60?'var(--bike)':'var(--run)';
+    const status = comp==null?'—': comp>=85?'À jour': comp>=60?'À surveiller':'Décroche';
+    const race = a.race ? `${a.race.name} · J–${a.race.days}` : '—';
+    return `<tr>
+      <td><span class="adh-av" style="--ac:${a.color||'var(--accent)'}">${a.ini||initials(a.name)}</span>${a.name}</td>
+      <td style="color:${athFormeColor(forme)}">${forme==null?'—':forme+'%'}</td>
+      <td><span class="adh-bar"><i style="width:${comp==null?0:comp}%;background:${cc}"></i></span><span style="color:${cc}">${comp==null?'—':comp+'%'}</span></td>
+      <td>${race}</td>
+      <td><span class="adh-pill" style="color:${cc};border-color:${cc}">${status}</span></td>
+    </tr>`;
+  }).join('');
+  const el=document.createElement('div'); el.className='adh-overlay';
+  el.innerHTML=`<div class="adh-modal" role="dialog" aria-label="Suivi de mes athlètes">
+    <button class="adh-close" aria-label="Fermer">✕</button>
+    <h3>Suivi de mes athlètes</h3>
+    <p class="adh-sub">Adhérence au plan (séances réalisées vs prévues) et forme du jour, pour repérer d'un coup d'œil qui décroche.</p>
+    <div class="adh-scroll"><table class="adh-tbl">
+      <thead><tr><th>Athlète</th><th>Forme</th><th>Adhérence</th><th>Prochaine course</th><th>Statut</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close;
+  el.addEventListener('click', e=>{ if(e.target===el) close(); });
+  document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
 }
 function renderAthPicker(){
   const btn=document.getElementById('apBtn'), menu=document.getElementById('apMenu');
