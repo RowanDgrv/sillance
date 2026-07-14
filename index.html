@@ -115,6 +115,15 @@ main,.nav,footer{position:relative;z-index:1}
 .feat p{color:var(--soft);font-size:14.5px;line-height:1.6;font-weight:300}
 @media(max-width:680px){.feat{grid-column:span 12}}
 
+/* comment ça marche — étapes numérotées */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.step{padding-top:22px;border-top:2px solid var(--accent2)}
+.step .sn{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--muted)}
+.step h4{font-family:var(--display);font-weight:600;font-size:21px;text-transform:uppercase;margin:12px 0 8px}
+.step p{color:var(--soft);font-size:14.5px;line-height:1.55;font-weight:300}
+@media(max-width:880px){.steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 24px}}
+@media(max-width:520px){.steps{grid-template-columns:1fr}}
+
 /* cta — dégradé animé eau -> air (drift lent, coupé si reduced-motion) */
 .cta{padding:110px 0;border-top:1px solid var(--line);text-align:center;background:var(--paper);position:relative;overflow:hidden}
 .cta::before{content:"";position:absolute;inset:-45%;z-index:0;filter:blur(46px);
@@ -143,6 +152,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
   <a class="brand" href="#top"><svg class="brandmark" width="22" height="22" viewBox="0 0 96 96" fill="none" aria-hidden="true" style="vertical-align:middle"><defs><linearGradient id="lmFuse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#46C2D8"/></linearGradient></defs><path d="M76 48 C56 34 36 28 8 24" stroke="#FF9A3D" stroke-width="10" stroke-linecap="round"/><path d="M76 48 C56 62 36 68 8 72" stroke="#46C2D8" stroke-width="10" stroke-linecap="round"/><circle cx="76" cy="48" r="11" fill="url(#lmFuse)"/><path d="M31 48 A7.5 7.5 0 0 1 46 48 Z" fill="#FF9A3D"/><path d="M46 48 A7.5 7.5 0 0 1 31 48 Z" fill="#46C2D8"/></svg><span class="wm">Sill<b>ance</b></span></a>
   <div class="nav-links">
     <a href="#roles">Pour qui</a>
+    <a href="#how">Comment ça marche</a>
     <a href="#data">La plateforme</a>
   </div>
   <div class="nav-right">
@@ -197,6 +207,20 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     </div>
   </div></section>
 
+  <!-- COMMENT ÇA MARCHE -->
+  <section class="section" id="how"><div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Comment ça marche</span>
+      <h2 class="h2">Planifier, voir, ajuster, être payé</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="sn">01</div><h4>Tu planifies</h4><p>Pose les séances de la semaine en quelques clics, ou un cycle complet d'un coup. Chaque athlète a son plan.</p></div>
+      <div class="step"><div class="sn">02</div><h4>L'athlète exécute</h4><p>Il suit son programme. Sa montre Garmin ou Coros, ou son fichier .FIT, remonte la séance réalisée.</p></div>
+      <div class="step"><div class="sn">03</div><h4>Sillance analyse</h4><p>La donnée brute devient lisible : charge, fraîcheur, respect du plan. L'assistant IA en fait la synthèse.</p></div>
+      <div class="step"><div class="sn">04</div><h4>Tu ajustes, tu encaisses</h4><p>Tu adaptes la suite sur du concret, et tes athlètes te paient automatiquement via la plateforme.</p></div>
+    </div>
+  </div></section>
+
   <!-- DATA -->
   <section class="section" id="data"><div class="wrap">
     <div class="sec-head">
@@ -204,10 +228,10 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
       <h2 class="h2">Une lecture au-delà des chiffres bruts</h2>
     </div>
     <div class="grid">
-      <div class="feat"><div class="num">01</div><div><h4>Découplage cardiaque</h4><p>La dérive entre l'effort produit et le coût cardiaque au fil de la séance — le marqueur de référence de l'endurance aérobie.</p></div></div>
-      <div class="feat"><div class="num">02</div><div><h4>Assistant IA</h4><p>Une synthèse claire de chaque séance et des recommandations concrètes, évaluées au regard de l'objectif fixé.</p></div></div>
-      <div class="feat"><div class="num">03</div><div><h4>Charge d'entraînement</h4><p>Forme, fatigue et fraîcheur réunies sur une métrique commune à toutes les disciplines.</p></div></div>
-      <div class="feat"><div class="num">04</div><div><h4>Multi-capteurs</h4><p>L'import de vos fichiers de séance, indépendamment de l'écosystème de votre montre.</p></div></div>
+      <div class="feat"><div class="num">01</div><div><h4>Charge d'entraînement</h4><p>Forme, fatigue et fraîcheur réunies sur une seule métrique, commune au vélo, à la course, à la natation et au Hyrox. Tu sais quand pousser et quand relâcher.</p></div></div>
+      <div class="feat"><div class="num">02</div><div><h4>Multi-capteurs</h4><p>Garmin, Coros, ou l'import de tes fichiers .FIT : la donnée de tes athlètes revient chez toi, quel que soit leur écosystème. La réponse au trou laissé par Strava.</p></div></div>
+      <div class="feat"><div class="num">03</div><div><h4>Assistant IA</h4><p>Une synthèse claire de chaque séance et des recommandations concrètes, évaluées au regard de l'objectif que tu as fixé.</p></div></div>
+      <div class="feat"><div class="num">04</div><div><h4>Découplage &amp; durabilité</h4><p>Les marqueurs fins de l'endurance : dérive cardiaque et puissance tenue sous fatigue. Pour affiner quand tu veux aller plus loin.</p></div></div>
     </div>
   </div></section>
 
@@ -228,10 +252,9 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
   <div class="fmono">© 2026 Sillance</div>
 </div>
 <div class="wrap"><nav class="legal-links" aria-label="Informations légales">
-  <a href="./legal/mentions-legales.html">Mentions légales</a>
-  <a href="./legal/cgu.html">CGU</a>
-  <a href="./legal/cgv.html">CGV</a>
-  <a href="./legal/confidentialite.html">Politique de confidentialité</a>
+  <a href="./legal.html#mentions">Mentions légales</a>
+  <a href="./legal.html#cgu">CGU / CGV</a>
+  <a href="./legal.html#confidentialite">Politique de confidentialité</a>
 </nav></div></footer>
 
 <script src="./sillance-flow.js"></script>
