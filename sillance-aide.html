@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<title>Sillance — Aide &amp; guide d'utilisation</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#0B1120;--panel:#121A2B;--panel-2:#18213A;--ink:#F3F6FC;--soft:#C2CBDD;--muted:#8A93A8;--accent:#46C2D8;--accent2:#FF9A3D;--line:rgba(150,165,200,.16);--line-strong:rgba(150,165,200,.30)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper);color:var(--soft);font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65}
+  a{color:var(--accent);text-decoration:none}
+  .top{position:sticky;top:0;z-index:10;background:rgba(11,17,32,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-strong)}
+  .top .in{max-width:1080px;margin:0 auto;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .wm{font-family:'Oswald',sans-serif;font-weight:600;font-size:21px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+  .wm b{color:var(--accent)}
+  .top .cta{font-family:'Archivo';font-size:13px;font-weight:600;border:1px solid var(--line-strong);border-radius:8px;padding:9px 16px;color:var(--soft)}
+  .top .cta:hover{border-color:var(--accent);color:var(--ink)}
+  .wrap{max-width:1080px;margin:0 auto;padding:42px 22px 90px;display:grid;grid-template-columns:210px 1fr;gap:44px}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr;gap:24px}.toc{position:static!important;display:none}}
+  /* sommaire */
+  .toc{position:sticky;top:96px;align-self:start;font-size:13.5px}
+  .toc .lbl{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
+  .toc a{display:block;color:var(--soft);padding:5px 0;border-left:2px solid transparent;padding-left:12px;margin-left:-2px}
+  .toc a:hover{color:var(--accent);border-color:var(--accent)}
+  /* contenu */
+  h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:38px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);line-height:1.05}
+  .intro{margin:12px 0 8px;max-width:60ch}
+  .roles-note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:13px 17px;margin:22px 0 8px;font-size:14px}
+  .roles-note b{color:var(--ink)}
+  .role-h{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2);margin:52px 0 4px;padding-top:22px;border-top:1px solid var(--line-strong)}
+  .tuto{margin-top:30px}
+  .tuto h2{font-family:'Oswald',sans-serif;font-weight:600;font-size:23px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline;gap:12px}
+  .tuto h2 .no{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--accent);font-weight:600}
+  .tuto .lead{margin:8px 0 4px;color:var(--soft)}
+  ol.steps{list-style:none;counter-reset:s;margin:18px 0 0}
+  ol.steps>li{counter-increment:s;position:relative;padding:4px 0 18px 44px;border-left:1px solid var(--line);margin-left:15px}
+  ol.steps>li:last-child{border-left:1px solid transparent}
+  ol.steps>li::before{content:counter(s);position:absolute;left:-15px;top:0;width:30px;height:30px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  ol.steps>li b{color:var(--ink)}
+  .hlword{color:var(--accent2);font-weight:600;white-space:nowrap}
+  figure{margin:20px 0 4px}
+  figure img{width:100%;display:block;border:1px solid var(--line-strong);border-radius:12px}
+  figcaption{font-size:12.5px;color:var(--muted);margin-top:9px;display:flex;gap:8px;align-items:baseline}
+  figcaption .dot{color:var(--accent2);font-weight:700}
+  .tip{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px 15px;margin-top:16px;font-size:13.5px;color:var(--soft)}
+  .tip b{color:var(--accent)}
+  footer{max-width:1080px;margin:0 auto;padding:26px 22px 50px;border-top:1px solid var(--line-strong);font-size:13px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="in">
+  <a class="wm" href="index.html">Sill<b>ance</b></a>
+  <a class="cta" href="sillance-app.html">← Retour à l'app</a>
+</div></div>
+
+<div class="wrap">
+
+  <!-- SOMMAIRE -->
+  <nav class="toc" aria-label="Sommaire">
+    <div class="lbl">Coach</div>
+    <a href="#creer-seance">Créer une séance</a>
+    <a href="#planifier">Planifier dans le calendrier</a>
+    <a href="#adherence">Suivre l'adhérence</a>
+    <div class="lbl">Club</div>
+    <a href="#deplacer-athlete">Déplacer un adhérent de groupe</a>
+    <a href="#creneau">Créer un créneau</a>
+    <div class="lbl">Athlète</div>
+    <a href="#checkin">Faire son check-in</a>
+  </nav>
+
+  <!-- CONTENU -->
+  <main>
+    <h1>Aide &amp; guide d'utilisation</h1>
+    <p class="intro">Les tâches les plus courantes, pas à pas. Sur chaque capture, <span class="hlword">l'élément à utiliser est encadré en orange</span>.</p>
+
+    <div class="roles-note"><b>Changer de rôle.</b> En haut de l'application, les trois boutons <b>Coach</b>, <b>Athlète</b> et <b>Club</b> font basculer l'affichage. Chaque guide ci-dessous précise le rôle à activer.</div>
+
+    <!-- ============ COACH ============ -->
+    <div class="role-h">Espace coach</div>
+
+    <section class="tuto" id="creer-seance">
+      <h2><span class="no">01</span> Créer une séance</h2>
+      <p class="lead">Construis une séance dans ta bibliothèque, puis pose-la sur le calendrier.</p>
+      <ol class="steps">
+        <li>Active le rôle <b>Coach</b>. Le panneau <b>Bibliothèque</b> apparaît à gauche.</li>
+        <li>Clique sur <span class="hlword">+ Créer une séance</span>.</li>
+        <li>Renseigne la discipline, la durée, l'objectif, puis ajoute les blocs (échauffement, intervalles, retour au calme).</li>
+        <li>Enregistre : la séance rejoint ta bibliothèque, prête à être planifiée.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/creer-seance.png" alt="Bouton « + Créer une séance » encadré dans le panneau Bibliothèque du mode coach" loading="lazy">
+        <figcaption><span class="dot">●</span> Le bouton « + Créer une séance » en haut de la bibliothèque.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="planifier">
+      <h2><span class="no">02</span> Planifier une séance dans le calendrier</h2>
+      <p class="lead">Une fois la séance créée, place-la sur le bon jour.</p>
+      <ol class="steps">
+        <li>Depuis la <b>Bibliothèque</b>, <b>glisse</b> une séance et dépose-la sur le jour voulu du calendrier.</li>
+        <li>Autre méthode : survole un jour et clique le <b>+</b> qui apparaît dans son en-tête pour créer une séance directement à cette date.</li>
+        <li>Une séance planifiée peut être re-déplacée d'un jour à l'autre par glisser-déposer.</li>
+      </ol>
+      <div class="tip"><b>Astuce.</b> Pour poser un programme complet d'un coup, utilise <b>+ Créer un cycle</b> sous la bibliothèque : plusieurs semaines de séances en un clic.</div>
+    </section>
+
+    <section class="tuto" id="adherence">
+      <h2><span class="no">03</span> Suivre l'adhérence de mes athlètes</h2>
+      <p class="lead">Vois d'un coup d'œil qui suit son plan et qui décroche.</p>
+      <ol class="steps">
+        <li>En rôle <b>Coach</b>, clique <span class="hlword">Suivi de mes athlètes</span>, en haut du panneau de gauche.</li>
+        <li>Le tableau liste tout ton roster : <b>forme du jour</b>, <b>adhérence</b> (séances réalisées vs prévues), <b>prochaine course</b> et un <b>statut</b>.</li>
+        <li>Repère les athlètes en rouge (« Décroche ») pour les relancer en priorité.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/adherence.png" alt="Bouton « Suivi de mes athlètes » encadré en bas du panneau coach" loading="lazy">
+        <figcaption><span class="dot">●</span> « Suivi de mes athlètes » ouvre le tableau d'adhérence.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ CLUB ============ -->
+    <div class="role-h">Espace club</div>
+
+    <section class="tuto" id="deplacer-athlete">
+      <h2><span class="no">04</span> Déplacer un adhérent d'un groupe à l'autre</h2>
+      <p class="lead">Un adhérent appartient à un seul groupe. Pour le déplacer, on le rattache au groupe d'arrivée.</p>
+      <ol class="steps">
+        <li>Active le rôle <b>Club</b>, puis ouvre l'onglet <b>Groupes</b>.</li>
+        <li>Sur le <b>groupe d'arrivée</b>, clique <span class="hlword">Modifier</span>.</li>
+        <li>Dans <b>Athlètes du groupe</b>, <span class="hlword">coche</span> l'adhérent à déplacer. Le cocher ici le retire automatiquement de son ancien groupe.</li>
+        <li>Clique <span class="hlword">Enregistrer le groupe</span>.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/groupe-modifier.png" alt="Bouton « Modifier » encadré sur une carte de groupe, onglet Groupes" loading="lazy">
+        <figcaption><span class="dot">●</span> Étape 2 : « Modifier » sur le groupe d'arrivée.</figcaption>
+      </figure>
+      <figure>
+        <img src="./aide-img/groupe-membres.png" alt="Liste des athlètes à cocher et bouton Enregistrer encadrés dans la fenêtre du groupe" loading="lazy">
+        <figcaption><span class="dot">●</span> Étapes 3 et 4 : cocher l'adhérent, puis « Enregistrer le groupe ».</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="creneau">
+      <h2><span class="no">05</span> Créer un créneau (récurrent)</h2>
+      <p class="lead">Un créneau collectif où les adhérents s'inscrivent eux-mêmes.</p>
+      <ol class="steps">
+        <li>Rôle <b>Club</b>, onglet <b>Créneaux</b>, clique <span class="hlword">+ Créer un créneau</span>.</li>
+        <li>Choisis la discipline, l'intitulé, le jour et l'heure, le lieu et la capacité.</li>
+        <li>Coche <b>Chaque semaine</b> pour un créneau récurrent (sinon, une séance ponctuelle datée).</li>
+        <li>Assigne-le à un <b>groupe</b> si son contenu ne doit être visible que par ce groupe.</li>
+        <li>Enregistre : les adhérents s'inscrivent seuls, tu vois la présence en direct.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/creneau.png" alt="Bouton « + Créer un créneau » encadré dans l'onglet Créneaux" loading="lazy">
+        <figcaption><span class="dot">●</span> « + Créer un créneau », au-dessus de la liste des créneaux existants.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ ATHLÈTE ============ -->
+    <div class="role-h">Espace athlète</div>
+
+    <section class="tuto" id="checkin">
+      <h2><span class="no">06</span> Faire son check-in du matin</h2>
+      <p class="lead">Trente secondes chaque matin pour que le coach adapte le plan.</p>
+      <ol class="steps">
+        <li>Active le rôle <b>Athlète</b>. Le panneau <b>Check-in du jour</b> est à gauche.</li>
+        <li>Règle les curseurs <b>Sommeil</b>, <b>Fatigue</b> et <b>Motivation</b>, et renseigne ton <b>poids</b> (le rapport W/kg se met à jour en direct).</li>
+        <li>Ta <b>fraîcheur</b> se calcule automatiquement en dessous.</li>
+        <li>Clique <span class="hlword">Valider mon check-in</span>. Si ta forme est basse, ton coach est prévenu.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/checkin.png" alt="Panneau de check-in encadré : curseurs, poids, fraîcheur et bouton Valider" loading="lazy">
+        <figcaption><span class="dot">●</span> Le panneau de check-in, curseurs et poids compris.</figcaption>
+      </figure>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <span>Sillance — aide &amp; guide d'utilisation</span>
+  <span><a href="index.html">Accueil</a> · <a href="legal.html">Informations légales</a> · <a href="mailto:rowandegraeve@gmail.com">Nous écrire</a></span>
+</footer>
+
+</body>
+</html>
