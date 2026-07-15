@@ -798,6 +798,11 @@ body[data-athview="home"] .today-panel{display:block}
 .today-card::before{content:"";position:absolute;inset:0;background:
   radial-gradient(600px 200px at 90% -20%, rgba(47,217,255,.08), transparent 60%);pointer-events:none}
 .today-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.today-head-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+/* bouton export bilan PDF (coach band + point du jour) */
+.cb-bilan{display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:transparent;border:1px solid var(--line-strong);color:var(--accent);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.cb-bilan:hover{border-color:var(--accent);background:rgba(70,194,216,.08)}
+.today-head-r .cb-bilan{margin-top:0}
 .today-title{font-family:var(--font-display);font-size:18px;font-weight:800;display:flex;align-items:center;gap:9px}
 .today-date{font-family:var(--font-data);font-size:12px;color:var(--muted)}
 .today-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px}
@@ -4659,6 +4664,80 @@ function applyDemoAthlete(i){
 /* Bandeau coach : identité de l'athlète suivi, forme du matin en anneau,
    détail du check-in et alertes actionnables (usure matériel, course proche,
    assiduité faible). C'est le cockpit "quel athlète je regarde, où il en est". */
+/* Bilan d'entraînement d'un athlète, exportable en PDF (impression navigateur).
+   Rassemble charge (CTL/ATL/TSB), semaine, records, références, séances
+   récentes et matériel dans un document A4 clair et brandé. */
+function exportBilan(name){
+  try{
+    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'Athlète');
+    const ref = (typeof ATHLETE_REF!=='undefined')?ATHLETE_REF:{};
+    const recs = (typeof RECORDS!=='undefined')?RECORDS:[];
+    let gear=[]; try{ gear=(GEAR||[]).filter(g=>g.type==='shoe'); }catch(e){}
+    let ctl=null,atl=null,tsb=null;
+    try{ ctl=Math.round(STRAVA_DEMO.ctl.at(-1)); atl=Math.round(STRAVA_DEMO.atl.at(-1)); tsb=ctl-atl; }catch(e){}
+    let done=0,tot=0,wtss=0,recent=[];
+    try{ const mon=mondayOf(0);
+      for(let i=0;i<7;i++){ (planning[iso(addDays(mon,i))]||[]).forEach(s=>{ tot++; wtss+=(s.tss||0); if(s.done)done++; }); }
+      for(let i=-7;i<7;i++){ const d=iso(addDays(mon,i)); (planning[d]||[]).forEach(s=>recent.push({date:d,s})); }
+    }catch(e){}
+    const comp = tot?Math.round(done/tot*100):null;
+    recent = recent.slice(-10);
+    let race=null; try{ race=UPCOMING_RACES&&UPCOMING_RACES[0]; }catch(e){}
+    const REFL={ftp:['FTP','W'],pma:['PMA','W'],cpBike:['CP vélo','W'],vma:['VMA','km/h'],cv:['VC','km/h'],seuilRun:['Seuil','s/km'],css:['CSS','s/100m'],fcMax:['FC max','bpm'],fcRepos:['FC repos','bpm']};
+    const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const dfmt=d=>{ try{ return new Date(d).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } };
+    const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+    const tsbCls = tsb==null?'':tsb>=5?'good':tsb>-15?'warn':'bad';
+    const compCls = comp==null?'':comp>=85?'good':comp>=60?'warn':'bad';
+    const refRows = Object.keys(REFL).filter(k=>ref[k]!=null&&ref[k]!=='').map(k=>`<div class="row"><span class="l">${REFL[k][0]}</span><span class="v">${esc(ref[k])} <em>${REFL[k][1]}</em></span></div>`).join('');
+    const recRows = recs.length?recs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v">${esc(r.v)}${r.isNew?' <span class="tag" style="background:#e6f7ef;color:#0a9b6a">RECORD</span>':''}</span></div>`).join(''):'<div class="row"><span class="l">Aucun record enregistré</span></div>';
+    const sessRows = recent.length?recent.map(({date,s})=>`<tr><td>${dfmt(date)}</td><td>${esc(s.title||s.disc||'Séance')}</td><td>${s.tss?esc(s.tss)+' TSS':'—'}</td><td>${s.done?(s.rpe?'RPE '+esc(s.rpe):'✓ fait'):'à venir'}</td></tr>`).join(''):'<tr><td colspan="4">Aucune séance sur la période.</td></tr>';
+    const gearRows = gear.length?gear.map(g=>{const p=g.max?Math.round(g.km/g.max*100):0;const c=p>=100?'bad':p>=85?'warn':'good';return `<div class="row"><span class="l">${esc(g.name)}</span><span class="v ${c}">${esc(g.km)} / ${esc(g.max||'?')} km · ${p}%</span></div>`;}).join(''):'';
+    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bilan — ${esc(name)}</title><style>
+@page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
+.wm{font:800 20px/1 system-ui;letter-spacing:.05em;color:#0B1120}.wm b{color:#0F9FBF}
+.hd .r{text-align:right;font-size:11px;color:#5a6a86}
+h1{font-size:23px;font-weight:800;margin:16px 0 1px;color:#0B1120}.sub{color:#5a6a86;font-size:12px;margin-bottom:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 4px}
+.kpi{border:1px solid #d8dfec;border-radius:9px;padding:11px 13px}.kpi .v{font:800 21px/1 system-ui;font-variant-numeric:tabular-nums}.kpi .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#5a6a86;margin-top:6px}
+.good{color:#0a9b6a}.warn{color:#c67b1b}.bad{color:#c2453f}.acc{color:#0F9FBF}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#0B1120;border-bottom:1px solid #d8dfec;padding-bottom:5px;margin:18px 0 8px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 30px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+.row{display:flex;justify-content:space-between;border-bottom:1px dotted #e6ebf3;padding:3px 0;font-size:12px}.row .l{color:#5a6a86}.row .v{font-weight:700}.row em{font-style:normal;color:#8593ad;font-weight:400;font-size:10px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{text-align:left;padding:5px 6px;border-bottom:1px solid #eef1f7}th{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#5a6a86}
+.tag{font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px}
+.foot{margin-top:20px;border-top:1px solid #d8dfec;padding-top:9px;font-size:10px;color:#8593ad;display:flex;justify-content:space-between}
+.note{font-size:10px;color:#8593ad;margin-top:3px}
+</style></head><body>
+<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">Bilan d'entraînement<br>${today}</div></div>
+<h1>${esc(name)}</h1>
+<div class="sub">${race?('Objectif : '+esc(race.name)+' · J–'+esc(race.inDays!=null?race.inDays:race.days)):'Suivi d\'entraînement'}</div>
+<div class="kpis">
+  <div class="kpi"><div class="v ${tsbCls}">${tsb==null?'—':(tsb>0?'+':'')+tsb}</div><div class="k">Forme (TSB)</div></div>
+  <div class="kpi"><div class="v">${ctl==null?'—':ctl}</div><div class="k">Fitness (CTL)</div></div>
+  <div class="kpi"><div class="v">${atl==null?'—':atl}</div><div class="k">Fatigue (ATL)</div></div>
+  <div class="kpi"><div class="v ${compCls}">${comp==null?'—':comp+'%'}</div><div class="k">Réalisé (semaine)</div></div>
+</div>
+<div class="note">Semaine en cours : ${done}/${tot} séance${tot>1?'s':''} réalisée${done>1?'s':''} · ${wtss} TSS planifiés.</div>
+<div class="cols">
+  <div><h2>Records personnels</h2>${recRows}</div>
+  <div><h2>Références physio</h2><div>${refRows||'<div class="row"><span class="l">Non renseignées</span></div>'}</div></div>
+</div>
+<h2>Séances récentes</h2>
+<table><thead><tr><th>Date</th><th>Séance</th><th>Charge</th><th>Statut</th></tr></thead><tbody>${sessRows}</tbody></table>
+${gearRows?('<h2>Matériel — usure</h2>'+gearRows):''}
+<div class="foot"><span>Généré par Sillance — ${today}</span><span>rowandgrv.github.io/sillance</span></div>
+</body></html>`;
+    const w=window.open('','_blank');
+    if(!w){ if(typeof toast==='function') toast('Autorise les pop-ups pour exporter le bilan'); return; }
+    w.document.write(html); w.document.close();
+    const go=()=>{ try{ w.focus(); w.print(); }catch(e){} };
+    if(w.document.readyState==='complete') setTimeout(go,300); else w.onload=()=>setTimeout(go,300);
+  }catch(e){ console.error('exportBilan',e); if(typeof toast==='function') toast('Export du bilan indisponible'); }
+}
+
 function renderCoachBand(){
   const band = document.getElementById('coachBand'); if(!band) return;
   const a = ROSTER[selectedAthleteIdx]; if(!a){ band.innerHTML=''; return; }
@@ -4688,6 +4767,7 @@ function renderCoachBand(){
         <div class="cb-kicker">Athlète suivi</div>
         <div class="cb-name">${a.name}</div>
         ${a.race?`<div class="cb-race"><i class="ic ic-flag"></i>${a.race.name} <b>J–${a.race.days}</b></div>`:''}
+        <button class="cb-bilan" id="bilanBtn" title="Exporter le bilan de l'athlète en PDF"><i class="ic ic-download"></i> Bilan PDF</button>
       </div>
     </div>
     <div class="cb-forme">
@@ -4710,6 +4790,7 @@ function renderCoachBand(){
       </div>
     </div>
     <div class="cb-flags">${flags.join('')}</div>`;
+  const _bb=document.getElementById('bilanBtn'); if(_bb) _bb.onclick=()=>exportBilan(a.name);
 }
 
 (function initAthPicker(){
@@ -8390,7 +8471,10 @@ function renderToday(){
   box.innerHTML = `<div class="today-card">
     <div class="today-head">
       <div class="today-title"><i class="ic ic-sun"></i> Ton point du jour</div>
-      <div class="today-date">${dateStr}</div>
+      <div class="today-head-r">
+        <button class="cb-bilan" onclick="exportBilan(typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'')" title="Exporter ton bilan en PDF"><i class="ic ic-download"></i> Mon bilan PDF</button>
+        <div class="today-date">${dateStr}</div>
+      </div>
     </div>
     <div class="today-grid">
       <div class="today-item">
