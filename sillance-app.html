@@ -3034,14 +3034,15 @@ function athFormeColor(s){ return s==null ? 'var(--muted)' : s>=75 ? 'var(--good
 function athNote(s){ return s==null ? '' : s>=75 ? 'Prêt pour la qualité' : s>=55 ? 'À surveiller' : 'Allègement conseillé'; }
 
 function setCoachAthletes(list, defaultId){
-  if(list && list.length){
-    ROSTER = list.map(a=>({ id:a.id, name:a.name,
-      ini:(a.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
-      color:'#46C2D8', checkin:null, race:null }));
-    rosterIsReal = true;
-    selectedAthleteIdx = Math.max(0, ROSTER.findIndex(a=>a.id===defaultId));
-    currentAthleteId = defaultId || ROSTER[0].id;
-  }
+  // Appelé uniquement au login réel : on remplace TOUJOURS le roster de démo,
+  // même par une liste vide — un vrai coach sans athlète ne doit pas voir les
+  // athlètes de démonstration (Léa, Marc…) comme si c'étaient les siens.
+  ROSTER = (list||[]).map(a=>({ id:a.id, name:a.name,
+    ini:(a.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+    color:'#46C2D8', checkin:null, race:null }));
+  rosterIsReal = true;
+  selectedAthleteIdx = ROSTER.length ? Math.max(0, ROSTER.findIndex(a=>a.id===defaultId)) : 0;
+  currentAthleteId = defaultId || (ROSTER[0] && ROSTER[0].id) || null;
   renderAthPicker();
   updatePlanAthleteVisibility();
 }
@@ -4564,7 +4565,7 @@ function apRowHtml(a, i){
   </button>`;
 }
 function openAdherence(){
-  const rows = ROSTER.map(a=>{
+  const rows = ROSTER.length ? ROSTER.map(a=>{
     const forme=athForme(a);
     const comp = (a.comp!=null ? Math.round(a.comp*100) : null);
     const cc = comp==null?'var(--muted)': comp>=85?'var(--good)': comp>=60?'var(--bike)':'var(--run)';
@@ -4577,7 +4578,7 @@ function openAdherence(){
       <td>${race}</td>
       <td><span class="adh-pill" style="color:${cc};border-color:${cc}">${status}</span></td>
     </tr>`;
-  }).join('');
+  }).join('') : `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">Aucun athlète pour l'instant. Invite un athlète pour suivre son adhérence au plan ici.</td></tr>`;
   const el=document.createElement('div'); el.className='adh-overlay';
   el.innerHTML=`<div class="adh-modal" role="dialog" aria-label="Suivi de mes athlètes">
     <button class="adh-close" aria-label="Fermer">✕</button>
@@ -4598,6 +4599,11 @@ function openAdherence(){
 function renderAthPicker(){
   const btn=document.getElementById('apBtn'), menu=document.getElementById('apMenu');
   if(!btn || !menu) return;
+  if(!ROSTER.length){
+    btn.innerHTML = `<span>Aucun athlète</span><span class="ap-chev"></span>`;
+    menu.innerHTML = `<div class="ap-head">Aucun athlète lié — invite ton premier athlète pour le suivre ici.</div>`;
+    return;
+  }
   const a = ROSTER[selectedAthleteIdx];
   const forme = athForme(a);
   btn.innerHTML = `<span class="ap-av" style="--ac:${a.color}">${a.ini}</span>
