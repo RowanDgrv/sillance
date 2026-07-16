@@ -72,6 +72,7 @@
     <a href="#creneau">Créer un créneau &amp; inviter</a>
     <div class="lbl">Athlète</div>
     <a href="#checkin">Faire son check-in</a>
+    <a href="#dispo-blessure">Signaler une blessure / indispo</a>
     <a href="#connecter-montre">Connecter une montre</a>
     <a href="#import-fit">Importer un fichier .FIT</a>
     <a href="#ajouter-chaussure">Ajouter des chaussures</a>
@@ -216,17 +217,38 @@
       <ol class="steps">
         <li>Active le rôle <b>Athlète</b>. Le panneau <b>Check-in du jour</b> est à gauche.</li>
         <li>Règle les curseurs <b>Sommeil</b>, <b>Fatigue</b> et <b>Motivation</b>, et renseigne ton <b>poids</b> (le rapport W/kg se met à jour en direct).</li>
+        <li>Indique ta <b>disponibilité</b> du jour — OK, fatigué, malade ou blessé (détail au guide suivant).</li>
         <li>Ta <b>fraîcheur</b> se calcule automatiquement en dessous.</li>
         <li>Clique <span class="hlword">Valider mon check-in</span>. Si ta forme est basse, ton coach est prévenu.</li>
       </ol>
       <figure>
-        <img src="./aide-img/checkin.png" alt="Panneau de check-in encadré : curseurs, poids, fraîcheur et bouton Valider" loading="lazy">
-        <figcaption><span class="dot">●</span> Le panneau de check-in, curseurs et poids compris.</figcaption>
+        <img src="./aide-img/checkin.png" alt="Panneau de check-in encadré : curseurs, poids, disponibilité, fraîcheur et bouton Valider" loading="lazy">
+        <figcaption><span class="dot">●</span> Le panneau de check-in : curseurs, poids et disponibilité.</figcaption>
       </figure>
     </section>
 
+    <section class="tuto" id="dispo-blessure">
+      <h2><span class="no">09</span> Signaler une blessure ou une indisponibilité</h2>
+      <p class="lead">Une douleur, un rhume, une grosse semaine de boulot ? Dis-le à ton coach en deux clics — il adapte le plan au lieu de découvrir le problème trop tard.</p>
+      <ol class="steps">
+        <li>Dans le <b>Check-in du jour</b> (rôle <b>Athlète</b>), repère la ligne <span class="hlword">Disponibilité</span>.</li>
+        <li>Choisis ton état : <b>OK</b>, <b>Fatigué</b>, <b>Malade</b> ou <b>Blessé</b>.</li>
+        <li>Dès que ce n'est pas « OK », un champ de note apparaît : précise l'essentiel (<i>« douleur mollet droit depuis mardi »</i>).</li>
+        <li>Clique <span class="hlword">Valider mon check-in</span>. Si tu es blessé, ton coach reçoit une <b>alerte prioritaire</b> avec ta note.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/dispo-checkin.png" alt="Ligne Disponibilité encadrée dans le check-in : boutons OK, Fatigué, Malade, Blessé et champ de note" loading="lazy">
+        <figcaption><span class="dot">●</span> La ligne Disponibilité : l'état « Blessé » sélectionné fait apparaître le champ de note.</figcaption>
+      </figure>
+      <figure>
+        <img src="./aide-img/dispo-coach.png" alt="Bandeau coach : le signalement « Blessé » de l'athlète encadré en tête des alertes" loading="lazy">
+        <figcaption><span class="dot">●</span> Côté coach : le signalement arrive en tête du bandeau de l'athlète, et dans la colonne « Dispo » du tableau <a href="#adherence">Suivi de mes athlètes</a>.</figcaption>
+      </figure>
+      <div class="tip"><b>Pourquoi c'est important.</b> S'entraîner sur une douleur qui s'installe transforme une gêne en blessure longue. Un signalement honnête chaque matin vaut mieux qu'une séance forcée.</div>
+    </section>
+
     <section class="tuto" id="connecter-montre">
-      <h2><span class="no">09</span> Connecter une montre</h2>
+      <h2><span class="no">10</span> Connecter une montre</h2>
       <p class="lead">Fais remonter tes activités dans Sillance automatiquement.</p>
       <ol class="steps">
         <li>En rôle <b>Athlète</b>, va au panneau <b>Synchronisation</b> (bas du panneau de gauche).</li>
@@ -241,7 +263,7 @@
     </section>
 
     <section class="tuto" id="import-fit">
-      <h2><span class="no">10</span> Importer un fichier .FIT</h2>
+      <h2><span class="no">11</span> Importer un fichier .FIT</h2>
       <p class="lead">Pas de montre connectée ? Importe le fichier exporté de ta montre.</p>
       <ol class="steps">
         <li>Dans le panneau <b>Synchronisation</b>, clique <span class="hlword">Importer un fichier</span>.</li>
@@ -255,7 +277,7 @@
     </section>
 
     <section class="tuto" id="ajouter-chaussure">
-      <h2><span class="no">11</span> Ajouter des chaussures</h2>
+      <h2><span class="no">12</span> Ajouter des chaussures</h2>
       <p class="lead">Ajoute tes chaussures pour suivre leur usure et être alerté avant que l'amorti ne se dégrade.</p>
       <ol class="steps">
         <li>En rôle <b>Athlète</b>, va à la section <b>Mon matériel</b> et clique <b>+ Ajouter un équipement</b>.</li>
@@ -272,7 +294,7 @@
     </section>
 
     <section class="tuto" id="refs-physio">
-      <h2><span class="no">12</span> Éditer ses références physio</h2>
+      <h2><span class="no">13</span> Éditer ses références physio</h2>
       <p class="lead">Tes seuils personnels servent à calculer tes zones et à analyser tes séances : garde-les à jour.</p>
       <ol class="steps">
         <li>En rôle <b>Athlète</b>, descends le panneau de gauche jusqu'à <b>Mes références physio</b>.</li>
