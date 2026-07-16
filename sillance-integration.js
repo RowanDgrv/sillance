@@ -86,7 +86,10 @@ async function hydrate() {
   await section("checkin", async () => {
     const c = await PF.todayCheckin();
     if (c) app.assignObj(app.data.checkin,
-      { sommeil: c.sommeil, fatigue: c.fatigue, motivation: c.motivation });
+      { sommeil: c.sommeil, fatigue: c.fatigue, motivation: c.motivation,
+        // colonnes 0019 (poids/dispo) : absentes tant que la migration n'est pas déployée
+        ...(c.poids != null ? { poids: c.poids } : {}),
+        dispo: c.dispo || 'ok', dispoNote: c.dispo_note || '' });
   });
 
   await section("gear", async () => {
@@ -99,9 +102,20 @@ async function hydrate() {
   let defaultAthleteId = null; // null = planifier pour soi-même (comportement historique)
   await section("coachAthletes", async () => {
     const rows = await PF.myAthletes();
+    // Check-ins du jour du roster : forme + disponibilité (journal blessure)
+    // visibles dans le bandeau coach, le sélecteur et la table de suivi.
+    let ckByAth = {};
+    try {
+      const cks = await PF.rosterCheckins(rows.map((r) => r.athlete_id));
+      for (const c of cks) ckByAth[c.athlete_id] = {
+        sommeil: c.sommeil, fatigue: c.fatigue, motivation: c.motivation,
+        dispo: c.dispo || 'ok', dispoNote: c.dispo_note || '',
+      };
+    } catch (e) { console.warn("[PF] rosterCheckins :", e); }
     const list = rows.map((r) => ({
       id: r.athlete_id,
       name: esc(r.profiles?.full_name || r.profiles?.email) || "Athlète",
+      checkin: ckByAth[r.athlete_id] || null,
     }));
     // Un coach avec des athlètes liés planifie par défaut pour le premier
     // (plus utile que "pour soi-même" dans le cas d'usage réel).
