@@ -1207,6 +1207,10 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .ck-dispo-seg button .ic{width:12px;height:12px}
 .ck-dispo-seg button.sel{color:var(--dc);border-color:var(--dc);background:color-mix(in srgb, var(--dc) 14%, transparent)}
 .ck-dispo textarea{width:100%;box-sizing:border-box;margin-top:8px;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;min-height:44px}
+.ck-hrv label{display:flex;justify-content:space-between;align-items:center}
+.ck-hrv-opt{font-size:9.5px;letter-spacing:.05em;color:var(--muted);font-weight:600;text-transform:none}
+.ck-hrv-stat{font-family:var(--font-data);font-size:12px;font-weight:700;white-space:nowrap;color:var(--muted)}
+.cb-hrv{display:inline-flex;align-items:center;gap:4px}
 .ap-dispo{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--fc);white-space:nowrap}
 .ap-dispo .ic{width:10px;height:10px}
 /* attribution multi-athlètes : séance ou cycle vers un groupe / plusieurs athlètes (coach) */
@@ -2895,8 +2899,23 @@ const ATHLETE_REF = {
   // — Natation —
   css: 98,         // critical swim speed : s/100m (1'38")
   // — FC —
-  fcMax: 190, fcRepos: 47
+  fcMax: 190, fcRepos: 47,
+  // — HRV (variabilité de fréquence cardiaque, rMSSD ms) — base de repos
+  //   sur 7 jours, sert de référence pour détecter une chute. null = l'athlète
+  //   ne suit pas le HRV. Renseignée par la montre/bracelet ou à la main.
+  hrvBase: 62
 };
+/* Statut HRV du matin par rapport à la base 7 j : une baisse marquée
+   (< 92 % de la base) = stress/fatigue/début d'infection → à surveiller. */
+function hrvStatus(hrv, base){
+  base = base || (typeof ATHLETE_REF!=='undefined' ? ATHLETE_REF.hrvBase : null);
+  if(!hrv || !base) return null;
+  const r = hrv/base;
+  if(r < 0.85) return {level:'low',  c:'var(--run)',  txt:'HRV basse', pct:Math.round((r-1)*100)};
+  if(r < 0.92) return {level:'warn', c:'var(--bike)', txt:'HRV sous la base', pct:Math.round((r-1)*100)};
+  if(r > 1.08) return {level:'high', c:'var(--good)', txt:'HRV au-dessus', pct:Math.round((r-1)*100)};
+  return {level:'ok', c:'var(--good)', txt:'HRV normale', pct:Math.round((r-1)*100)};
+}
 
 /* Définition des "modèles de zones" sélectionnables par bloc.
    Chaque référence sait calculer une cible à partir d'un % ou d'une zone. */
@@ -3048,7 +3067,7 @@ const COACH_ROSTER = [
     {id:'g3', type:'shoe', name:'Asics Metaspeed Sky Paris', km:118, max:350, price:250, cat:'race', comm:320, notified:[]},
     {id:'g4', type:'bike', name:'Canyon Ultimate CF', km:4380, max:20000, price:3200, cat:null, comm:null, notified:[]},
   ]},
- {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',dispoNote:'Grosse semaine de boulot, jambes lourdes'}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55,
+ {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',dispoNote:'Grosse semaine de boulot, jambes lourdes',hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55,
   gear:[
     {id:'g5', type:'shoe', name:'Adidas Boston 12', km:723, max:700, price:150, cat:'tempo', comm:660, notified:[420,595,700]},
     {id:'g6', type:'shoe', name:'Adidas Ultraboost Light', km:214, max:850, price:180, cat:'daily', comm:800, notified:[]},
@@ -3057,14 +3076,14 @@ const COACH_ROSTER = [
   gear:[
     {id:'g7', type:'shoe', name:'Puma Deviate Nitro 3', km:405, max:700, price:160, cat:'tempo', comm:650, notified:[420]},
   ]},
- {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',dispoNote:'Douleur tibia droit depuis lundi, 4/10 en courant'}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70,
+ {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',dispoNote:'Douleur tibia droit depuis lundi, 4/10 en courant',hrv:60}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70,
   gear:[
     {id:'g8', type:'shoe', name:'Asics Novablast 5', km:648, max:750, price:150, cat:'tempo', comm:710, notified:[450,638]},
     {id:'g9', type:'bike', name:'BMC Roadmachine', km:2150, max:20000, price:2400, cat:null, comm:null, notified:[]},
   ]},
  {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,
   gear:[]},
- {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',dispoNote:'Rhume, gorge prise — nuit hachée'}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35,
+ {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',dispoNote:'Rhume, gorge prise — nuit hachée',hrv:48}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35,
   gear:[]},
 ];
 let ROSTER = COACH_ROSTER;     // remplacé par le roster réel une fois connecté
@@ -3184,7 +3203,7 @@ const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const fmt = new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
-const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'' };
+const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null };
 const RECORDS = [
   {d:'10 km', v:'31:45', isNew:true},
   {d:'Semi', v:'1:08:52', isNew:true},
@@ -3316,6 +3335,13 @@ function renderSidebar(){
             <span class="ck-wkg" id="ckWkg">${ATHLETE_REF.ftp?(ATHLETE_REF.ftp/checkin.poids).toFixed(2)+' W/kg':''}</span>
           </div>
         </div>
+        <div class="row ck-hrv">
+          <label><i class="ic ic-refresh"></i> HRV du matin <span class="ck-hrv-opt">montre / bracelet · facultatif</span></label>
+          <div class="ck-wrow">
+            <input type="number" min="10" max="200" step="1" value="${checkin.hrv||''}" id="ckHrv" placeholder="rMSSD (ms)" aria-label="HRV du matin en millisecondes">
+            <span class="ck-hrv-stat" id="ckHrvStat"></span>
+          </div>
+        </div>
         <div class="row ck-dispo">
           <label><i class="ic ic-clipboard"></i> Disponibilité</label>
           <div class="ck-dispo-seg" id="ckDispoSeg" role="group" aria-label="Disponibilité du jour">
@@ -3382,6 +3408,15 @@ function renderSidebar(){
     });
     (function(){ var wp=document.getElementById('ckPoids'); if(wp) wp.addEventListener('input',function(){ var v=parseFloat(wp.value); if(!v||v<30||v>150) return; checkin.poids=v; var vl=document.getElementById('val-poids'); if(vl) vl.textContent=v+' kg'; var w=document.getElementById('ckWkg'); if(w&&ATHLETE_REF.ftp) w.textContent=(ATHLETE_REF.ftp/v).toFixed(2)+' W/kg'; }); })();
     (function(){
+      var hp=document.getElementById('ckHrv'), st=document.getElementById('ckHrvStat');
+      function upd(){
+        var v=parseFloat(hp.value); checkin.hrv = (v&&v>=10&&v<=200)?Math.round(v):null;
+        var s=hrvStatus(checkin.hrv, ATHLETE_REF.hrvBase);
+        if(st){ if(s){ st.textContent=(s.pct>0?'+':'')+s.pct+'% · '+s.txt; st.style.color=s.c; } else { st.textContent = ATHLETE_REF.hrvBase?('base '+ATHLETE_REF.hrvBase+' ms'):''; st.style.color='var(--muted)'; } }
+      }
+      if(hp){ hp.addEventListener('input', upd); upd(); }
+    })();
+    (function(){
       const seg=document.getElementById('ckDispoSeg'), note=document.getElementById('ckDispoNote');
       if(!seg) return;
       seg.querySelectorAll('button').forEach(b=> b.onclick=()=>{
@@ -3438,14 +3473,16 @@ const ATHLETE_NAME = 'Romain D.'; // démo — vient du profil athlète
 function submitCheckin(){
   const score = readinessScore();
   const dispo = checkin.dispo || 'ok';
-  // blessé = alerte prioritaire quel que soit le score ; malade/fatigué = alerte simple
-  const low = score < CHECKIN_THRESHOLD || dispo !== 'ok';
-  const urgent = score < CHECKIN_URGENT || dispo === 'blesse';
+  const hrvS = hrvStatus(checkin.hrv, ATHLETE_REF.hrvBase);
+  const hrvLow = hrvS && (hrvS.level==='low' || hrvS.level==='warn');
+  // blessé/HRV effondrée = alerte prioritaire ; malade/fatigué/HRV sous base = alerte simple
+  const low = score < CHECKIN_THRESHOLD || dispo !== 'ok' || hrvLow;
+  const urgent = score < CHECKIN_URGENT || dispo === 'blesse' || (hrvS && hrvS.level==='low');
   // Persistance backend (Sillance cloud) — non bloquant, ignoré en mode démo.
   if(window.PF?.user){
     PF.saveCheckin({ sommeil:checkin.sommeil, fatigue:checkin.fatigue,
       motivation:checkin.motivation, readiness:score,
-      poids:checkin.poids||null, dispo, dispoNote:checkin.dispoNote||null })
+      poids:checkin.poids||null, dispo, dispoNote:checkin.dispoNote||null, hrv:checkin.hrv||null })
       .catch(e=> console.warn('[PF] saveCheckin échoué :', e));
   }
   // confirmation visuelle athlète
@@ -5123,6 +5160,10 @@ function renderCoachBand(){
     const d = DISPO_META[dk];
     flags.unshift(`<span class="cb-flag ${dk==='fatigue'?'warn':'danger'}"><i class="ic ${d.ic}"></i>${d.l}${a.checkin.dispoNote?' — '+dispoSafe(a.checkin.dispoNote):''}</span>`);
   }
+  const hs = a.checkin && hrvStatus(a.checkin.hrv, ATHLETE_REF.hrvBase);
+  if(hs && (hs.level==='low'||hs.level==='warn')){
+    flags.unshift(`<span class="cb-flag ${hs.level==='low'?'danger':'warn'}"><i class="ic ic-refresh"></i>${hs.txt} : ${a.checkin.hrv} ms (${hs.pct}% vs base)</span>`);
+  }
   if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>Rien à signaler</span>`);
   const ck = a.checkin;
   band.style.setProperty('--cbc', a.color);
@@ -5153,6 +5194,7 @@ function renderCoachBand(){
           <span><i class="ic ic-moon"></i>${ck.sommeil}/10</span>
           <span><i class="ic ic-battery"></i>${ck.fatigue}/10</span>
           <span><i class="ic ic-zap"></i>${ck.motivation}/10</span>
+          ${(()=>{ const hs=hrvStatus(ck.hrv, ATHLETE_REF.hrvBase); return hs?`<span class="cb-hrv" style="color:${hs.c}" title="${hs.txt} (${ck.hrv} ms)"><i class="ic ic-refresh"></i>HRV ${ck.hrv}</span>`:''; })()}
         </div>`:''}
       </div>
     </div>
