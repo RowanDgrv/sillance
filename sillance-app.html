@@ -1222,6 +1222,23 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .ck-hrv-opt{font-size:9.5px;letter-spacing:.05em;color:var(--muted);font-weight:600;text-transform:none}
 .ck-hrv-stat{font-family:var(--font-data);font-size:12px;font-weight:700;white-space:nowrap;color:var(--muted)}
 .cb-hrv{display:inline-flex;align-items:center;gap:4px}
+/* affûtage / tapering sur le calendrier */
+.taper-hint{display:flex;align-items:center;gap:11px;margin-bottom:12px;padding:11px 15px;border-radius:12px;
+  border:1px solid color-mix(in srgb,var(--bike) 40%,var(--line));background:color-mix(in srgb,var(--bike) 9%,transparent)}
+.taper-hint .ic{width:18px;height:18px;color:var(--bike);flex:none}
+.taper-hint .th-txt{font-size:13px;color:var(--soft);line-height:1.4}
+.taper-hint .th-txt b{color:var(--text)}
+.taper-hint .th-txt .k{font-family:var(--font-data);color:var(--bike);font-weight:700}
+.day.day-taper{background:linear-gradient(180deg,color-mix(in srgb,var(--bike) 10%,transparent),transparent 70%)}
+.day.day-taper .day-head{position:relative}
+.day-race-pill{display:flex;align-items:center;gap:5px;margin:2px 6px 0;padding:4px 8px;border-radius:7px;
+  background:color-mix(in srgb,var(--run) 18%,transparent);border:1px solid color-mix(in srgb,var(--run) 55%,transparent);
+  color:var(--run);font-size:10.5px;font-weight:700;line-height:1.15}
+.day-race-pill .ic{width:11px;height:11px;flex:none}
+.day-taper-tag{display:inline-flex;align-items:center;gap:4px;margin:2px 6px 0;font-size:9.5px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--bike)}
+.day-taper-tag .ic{width:10px;height:10px}
+.day.day-race{outline:1px solid color-mix(in srgb,var(--run) 45%,transparent);outline-offset:-1px}
 .ap-dispo{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--fc);white-space:nowrap}
 .ap-dispo .ic{width:10px;height:10px}
 /* attribution multi-athlètes : séance ou cycle vers un groupe / plusieurs athlètes (coach) */
@@ -2100,6 +2117,7 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
 
     <section class="calendar" aria-label="Calendrier d'entraînement">
       <div class="wk-int" id="weekIntensity" hidden></div>
+      <div class="taper-hint" id="taperHint" hidden></div>
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-guides" aria-hidden="true"><div class="cg-cols" id="calCols"></div><div class="cg-rows"></div></div>
     </section>
@@ -4482,12 +4500,44 @@ document.querySelectorAll('#setNav .set-tab').forEach(b=> b.addEventListener('cl
 const calGrid = document.getElementById('calGrid');
 const weekLabel = document.getElementById('weekLabel');
 
+/* ============================================================
+   AFFÛTAGE / TAPERING — sur les courses de l'agenda (#audit 6)
+   ------------------------------------------------------------
+   Durée d'affûtage recommandée selon la distance : plus la course
+   est longue, plus l'affûtage est long (littérature : 8-21 j, on
+   réduit le VOLUME 40-60 % en gardant des rappels d'intensité courts).
+   ============================================================ */
+function taperDaysFor(name){
+  const t = (name||'').toLowerCase();
+  if(/ironman|140\.?6|full/.test(t)) return 21;
+  if(/marathon|42 ?km|42\.2/.test(t)) return 14;
+  if(/70\.?3|half|semi|21 ?km|ironman 70/.test(t)) return 11;
+  if(/hyrox/.test(t)) return 10;
+  if(/sprint|olympic|olympique|10 ?km|10k|5 ?km|5k/.test(t)) return 6;
+  return 10;
+}
+function taperVolCut(days){ return days>=18?55 : days>=13?50 : days>=9?45 : 35; }
+/* course cible de l'athlète affiché, avec date absolue + fenêtre d'affûtage */
+function currentRace(){
+  let r=null;
+  if(typeof mode!=='undefined' && mode==='coach' && typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].race){
+    r = ROSTER[selectedAthleteIdx].race;
+  } else { try{ if(UPCOMING_RACES && UPCOMING_RACES[0]) r={name:UPCOMING_RACES[0].name, days:UPCOMING_RACES[0].inDays}; }catch(e){} }
+  if(!r) return null;
+  const days = r.days!=null?r.days:r.inDays;
+  if(days==null || days<0) return null;
+  const date = iso(addDays(new Date(), days));
+  const taper = taperDaysFor(r.name);
+  return { name:r.name, days, date, taperDays:taper, taperStart: iso(addDays(new Date(), days-taper)), volCut: taperVolCut(taper) };
+}
+
 function render(){
   const mon = mondayOf(weekOffset);
   const sun = addDays(mon,6);
   weekLabel.textContent = `${fmt.format(mon)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
   calGrid.innerHTML='';
   const todayIso = iso(new Date());
+  const race = currentRace();
   let totalTss=0, totalMin=0, count=0, doneCount=0;
   const maxDayTss = Math.max(60, ...Array.from({length:7},(_,i)=>{
     const s = planning[iso(addDays(mon,i))]||[];
@@ -4504,14 +4554,21 @@ function render(){
     count += sessions.length;
     doneCount += sessions.filter(s=>s.done).length;
 
+    // affûtage : ce jour est-il la course, ou dans la fenêtre d'affûtage ?
+    const isRace = race && key===race.date;
+    const inTaper = race && key>=race.taperStart && key<race.date;
+    const isTaperStart = race && key===race.taperStart;
+
     const day = document.createElement('div');
-    day.className = 'day'+(key===todayIso?' today':'');
+    day.className = 'day'+(key===todayIso?' today':'')+(isRace?' day-race':'')+(inTaper?' day-taper':'');
     day.dataset.date = key;
     day.innerHTML = `
       <div class="day-head">
         <span class="dname">${DAYS[i]}</span>
         <span class="dnum">${date.getDate()}</span>
       </div>
+      ${isRace?`<div class="day-race-pill"><i class="ic ic-flag"></i>${race.name}</div>`:''}
+      ${isTaperStart?`<div class="day-taper-tag"><i class="ic ic-gradient"></i>Début affûtage</div>`:''}
       ${mode==='coach'?`<button class="day-add" data-key="${key}" aria-label="Créer une séance ce jour">+</button>`:''}
       <div class="day-body"></div>
       <div class="day-load">
@@ -4553,7 +4610,26 @@ function render(){
   document.getElementById('weekCount').textContent = `${count} séances`;
   document.getElementById('compliance').innerHTML = `${count?Math.round(doneCount/count*100):0}<em>%</em>`;
   renderWeekIntensity(mon);
+  renderTaperHint(race, mon);
   if(typeof wireSessionVideos==='function') wireSessionVideos();
+}
+
+/* Bandeau de suggestion d'affûtage quand la semaine affichée chevauche la
+   fenêtre d'affûtage de la course cible. Suggestion, pas automatisme. */
+function renderTaperHint(race, mon){
+  const el = document.getElementById('taperHint'); if(!el) return;
+  if(!race){ el.hidden=true; return; }
+  const weekDays = Array.from({length:7},(_,i)=>iso(addDays(mon,i)));
+  const overlaps = weekDays.some(k=> k>=race.taperStart && k<=race.date);
+  if(!overlaps){ el.hidden=true; return; }
+  const isCoach = (typeof mode!=='undefined' && mode==='coach');
+  const who = isCoach ? 'ton athlète' : 'toi';
+  el.hidden=false;
+  el.innerHTML = `<i class="ic ic-gradient"></i><div class="th-txt">
+    <b>Affûtage — ${dispoSafe(race.name)}, J–${race.days}.</b>
+    Fenêtre recommandée : <span class="k">${race.taperDays} j</span>. Réduis le volume d'environ
+    <span class="k">${race.volCut}%</span> ${isCoach?'pour '+who:''} en gardant des <b>rappels d'intensité courts</b>
+    (VMA/seuil brefs) et la fréquence des séances — c'est le volume qu'on coupe, pas la vivacité.</div>`;
 }
 
 /* ============================================================
