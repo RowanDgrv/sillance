@@ -1211,6 +1211,25 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .ck-hrv-opt{font-size:9.5px;letter-spacing:.05em;color:var(--muted);font-weight:600;text-transform:none}
 .ck-hrv-stat{font-family:var(--font-data);font-size:12px;font-weight:700;white-space:nowrap;color:var(--muted)}
 .cb-hrv{display:inline-flex;align-items:center;gap:4px}
+/* physio féminine — cycle menstruel (opt-in) */
+.ck-cycle label{display:flex;justify-content:space-between;align-items:center}
+.ck-cycle-optin{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--panel-2);border:1px dashed var(--line-strong);color:var(--soft);border-radius:9px;padding:9px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.ck-cycle-optin:hover{border-color:#DD5C72;color:#DD5C72}
+.ck-cycle-optin .ic{width:14px;height:14px}
+.ck-cycle-note{font-size:10.5px;color:var(--muted);margin-top:5px;text-align:center}
+.ck-cycle-off{background:transparent;border:none;color:var(--muted);font-size:10.5px;cursor:pointer;text-decoration:underline;font-family:inherit;text-transform:none;letter-spacing:0}
+.ck-cycle-off:hover{color:var(--soft)}
+.ck-cycle-day{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:var(--muted)}
+.ck-cycle-day input{width:56px;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:7px;padding:6px 8px;font-family:var(--font-data);font-size:12px}
+.ck-cycle-hint{font-size:10.5px}
+.ck-cycle-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.ck-cycle-seg button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 3px;font-size:11px;font-weight:600;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:9px;cursor:pointer;line-height:1.1}
+.ck-cycle-seg button .ic{width:12px;height:12px}
+.ck-cycle-seg button small{font-family:var(--font-data);font-size:8.5px;opacity:.7;font-weight:400}
+.ck-cycle-seg button.sel{color:var(--cc);border-color:var(--cc);background:color-mix(in srgb, var(--cc) 14%, transparent)}
+.ck-cycle-tip{font-size:11.5px;color:var(--soft);margin-top:8px;line-height:1.4;padding-left:9px;border-left:2px solid var(--line-strong)}
+.ck-cycle-tip:empty{display:none}
+.cb-cycle{display:inline-flex;align-items:center;gap:4px}
 /* affûtage / tapering sur le calendrier */
 .taper-hint{display:flex;align-items:center;gap:11px;margin-bottom:12px;padding:11px 15px;border-radius:12px;
   border:1px solid color-mix(in srgb,var(--bike) 40%,var(--line));background:color-mix(in srgb,var(--bike) 9%,transparent)}
@@ -3078,7 +3097,7 @@ function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${Str
    remplace la démo via setCoachAthletes().
    ============================================================ */
 const COACH_ROSTER = [
- {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,
+ {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8,cyclePhase:'follicular',cycleDay:9}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,
   gear:[
     {id:'g1', type:'shoe', name:'Nike Pegasus 40', km:612, max:900, price:130, cat:'daily', comm:870, notified:[540]},
     {id:'g2', type:'shoe', name:'Saucony Endorphin Speed 4', km:284, max:650, price:180, cat:'tempo', comm:630, notified:[]},
@@ -3090,7 +3109,7 @@ const COACH_ROSTER = [
     {id:'g5', type:'shoe', name:'Adidas Boston 12', km:723, max:700, price:150, cat:'tempo', comm:660, notified:[420,595,700]},
     {id:'g6', type:'shoe', name:'Adidas Ultraboost Light', km:214, max:850, price:180, cat:'daily', comm:800, notified:[]},
   ]},
- {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95,
+ {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8,cyclePhase:'luteal',cycleDay:24}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95,
   gear:[
     {id:'g7', type:'shoe', name:'Puma Deviate Nitro 3', km:405, max:700, price:160, cat:'tempo', comm:650, notified:[420]},
   ]},
@@ -3099,7 +3118,7 @@ const COACH_ROSTER = [
     {id:'g8', type:'shoe', name:'Asics Novablast 5', km:648, max:750, price:150, cat:'tempo', comm:710, notified:[450,638]},
     {id:'g9', type:'bike', name:'BMC Roadmachine', km:2150, max:20000, price:2400, cat:null, comm:null, notified:[]},
   ]},
- {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,
+ {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9,cyclePhase:'menstrual',cycleDay:2}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,
   gear:[]},
  {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',dispoNote:'Rhume, gorge prise — nuit hachée',hrv:48}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35,
   gear:[]},
@@ -3121,6 +3140,34 @@ const DISPO_META = {
 };
 function athDispo(a){ const d=a&&a.checkin&&a.checkin.dispo; return (d&&DISPO_META[d])?d:null; }
 function dispoSafe(t){ return String(t||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+
+/* ============================================================
+   PHYSIO FÉMININE — suivi du cycle menstruel (opt-in, sensible)
+   ------------------------------------------------------------
+   Donnée de santé (art.9 RGPD) : facultative, activée par l'athlète,
+   visible du coach pour adapter l'entraînement au jour du cycle.
+   Repères d'adaptation issus de la littérature (indicatifs, à croiser
+   avec le ressenti — la réponse est très individuelle).
+   ============================================================ */
+const CYCLE_META = {
+  menstrual: {l:'Règles',      short:'J1–5',   c:'#DD5C72', ic:'ic-waves',
+    tip:"Symptômes possibles (fatigue, crampes) : intensité selon les sensations, rien d'imposé."},
+  follicular:{l:'Folliculaire', short:'J6–13',  c:'#35C58C', ic:'ic-zap',
+    tip:"Fenêtre souvent favorable : bon moment pour le travail intense (VMA, seuil, force) et les gros volumes."},
+  ovulation: {l:'Ovulation',    short:'~J14',   c:'#46C2D8', ic:'ic-target',
+    tip:"Force au plus haut, mais laxité ligamentaire accrue → échauffement soigné, vigilance blessure (genou/cheville)."},
+  luteal:    {l:'Lutéale',      short:'J15–28', c:'#D9962F', ic:'ic-thermometer',
+    tip:"Effort perçu et température plus élevés en fin de phase : récup allongée, hydratation/chaleur surveillées, plutôt endurance/technique."}
+};
+/* phase auto-déduite du jour de cycle (repère 28 j, ajusté au ressenti) */
+function cyclePhaseFromDay(d){
+  if(!d||d<1) return null;
+  if(d<=5) return 'menstrual';
+  if(d<=13) return 'follicular';
+  if(d<=15) return 'ovulation';
+  return 'luteal';
+}
+function athCycle(a){ const p=a&&a.checkin&&a.checkin.cyclePhase; return (p&&CYCLE_META[p])?p:null; }
 function athNote(s){ return s==null ? '' : s>=75 ? 'Prêt pour la qualité' : s>=55 ? 'À surveiller' : 'Allègement conseillé'; }
 
 function setCoachAthletes(list, defaultId){
@@ -3221,7 +3268,7 @@ const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const fmt = new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
-const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null };
+const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null, cyclePhase:null, cycleDay:null };
 const RECORDS = [
   {d:'10 km', v:'31:45', isNew:true},
   {d:'Semi', v:'1:08:52', isNew:true},
@@ -3367,6 +3414,22 @@ function renderSidebar(){
           </div>
           <textarea id="ckDispoNote" rows="2" placeholder="Précise pour ton coach (ex. douleur mollet droit depuis mardi)…" ${(checkin.dispo||'ok')==='ok'?'hidden':''}>${dispoSafe(checkin.dispoNote)}</textarea>
         </div>
+        ${(()=>{ const on = localStorage.getItem('sil_track_cycle')==='1' || checkin.cyclePhase; return `
+        <div class="row ck-cycle">
+          ${on ? `
+          <label><i class="ic ic-waves"></i> Cycle menstruel <button type="button" class="ck-cycle-off" id="ckCycleOff" title="Ne plus suivre">masquer</button></label>
+          <div class="ck-cycle-day">
+            <span>Jour du cycle</span>
+            <input type="number" min="1" max="40" value="${checkin.cycleDay||''}" id="ckCycleDay" placeholder="J—" aria-label="Jour du cycle">
+            <span class="ck-cycle-hint">ou choisis la phase :</span>
+          </div>
+          <div class="ck-cycle-seg" id="ckCycleSeg" role="group" aria-label="Phase du cycle">
+            ${Object.entries(CYCLE_META).map(([k,d])=>`<button type="button" data-cyc="${k}" class="${checkin.cyclePhase===k?'sel':''}" style="--cc:${d.c}"><i class="ic ${d.ic}"></i>${d.l}<small>${d.short}</small></button>`).join('')}
+          </div>
+          <div class="ck-cycle-tip" id="ckCycleTip">${checkin.cyclePhase?CYCLE_META[checkin.cyclePhase].tip:''}</div>
+          ` : `<button type="button" class="ck-cycle-optin" id="ckCycleOptin"><i class="ic ic-waves"></i> Suivre mon cycle menstruel</button>
+               <div class="ck-cycle-note">Facultatif et privé — aide ton coach à adapter les séances au bon moment du cycle.</div>`}
+        </div>`; })()}
         <div class="readiness">
           <div class="lbl">Fraîcheur</div>
           <div class="score" id="readyScore" style="color:${adv.c}">${s}%</div>
@@ -3435,6 +3498,19 @@ function renderSidebar(){
       if(hp){ hp.addEventListener('input', upd); upd(); }
     })();
     (function(){
+      var optin=document.getElementById('ckCycleOptin');
+      if(optin) optin.onclick=function(){ localStorage.setItem('sil_track_cycle','1'); renderSidebar(); };
+      var off=document.getElementById('ckCycleOff');
+      if(off) off.onclick=function(){ localStorage.removeItem('sil_track_cycle'); checkin.cyclePhase=null; checkin.cycleDay=null; renderSidebar(); };
+      var seg=document.getElementById('ckCycleSeg'), tip=document.getElementById('ckCycleTip'), dayIn=document.getElementById('ckCycleDay');
+      function paint(){
+        if(seg) seg.querySelectorAll('button').forEach(function(b){ b.classList.toggle('sel', b.dataset.cyc===checkin.cyclePhase); });
+        if(tip) tip.textContent = checkin.cyclePhase?CYCLE_META[checkin.cyclePhase].tip:'';
+      }
+      if(seg) seg.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ checkin.cyclePhase=b.dataset.cyc; paint(); }; });
+      if(dayIn) dayIn.addEventListener('input', function(){ var v=parseInt(dayIn.value,10); checkin.cycleDay=(v>=1&&v<=40)?v:null; var ph=cyclePhaseFromDay(checkin.cycleDay); if(ph){ checkin.cyclePhase=ph; paint(); } });
+    })();
+    (function(){
       const seg=document.getElementById('ckDispoSeg'), note=document.getElementById('ckDispoNote');
       if(!seg) return;
       seg.querySelectorAll('button').forEach(b=> b.onclick=()=>{
@@ -3500,7 +3576,8 @@ function submitCheckin(){
   if(window.PF?.user){
     PF.saveCheckin({ sommeil:checkin.sommeil, fatigue:checkin.fatigue,
       motivation:checkin.motivation, readiness:score,
-      poids:checkin.poids||null, dispo, dispoNote:checkin.dispoNote||null, hrv:checkin.hrv||null })
+      poids:checkin.poids||null, dispo, dispoNote:checkin.dispoNote||null, hrv:checkin.hrv||null,
+      cyclePhase:checkin.cyclePhase||null, cycleDay:checkin.cycleDay||null })
       .catch(e=> console.warn('[PF] saveCheckin échoué :', e));
   }
   // confirmation visuelle athlète
@@ -5240,6 +5317,11 @@ function renderCoachBand(){
   if(hs && (hs.level==='low'||hs.level==='warn')){
     flags.unshift(`<span class="cb-flag ${hs.level==='low'?'danger':'warn'}"><i class="ic ic-refresh"></i>${hs.txt} : ${a.checkin.hrv} ms (${hs.pct}% vs base)</span>`);
   }
+  const cp = athCycle(a);
+  if(cp && (cp==='menstrual' || cp==='luteal' || cp==='ovulation')){
+    const cm = CYCLE_META[cp];
+    flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>Cycle · ${cm.l} — ${cm.tip}</span>`);
+  }
   if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>Rien à signaler</span>`);
   const ck = a.checkin;
   band.style.setProperty('--cbc', a.color);
@@ -5271,6 +5353,7 @@ function renderCoachBand(){
           <span><i class="ic ic-battery"></i>${ck.fatigue}/10</span>
           <span><i class="ic ic-zap"></i>${ck.motivation}/10</span>
           ${(()=>{ const hs=hrvStatus(ck.hrv, ATHLETE_REF.hrvBase); return hs?`<span class="cb-hrv" style="color:${hs.c}" title="${hs.txt} (${ck.hrv} ms)"><i class="ic ic-refresh"></i>HRV ${ck.hrv}</span>`:''; })()}
+          ${(()=>{ const cp=athCycle(a); return cp?`<span class="cb-cycle" style="color:${CYCLE_META[cp].c}" title="${CYCLE_META[cp].tip}"><i class="ic ${CYCLE_META[cp].ic}"></i>${CYCLE_META[cp].l}</span>`:''; })()}
         </div>`:''}
       </div>
     </div>
