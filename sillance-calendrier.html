@@ -1934,6 +1934,20 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .stats-tab:hover{color:var(--soft)}
 .stats-tab.active{color:#04121a;background:var(--accent);box-shadow:0 4px 14px rgba(70,194,216,.35)}
 .stats-group[hidden]{display:none}
+/* filtres : cases à cocher par graphe (choisir ce qu'on affiche) */
+.chart-filter{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 18px}
+.cf-lbl{font-family:var(--font-data);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.cf-chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--muted);
+  border:1px solid var(--line-strong);background:var(--panel-2);border-radius:99px;padding:6px 13px;cursor:pointer;user-select:none;transition:.12s;font-family:inherit}
+.cf-chip:hover{color:var(--soft)}
+.cf-chip.on{color:var(--text);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.cf-box{width:15px;height:15px;border-radius:4px;border:1.5px solid currentColor;display:grid;place-items:center;flex:none}
+.cf-box .ic{width:10px;height:10px;opacity:0;transition:.1s}
+.cf-chip.on .cf-box{background:var(--accent);border-color:var(--accent);color:#06222a}
+.cf-chip.on .cf-box .ic{opacity:1}
+.cf-all{font-family:var(--font-data);font-size:11px;color:var(--muted);background:transparent;border:none;cursor:pointer;text-decoration:underline;padding:4px 6px}
+.cf-all:hover{color:var(--soft)}
+.chart-card.c-hidden{display:none}
 .chart-card.c7{grid-column:span 7}.chart-card.c5{grid-column:span 5}
 .chart-card.c6{grid-column:span 6}.chart-card.c12{grid-column:span 12}
 @media (max-width:900px){.chart-card.c7,.chart-card.c5,.chart-card.c6,.chart-card.c12{grid-column:span 12}}
@@ -2185,14 +2199,8 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
     </div>
     <p class="sub">Vitesse, fréquence cardiaque, volume et charge d'entraînement de l'athlète — mis à jour à chaque activité synchronisée.</p>
 
-    <nav class="stats-tabs" id="statsTabs" aria-label="Thèmes d'analyse">
-      <button class="stats-tab active" data-g="charge"><i class="ic ic-chart"></i>Charge &amp; forme</button>
-      <button class="stats-tab" data-g="tests"><i class="ic ic-flask"></i>Seuils &amp; tests</button>
-      <button class="stats-tab" data-g="biomeca"><i class="ic ic-run"></i>Biomécanique</button>
-      <button class="stats-tab" data-g="profil"><i class="ic ic-user"></i>Profil</button>
-    </nav>
+    <div class="chart-filter" id="chartFilter" aria-label="Choisir les graphiques à afficher"></div>
 
-    <!-- ===== Onglet : Charge & forme ===== -->
     <div class="charts stats-group" data-group="charge">
       <div class="chart-card c12">
         <h3>Charge cumulée &amp; signaux <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— sur toute l'année du calendrier</span></h3>
@@ -2242,7 +2250,7 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
     </div>
 
     <!-- ===== Onglet : Seuils & tests ===== -->
-    <div class="charts stats-group" data-group="tests" hidden>
+    <div class="charts stats-group" data-group="tests">
       <div class="chart-card c12">
         <h3>Courbe lactate — vélo</h3>
         <div class="sub">test terrain · lactate (mmol/L) vs puissance</div>
@@ -2272,7 +2280,7 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
     </div>
 
     <!-- ===== Onglet : Biomécanique ===== -->
-    <div class="charts stats-group" data-group="biomeca" hidden>
+    <div class="charts stats-group" data-group="biomeca">
       <div class="chart-card c7">
         <h3>Dynamiques de course <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— zones</span></h3>
         <div class="sub">cadence · oscillation verticale · ratio vertical · contact au sol — repère par rapport aux zones de référence</div>
@@ -2304,7 +2312,7 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
     </div>
 
     <!-- ===== Onglet : Profil ===== -->
-    <div class="charts stats-group" data-group="profil" hidden>
+    <div class="charts stats-group" data-group="profil">
       <div class="chart-card c6">
         <h3>Zones de fréquence cardiaque</h3>
         <div class="sub">répartition du temps · 4 dernières semaines</div>
@@ -8724,16 +8732,44 @@ function renderRunSymmetry(){
   }).join('');
 }
 renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
-/* sous-onglets par thème dans Statistiques : n'affiche qu'un groupe à la fois */
-(function initStatsTabs(){
-  const nav=document.getElementById('statsTabs'); if(!nav) return;
-  nav.querySelectorAll('.stats-tab').forEach(b=> b.onclick=()=>{
-    const g=b.dataset.g;
-    nav.querySelectorAll('.stats-tab').forEach(x=> x.classList.toggle('active', x===b));
-    document.querySelectorAll('.stats-group').forEach(el=> el.hidden = el.dataset.group!==g);
-    // le graphe de charge est rendu large : re-caler le scroll sur les semaines récentes
-    if(g==='charge'){ const sc=document.getElementById('loadStackScroll'); if(sc) sc.scrollLeft=sc.scrollWidth; }
-  });
+/* Filtres d'analyse : cases à cocher par graphe → l'utilisateur choisit ce
+   qui s'affiche. Persisté par personne (localStorage). */
+(function initChartFilter(){
+  const box=document.getElementById('chartFilter'); if(!box) return;
+  const REG=[
+    {key:'loadstack', label:'Charge cumulée', a:'loadStackChart'},
+    {key:'load',      label:'Charge & forme', a:'loadChart'},
+    {key:'ftp',       label:'FTP & PMA',      a:'ftpChart'},
+    {key:'dist',      label:'Distance hebdo', a:'distChart'},
+    {key:'hr',        label:'Zones FC',       a:'hrChart'},
+    {key:'lactate',   label:'Lactate',        a:'lactateBike'},
+    {key:'mmp',       label:'Puissance–durée',a:'mmpChart'},
+    {key:'durab',     label:'Durabilité',     a:'durabChart'},
+    {key:'loadmix',   label:'Charge — méthode',a:'loadMixBody'},
+    {key:'hyrox',     label:'Profil Hyrox',   a:'hyroxBody'},
+    {key:'runDyn',    label:'Dynamiques course', a:'runDynBody'},
+    {key:'runTiles',  label:'Foulée & puissance', a:'runTilesBody'},
+    {key:'runSym',    label:'Symétrie G/D',   a:'runSymBody'},
+    {key:'runTrend',  label:'Tendance cadence', a:'runTrendChart'},
+  ];
+  const DEFAULT=['loadstack','load','ftp','dist','hr'];   // sélection de départ (les plus utilisés)
+  let sel; try{ sel=new Set(JSON.parse(localStorage.getItem('sil_chart_filter'))); if(!sel.size) sel=new Set(DEFAULT); }
+  catch(e){ sel=new Set(DEFAULT); }
+  const cards={};
+  REG.forEach(r=>{ const n=document.getElementById(r.a); const c=n&&n.closest('.chart-card'); if(c){ c.dataset.chart=r.key; cards[r.key]=c; } });
+  const save=()=>{ try{ localStorage.setItem('sil_chart_filter', JSON.stringify([...sel])); }catch(e){} };
+  const apply=()=>{
+    REG.forEach(r=>{ if(cards[r.key]) cards[r.key].classList.toggle('c-hidden', !sel.has(r.key)); });
+    box.querySelectorAll('.cf-chip').forEach(ch=>{ const on=sel.has(ch.dataset.key); ch.classList.toggle('on',on); ch.setAttribute('aria-pressed',on); });
+    if(sel.has('loadstack')){ const sc=document.getElementById('loadStackScroll'); if(sc) requestAnimationFrame(()=>{ sc.scrollLeft=sc.scrollWidth; }); }
+  };
+  box.innerHTML=`<span class="cf-lbl">Graphiques à afficher</span>`+
+    REG.filter(r=>cards[r.key]).map(r=>`<button type="button" class="cf-chip" data-key="${r.key}" aria-pressed="false"><span class="cf-box"><i class="ic ic-check"></i></span>${r.label}</button>`).join('')+
+    `<button type="button" class="cf-all" id="cfAll">Tout</button><button type="button" class="cf-all" id="cfNone">Aucun</button>`;
+  box.querySelectorAll('.cf-chip').forEach(ch=> ch.onclick=()=>{ const k=ch.dataset.key; sel.has(k)?sel.delete(k):sel.add(k); apply(); save(); });
+  box.querySelector('#cfAll').onclick=()=>{ REG.forEach(r=>{ if(cards[r.key]) sel.add(r.key); }); apply(); save(); };
+  box.querySelector('#cfNone').onclick=()=>{ sel.clear(); apply(); save(); };
+  apply();
 })();
 (function drawRunTrend(){
   const svg=document.getElementById('runTrendChart'); if(!svg) return;
