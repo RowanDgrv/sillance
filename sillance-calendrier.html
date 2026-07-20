@@ -1912,6 +1912,13 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
 .chart-section{grid-column:1/-1;font-family:var(--font-display,'Oswald');font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent2,#FF9A3D);display:flex;align-items:center;gap:12px;margin:10px 0 -4px}
 .chart-section::after{content:'';flex:1;height:1px;background:var(--line-strong)}
 .chart-section:first-child{margin-top:0}
+/* sous-onglets par thème dans Statistiques */
+.stats-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px;padding:5px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px}
+.stats-tab{flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;border:none;background:transparent;color:var(--muted);font-family:var(--font-ui);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;transition:color .18s,background .18s}
+.stats-tab .ic{width:14px;height:14px}
+.stats-tab:hover{color:var(--soft)}
+.stats-tab.active{color:#04121a;background:var(--accent);box-shadow:0 4px 14px rgba(70,194,216,.35)}
+.stats-group[hidden]{display:none}
 .chart-card.c7{grid-column:span 7}.chart-card.c5{grid-column:span 5}
 .chart-card.c6{grid-column:span 6}.chart-card.c12{grid-column:span 12}
 @media (max-width:900px){.chart-card.c7,.chart-card.c5,.chart-card.c6,.chart-card.c12{grid-column:span 12}}
@@ -2206,10 +2213,15 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
     </div>
     <p class="sub">Vitesse, fréquence cardiaque, volume et charge d'entraînement de l'athlète — mis à jour à chaque activité synchronisée.</p>
 
-    <div class="charts">
-      <!-- ===== Bloc 1 : suivi dans le temps (graphes synchronisés) ===== -->
-      <div class="chart-section">Suivi dans le temps</div>
+    <nav class="stats-tabs" id="statsTabs" aria-label="Thèmes d'analyse">
+      <button class="stats-tab active" data-g="charge"><i class="ic ic-chart"></i>Charge &amp; forme</button>
+      <button class="stats-tab" data-g="tests"><i class="ic ic-flask"></i>Seuils &amp; tests</button>
+      <button class="stats-tab" data-g="biomeca"><i class="ic ic-run"></i>Biomécanique</button>
+      <button class="stats-tab" data-g="profil"><i class="ic ic-user"></i>Profil</button>
+    </nav>
 
+    <!-- ===== Onglet : Charge & forme ===== -->
+    <div class="charts stats-group" data-group="charge">
       <div class="chart-card c12">
         <h3>Charge cumulée &amp; signaux <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— sur toute l'année du calendrier</span></h3>
         <div class="sub">charge hebdo empilée par discipline · défile sur l'année · coche les signaux à afficher · survole une semaine pour le détail</div>
@@ -2255,10 +2267,10 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
           <span><i style="background:var(--run)"></i>Course</span>
         </div>
       </div>
+    </div>
 
-      <!-- ===== Bloc 2 : tests & records ===== -->
-      <div class="chart-section">Tests &amp; records</div>
-
+    <!-- ===== Onglet : Seuils & tests ===== -->
+    <div class="charts stats-group" data-group="tests" hidden>
       <div class="chart-card c12">
         <h3>Courbe lactate — vélo</h3>
         <div class="sub">test terrain · lactate (mmol/L) vs puissance</div>
@@ -2285,31 +2297,10 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
         <svg id="durabChart" viewBox="0 0 940 300" role="img" aria-label="Courbe de durabilité"></svg>
         <div class="legend" id="durabLegend"></div>
       </div>
+    </div>
 
-      <!-- ===== Bloc 3 : répartition & profil ===== -->
-      <div class="chart-section">Répartition &amp; profil</div>
-
-      <div class="chart-card c6">
-        <h3>Zones de fréquence cardiaque</h3>
-        <div class="sub">répartition du temps · 4 dernières semaines</div>
-        <svg id="hrChart" viewBox="0 0 460 230" role="img" aria-label="Répartition des zones cardiaques"></svg>
-      </div>
-
-      <div class="chart-card c6">
-        <h3>Charge d'entraînement <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— méthode</span></h3>
-        <div class="sub">comment la charge de chaque séance est calculée (estimé)</div>
-        <div id="loadMixBody"></div>
-      </div>
-
-      <div class="chart-card c12">
-        <h3>Profil Hyrox</h3>
-        <div class="sub">charge aérobie vs musculaire · dégradation d'allure · course sous fatigue</div>
-        <div id="hyroxBody"></div>
-      </div>
-
-      <!-- ===== Bloc 4 : biomécanique de course ===== -->
-      <div class="chart-section">Biomécanique — course à pied</div>
-
+    <!-- ===== Onglet : Biomécanique ===== -->
+    <div class="charts stats-group" data-group="biomeca" hidden>
       <div class="chart-card c7">
         <h3>Dynamiques de course <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— zones</span></h3>
         <div class="sub">cadence · oscillation verticale · ratio vertical · contact au sol — repère par rapport aux zones de référence</div>
@@ -2338,7 +2329,27 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
           <span><i style="background:#DD5C72"></i>Contact au sol (ms)</span>
         </div>
       </div>
+    </div>
 
+    <!-- ===== Onglet : Profil ===== -->
+    <div class="charts stats-group" data-group="profil" hidden>
+      <div class="chart-card c6">
+        <h3>Zones de fréquence cardiaque</h3>
+        <div class="sub">répartition du temps · 4 dernières semaines</div>
+        <svg id="hrChart" viewBox="0 0 460 230" role="img" aria-label="Répartition des zones cardiaques"></svg>
+      </div>
+
+      <div class="chart-card c6">
+        <h3>Charge d'entraînement <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— méthode</span></h3>
+        <div class="sub">comment la charge de chaque séance est calculée (estimé)</div>
+        <div id="loadMixBody"></div>
+      </div>
+
+      <div class="chart-card c12">
+        <h3>Profil Hyrox</h3>
+        <div class="sub">charge aérobie vs musculaire · dégradation d'allure · course sous fatigue</div>
+        <div id="hyroxBody"></div>
+      </div>
     </div>
   </section>
 
@@ -8680,6 +8691,17 @@ function renderRunSymmetry(){
   }).join('');
 }
 renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
+/* sous-onglets par thème dans Statistiques : n'affiche qu'un groupe à la fois */
+(function initStatsTabs(){
+  const nav=document.getElementById('statsTabs'); if(!nav) return;
+  nav.querySelectorAll('.stats-tab').forEach(b=> b.onclick=()=>{
+    const g=b.dataset.g;
+    nav.querySelectorAll('.stats-tab').forEach(x=> x.classList.toggle('active', x===b));
+    document.querySelectorAll('.stats-group').forEach(el=> el.hidden = el.dataset.group!==g);
+    // le graphe de charge est rendu large : re-caler le scroll sur les semaines récentes
+    if(g==='charge'){ const sc=document.getElementById('loadStackScroll'); if(sc) sc.scrollLeft=sc.scrollWidth; }
+  });
+})();
 (function drawRunTrend(){
   const svg=document.getElementById('runTrendChart'); if(!svg) return;
   const {weeks}=STRAVA_DEMO, cad=RUN_DYN.cadenceHist, gct=RUN_DYN.gctHist;
@@ -9112,72 +9134,14 @@ mmpChart(); durabChart(); renderLoadMix(); renderHyrox();
    qui ne veulent pas de toute la data.
    ============================================================ */
 (function chartToggles(){
-  const REG = [
-    {key:'lactate', label:'Lactate', a:'lactateBike'},
-    {key:'ftp',     label:'FTP & PMA', a:'ftpChart'},
-    {key:'hr',      label:'Zones FC', a:'hrChart'},
-    {key:'dist',    label:'Distance hebdo', a:'distChart'},
-    {key:'load',    label:'Charge & forme', a:'loadChart'},
-    {key:'mmp',     label:'Puissance–durée', a:'mmpChart'},
-    {key:'durab',   label:'Durabilité', a:'durabChart'},
-    {key:'loadmix', label:'Charge — méthode', a:'loadMixBody'},
-    {key:'hyrox',   label:'Profil Hyrox', a:'hyroxBody'},
-  ];
-  const charts = document.querySelector('.analytics .charts');
-  if(!charts) return;
+  // Les sous-onglets par thème (stats-tabs) remplacent l'ancien affichage
+  // « à la carte » (cases à cocher + croix par graphe). On ne garde que le
+  // packing dense des grilles pour un rendu propre par onglet.
   if(!document.getElementById('pf-ctog-css')){
     const st=document.createElement('style'); st.id='pf-ctog-css';
-    st.textContent=`
-    .analytics .charts{grid-auto-flow:row dense}
-    .chart-toggles{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
-    .ctog-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
-    .ctog{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);
-      border:1px solid var(--line-strong);background:var(--panel-2);border-radius:99px;padding:6px 12px;cursor:pointer;user-select:none;transition:.12s}
-    .ctog:hover{color:var(--text)}
-    .ctog.on{color:var(--text);border-color:var(--accent);background:rgba(70,194,216,.10)}
-    .ctog .box{width:14px;height:14px;border-radius:4px;border:1.5px solid currentColor;display:grid;place-items:center;font-size:10px;line-height:1}
-    .ctog.on .box{background:var(--accent);border-color:var(--accent);color:#06222a}
-    .chart-card{position:relative}
-    .chart-x{position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:7px;border:1px solid var(--line-strong);
-      background:var(--panel-2);color:var(--muted);cursor:pointer;font-size:15px;line-height:1;display:grid;place-items:center;z-index:3;opacity:0;transition:.12s}
-    .chart-card:hover .chart-x{opacity:1}
-    .chart-x:hover{color:var(--text);border-color:var(--accent)}
-    .chart-card.c-hidden{display:none}`;
+    st.textContent='.analytics .charts{grid-auto-flow:row dense}';
     document.head.appendChild(st);
   }
-  let hidden;
-  try{ hidden=new Set(JSON.parse(localStorage.getItem('pf_hidden_charts')||'[]')); }catch(e){ hidden=new Set(); }
-  const save=()=>{ try{ localStorage.setItem('pf_hidden_charts', JSON.stringify([...hidden])); }catch(e){} };
-  const cards={};
-  REG.forEach(r=>{
-    const node=document.getElementById(r.a), card=node&&node.closest('.chart-card');
-    if(!card) return;
-    card.dataset.chart=r.key; cards[r.key]=card;
-    if(!card.querySelector('.chart-x')){
-      const x=document.createElement('button'); x.className='chart-x'; x.type='button';
-      x.title='Masquer ce graphique'; x.textContent='×';
-      x.onclick=()=>{ hidden.add(r.key); apply(); save(); };
-      card.appendChild(x);
-    }
-  });
-  const bar=document.createElement('div'); bar.className='chart-toggles'; bar.id='chartToggles';
-  const lab=document.createElement('span'); lab.className='ctog-lbl'; lab.textContent='Graphiques affichés'; bar.appendChild(lab);
-  REG.forEach(r=>{ if(!cards[r.key]) return;
-    const chip=document.createElement('button'); chip.type='button'; chip.className='ctog'; chip.dataset.key=r.key;
-    chip.innerHTML=`<span class="box"><i class="ic ic-check"></i></span>${r.label}`;
-    chip.onclick=()=>{ hidden.has(r.key)?hidden.delete(r.key):hidden.add(r.key); apply(); save(); };
-    bar.appendChild(chip);
-  });
-  charts.parentNode.insertBefore(bar, charts);
-  function apply(){
-    REG.forEach(r=>{ const card=cards[r.key]; if(!card) return;
-      const vis=!hidden.has(r.key);
-      card.classList.toggle('c-hidden', !vis);
-      const chip=bar.querySelector(`.ctog[data-key="${r.key}"]`);
-      if(chip){ chip.classList.toggle('on', vis); chip.querySelector('.box').innerHTML=vis?'<i class="ic ic-check"></i>':''; }
-    });
-  }
-  apply();
 })();
 
 /* Redessine les graphiques à couleurs figées après changement de palette */
