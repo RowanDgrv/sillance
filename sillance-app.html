@@ -5052,8 +5052,10 @@ function sessionCard(s, dateKey){
       return;
     }
     if(e.target.closest('.video-chip') && vid){ openVideo(vid); return; }
-    openModal(s, dateKey);
-    revealAnalysis();
+    // COACH : cliquer une séance ouvre l'analyse SOUS le calendrier (pas de pop-up).
+    // ATHLÈTE : garde la fiche séance (détails, nutrition, mark-done).
+    if(mode==='coach') revealAnalysis(s);
+    else openModal(s, dateKey);
   });
   return el;
 }
