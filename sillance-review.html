@@ -1546,6 +1546,10 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
    L'onglet Statistiques de l'athlète l'affiche toujours (inchangé). */
 body:not([data-athview]):not([data-clubview]):not([data-analysis="open"]) #athPanelStats{display:none}
 body[data-athview="home"][data-analysis="open"] #athPanelStats{display:block}
+/* Mode focus analyse : bandeau gauche masqué + calendrier pleine largeur,
+   pour que l'analyse soit collée sous le calendrier (Replier restaure tout). */
+body[data-analysis="open"]:not([data-athview="stats"]) .planner{grid-template-columns:1fr}
+body[data-analysis="open"]:not([data-athview="stats"]) .planner > .library{display:none}
 .analysis-bar{display:none;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 4px;
   padding:12px 16px;border:1px solid var(--line-strong);border-radius:12px;
   background:linear-gradient(180deg,var(--panel-2),var(--panel))}
@@ -1934,8 +1938,12 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .stats-tab:hover{color:var(--soft)}
 .stats-tab.active{color:#04121a;background:var(--accent);box-shadow:0 4px 14px rgba(70,194,216,.35)}
 .stats-group[hidden]{display:none}
-/* filtres : cases à cocher par graphe (choisir ce qu'on affiche) */
-.chart-filter{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 18px}
+/* filtres GROUPÉS par catégorie (choisir ce qu'on affiche) */
+.chart-filter{display:flex;flex-direction:column;gap:10px;margin:0 0 18px}
+.cf-cat{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cf-cat-lbl{font-family:var(--font-data);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);font-weight:700;min-width:150px;flex:none}
+.cf-actions{display:flex;gap:10px;margin-top:2px;padding-left:150px}
+@media(max-width:720px){.cf-cat-lbl{min-width:100%}.cf-actions{padding-left:0}}
 .cf-lbl{font-family:var(--font-data);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
 .cf-chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--muted);
   border:1px solid var(--line-strong);background:var(--panel-2);border-radius:99px;padding:6px 13px;cursor:pointer;user-select:none;transition:.12s;font-family:inherit}
@@ -8732,27 +8740,28 @@ function renderRunSymmetry(){
   }).join('');
 }
 renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
-/* Filtres d'analyse : cases à cocher par graphe → l'utilisateur choisit ce
-   qui s'affiche. Persisté par personne (localStorage). */
+/* Filtres d'analyse GROUPÉS par catégorie (Charge & puissance / Physio /
+   Biomécanique / Hyrox) → l'utilisateur coche ce qu'il affiche. Persisté. */
 (function initChartFilter(){
   const box=document.getElementById('chartFilter'); if(!box) return;
+  const CATS=[['charge','Charge & puissance'],['physio','Physio'],['biomeca','Biomécanique'],['hyrox','Hyrox']];
   const REG=[
-    {key:'loadstack', label:'Charge cumulée', a:'loadStackChart'},
-    {key:'load',      label:'Charge & forme', a:'loadChart'},
-    {key:'ftp',       label:'FTP & PMA',      a:'ftpChart'},
-    {key:'dist',      label:'Distance hebdo', a:'distChart'},
-    {key:'hr',        label:'Zones FC',       a:'hrChart'},
-    {key:'lactate',   label:'Lactate',        a:'lactateBike'},
-    {key:'mmp',       label:'Puissance–durée',a:'mmpChart'},
-    {key:'durab',     label:'Durabilité',     a:'durabChart'},
-    {key:'loadmix',   label:'Charge — méthode',a:'loadMixBody'},
-    {key:'hyrox',     label:'Profil Hyrox',   a:'hyroxBody'},
-    {key:'runDyn',    label:'Dynamiques course', a:'runDynBody'},
-    {key:'runTiles',  label:'Foulée & puissance', a:'runTilesBody'},
-    {key:'runSym',    label:'Symétrie G/D',   a:'runSymBody'},
-    {key:'runTrend',  label:'Tendance cadence', a:'runTrendChart'},
+    {key:'loadstack', label:'Charge cumulée',   a:'loadStackChart', cat:'charge'},
+    {key:'load',      label:'Charge & forme',   a:'loadChart',      cat:'charge'},
+    {key:'ftp',       label:'FTP & PMA',        a:'ftpChart',       cat:'charge'},
+    {key:'dist',      label:'Distance hebdo',   a:'distChart',      cat:'charge'},
+    {key:'mmp',       label:'Puissance–durée',  a:'mmpChart',       cat:'charge'},
+    {key:'durab',     label:'Durabilité',       a:'durabChart',     cat:'charge'},
+    {key:'loadmix',   label:'Méthode de charge',a:'loadMixBody',    cat:'charge'},
+    {key:'hr',        label:'Zones FC',         a:'hrChart',        cat:'physio'},
+    {key:'lactate',   label:'Lactate & seuils', a:'lactateBike',    cat:'physio'},
+    {key:'runDyn',    label:'Dynamiques de foulée', a:'runDynBody', cat:'biomeca'},
+    {key:'runTiles',  label:'Foulée & puissance',   a:'runTilesBody', cat:'biomeca'},
+    {key:'runSym',    label:'Symétrie G/D',     a:'runSymBody',     cat:'biomeca'},
+    {key:'runTrend',  label:'Tendance cadence', a:'runTrendChart',  cat:'biomeca'},
+    {key:'hyrox',     label:'Profil Hyrox',     a:'hyroxBody',      cat:'hyrox'},
   ];
-  const DEFAULT=['loadstack','load','ftp','dist','hr'];   // sélection de départ (les plus utilisés)
+  const DEFAULT=['loadstack','load','hr'];   // sélection de départ resserrée
   let sel; try{ sel=new Set(JSON.parse(localStorage.getItem('sil_chart_filter'))); if(!sel.size) sel=new Set(DEFAULT); }
   catch(e){ sel=new Set(DEFAULT); }
   const cards={};
@@ -8763,9 +8772,12 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     box.querySelectorAll('.cf-chip').forEach(ch=>{ const on=sel.has(ch.dataset.key); ch.classList.toggle('on',on); ch.setAttribute('aria-pressed',on); });
     if(sel.has('loadstack')){ const sc=document.getElementById('loadStackScroll'); if(sc) requestAnimationFrame(()=>{ sc.scrollLeft=sc.scrollWidth; }); }
   };
-  box.innerHTML=`<span class="cf-lbl">Graphiques à afficher</span>`+
-    REG.filter(r=>cards[r.key]).map(r=>`<button type="button" class="cf-chip" data-key="${r.key}" aria-pressed="false"><span class="cf-box"><i class="ic ic-check"></i></span>${r.label}</button>`).join('')+
-    `<button type="button" class="cf-all" id="cfAll">Tout</button><button type="button" class="cf-all" id="cfNone">Aucun</button>`;
+  box.innerHTML = CATS.map(([ck,cl])=>{
+    const items=REG.filter(r=>r.cat===ck && cards[r.key]); if(!items.length) return '';
+    return `<div class="cf-cat"><span class="cf-cat-lbl">${cl}</span>`+
+      items.map(r=>`<button type="button" class="cf-chip" data-key="${r.key}" aria-pressed="false"><span class="cf-box"><i class="ic ic-check"></i></span>${r.label}</button>`).join('')+
+      `</div>`;
+  }).join('') + `<div class="cf-actions"><button type="button" class="cf-all" id="cfAll">Tout</button><button type="button" class="cf-all" id="cfNone">Aucun</button></div>`;
   box.querySelectorAll('.cf-chip').forEach(ch=> ch.onclick=()=>{ const k=ch.dataset.key; sel.has(k)?sel.delete(k):sel.add(k); apply(); save(); });
   box.querySelector('#cfAll').onclick=()=>{ REG.forEach(r=>{ if(cards[r.key]) sel.add(r.key); }); apply(); save(); };
   box.querySelector('#cfNone').onclick=()=>{ sel.clear(); apply(); save(); };
