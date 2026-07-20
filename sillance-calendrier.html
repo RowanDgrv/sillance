@@ -1541,6 +1541,21 @@ body[data-athview="stats"] .lactest,
 body[data-athview="stats"] .pulse-strip{display:none}
 /* en mode coach (ni athlète ni club), le panneau stats est visible */
 body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
+/* Analyse repliée par défaut sous le calendrier (coach + accueil athlète) ;
+   s'ouvre au clic sur une séance → body[data-analysis="open"].
+   L'onglet Statistiques de l'athlète l'affiche toujours (inchangé). */
+body:not([data-athview]):not([data-clubview]):not([data-analysis="open"]) #athPanelStats{display:none}
+body[data-athview="home"][data-analysis="open"] #athPanelStats{display:block}
+.analysis-bar{display:none;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 4px;
+  padding:12px 16px;border:1px solid var(--line-strong);border-radius:12px;
+  background:linear-gradient(180deg,var(--panel-2),var(--panel))}
+body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:flex}
+.analysis-bar .ab-t{font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:9px}
+.analysis-bar .ab-t .ic{width:16px;height:16px;color:var(--accent)}
+.analysis-close{background:transparent;border:1px solid var(--line-strong);color:var(--soft);border-radius:8px;
+  padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px}
+.analysis-close:hover{border-color:var(--accent);color:var(--ink)}
+.analysis-close .ic{width:13px;height:13px}
 
 /* ---------- Messagerie ---------- */
 .chat-fab{position:fixed;bottom:22px;right:22px;z-index:75;width:56px;height:56px;border-radius:50%;border:none;
@@ -2117,55 +2132,12 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
     </section>
   </div>
 
-  <!-- ===================== BIBLIOTHÈQUE VIDÉO ===================== -->
-  <section class="videolib" id="videolib" aria-label="Bibliothèque vidéo">
-    <div class="vl-head">
-      <div>
-        <div class="vl-eyebrow"><span class="vl-dot"></span>Technique</div>
-        <h2>Bibliothèque <span>vidéo</span></h2>
-        <p class="vl-sub">Éducatifs, gammes et gestes techniques, filtrés par sport. Les vidéos liées à tes séances apparaissent au survol dans ton programme.</p>
-        <div class="vl-count"><b id="vlCount">0</b> vidéos · <span id="vlCountDisc">Natation</span></div>
-      </div>
-      <div class="vl-search">
-        <input type="search" id="vlSearch" placeholder="Rechercher (rattrapé, gammes, squat…)" aria-label="Rechercher une vidéo">
-      </div>
-      <button class="vl-grid-toggle" id="vlGridToggle" aria-pressed="false" title="Afficher la grille modulaire (Müller-Brockmann)"><span class="gt-dot"></span>Grille</button>
-    </div>
-    <div class="vl-filters" id="vlFilters" role="tablist" aria-label="Filtrer par sport">
-      <button class="vl-filter active" data-f="swim" role="tab" aria-selected="true"><i class="ic ic-waves"></i>Natation</button>
-      <button class="vl-filter" data-f="bike" role="tab"><i class="ic ic-bike"></i>Vélo</button>
-      <button class="vl-filter" data-f="run" role="tab"><i class="ic ic-run"></i>Course</button>
-      <button class="vl-filter" data-f="strength" role="tab"><i class="ic ic-dumbbell"></i>Renfo</button>
-      <button class="vl-filter" data-f="hyrox" role="tab"><i class="ic ic-dumbbell"></i>Hyrox</button>
-    </div>
-    <div class="vl-grid" id="vlGrid"></div>
-    <div class="vl-guides" aria-hidden="true"><div class="vg-cols" id="vlCols"></div><div class="vg-rows"></div></div>
-  </section>
-
-  <!-- ===================== PRÉPA MENTALE ===================== -->
-  <section class="mental" aria-label="Préparation mentale">
-    <div class="mental-glow" aria-hidden="true"></div>
-    <div class="mental-txt">
-      <span class="mental-tag">Inclus dans ta formule coaching</span>
-      <h2>Le mental, ta 4<sup>e</sup> discipline</h2>
-      <p>Gestion du stress de course, visualisation, routines pré-compétition — une séance individuelle avec <b>Éric</b>, notre préparateur mental, directement dans son agenda.</p>
-    </div>
-    <button class="btn mental-btn" id="mentalBtn"><i class="ic ic-calendar"></i>Prendre RDV prépa mentale</button>
-  </section>
-
-  <!-- ===================== RÉSERVATION TEST LACTATE (accueil) ===================== -->
-  <section class="lactest" aria-label="Réserver un test lactate">
-    <div class="lactest-glow" aria-hidden="true"></div>
-    <div class="lactest-txt">
-      <span class="lactest-tag">Connais tes vrais seuils</span>
-      <h2>Réserve ton test lactate</h2>
-      <p>Un test à l'effort avec prélèvements sanguins détermine précisément tes seuils SV1 et SV2 — la base la plus fiable pour calibrer tes zones d'entraînement. Course à pied ou vélo, sur le terrain ou en labo.</p>
-    </div>
-    <button class="btn lactest-btn" id="lactestBtn"><i class="ic ic-flask"></i>Réserver mon test</button>
-  </section>
-
-  <!-- ===================== PANNEAU STATISTIQUES (onglet) ===================== -->
+  <!-- ===== ANALYSE (repliée, s'ouvre au clic sur une séance) ===== -->
   <div class="ath-panel-stats" id="athPanelStats">
+  <div class="analysis-bar">
+    <span class="ab-t"><i class="ic ic-chart"></i>Analyse de la séance &amp; de la performance</span>
+    <button class="analysis-close" id="analysisClose"><i class="ic ic-x"></i>Replier</button>
+  </div>
   <!-- ===================== IA · ÉTAT DE FORME ===================== -->
   <section class="readyhub" id="readyhub" aria-label="Analyse de l'état de forme">
     <div class="readyhub-head">
@@ -2392,6 +2364,54 @@ body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
   </section>
   </div><!-- /ath-panel-stats -->
 
+  <!-- ===================== BIBLIOTHÈQUE VIDÉO ===================== -->
+  <section class="videolib" id="videolib" aria-label="Bibliothèque vidéo">
+    <div class="vl-head">
+      <div>
+        <div class="vl-eyebrow"><span class="vl-dot"></span>Technique</div>
+        <h2>Bibliothèque <span>vidéo</span></h2>
+        <p class="vl-sub">Éducatifs, gammes et gestes techniques, filtrés par sport. Les vidéos liées à tes séances apparaissent au survol dans ton programme.</p>
+        <div class="vl-count"><b id="vlCount">0</b> vidéos · <span id="vlCountDisc">Natation</span></div>
+      </div>
+      <div class="vl-search">
+        <input type="search" id="vlSearch" placeholder="Rechercher (rattrapé, gammes, squat…)" aria-label="Rechercher une vidéo">
+      </div>
+      <button class="vl-grid-toggle" id="vlGridToggle" aria-pressed="false" title="Afficher la grille modulaire (Müller-Brockmann)"><span class="gt-dot"></span>Grille</button>
+    </div>
+    <div class="vl-filters" id="vlFilters" role="tablist" aria-label="Filtrer par sport">
+      <button class="vl-filter active" data-f="swim" role="tab" aria-selected="true"><i class="ic ic-waves"></i>Natation</button>
+      <button class="vl-filter" data-f="bike" role="tab"><i class="ic ic-bike"></i>Vélo</button>
+      <button class="vl-filter" data-f="run" role="tab"><i class="ic ic-run"></i>Course</button>
+      <button class="vl-filter" data-f="strength" role="tab"><i class="ic ic-dumbbell"></i>Renfo</button>
+      <button class="vl-filter" data-f="hyrox" role="tab"><i class="ic ic-dumbbell"></i>Hyrox</button>
+    </div>
+    <div class="vl-grid" id="vlGrid"></div>
+    <div class="vl-guides" aria-hidden="true"><div class="vg-cols" id="vlCols"></div><div class="vg-rows"></div></div>
+  </section>
+
+  <!-- ===================== PRÉPA MENTALE ===================== -->
+  <section class="mental" aria-label="Préparation mentale">
+    <div class="mental-glow" aria-hidden="true"></div>
+    <div class="mental-txt">
+      <span class="mental-tag">Inclus dans ta formule coaching</span>
+      <h2>Le mental, ta 4<sup>e</sup> discipline</h2>
+      <p>Gestion du stress de course, visualisation, routines pré-compétition — une séance individuelle avec <b>Éric</b>, notre préparateur mental, directement dans son agenda.</p>
+    </div>
+    <button class="btn mental-btn" id="mentalBtn"><i class="ic ic-calendar"></i>Prendre RDV prépa mentale</button>
+  </section>
+
+  <!-- ===================== RÉSERVATION TEST LACTATE (accueil) ===================== -->
+  <section class="lactest" aria-label="Réserver un test lactate">
+    <div class="lactest-glow" aria-hidden="true"></div>
+    <div class="lactest-txt">
+      <span class="lactest-tag">Connais tes vrais seuils</span>
+      <h2>Réserve ton test lactate</h2>
+      <p>Un test à l'effort avec prélèvements sanguins détermine précisément tes seuils SV1 et SV2 — la base la plus fiable pour calibrer tes zones d'entraînement. Course à pied ou vélo, sur le terrain ou en labo.</p>
+    </div>
+    <button class="btn lactest-btn" id="lactestBtn"><i class="ic ic-flask"></i>Réserver mon test</button>
+  </section>
+
+  <!-- ===================== PANNEAU STATISTIQUES (onglet) ===================== -->
   <!-- ===================== PANNEAU CLUB ===================== -->
   <div class="club-panel" id="clubPanel">
     <div class="club-head">
@@ -4930,9 +4950,22 @@ function sessionCard(s, dateKey){
     }
     if(e.target.closest('.video-chip') && vid){ openVideo(vid); return; }
     openModal(s, dateKey);
+    revealAnalysis();
   });
   return el;
 }
+/* Ouvre la partie analyse (repliée par défaut, sous le calendrier) et l'amène
+   à l'écran. Déclenchée au clic sur une séance à analyser. */
+function revealAnalysis(){
+  document.body.setAttribute('data-analysis','open');
+  const ap=document.getElementById('athPanelStats');
+  if(ap) setTimeout(()=>{ try{ ap.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }, 80);
+}
+(function wireAnalysisClose(){
+  const b=document.getElementById('analysisClose'); if(!b) return;
+  b.onclick=()=>{ document.body.removeAttribute('data-analysis');
+    const cal=document.querySelector('.calendar'); if(cal){ try{ cal.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} } };
+})();
 
 /* ---- RPE ---- */
 function rpeColor(n){
