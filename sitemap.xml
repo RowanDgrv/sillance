@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://rowandgrv.github.io/sillance/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://rowandgrv.github.io/sillance/sillance-club.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://rowandgrv.github.io/sillance/legal/mentions-legales.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://rowandgrv.github.io/sillance/legal/cgu.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://rowandgrv.github.io/sillance/legal/cgv.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://rowandgrv.github.io/sillance/legal/confidentialite.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://sillance.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://sillance.app/sillance-club.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://sillance.app/legal.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
