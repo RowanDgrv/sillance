@@ -1642,6 +1642,8 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .strava-act .ai{flex:1;min-width:0}
 .strava-act .at{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .strava-act .am{font-family:var(--font-data);font-size:10.5px;color:var(--muted)}
+.strava-act.clickable{cursor:pointer;transition:border-color .15s}
+.strava-act.clickable:hover{border-color:#46C2D8}
 .strava-powered{font-size:9.5px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:.04em}
 
 /* ---------- Consignes nutrition ---------- */
@@ -4173,10 +4175,11 @@ function renderStravaCard(){
     document.getElementById('stravaConnectBtn').onclick=connectStrava;
     box.querySelectorAll('.dev-mini').forEach(b=> b.onclick=()=> connectProvider(b.dataset.p));
   } else {
-    const actsHtml = stravaActivities.length? `<div class="strava-acts">${stravaActivities.slice(0,6).map(a=>{
+    const actsHtml = stravaActivities.length? `<div class="strava-acts">${stravaActivities.slice(0,6).map((a,i)=>{
       const D=DISC[a.disc]||DISC.run;
       const src = a.src? ` · ${SRC[a.src]||a.src}` : '';
-      return `<div class="strava-act"><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${a.name}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${a.date}${src}</div></div></div>`;
+      const clickable = a.id && a.src==='strava';
+      return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="Voir l'analyse détaillée"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${a.name}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${a.date}${src}</div></div></div>`;
     }).join('')}</div>` : `<p class="hint" style="margin-top:9px">Aucune activité encore importée.</p>`;
     const linked = providers.length? providers.map(p=>SRC[p]||p).join(' · ') : 'Strava';
     box.innerHTML=`
@@ -4193,6 +4196,7 @@ function renderStravaCard(){
       <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ Les activités <b>Strava</b> restent personnelles à l'athlète (conditions Strava) et ne sont pas partagées au coach. Canaux partageables : <b>Garmin/Coros</b> ou <b>import .FIT/.TCX/.GPX</b>.</p>
       <div class="strava-powered">Powered by Strava · Garmin · Coros</div>`;
     document.getElementById('stravaSyncBtn').onclick=syncStrava;
+    box.querySelectorAll('.strava-act.clickable').forEach(el=> el.onclick=()=>openStravaAnalysis(stravaActivities[+el.dataset.idx]));
     box.querySelectorAll('.dp-chip').forEach(b=> b.onclick=()=>{ stravaDemoSet=b.dataset.set; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); });
     document.getElementById('stravaDisconnectBtn').onclick=()=>{
       if(window.PF?.user){ const p=providers[0]||'strava'; PF.disconnectDevice(p).then(()=>refreshDeviceState()).catch(e=>console.warn('[PF] disconnect:',e)); toast('Compte délié'); }
@@ -4229,6 +4233,22 @@ function importActivityFile(file){
       PF.saveActivity(res.summary, res.data).catch(e=>console.warn('[PF] saveActivity échoué :', e));
     }
   });
+}
+
+// Détail seconde-par-seconde d'une activité Strava synchronisée : récupère les
+// séries (GPS/FC/allure/puissance) via l'edge function (cache serveur), les
+// rejoue avec PFFit.buildFromRaw (même pipeline que l'import .FIT) puis ouvre
+// le modal d'analyse habituel (découplage, comparateur, IA…).
+function openStravaAnalysis(act){
+  if(!act || !act.id){ return; }
+  toast('Chargement du détail…');
+  PF.getActivityStreams(act.id).then(points=>{
+    if(!points || !points.length){ toast('Pas de détail seconde-par-seconde pour cette activité'); return; }
+    const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
+    const res = PFFit.buildFromRaw(points, act.disc, [], {ftp});
+    if(!res.ok){ toast(res.error||'Analyse impossible'); return; }
+    openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
+  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast('Récupération du détail Strava impossible'); });
 }
 
 function connectStrava(){
@@ -4278,6 +4298,7 @@ async function refreshDeviceState(){
     if(stravaConnected){
       const acts = await PF.getActivities(8);
       stravaActivities = acts.map(a=>({
+        id: a.id,
         disc: a.disc || 'run',
         name: a.name || 'Activité',
         dur: a.duration_s ? Math.round(a.duration_s/60) : 0,

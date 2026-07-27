@@ -65,9 +65,11 @@ export const PF = {
   },
 
   // -------- ABONNEMENT (Stripe) --------
-  // plan ∈ 'coach' | 'athlete' | 'club'
-  async startCheckout(plan) {
-    const { url } = await this._invoke("stripe-checkout", { plan });
+  // plan ∈ 'coach' | 'athlete' | 'club'. tier (coach uniquement) ∈ 1|2|3
+  // = 1-10 / 11-30 / 31+ athlètes coachés (auto-déclaré).
+  async startCheckout(plan, tier) {
+    const body = tier ? { plan, tier } : { plan };
+    const { url } = await this._invoke("stripe-checkout", body);
     window.location.href = url;
   },
   async openBillingPortal() {
@@ -521,6 +523,13 @@ export const PF = {
     if (athleteId) q = q.eq("user_id", athleteId);
     const { data } = await q;
     return data ?? [];
+  },
+  // Détail seconde-par-seconde d'une activité Strava (GPS/FC/allure/puissance),
+  // récupéré à la demande et mis en cache côté serveur. Renvoie la même forme
+  // que window.PFFit (points bruts) pour rejouer le modal d'analyse.
+  async getActivityStreams(activityId) {
+    const data = await this._invoke("strava-activity-streams", { activity_id: activityId });
+    return data?.points ?? [];
   },
   // Persiste un import manuel .TCX/.GPX (window.PFFit.parseFile → { summary, data }).
   // Upsert sur (provider, provider_activity_id) : ré-importer le même fichier ne duplique pas.
