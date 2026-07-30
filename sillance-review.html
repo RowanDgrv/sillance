@@ -1534,8 +1534,14 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .cr-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 @media (max-width:520px){.cr-row{grid-template-columns:1fr 1fr}}
 .cr-form .b-fld label{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px;display:block}
-.cr-form input,.cr-form select{width:100%;border:1px solid var(--line-strong);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--font-ui);font-size:13.5px;padding:9px 11px}
+.cr-form input,.cr-form select,.cr-form textarea{width:100%;border:1px solid var(--line-strong);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--font-ui);font-size:13.5px;padding:9px 11px}
+.cr-form textarea{resize:vertical;min-height:52px}
 .cr-note{font-size:11.5px;color:var(--muted);line-height:1.5}
+.prof-list{display:flex;flex-direction:column;gap:6px}
+.prof-row{display:flex;gap:8px;align-items:center}
+.prof-row input{flex:1}
+.prof-row-del{background:transparent;border:1px solid var(--line-strong);color:var(--muted);border-radius:8px;width:32px;height:32px;flex:none;cursor:pointer}
+.prof-row-del:hover{color:var(--run);border-color:var(--run)}
 
 /* ---------- Onglets athlète (Accueil / Statistiques) ---------- */
 .ath-tabs{display:none;gap:6px;margin:0 0 4px;padding:5px;background:var(--panel-2);border:1px solid var(--line);
@@ -2671,6 +2677,33 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   </div>
 </div>
 
+<!-- Modal fiche athlète (coach) : VO2max, parcours, records, blessures, habitudes -->
+<div class="overlay" id="profileOverlay" role="dialog" aria-modal="true" aria-label="Fiche athlète">
+  <div class="modal group-modal">
+    <button class="close" id="profileClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--strength)"><i class="ic ic-user"></i> Fiche athlète</span>
+    <h3>Fiche — <span id="profileAthName"></span></h3>
+    <div class="cr-form">
+      <div class="b-fld"><label>VO2max (ml/kg/min, optionnel)</label><input type="number" step="0.1" min="0" max="99" id="profVo2max" placeholder="Ex. 58"></div>
+      <div class="b-fld"><label>Parcours sportif</label><textarea id="profBackground" rows="3" placeholder="Depuis quand il/elle pratique, expérience, contexte…"></textarea></div>
+
+      <div class="b-fld"><label>Records personnels</label>
+        <div class="prof-list" id="profRecords"></div>
+        <button class="group-edit" id="profAddRecord" type="button" style="margin-top:6px">+ Ajouter un record</button>
+      </div>
+
+      <div class="b-fld"><label>Historique de blessures</label>
+        <div class="prof-list" id="profInjuries"></div>
+        <button class="group-edit" id="profAddInjury" type="button" style="margin-top:6px">+ Ajouter une blessure</button>
+      </div>
+
+      <div class="b-fld"><label>Habitudes alimentaires</label><textarea id="profDiet" rows="2" placeholder="Allergies, régime, préférences…"></textarea></div>
+      <div class="b-fld"><label>Habitudes de vie / travail</label><textarea id="profWork" rows="2" placeholder="Horaires, métier physique ou sédentaire, contraintes…"></textarea></div>
+    </div>
+    <button class="btn" id="profileSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer la fiche</button>
+  </div>
+</div>
+
 <!-- Modal acceptation d'une demande d'adhésion (affecter à un groupe) -->
 <div class="overlay" id="acceptOverlay" role="dialog" aria-modal="true" aria-label="Accepter une demande">
   <div class="modal accept-modal">
@@ -3512,6 +3545,15 @@ const RECORDS = [
   {d:'FTP', v:'310 W', isNew:false},
   {d:'PMA', v:'415 W', isNew:false}
 ];
+/* ---- Fiche athlète (coach) : VO2max, parcours, records, blessures, habitudes.
+   Indexée par athlète (contrairement à ATHLETE_REF/RECORDS ci-dessus qui sont
+   des singletons "athlète actuellement affiché", pensés pour l'auto-édition
+   côté athlète). 100% front pour l'instant, pas de colonne backend dédiée. */
+let ATHLETE_PROFILES = {};
+function athleteProfile(aid){
+  if(!ATHLETE_PROFILES[aid]) ATHLETE_PROFILES[aid] = {vo2max:null, background:'', records:[], injuries:[], diet:'', work:''};
+  return ATHLETE_PROFILES[aid];
+}
 function readinessScore(){
   return Math.round((checkin.sommeil + (10-checkin.fatigue) + checkin.motivation)/30*100);
 }
@@ -5593,7 +5635,8 @@ function openInviteAthlete(){
       <div class="invite-share">
         <button class="invite-copy cc-btn" id="invAthCopy">Copier le lien</button>
         <button class="invite-wa" id="invAthWa">WhatsApp</button>
-      </div>`;
+      </div>
+      <p class="cr-note" style="margin-top:10px">Une fois qu'il aura rejoint, retrouve « Fiche athlète » dans son bandeau pour renseigner VO2max, records, blessures et habitudes.</p>`;
     document.getElementById('invAthCopy').onclick=()=>{
       const inp=document.getElementById('invAthLink'); inp.select();
       try{ navigator.clipboard.writeText(inp.value); }catch(e){ document.execCommand && document.execCommand('copy'); }
@@ -5812,6 +5855,7 @@ function renderCoachBand(){
         ${a.race?`<div class="cb-race"><i class="ic ic-flag"></i>${a.race.name} <b>J–${a.race.days}</b></div>`:''}
         <button class="cb-bilan" id="bilanBtn" title="Exporter le bilan de l'athlète en PDF"><i class="ic ic-download"></i> Bilan PDF</button>
         <button class="cb-bilan" id="zonesBtn" title="Personnaliser les zones de travail de l'athlète"><i class="ic ic-target"></i> Zones</button>
+        <button class="cb-bilan" id="profileBtn" title="VO2max, parcours, records, blessures, habitudes"><i class="ic ic-user"></i> Fiche athlète</button>
       </div>
     </div>
     <div class="cb-forme">
@@ -5838,7 +5882,87 @@ function renderCoachBand(){
     <div class="cb-flags">${flags.join('')}</div>`;
   const _bb=document.getElementById('bilanBtn'); if(_bb) _bb.onclick=()=>exportBilan(a.name);
   const _zb=document.getElementById('zonesBtn'); if(_zb) _zb.onclick=()=>openZoneEditor();
+  const _pb=document.getElementById('profileBtn'); if(_pb) _pb.onclick=()=>openAthleteProfile(a.id);
 }
+
+/* ---- Fiche athlète (coach) : VO2max, parcours, records, blessures, habitudes ---- */
+let profileAthId = null;
+function profRowHTML(kind, i, a, b){
+  if(kind==='record'){
+    return `<div class="prof-row" data-i="${i}">
+      <input type="text" placeholder="Ex. 10 km" data-f="d" value="${dispoSafe(a||'')}">
+      <input type="text" placeholder="Ex. 38:20" data-f="v" value="${dispoSafe(b||'')}">
+      <button class="prof-row-del" type="button" data-act="delrow" title="Supprimer"><i class="ic ic-x"></i></button>
+    </div>`;
+  }
+  return `<div class="prof-row" data-i="${i}">
+    <input type="date" data-f="date" value="${a||''}" style="flex:0 0 150px">
+    <input type="text" placeholder="Ex. Tendinite rotulienne genou droit" data-f="desc" value="${dispoSafe(b||'')}">
+    <button class="prof-row-del" type="button" data-act="delrow" title="Supprimer"><i class="ic ic-x"></i></button>
+  </div>`;
+}
+function wireProfRows(boxId, list, rerender){
+  document.getElementById(boxId).querySelectorAll('[data-act="delrow"]').forEach(btn=>{
+    btn.onclick=()=>{ const i=+btn.closest('.prof-row').dataset.i; list.splice(i,1); rerender(list); };
+  });
+}
+function renderProfRecords(list){
+  document.getElementById('profRecords').innerHTML = list.map((r,i)=>profRowHTML('record',i,r.d,r.v)).join('') || '<p class="club-hint">Aucun record renseigné.</p>';
+  wireProfRows('profRecords', list, renderProfRecords);
+}
+function renderProfInjuries(list){
+  document.getElementById('profInjuries').innerHTML = list.map((r,i)=>profRowHTML('injury',i,r.date,r.desc)).join('') || '<p class="club-hint">Aucune blessure renseignée.</p>';
+  wireProfRows('profInjuries', list, renderProfInjuries);
+}
+function openAthleteProfile(aid){
+  const a = ROSTER.find(x=>x.id===aid); if(!a) return;
+  profileAthId = aid;
+  const p = athleteProfile(aid);
+  document.getElementById('profileAthName').textContent = a.name;
+  document.getElementById('profVo2max').value = p.vo2max ?? '';
+  document.getElementById('profBackground').value = p.background || '';
+  document.getElementById('profDiet').value = p.diet || '';
+  document.getElementById('profWork').value = p.work || '';
+  renderProfRecords(p.records);
+  renderProfInjuries(p.injuries);
+  document.getElementById('profileOverlay').classList.add('open');
+}
+function saveAthleteProfile(){
+  if(!profileAthId) return;
+  const a = ROSTER.find(x=>x.id===profileAthId);
+  const p = athleteProfile(profileAthId);
+  const vo2 = document.getElementById('profVo2max').value;
+  p.vo2max = vo2==='' ? null : +vo2;
+  p.background = document.getElementById('profBackground').value.trim();
+  p.diet = document.getElementById('profDiet').value.trim();
+  p.work = document.getElementById('profWork').value.trim();
+  p.records = [...document.querySelectorAll('#profRecords .prof-row')].map(row=>({
+    d: row.querySelector('[data-f="d"]').value.trim(),
+    v: row.querySelector('[data-f="v"]').value.trim()
+  })).filter(r=>r.d || r.v);
+  p.injuries = [...document.querySelectorAll('#profInjuries .prof-row')].map(row=>({
+    date: row.querySelector('[data-f="date"]').value,
+    desc: row.querySelector('[data-f="desc"]').value.trim()
+  })).filter(r=>r.date || r.desc);
+  document.getElementById('profileOverlay').classList.remove('open');
+  toast(`Fiche mise à jour pour ${a?a.name:'l\'athlète'}`);
+}
+(function initAthleteProfile(){
+  const ov=document.getElementById('profileOverlay'); if(!ov) return;
+  document.getElementById('profileSave').addEventListener('click', saveAthleteProfile);
+  document.getElementById('profileClose').addEventListener('click', ()=> ov.classList.remove('open'));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+  document.getElementById('profAddRecord').addEventListener('click', ()=>{
+    const p = athleteProfile(profileAthId);
+    p.records.push({d:'', v:''});
+    renderProfRecords(p.records);
+  });
+  document.getElementById('profAddInjury').addEventListener('click', ()=>{
+    const p = athleteProfile(profileAthId);
+    p.injuries.push({date:'', desc:''});
+    renderProfInjuries(p.injuries);
+  });
+})();
 
 (function initAthPicker(){
   const btn=document.getElementById('apBtn'), menu=document.getElementById('apMenu');
