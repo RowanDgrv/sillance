@@ -1150,7 +1150,7 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .cpay{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px}
 .cpay.ok{background:rgba(53,197,140,.14);color:var(--good)}
 .cpay.wait{background:rgba(217,150,47,.16);color:var(--bike)}
-.coffers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.coffers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
 @media(max-width:760px){.coffers{grid-template-columns:1fr}}
 .coffer{border:1px solid var(--line);border-radius:14px;background:var(--panel-2);padding:16px 17px;position:relative}
 .coffer.feat{border-color:rgba(217,150,47,.5);box-shadow:0 0 0 1px rgba(217,150,47,.16)}
@@ -1193,7 +1193,6 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .csub-terms{font-size:11px;color:var(--muted);max-width:560px;display:flex;gap:7px;align-items:flex-start}
 @media(max-width:760px){.csub-tiers{grid-template-columns:1fr}}
 .club-ath-offer{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-top:4px;margin-left:6px;cursor:pointer;border:1px solid var(--line-strong);color:var(--muted)}
-.club-ath-offer.co-dropin{color:var(--bike)}
 .club-ath-offer.co-sub{color:var(--good)}
 .club-ath-offer.co-coach{background:rgba(70,194,216,.14);color:var(--accent);border-color:transparent}
 .cconnect{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);background:var(--panel-2);border-radius:12px;padding:13px 15px;margin-bottom:14px}
@@ -1435,6 +1434,13 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .grp-mem .gm-n{font-size:13px;font-weight:600}
 .group-modal{width:min(540px,100%)}
 .club-ath-grp{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:99px;color:#fff;margin-top:3px;display:inline-block}
+.club-ath-grp-sel{font-size:9.5px;font-weight:700;padding:2px 20px 2px 8px;border-radius:99px;color:#fff;margin-top:3px;display:inline-block;border:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-color:var(--gc,var(--muted));background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center;background-size:9px;font-family:inherit}
+.club-ath-grp-sel.none{background-color:transparent;border:1px dashed var(--line-strong);color:var(--muted)}
+.grp-search{margin-bottom:8px}
+.grp-mem-other{font-size:10px;color:var(--muted);margin-left:auto;padding:2px 7px;border-radius:99px;border:1px solid var(--line-strong);white-space:nowrap}
+.grp-unassigned-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px dashed var(--line-strong);border-radius:12px;padding:10px 14px;margin-bottom:13px;background:var(--panel-2);cursor:pointer;font-size:12.5px;color:var(--soft)}
+.grp-unassigned-banner:hover{border-color:var(--strength)}
+.grp-unassigned-banner b{color:var(--text)}
 
 /* créneaux */
 .creneau-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
@@ -1468,7 +1474,6 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .club-ath-n{font-weight:700;font-size:14px}
 .club-ath-m{font-size:11.5px;color:var(--muted);font-family:var(--font-data)}
 .club-ath-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--panel-2);color:var(--muted)}
-.club-ath-tag.hyrox{background:rgba(255,138,61,.14);color:#FF8A3D}
 .club-ath-vid{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   cursor:pointer;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);user-select:none}
 .club-ath-vid.on{background:rgba(70,194,216,.14);color:var(--accent);border-color:rgba(70,194,216,.5)}
@@ -1512,6 +1517,11 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
   border:1px solid var(--line-strong);color:var(--muted);cursor:pointer}
 .club-ath-minor.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
 .club-ath-minor.ok{background:rgba(57,230,163,.12);color:var(--good);border-color:rgba(57,230,163,.4)}
+.club-ath-licence{display:inline-block;margin-top:5px;margin-left:6px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+  border:1px solid var(--line-strong);color:var(--muted);cursor:pointer}
+.club-ath-licence.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
+.club-ath-licence.soon{background:rgba(255,177,61,.14);color:var(--bike);border-color:rgba(255,177,61,.5)}
+.club-ath-licence.ok{background:rgba(57,230,163,.12);color:var(--good);border-color:rgba(57,230,163,.4)}
 .consent-note{font-size:12px;line-height:1.5;color:var(--soft);background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin:4px 0 2px}
 .consent-check{display:flex;gap:9px;align-items:flex-start;width:100%;font-size:12.5px;line-height:1.45;color:var(--soft);cursor:pointer;margin-top:8px}
 .consent-check input[type="checkbox"]{width:auto;flex:none;margin-top:2px}
@@ -2163,6 +2173,9 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <a class="icon-btn help-btn" href="./sillance-aide.html" target="_blank" rel="noopener" aria-label="Aide" title="Aide &amp; guide">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M9.3 9.3a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.2" r="0.5" fill="currentColor" stroke="none"/></svg>
     </a>
+    <button class="icon-btn tuto-btn" id="tutoBtn" aria-label="Tutoriel guidé" title="Tutoriel guidé — créer une séance">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 7-6 2-2 6-6-15z"/></svg>
+    </button>
     <button class="icon-btn theme-btn" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre">
       <span id="themeIcon"><i class="ic ic-moon"></i></span>
     </button>
@@ -2547,7 +2560,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div>
         <div class="club-eyebrow"><span class="club-dot"></span>Espace club</div>
         <h2 id="clubName">Muret Goat Squad</h2>
-        <p class="club-sub">Gère tes créneaux collectifs, les inscriptions et les présences. Idéal pour les clubs de triathlon et les salles Hyrox.</p>
+        <p class="club-sub">Gère tes créneaux collectifs, les inscriptions et les présences. Idéal pour les clubs de triathlon, course à pied, natation et cyclisme.</p>
       </div>
     </div>
 
@@ -2576,7 +2589,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <div class="club-view" id="clubViewGroupes" hidden>
       <div class="club-actions">
         <button class="btn club-add" id="clubAddGroup">+ Créer un groupe</button>
-        <span class="club-hint">Organise tes licenciés par niveau ou objectif (jeunes, compétition, Ironman, Hyrox…).</span>
+        <span class="club-hint">Organise tes licenciés par niveau ou objectif (jeunes, compétition, distance M, Ironman…).</span>
       </div>
       <div class="group-list" id="groupList"></div>
     </div>
@@ -2600,6 +2613,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       </div>
 
       <div id="joinRequests"></div>
+
+      <div id="licenceAlert"></div>
 
       <div class="club-actions">
         <input type="search" id="clubAthleteSearch" class="club-search" placeholder="Rechercher un athlète…">
@@ -2636,7 +2651,6 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <option value="bike">Vélo</option>
           <option value="run">Course</option>
           <option value="strength">Renfo</option>
-          <option value="hyrox">Hyrox</option>
         </select>
       </div>
       <div class="b-fld"><label>Intitulé</label><input type="text" id="crTitle" placeholder="Ex. Séance piste collective"></div>
@@ -2659,7 +2673,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
         <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> Inviter tout le groupe</label></div>
       </div>
       <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres — ils n'ont qu'à confirmer leur présence.</p>
-      <p class="cr-note" id="crPriceNote">Mets 0 pour un créneau inclus dans l'adhésion. Un tarif &gt; 0 active la séance « à la carte » (utile pour les salles Hyrox).</p>
+      <p class="cr-note" id="crPriceNote">Mets 0 pour un créneau inclus dans l'adhésion. Un tarif &gt; 0 active la séance « à la carte » (utile pour un stage ou une séance ouverte aux invités).</p>
     </div>
     <button class="btn" id="crSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Publier le créneau</button>
   </div>
@@ -2694,6 +2708,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
         <div class="grp-colors" id="grpColors"></div>
       </div>
       <div class="b-fld"><label>Athlètes du groupe</label>
+        <input type="search" id="grpMemberSearch" class="club-search grp-search" placeholder="Rechercher un athlète…">
         <div class="grp-members" id="grpMembers"></div>
       </div>
     </div>
@@ -2717,6 +2732,28 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       </div>
     </div>
     <button class="btn" id="consentSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
+  </div>
+</div>
+
+<!-- Modal licence & certificat médical -->
+<div class="overlay" id="licenceOverlay" role="dialog" aria-modal="true" aria-label="Licence et certificat médical">
+  <div class="modal group-modal">
+    <button class="close" id="licenceClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--bike)"><i class="ic ic-shield"></i> Licence sportive</span>
+    <h3>Licence — <span id="licenceAthName"></span></h3>
+    <div class="cr-form">
+      <div class="b-fld"><label>Fédération</label>
+        <select id="licFed">
+          <option value="FFTri">FFTri — Fédération Française de Triathlon</option>
+          <option value="FFC">FFC — Fédération Française de Cyclisme</option>
+          <option value="Autre">Autre / aucune</option>
+        </select>
+      </div>
+      <div class="b-fld"><label>Numéro de licence</label><input type="text" id="licNum" placeholder="Ex. 1234567"></div>
+      <div class="b-fld"><label>Certificat médical valable jusqu'au</label><input type="date" id="licCert"></div>
+      <p class="consent-note">Le certificat médical (ou le questionnaire de santé qui en tient lieu selon les règles de ta fédération) est une donnée de santé, traitée selon la <a href="./legal.html#confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
+    </div>
+    <button class="btn" id="licSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
   </div>
 </div>
 
@@ -3017,6 +3054,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-fit.js"></script>
+<script src="./sillance-tour.js"></script>
 <script src="./sillance-flow.js"></script>
 <script>
 /* ============================================================
@@ -5953,19 +5991,19 @@ document.querySelectorAll('.ath-tab').forEach(b=>{
    ------------------------------------------------------------
    Le gestionnaire crée des créneaux ; les athlètes du club s'y
    inscrivent (démo : on simule l'inscription de "moi"). Sert aux
-   clubs tri ET aux salles Hyrox (séances à la carte avec tarif).
+   clubs de sport d'endurance : triathlon, course à pied, natation, cyclisme.
    Backend : persister clubs, athlètes, créneaux et inscriptions ;
    brancher un paiement pour les créneaux tarifés.
    ============================================================ */
 const CLUB_ATHLETES = [
-  {id:'a1', name:'Romain Dubois', disc:'tri', since:'2023', group:'g3', offer:'coach', coach:'Éric'},
-  {id:'a2', name:'Léa Martin', disc:'tri', since:'2024', group:'g4', offer:'sub', minor:true},
-  {id:'a3', name:'Karim Benali', disc:'hyrox', since:'2025', group:'g6', offer:'coach', coach:'Karim'},
-  {id:'a4', name:'Sophie Laurent', disc:'tri', since:'2022', group:'g5', offer:'sub'},
-  {id:'a5', name:'Tom Variable', disc:'hyrox', since:'2025', group:'g6', offer:'dropin'},
-  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12'},
-  {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie'},
-  {id:'a8', name:'Marie Girard', disc:'hyrox', since:'2025', group:'g6', offer:'dropin'}
+  {id:'a1', name:'Romain Dubois', disc:'tri', since:'2023', group:'g3', offer:'coach', coach:'Éric', licence:{fed:'FFTri', num:'4501234', medCertUntil:'2027-02-10'}},
+  {id:'a2', name:'Léa Martin', disc:'tri', since:'2024', group:'g4', offer:'sub', minor:true, licence:{fed:'FFTri', num:'4509876', medCertUntil:'2026-09-10'}},
+  {id:'a3', name:'Karim Benali', disc:'bike', since:'2025', group:'g6', offer:'coach', coach:'Karim', licence:{fed:'FFC', num:'1122334', medCertUntil:'2027-01-20'}},
+  {id:'a4', name:'Sophie Laurent', disc:'tri', since:'2022', group:'g5', offer:'sub', licence:{fed:'FFTri', num:'4498765', medCertUntil:'2026-05-30'}},
+  {id:'a5', name:'Tom Variable', disc:'bike', since:'2025', group:'g6', offer:'sub'},
+  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12', licence:{fed:'FFTri', num:'4587654', medCertUntil:'2027-04-01'}},
+  {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie', licence:{fed:'FFTri', num:'4523456', medCertUntil:'2026-12-15'}},
+  {id:'a8', name:'Marie Girard', disc:'bike', since:'2025', group:'g6', offer:'sub'}
 ];
 /* groupes du club : le gestionnaire les crée et y affecte des athlètes.
    Sert à cibler les créneaux (ex. un créneau réservé au groupe Compétition). */
@@ -5975,14 +6013,14 @@ let CLUB_GROUPS = [
   {id:'g3', name:'Adultes Triathlon M', color:'#FFB13D', desc:'Format découverte / distance M (olympique)'},
   {id:'g4', name:'Adultes Triathlon Half', color:'#9D7BFF', desc:'Préparation 70.3 / half-distance'},
   {id:'g5', name:'Adultes Triathlon Ironman', color:'#39E6A3', desc:'Longue distance, format Ironman'},
-  {id:'g6', name:'Hyrox', color:'#FF8A3D', desc:'Préparation et compétition Hyrox'}
+  {id:'g6', name:'Cyclisme Compétition', color:'#FF8A3D', desc:'Cyclisme sur route, groupe compétition'}
 ];
 function clubGroup(id){ return CLUB_GROUPS.find(g=>g.id===id); }
 const CLUB_DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 let CRENEAUX = [
   {id:'c1', disc:'run', title:'Séance piste collective', day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7']},
   {id:'c2', disc:'swim', title:'Technique natation', day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6']},
-  {id:'c3', disc:'hyrox', title:'Hyrox — simulation complète', day:5, time:'19:00', dur:75, place:'Box Hyrox Muret', cap:12, coach:'Karim', price:15, attendees:['a3','a5','a8']},
+  {id:'c3', disc:'bike', title:'Sortie vélo — groupe compétition', day:5, time:'19:00', dur:150, place:'Départ Vélodrome, Muret', cap:12, coach:'Karim', price:0, attendees:['a3','a5','a8']},
   {id:'c4', disc:'bike', title:'Sortie longue groupe', day:6, time:'08:00', dur:180, place:'Départ Base de loisirs, Muret', cap:30, coach:'Éric', price:0, attendees:['a1','a4','a7']}
 ];
 const ME_CLUB_ID = 'a1'; // l'athlète "moi" (pour la démo d'inscription)
@@ -5991,13 +6029,14 @@ let clubView = 'dash';
 /* demandes d'adhésion en attente (arrivées via le lien d'invitation) */
 let JOIN_REQUESTS = [
   {id:'r1', name:'Hugo Mercier', disc:'tri', msg:'Triathlète, j\'aimerais préparer un half cette année'},
-  {id:'r2', name:'Camille Faure', disc:'hyrox', msg:'Débutante Hyrox, motivée !'}
+  {id:'r2', name:'Camille Faure', disc:'bike', msg:'Débutante cyclisme sur route, motivée !'}
 ];
 /* noms fictifs pour simuler de nouvelles demandes (démo) */
 const DEMO_NAMES = ['Antoine Roche','Julie Vasseur','Nadia Lefort','Paul Chevalier','Emma Bonnet','Yanis Khelifi'];
 let demoNameIdx = 0;
 
 function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+const CLUB_DISC_LABEL = {tri:'Tri', run:'Course', swim:'Natation', bike:'Vélo'};
 
 function renderClubStats(){
   const el = document.getElementById('clubStats'); if(!el) return; // bandeau retiré : no-op
@@ -6016,10 +6055,6 @@ function renderClubStats(){
    (ops + argent, zéro analyse : la data reste côté coach)
    =========================================================== */
 const CLUB_OFFERS = [
-  {id:'dropin', name:'À la séance', price:15, unit:'/ séance', feature:false,
-   pitch:'Réserve, fais la séance, repars.',
-   inc:['Réservation + paiement en ligne','Accès au créneau choisi','Sans engagement'],
-   who:'Occasionnels, événementiel Hyrox.'},
   {id:'sub', name:'Abonnement club', price:59, unit:'/ mois', feature:false,
    pitch:'Toutes les séances collectives incluses.',
    inc:['Créneaux collectifs illimités','Réservation prioritaire','Suivi des présences'],
@@ -6027,7 +6062,7 @@ const CLUB_OFFERS = [
   {id:'coach', name:'Coaching +', price:119, unit:'/ mois', feature:true,
    pitch:'Abonnement + un coach qui lit tes données et adapte tes séances.',
    inc:["Tout l'abonnement club",'Coach dédié + plan perso','Check-in du matin → séance ajustée','Analyse montre (Garmin / Coros / .FIT)'],
-   who:'Athlètes engagés, prépa course / Hyrox compétition.'}
+   who:'Athlètes engagés, prépa course ou triathlon compétition.'}
 ];
 const clubOffer = id => CLUB_OFFERS.find(o=>o.id===id) || CLUB_OFFERS[0];
 const COACH_OFFER = { name:'Suivi coaching', price:99 };
@@ -6190,7 +6225,7 @@ function renderClubOffres(){
   const box=document.getElementById('clubViewOffres'); if(!box) return;
   box.innerHTML=`
   <div class="cconnect">
-    <div><b><i class="ic ic-credit-card"></i> Encaisse tes adhérents</b><div class="cconnect-s">Relie le compte Stripe de la salle → tu perçois abonnements &amp; séances à la carte directement (commission plateforme configurable).</div></div>
+    <div><b><i class="ic ic-credit-card"></i> Encaisse tes adhérents</b><div class="cconnect-s">Relie le compte Stripe du club → tu perçois abonnements &amp; séances à la carte directement (commission plateforme configurable).</div></div>
     <button class="co-edit" id="clubConnectBtn" style="border-color:var(--accent);color:var(--accent)">Relier Stripe</button>
   </div>
   <p class="club-hint" style="margin-bottom:14px">Une échelle de valeur : on monte → on paie plus → plus de suivi et de data. Clique un tarif pour l'ajuster.</p>
@@ -6259,11 +6294,7 @@ const CLUB_HISTORY = {
   trimestre: 23,            // séances club ce trimestre (démo)
   heures: 31,               // heures cumulées
   presence: 88,             // % de présence
-  paid: [                   // séances payantes consommées
-    {label:'Hyrox — simulation', date:'12 juin', amount:15},
-    {label:'Hyrox — technique stations', date:'29 mai', amount:15},
-    {label:'Hyrox — simulation', date:'15 mai', amount:15}
-  ]
+  paid: []                  // séances payantes consommées (démo : aucune — clubs d'endurance = adhésion, pas de drop-in)
 };
 function renderClubHistory(){
   const box=document.getElementById('clubHistory'); if(!box) return;
@@ -6388,31 +6419,52 @@ function openClubAthleteCalendar(a){
   window.scrollTo({top:0, behavior:'smooth'});
   toast(`Calendrier de ${a.name}` + (rosterIsReal?'':' — démo : plan type du club'));
 }
+let clubOnlyUnassigned = false;
 function renderClubAthletes(filter){
   renderJoinRequests();
+  renderLicenceAlert();
   const box=document.getElementById('clubAthletesList');
   const q=(filter||'').toLowerCase();
-  const list=CLUB_ATHLETES.filter(a=>!q||a.name.toLowerCase().includes(q));
-  box.innerHTML = list.map(a=>{
+  let list=CLUB_ATHLETES.filter(a=>!q||a.name.toLowerCase().includes(q));
+  if(clubOnlyUnassigned) list=list.filter(a=>!a.group);
+  if(clubLicenceOnly) list=list.filter(a=>licenceStatus(a)!=='ok');
+  const banner = clubOnlyUnassigned
+    ? `<div class="grp-unassigned-banner" id="clubUnassignedClear"><span>Filtré sur les athlètes <b>sans groupe</b></span><span>✕ Tout afficher</span></div>` : '';
+  const rows = list.map(a=>{
     const nbInscr = CRENEAUX.filter(c=>c.attendees.includes(a.id)).length;
     const g = a.group ? clubGroup(a.group) : null;
+    const grpOptions = '<option value="">Sans groupe</option>' + CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${a.group===gr.id?'selected':''}>${gr.name}</option>`).join('');
     return `<div class="club-ath">
       <div class="club-ath-av">${initials(a.name)}</div>
       <div class="club-ath-i">
         <div class="club-ath-n">${a.name}</div>
         <div class="club-ath-m">membre depuis ${a.since} · ${nbInscr} créneau${nbInscr>1?'x':''}</div>
-        ${g?`<span class="club-ath-grp" style="background:${g.color}">${g.name}</span>`:''}
+        <select class="club-ath-grp-sel ${g?'':'none'}" data-aid="${a.id}" style="${g?`--gc:${g.color}`:''}" title="Changer de groupe">${grpOptions}</select>
         <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="Cliquer pour changer de formule">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
         <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="Bientôt disponible — contenu vidéo en cours d'ajout"><i class="ic ic-film"></i> Vidéos <span class="cc-soon" style="margin-left:4px">Bientôt</span></span>
         <span class="club-ath-cal" data-caid="${a.id}" title="Ouvrir le calendrier d'entraînement de cet athlète"><i class="ic ic-calendar"></i> Calendrier</span>
         ${minorChip(a)}
+        ${licenceChip(a)}
       </div>
-      <span class="club-ath-tag ${a.disc==='hyrox'?'hyrox':''}">${a.disc==='hyrox'?'Hyrox':'Tri'}</span>
+      <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||'Tri'}</span>
     </div>`;
   }).join('') || '<p class="club-hint">Aucun athlète trouvé.</p>';
+  box.innerHTML = banner + rows;
+  const clearBtn = document.getElementById('clubUnassignedClear');
+  if(clearBtn) clearBtn.onclick=()=>{ clubOnlyUnassigned=false; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
+  box.querySelectorAll('.club-ath-grp-sel').forEach(sel=>sel.onchange=()=>{
+    const a=CLUB_ATHLETES.find(x=>x.id===sel.dataset.aid); if(!a) return;
+    a.group = sel.value || null;
+    renderClubAthletes(filter);
+    renderClubStats();
+    toast(`${a.name} → ${a.group?clubGroup(a.group).name:'Sans groupe'}`);
+    if(window.PF?.user && window.__pf_clubId){
+      PF.assignMemberGroup(a.id, a.group).catch(e=>console.warn('[PF] assignMemberGroup échoué :',e));
+    }
+  });
   box.querySelectorAll('.club-ath-offer').forEach(el=>el.onclick=()=>{
     const a=CLUB_ATHLETES.find(x=>x.id===el.dataset.aid); if(!a) return;
-    const order=['dropin','sub','coach']; a.offer=order[(order.indexOf(a.offer)+1)%order.length];
+    const order=['sub','coach']; a.offer=order[(order.indexOf(a.offer)+1)%order.length];
     if(a.offer==='coach' && !a.coach) a.coach='Karim';
     renderClubAthletes(filter); renderClubStats();
     toast(`${a.name} → ${clubOffer(a.offer).name}`);
@@ -6424,10 +6476,66 @@ function renderClubAthletes(filter){
     toast('Bibliothèque vidéo bientôt disponible — contenu en cours d\'ajout');
   });
   box.querySelectorAll('.club-ath-minor').forEach(el=>el.onclick=()=> openConsent(el.dataset.maid, filter));
+  box.querySelectorAll('.club-ath-licence').forEach(el=>el.onclick=()=> openLicence(el.dataset.lid, filter));
   box.querySelectorAll('.club-ath-cal').forEach(el=>el.onclick=()=>{
     const a=CLUB_ATHLETES.find(x=>x.id===el.dataset.caid); if(a) openClubAthleteCalendar(a);
   });
 }
+let clubLicenceOnly = false;
+function licenceStatus(a){
+  if(!a.licence || !a.licence.medCertUntil) return 'missing';
+  const days = Math.round((new Date(a.licence.medCertUntil) - new Date())/86400000);
+  if(days<0) return 'expired';
+  if(days<=60) return 'soon';
+  return 'ok';
+}
+function renderLicenceAlert(){
+  const box=document.getElementById('licenceAlert'); if(!box) return;
+  const n = CLUB_ATHLETES.filter(a=>licenceStatus(a)!=='ok').length;
+  if(!n){ box.innerHTML=''; return; }
+  box.innerHTML = `<div class="grp-unassigned-banner" id="licenceAlertBanner"><span><b>${n}</b> licence${n>1?'s':''} à traiter (certificat manquant, à renouveler ou expiré)</span><span>${clubLicenceOnly?'✕ Tout afficher':'Voir →'}</span></div>`;
+  const bn=document.getElementById('licenceAlertBanner');
+  if(bn) bn.onclick=()=>{ clubLicenceOnly=!clubLicenceOnly; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
+}
+
+/* Chip « licence fédérale / certificat médical » sur chaque fiche athlète club. */
+function licenceChip(a){
+  const st = licenceStatus(a);
+  const fed = a.licence?.fed || '';
+  if(st==='ok') return `<span class="club-ath-licence ok" data-lid="${a.id}" title="Licence ${fed} à jour — cliquer pour voir/modifier"><i class="ic ic-check"></i> ${fed} · à jour</span>`;
+  if(st==='soon') return `<span class="club-ath-licence soon" data-lid="${a.id}" title="Certificat médical ${fed} à renouveler bientôt — cliquer pour modifier"><i class="ic ic-alert-triangle"></i> ${fed} · à renouveler</span>`;
+  if(st==='expired') return `<span class="club-ath-licence warn" data-lid="${a.id}" title="Certificat médical ${fed} expiré — cliquer pour modifier"><i class="ic ic-alert-triangle"></i> ${fed} · expiré</span>`;
+  return `<span class="club-ath-licence" data-lid="${a.id}" title="Aucune licence enregistrée — cliquer pour renseigner">Licence ?</span>`;
+}
+
+/* ---- Modal licence & certificat médical ---- */
+let licenceAthId = null, licenceFilter = null;
+function openLicence(aid, filter){
+  const a = CLUB_ATHLETES.find(x=>x.id===aid); if(!a) return;
+  licenceAthId = aid; licenceFilter = filter;
+  document.getElementById('licenceAthName').textContent = a.name;
+  document.getElementById('licFed').value = a.licence?.fed || (a.disc==='bike'?'FFC':'FFTri');
+  document.getElementById('licNum').value = a.licence?.num || '';
+  document.getElementById('licCert').value = a.licence?.medCertUntil || '';
+  document.getElementById('licenceOverlay').classList.add('open');
+}
+function saveLicence(){
+  const a = CLUB_ATHLETES.find(x=>x.id===licenceAthId); if(!a) return;
+  const fed = document.getElementById('licFed').value;
+  const num = document.getElementById('licNum').value.trim();
+  const cert = document.getElementById('licCert').value;
+  if(!num && !cert){ delete a.licence; }
+  else { a.licence = {fed, num, medCertUntil: cert||null}; }
+  document.getElementById('licenceOverlay').classList.remove('open');
+  renderClubAthletes(licenceFilter);
+  toast(`Licence mise à jour pour ${a.name}`);
+}
+(function initLicence(){
+  const ov=document.getElementById('licenceOverlay'); if(!ov) return;
+  document.getElementById('licSave').addEventListener('click', saveLicence);
+  document.getElementById('licenceClose').addEventListener('click', ()=> ov.classList.remove('open'));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+})();
 
 /* Chip « mineur / consentement parental » sur chaque fiche athlète club. */
 function minorConsentOk(a){ return !!(a.consentAt || a.guardian_consent_at); }
@@ -6505,7 +6613,7 @@ function renderJoinRequests(){
       <div class="join-req" data-id="${r.id}">
         <div class="join-av">${initials(r.name)}</div>
         <div class="join-i">
-          <div class="join-n">${r.name} <span class="club-ath-tag ${r.disc==='hyrox'?'hyrox':''}" style="margin-left:5px">${r.disc==='hyrox'?'Hyrox':'Tri'}</span></div>
+          <div class="join-n">${r.name} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||'Tri'}</span></div>
           <div class="join-m">${r.msg||'Souhaite rejoindre le club'}</div>
         </div>
         <div class="join-acts">
@@ -6571,7 +6679,7 @@ document.getElementById('inviteWhatsapp').onclick=()=>{
 };
 document.getElementById('inviteSimulate').onclick=()=>{
   const name=DEMO_NAMES[demoNameIdx % DEMO_NAMES.length]; demoNameIdx++;
-  JOIN_REQUESTS.push({id:'r'+Date.now(), name, disc: Math.random()>0.5?'tri':'hyrox', msg:'Souhaite rejoindre le club via le lien'});
+  JOIN_REQUESTS.push({id:'r'+Date.now(), name, disc: Math.random()>0.5?'tri':'bike', msg:'Souhaite rejoindre le club via le lien'});
   renderClubAthletes();
   toast(`Nouvelle demande reçue : ${name}`);
 };
@@ -6614,7 +6722,10 @@ document.getElementById('clubAthleteSearch').addEventListener('input', e=> rende
 /* ---- Groupes ---- */
 function renderGroups(){
   const box=document.getElementById('groupList');
-  box.innerHTML = CLUB_GROUPS.map(g=>{
+  const unassigned = CLUB_ATHLETES.filter(a=>!a.group);
+  const banner = unassigned.length
+    ? `<div class="grp-unassigned-banner" id="grpUnassignedBanner"><span><b>${unassigned.length}</b> athlète${unassigned.length>1?'s':''} sans groupe</span><span>Voir →</span></div>` : '';
+  const cards = CLUB_GROUPS.map(g=>{
     const members=CLUB_ATHLETES.filter(a=>a.group===g.id);
     const avs = members.slice(0,8).map(a=>`<div class="group-av" title="${a.name}">${initials(a.name)}</div>`).join('')
       + (members.length>8?`<div class="group-av more">+${members.length-8}</div>`:'');
@@ -6628,6 +6739,9 @@ function renderGroups(){
       <div class="group-avs">${avs||'<span class="group-desc">Aucun athlète affecté</span>'}</div>
     </div>`;
   }).join('') || '<p class="club-hint">Aucun groupe. Crée le premier !</p>';
+  box.innerHTML = banner + cards;
+  const bn = document.getElementById('grpUnassignedBanner');
+  if(bn) bn.onclick=()=>{ clubOnlyUnassigned=true; clubView='athletes'; switchClubView(); };
   box.querySelectorAll('.group-card').forEach(card=>{
     card.querySelector('[data-act="editgroup"]').onclick=()=> openGroupModal(card.dataset.id);
   });
@@ -6650,12 +6764,24 @@ function openGroupModal(id){
   document.querySelectorAll('.grp-color').forEach(el=> el.onclick=()=>{
     document.querySelectorAll('.grp-color').forEach(x=>x.classList.remove('sel')); el.classList.add('sel');
   });
-  // membres (cases à cocher)
-  document.getElementById('grpMembers').innerHTML = CLUB_ATHLETES.map(a=>{
+  // membres (cases à cocher) — triés : ce groupe d'abord, puis sans groupe, puis autre groupe
+  const bucket = a => (g && a.group===g.id) ? 0 : (!a.group ? 1 : 2);
+  const sorted = [...CLUB_ATHLETES].sort((a,b)=> bucket(a)-bucket(b) || a.name.localeCompare(b.name));
+  document.getElementById('grpMembers').innerHTML = sorted.map(a=>{
     const checked = g && a.group===g.id;
-    return `<label class="grp-mem"><input type="checkbox" data-aid="${a.id}" ${checked?'checked':''}>
-      <span class="gm-av">${initials(a.name)}</span><span class="gm-n">${a.name}</span></label>`;
+    const other = (a.group && (!g || a.group!==g.id)) ? clubGroup(a.group) : null;
+    return `<label class="grp-mem" data-name="${a.name.toLowerCase()}"><input type="checkbox" data-aid="${a.id}" ${checked?'checked':''}>
+      <span class="gm-av">${initials(a.name)}</span><span class="gm-n">${a.name}</span>
+      ${other?`<span class="grp-mem-other" style="border-color:${other.color}">déjà dans ${other.name}</span>`:''}</label>`;
   }).join('');
+  const search = document.getElementById('grpMemberSearch');
+  search.value = '';
+  search.oninput = ()=>{
+    const q = search.value.trim().toLowerCase();
+    document.querySelectorAll('#grpMembers .grp-mem').forEach(el=>{
+      el.style.display = (!q || el.dataset.name.includes(q)) ? '' : 'none';
+    });
+  };
   groupOverlay.classList.add('open');
 }
 document.getElementById('clubAddGroup').onclick=()=> openGroupModal(null);
@@ -6808,9 +6934,6 @@ document.getElementById('clubAddCreneau').onclick=()=>{
 };
 document.getElementById('creneauClose').onclick=()=> creneauOverlay.classList.remove('open');
 creneauOverlay.addEventListener('click', e=>{ if(e.target===creneauOverlay) creneauOverlay.classList.remove('open'); });
-document.getElementById('crDisc').addEventListener('change', e=>{
-  if(e.target.value==='hyrox'){ document.getElementById('crPrice').value=15; }
-});
 document.getElementById('crSave').onclick=()=>{
   const c={
     id:'c'+Date.now(),
@@ -6854,6 +6977,7 @@ function renderClub(){
 renderSidebar();
 render();
 updateVideolibVisibility();
+if(typeof SillanceTour!=='undefined') SillanceTour.init();
 
 /* ---- Hook d'intégration backend (Sillance cloud) — non destructif ----
    Expose les globales et les fonctions de rendu pour que la couche
