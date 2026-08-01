@@ -1227,6 +1227,7 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .ck-dispo-seg button{display:flex;align-items:center;justify-content:center;gap:4px;padding:7px 3px;font-size:11px;font-weight:600;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:8px;cursor:pointer}
 .ck-dispo-seg button .ic{width:12px;height:12px}
 .ck-dispo-seg button.sel{color:var(--dc);border-color:var(--dc);background:color-mix(in srgb, var(--dc) 14%, transparent)}
+.wp-feel-seg{grid-template-columns:repeat(3,minmax(0,1fr))}
 .ck-dispo textarea{width:100%;box-sizing:border-box;margin-top:8px;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;min-height:44px}
 .ck-hrv label{display:flex;justify-content:space-between;align-items:center}
 .ck-hrv-opt{font-size:9.5px;letter-spacing:.05em;color:var(--muted);font-weight:600;text-transform:none}
@@ -2282,6 +2283,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="wk-int" id="weekIntensity" hidden></div>
       <div class="taper-hint" id="taperHint" hidden></div>
       <div class="taper-hint" id="weekRiskHint" hidden></div>
+      <div class="sn-block" id="weekPulse" style="margin:0 0 12px" hidden></div>
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-guides" aria-hidden="true"><div class="cg-cols" id="calCols"></div><div class="cg-rows"></div></div>
     </section>
@@ -3730,9 +3732,43 @@ function coachGuideHTML(){
         <button class="sg-cta" id="sgCta">Créer ma première séance</button>
       </div>`;
 }
+/* ============================================================
+   RADAR "QUI A BESOIN DE MOI CETTE SEMAINE"
+   ------------------------------------------------------------
+   Trie le roster par urgence au lieu de forcer le coach à cliquer
+   athlète par athlète. Volontairement basé UNIQUEMENT sur des signaux
+   fiables en démo ET en réel (checkin du jour, refs physio) — pas sur
+   l'adhérence (a.comp), qui n'existe que côté démo et donnerait une
+   fausse impression de fiabilité pour un vrai coach.
+   ============================================================ */
+function athNeedScore(a){
+  let score=0; const reasons=[];
+  const dk = athDispo(a);
+  if(dk==='blesse'){ score+=100; reasons.push('Blessé'); }
+  else if(dk==='malade'){ score+=70; reasons.push('Malade'); }
+  else if(dk==='fatigue'){ score+=40; reasons.push('Fatigué'); }
+  const forme = athForme(a);
+  if(forme!=null && forme<55){ score+=30; reasons.push(`Forme basse (${forme}%)`); }
+  const hs = a.checkin && hrvStatus(a.checkin.hrv, ATHLETE_REF.hrvBase);
+  if(hs && hs.level==='low'){ score+=35; reasons.push('HRV basse'); }
+  if(a.refsUpdatedAt){
+    const days = Math.floor((Date.now()-new Date(a.refsUpdatedAt).getTime())/86400000);
+    if(days>=90){ score+=15; reasons.push(`Zones à retester (${days} j)`); }
+  }
+  if(!a.checkin){ score+=8; reasons.push("Pas de check-in aujourd'hui"); }
+  return {score, reasons};
+}
+function needRadarHTML(){
+  if(!ROSTER.length) return '';
+  const scored = ROSTER.map(a=>({a, ...athNeedScore(a)})).filter(x=>x.score>0).sort((x,y)=>y.score-x.score).slice(0,5);
+  if(!scored.length) return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-check"></i> Qui a besoin de toi</div><p class="club-hint">Rien d'urgent — le roster est propre aujourd'hui.</p></div>`;
+  return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-alert-triangle"></i> Qui a besoin de toi cette semaine</div>
+    ${scored.map(({a,reasons})=>`<div class="sn-item" style="cursor:pointer" data-need-aid="${a.id}"><div class="sn-when">${dispoSafe(a.name)}</div><div class="sn-txt">${reasons.map(dispoSafe).join(' · ')}</div></div>`).join('')}
+  </div>`;
+}
 function renderSidebar(){
   if(mode==='coach'){
-    sidebarContent.innerHTML = coachGuideHTML() + `
+    sidebarContent.innerHTML = coachGuideHTML() + needRadarHTML() + `
       <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> Suivi de mes athlètes</button>
       <button class="btn adh-open-btn" id="inviteAthOpen" style="margin-top:8px"><i class="ic ic-user-plus"></i> Inviter un athlète</button>
       <h2>Bibliothèque</h2>
@@ -3773,6 +3809,10 @@ function renderSidebar(){
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
     var _sgCta=document.getElementById('sgCta'); if(_sgCta) _sgCta.onclick=function(){ openBuilder(null,null); };
     var _adhOpen=document.getElementById('adhOpen'); if(_adhOpen) _adhOpen.onclick=openAdherence;
+    sidebarContent.querySelectorAll('[data-need-aid]').forEach(el=> el.onclick=()=>{
+      const idx = ROSTER.findIndex(x=>x.id===el.dataset.needAid);
+      if(idx>-1){ selectAthlete(idx); render(); }
+    });
     var _invAthOpen=document.getElementById('inviteAthOpen'); if(_invAthOpen) _invAthOpen.onclick=openInviteAthlete;
     buildCycles(document.getElementById('cycleList'));
     document.getElementById('createCycleBtn').addEventListener('click', ()=> openCycleBuilder(null));
@@ -5057,6 +5097,7 @@ function render(){
   renderWeekIntensity(mon);
   renderTaperHint(race, mon);
   renderWeekRiskHint(mon);
+  renderWeekPulse(mon);
   if(typeof wireSessionVideos==='function') wireSessionVideos();
 }
 
@@ -5106,6 +5147,92 @@ function renderWeekRiskHint(mon){
   if(!findings.length){ el.hidden=true; return; }
   el.hidden=false;
   el.innerHTML = `<i class="ic ic-alert-triangle"></i><div class="th-txt"><b>Répartition à vérifier cette semaine.</b> ${findings.slice(0,3).join(' ')}</div>`;
+}
+
+/* ============================================================
+   FEEDBACK HEBDO BIDIRECTIONNEL
+   ------------------------------------------------------------
+   Bilan croisé de la semaine affichée dans le calendrier : ressenti +
+   note de l'athlète (charge perçue), note du coach — chacun écrit dans
+   sa vue, lit l'autre en lecture seule. Indexé par id athlète + lundi
+   de semaine ISO, comme les débriefs de course.
+   ============================================================ */
+let WEEK_PULSES = {}; // clé "athleteId|weekMondayIso" -> {athleteFeel, athleteNote, coachNote}
+const WEEK_FEELS = { hard:{l:'Trop dur', c:'var(--run)'}, ok:{l:'Bien calibré', c:'var(--good)'}, easy:{l:'Trop facile', c:'var(--bike)'} };
+/* id de l'athlète concerné par la vue courante : soi-même en vue Athlète,
+   l'athlète suivi en vue Coach (démo ou réel). null en vue Club. */
+function activeAthleteKey(){
+  if(mode==='coach'){
+    if(rosterIsReal) return currentAthleteId;
+    return (ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].id) || null;
+  }
+  if(mode==='athlete') return myDebriefKey();
+  return null;
+}
+function renderWeekPulse(mon){
+  const el = document.getElementById('weekPulse'); if(!el) return;
+  const key = activeAthleteKey();
+  if(!key){ el.hidden=true; return; }
+  const wk = iso(mon);
+  const ck = key+'|'+wk;
+  const p = WEEK_PULSES[ck] || {};
+  el.hidden = false;
+  el.innerHTML = `
+    <div class="sn-head"><i class="ic ic-message-circle"></i> Bilan de la semaine</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div class="sn-when" style="margin-bottom:6px">Ressenti de l'athlète</div>
+        ${mode==='athlete' ? `
+          <div class="wp-feel-seg ck-dispo-seg" id="wpFeelSeg">${Object.entries(WEEK_FEELS).map(([k,f])=>`<button type="button" data-feel="${k}" class="${p.athleteFeel===k?'sel':''}" style="--dc:${f.c}">${f.l}</button>`).join('')}</div>
+          <textarea id="wpAthNote" rows="2" placeholder="Comment s'est passée ta semaine…" style="width:100%;box-sizing:border-box;margin-top:6px">${p.athleteNote?dispoSafe(p.athleteNote):''}</textarea>
+          <button class="btn" id="wpAthSave" style="margin-top:6px">Enregistrer mon bilan</button>
+        ` : (p.athleteFeel||p.athleteNote) ? `
+          <div class="sn-txt">${p.athleteFeel&&WEEK_FEELS[p.athleteFeel]?`<b style="color:${WEEK_FEELS[p.athleteFeel].c}">${WEEK_FEELS[p.athleteFeel].l}</b>${p.athleteNote?' — ':''}`:''}${p.athleteNote?dispoSafe(p.athleteNote):''}</div>
+        ` : `<p class="club-hint">Pas encore de bilan de l'athlète pour cette semaine.</p>`}
+      </div>
+      <div>
+        <div class="sn-when" style="margin-bottom:6px">Note du coach</div>
+        ${mode==='coach' ? `
+          <textarea id="wpCoachNote" rows="2" placeholder="Ta lecture de la semaine pour cet athlète…" style="width:100%;box-sizing:border-box">${p.coachNote?dispoSafe(p.coachNote):''}</textarea>
+          <button class="btn" id="wpCoachSave" style="margin-top:6px">Enregistrer ma note</button>
+        ` : p.coachNote ? `<div class="sn-txt">${dispoSafe(p.coachNote)}</div>` : `<p class="club-hint">Ton coach n'a pas encore laissé de note pour cette semaine.</p>`}
+      </div>
+    </div>`;
+  const fs = document.getElementById('wpFeelSeg');
+  if(fs) fs.querySelectorAll('button').forEach(b=> b.onclick=()=> fs.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b)));
+  const as = document.getElementById('wpAthSave');
+  if(as) as.onclick=()=> saveWeekPulseAthlete(key, wk);
+  const cs = document.getElementById('wpCoachSave');
+  if(cs) cs.onclick=()=> saveWeekPulseCoach(key, wk);
+  // chargement réel à la demande (une fois par semaine consultée, pas à chaque re-render)
+  if(window.PF?.user && !WEEK_PULSES['_f_'+ck]){
+    WEEK_PULSES['_f_'+ck] = true;
+    PF.getWeekPulse(key, wk).then(row=>{
+      if(row){ WEEK_PULSES[ck] = { athleteFeel: row.athlete_feel, athleteNote: row.athlete_note, coachNote: row.coach_note };
+        renderWeekPulse(mondayOf(weekOffset)); }
+    }).catch(e=> console.warn('[PF] getWeekPulse :', e));
+  }
+}
+function saveWeekPulseAthlete(key, wk){
+  const seg = document.getElementById('wpFeelSeg');
+  const sel = seg && seg.querySelector('button.sel');
+  const feel = sel ? sel.dataset.feel : null;
+  const note = document.getElementById('wpAthNote').value.trim();
+  const ck = key+'|'+wk;
+  const p = WEEK_PULSES[ck] || (WEEK_PULSES[ck]={});
+  p.athleteFeel = feel; p.athleteNote = note;
+  if(window.PF?.user){ PF.saveMyWeekFeel(wk, feel, note).catch(e=> console.warn('[PF] saveMyWeekFeel :', e)); }
+  renderWeekPulse(mondayOf(weekOffset));
+  toast('Bilan de la semaine enregistré');
+}
+function saveWeekPulseCoach(key, wk){
+  const note = document.getElementById('wpCoachNote').value.trim();
+  const ck = key+'|'+wk;
+  const p = WEEK_PULSES[ck] || (WEEK_PULSES[ck]={});
+  p.coachNote = note;
+  if(window.PF?.user && rosterIsReal){ PF.saveCoachWeekNote(key, wk, note).catch(e=> console.warn('[PF] saveCoachWeekNote :', e)); }
+  renderWeekPulse(mondayOf(weekOffset));
+  toast('Note enregistrée');
 }
 
 /* ============================================================
@@ -6035,6 +6162,68 @@ ${gearRows?('<h2>Matériel — usure</h2>'+gearRows):''}
   }catch(e){ console.error('exportBilan',e); if(typeof toast==='function') toast('Export du bilan indisponible'); }
 }
 
+/* Fiche de progression partageable ("case study") : ce que le coach peut
+   montrer à un prospect. Contrairement au Bilan (état des lieux du jour),
+   celle-ci raconte un AVANT/APRÈS sur la période — records améliorés
+   (déjà détectés via isNew), delta de charge (CTL réel via buildLoadWeeks,
+   calculé sur l'historique du planning donc valable en démo ET en réel),
+   adhérence, + une citation courte que le coach écrit lui-même. */
+function exportCaseStudy(name){
+  try{
+    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'Cet athlète');
+    const coachName = (window.PF?.profile?.full_name) || 'Ton coach Sillance';
+    const recs = (typeof RECORDS!=='undefined')?RECORDS:[];
+    const newRecs = recs.filter(r=>r.isNew);
+    const weeks = (typeof buildLoadWeeks==='function') ? buildLoadWeeks() : [];
+    const now = weeks.length ? weeks[weeks.length-1] : null;
+    const before = weeks.length>12 ? weeks[weeks.length-13] : null;
+    const ctlDeltaPct = (now && before && before.ctl) ? Math.round((now.ctl-before.ctl)/before.ctl*100) : null;
+    let done=0, tot=0;
+    for(let i=0;i<84;i++){ const d=iso(addDays(new Date(),-i)); (planning[d]||[]).forEach(s=>{ tot++; if(s.done) done++; }); }
+    const adherence = tot ? Math.round(done/tot*100) : null;
+    const quote = (prompt("Un mot sur ce cycle avec "+name+" (optionnel, apparaît sur la fiche) :", "") || '').trim();
+    const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+    const recRows = newRecs.length ? newRecs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v acc">${esc(r.v)}</span></div>`).join('') : '';
+    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Progression — ${esc(name)}</title><style>
+@page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
+.wm{font:800 20px/1 system-ui;letter-spacing:.05em;color:#0B1120}.wm b{color:#0F9FBF}
+.hd .r{text-align:right;font-size:11px;color:#5a6a86}
+.kicker{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:#0F9FBF;font-weight:800;margin-top:18px}
+h1{font-size:26px;font-weight:800;margin:4px 0 14px;color:#0B1120}
+.hero{border:1px solid #d8dfec;border-radius:14px;padding:22px;background:#f3fbfd;text-align:center;margin-bottom:16px}
+.hero .v{font:800 40px/1 system-ui;color:#0F9FBF}.hero .k{font-size:12px;color:#5a6a86;margin-top:8px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.kpi{border:1px solid #d8dfec;border-radius:9px;padding:12px 13px;text-align:center}.kpi .v{font:800 22px/1 system-ui}.kpi .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#5a6a86;margin-top:6px}
+.acc{color:#0F9FBF}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#0B1120;border-bottom:1px solid #d8dfec;padding-bottom:5px;margin:18px 0 8px}
+.row{display:flex;justify-content:space-between;border-bottom:1px dotted #e6ebf3;padding:4px 0;font-size:12.5px}.row .l{color:#5a6a86}.row .v{font-weight:700}
+.quote{font-size:14px;font-style:italic;color:#0B1120;border-left:3px solid #0F9FBF;padding:4px 0 4px 14px;margin-top:16px}
+.foot{margin-top:22px;border-top:1px solid #d8dfec;padding-top:9px;font-size:10px;color:#8593ad;display:flex;justify-content:space-between}
+</style></head><body>
+<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">Fiche de progression<br>${today}</div></div>
+<div class="kicker">Coaching par ${esc(coachName)}</div>
+<h1>${esc(name)}</h1>
+${ctlDeltaPct!=null ? `<div class="hero"><div class="v">${ctlDeltaPct>0?'+':''}${ctlDeltaPct}%</div><div class="k">de charge d'entraînement absorbée en 12 semaines</div></div>` : ''}
+<div class="kpis">
+  <div class="kpi"><div class="v acc">${newRecs.length}</div><div class="k">Record${newRecs.length>1?'s':''} amélioré${newRecs.length>1?'s':''}</div></div>
+  <div class="kpi"><div class="v">${adherence==null?'—':adherence+'%'}</div><div class="k">Adhérence au plan</div></div>
+  <div class="kpi"><div class="v">${now?now.ctl:'—'}</div><div class="k">Fitness (CTL) actuelle</div></div>
+</div>
+${recRows?(`<h2>Records battus sur la période</h2>${recRows}`):''}
+${quote?(`<div class="quote">« ${esc(quote)} »<br><span style="font-style:normal;font-size:11px;color:#5a6a86">— ${esc(coachName)}</span></div>`):''}
+<div class="foot"><span>Généré par Sillance — ${today}</span><span>sillance.app</span></div>
+</body></html>`;
+    const w=window.open('','_blank');
+    if(!w){ if(typeof toast==='function') toast('Autorise les pop-ups pour exporter la fiche'); return; }
+    w.document.write(html); w.document.close();
+    const go=()=>{ try{ w.focus(); w.print(); }catch(e){} };
+    if(w.document.readyState==='complete') setTimeout(go,300); else w.onload=()=>setTimeout(go,300);
+  }catch(e){ console.error('exportCaseStudy',e); if(typeof toast==='function') toast('Export indisponible'); }
+}
+
 function renderCoachBand(){
   const band = document.getElementById('coachBand'); if(!band) return;
   const a = ROSTER[selectedAthleteIdx]; if(!a){ band.innerHTML=''; return; }
@@ -6083,6 +6272,7 @@ function renderCoachBand(){
         <div class="cb-name">${a.name}</div>
         ${a.race?`<div class="cb-race"><i class="ic ic-flag"></i>${a.race.name} <b>J–${a.race.days}</b></div>`:''}
         <button class="cb-bilan" id="bilanBtn" title="Exporter le bilan de l'athlète en PDF"><i class="ic ic-download"></i> Bilan PDF</button>
+        <button class="cb-bilan" id="caseStudyBtn" title="Fiche de progression partageable (records, charge, adhérence)"><i class="ic ic-sparkles"></i> Étude de cas</button>
         <button class="cb-bilan" id="zonesBtn" title="Personnaliser les zones de travail de l'athlète"><i class="ic ic-target"></i> Zones</button>
         <button class="cb-bilan" id="profileBtn" title="VO2max, parcours, records, blessures, habitudes"><i class="ic ic-user"></i> Fiche athlète</button>
       </div>
@@ -6110,6 +6300,7 @@ function renderCoachBand(){
     </div>
     <div class="cb-flags">${flags.join('')}</div>`;
   const _bb=document.getElementById('bilanBtn'); if(_bb) _bb.onclick=()=>exportBilan(a.name);
+  const _csb=document.getElementById('caseStudyBtn'); if(_csb) _csb.onclick=()=>exportCaseStudy(a.name);
   const _zb=document.getElementById('zonesBtn'); if(_zb) _zb.onclick=()=>openZoneEditor();
   const _pb=document.getElementById('profileBtn'); if(_pb) _pb.onclick=()=>openAthleteProfile(a.id);
 }
