@@ -3297,7 +3297,10 @@ const ATHLETE_REF = {
   // — HRV (variabilité de fréquence cardiaque, rMSSD ms) — base de repos
   //   sur 7 jours, sert de référence pour détecter une chute. null = l'athlète
   //   ne suit pas le HRV. Renseignée par la montre/bracelet ou à la main.
-  hrvBase: 62
+  hrvBase: 62,
+  // Dernière modification des références physio (demo : ancienne, pour
+  // illustrer le rappel de retest). En prod, vient de athlete_profiles.updated_at.
+  updatedAt: new Date(Date.now()-1000*60*60*24*132).toISOString()
 };
 /* Statut HRV du matin par rapport à la base 7 j : une baisse marquée
    (< 92 % de la base) = stress/fatigue/début d'infection → à surveiller. */
@@ -3454,28 +3457,28 @@ function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${Str
    remplace la démo via setCoachAthletes().
    ============================================================ */
 const COACH_ROSTER = [
- {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8,cyclePhase:'follicular',cycleDay:9}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,
+ {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8,cyclePhase:'follicular',cycleDay:9}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,  refsUpdatedAt:new Date(Date.now()-1000*60*60*24*10).toISOString(),
   gear:[
     {id:'g1', type:'shoe', name:'Nike Pegasus 40', km:612, max:900, price:130, cat:'daily', comm:870, notified:[540]},
     {id:'g2', type:'shoe', name:'Saucony Endorphin Speed 4', km:284, max:650, price:180, cat:'tempo', comm:630, notified:[]},
     {id:'g3', type:'shoe', name:'Asics Metaspeed Sky Paris', km:118, max:350, price:250, cat:'race', comm:320, notified:[]},
     {id:'g4', type:'bike', name:'Canyon Ultimate CF', km:4380, max:20000, price:3200, cat:null, comm:null, notified:[]},
   ]},
- {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',dispoNote:'Grosse semaine de boulot, jambes lourdes',hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55,
+ {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',dispoNote:'Grosse semaine de boulot, jambes lourdes',hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*210).toISOString(),
   gear:[
     {id:'g5', type:'shoe', name:'Adidas Boston 12', km:723, max:700, price:150, cat:'tempo', comm:660, notified:[420,595,700]},
     {id:'g6', type:'shoe', name:'Adidas Ultraboost Light', km:214, max:850, price:180, cat:'daily', comm:800, notified:[]},
   ]},
- {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8,cyclePhase:'luteal',cycleDay:24}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95,
+ {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8,cyclePhase:'luteal',cycleDay:24}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*25).toISOString(),
   gear:[
     {id:'g7', type:'shoe', name:'Puma Deviate Nitro 3', km:405, max:700, price:160, cat:'tempo', comm:650, notified:[420]},
   ]},
- {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',dispoNote:'Douleur tibia droit depuis lundi, 4/10 en courant',hrv:60}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70,
+ {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',dispoNote:'Douleur tibia droit depuis lundi, 4/10 en courant',hrv:60}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*104).toISOString(),
   gear:[
     {id:'g8', type:'shoe', name:'Asics Novablast 5', km:648, max:750, price:150, cat:'tempo', comm:710, notified:[450,638]},
     {id:'g9', type:'bike', name:'BMC Roadmachine', km:2150, max:20000, price:2400, cat:null, comm:null, notified:[]},
   ]},
- {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9,cyclePhase:'menstrual',cycleDay:2}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,
+ {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9,cyclePhase:'menstrual',cycleDay:2}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,  refsUpdatedAt:new Date(Date.now()-1000*60*60*24*45).toISOString(),
   gear:[]},
  {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',dispoNote:'Rhume, gorge prise — nuit hachée',hrv:48}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35,
   gear:[]},
@@ -3533,7 +3536,7 @@ function setCoachAthletes(list, defaultId){
   // athlètes de démonstration (Léa, Marc…) comme si c'étaient les siens.
   ROSTER = (list||[]).map(a=>({ id:a.id, name:a.name,
     ini:(a.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
-    color:'#46C2D8', checkin:a.checkin||null, race:null }));
+    color:'#46C2D8', checkin:a.checkin||null, race:null, refsUpdatedAt:a.refsUpdatedAt||null }));
   rosterIsReal = true;
   selectedAthleteIdx = ROSTER.length ? Math.max(0, ROSTER.findIndex(a=>a.id===defaultId)) : 0;
   currentAthleteId = defaultId || (ROSTER[0] && ROSTER[0].id) || null;
@@ -3809,6 +3812,7 @@ function renderSidebar(){
       </div>
       <div class="records" id="refsBlock">
         <h2>Mes références physio</h2>
+        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return "Jamais renseignées."; const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return `Dernière mise à jour&nbsp;: il y a ${days}&nbsp;j${days>=90?' — pense à retester tes zones':''}`; })()}</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
           ${[['ftp','FTP','W'],['pma','PMA','W'],['cpBike','CP vélo','W'],['vma','VMA','km/h'],['cv','VC','km/h'],['seuilRun','Seuil','s/km'],['css','CSS','s/100m'],['fcMax','FC max','bpm'],['fcRepos','FC repos','bpm']].map(([k,l,u])=>`
           <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)"><span>${l} <em style="font-style:normal;opacity:.65">${u}</em></span>
@@ -3908,6 +3912,7 @@ function saveMyRefs(){
     const v = inp.value.trim();
     ATHLETE_REF[inp.dataset.ref] = v==='' ? null : +v;
   });
+  ATHLETE_REF.updatedAt = new Date().toISOString();
   if(window.PF?.user){
     const m = ATHLETE_REF;
     PF.saveAthleteRefs({ ftp:m.ftp, pma:m.pma, cp_bike:m.cpBike, vma:m.vma,
@@ -5476,6 +5481,23 @@ function lineLabel(ln){
 }
 /* section "Consignes du coach par intervalle" : liste les intervalles porteurs
    d'une note. Additif — n'apparaît que si au moins un commentaire existe. */
+const OBJECTIF_META = {
+  endurance:{l:'Endurance fondamentale', ic:'ic-mountain',
+    why:"Construit ta base aérobie : plus de mitochondries, un cœur plus efficace, une meilleure utilisation des graisses. C'est le socle qui rend les séances dures payantes plus tard."},
+  seuil:{l:'Seuil', ic:'ic-zap',
+    why:"Repousse la vitesse/puissance que tu peux tenir longtemps sans t'effondrer — le levier le plus direct pour progresser sur les distances moyennes à longues."},
+  vo2:{l:'VMA / VO2max', ic:'ic-chart',
+    why:"Développe ta capacité aérobie maximale, ta « cylindrée ». Séance courte et intense : elle élève le plafond sur lequel tout le reste s'appuie."},
+  recup:{l:'Récupération', ic:'ic-moon',
+    why:"Laisse le corps encaisser la charge des jours précédents. Sauter ces séances n'accélère pas la progression, ça l'annule."},
+  hyrox:{l:'Hyrox', ic:'ic-dumbbell',
+    why:"Travaille la transition course/effort musculaire — le vrai facteur limitant en Hyrox, plus que chaque discipline isolée."}
+};
+function sessionWhyHTML(s){
+  const type = (s.objectif&&s.objectif.type) || sessionType(s);
+  const m = OBJECTIF_META[type]; if(!m) return '';
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ${m.ic}"></i> Pourquoi cette séance</div><div class="sn-item"><div class="sn-txt">${m.why}</div></div></div>`;
+}
 function sessionNotesHTML(s){
   if(!s.blocksV2 || !s.blocksV2.blocks) return '';
   const items=[];
@@ -5505,6 +5527,7 @@ function openModal(s){
       <div class="cell"><div class="k">Intensité</div><div class="v">${s.zone}</div></div>
     </div>
     <p class="desc">${s.desc||'Séance planifiée.'}</p>
+    ${sessionWhyHTML(s)}
     ${sessionNotesHTML(s)}
     ${(()=>{ const n=nutritionForSession(s); return `
       <div class="nutri-block nutri-pre">
@@ -5929,6 +5952,10 @@ function renderCoachBand(){
   if(cp && (cp==='menstrual' || cp==='luteal' || cp==='ovulation')){
     const cm = CYCLE_META[cp];
     flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>Cycle · ${cm.l} — ${cm.tip}</span>`);
+  }
+  if(a.refsUpdatedAt){
+    const refsAge = Math.floor((Date.now()-new Date(a.refsUpdatedAt).getTime())/86400000);
+    if(refsAge>=90) flags.push(`<span class="cb-flag warn"><i class="ic ic-target"></i>Références physio non retestées depuis ${refsAge} j</span>`);
   }
   if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>Rien à signaler</span>`);
   const ck = a.checkin;
@@ -7159,8 +7186,20 @@ let CHAT_MSGS = [
   {from:'them', text:'Salut coach ! Prêt pour la semaine', t:'08:12'},
   {from:'me',   text:'Yes ! Belle séance de seuil prévue demain.', t:'08:15'}
 ];
-const QUICK_COACH = ['Repose-toi aujourd\'hui','Allège la séance du jour','Bravo pour la séance !','On décale à demain ?','Hydrate-toi bien'];
+const QUICK_COACH_DEFAULT = ['Repose-toi aujourd\'hui','Allège la séance du jour','Bravo pour la séance !','On décale à demain ?','Hydrate-toi bien'];
 const QUICK_ATHLETE = ['Bien récupéré','Jambes fatiguées aujourd\'hui','Séance validée','Une question sur la séance ?'];
+/* Réponses rapides du coach — personnalisables, persistées en local.
+   Le chip "Gérer" ouvre un éditeur texte simple (une réponse par ligne)
+   plutôt qu'une UI dédiée : rapide à livrer, suffisant pour un coach qui
+   gère 20-30 athlètes au clavier. */
+let CHAT_MACROS = (()=>{ try{ const s=JSON.parse(localStorage.getItem('sil_chat_macros')||'null'); return (Array.isArray(s)&&s.length) ? s : QUICK_COACH_DEFAULT.slice(); }catch(e){ return QUICK_COACH_DEFAULT.slice(); } })();
+function manageChatMacros(){
+  const next = prompt('Tes réponses rapides (une par ligne) :', CHAT_MACROS.join('\n'));
+  if(next==null) return;
+  CHAT_MACROS = next.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8);
+  localStorage.setItem('sil_chat_macros', JSON.stringify(CHAT_MACROS));
+  renderChat();
+}
 
 const chatPanel=document.getElementById('chatPanel');
 const chatBody=document.getElementById('chatBody');
@@ -7169,10 +7208,10 @@ function renderChat(){
   chatBody.innerHTML = `<div class="chat-day">Aujourd'hui</div>` + CHAT_MSGS.map(m=>
     `<div class="chat-msg ${m.from}">${m.text}<span class="time">${m.t}</span></div>`).join('');
   chatBody.scrollTop = chatBody.scrollHeight;
-  const quick = (mode==='coach') ? QUICK_COACH : QUICK_ATHLETE;
+  const quick = (mode==='coach') ? CHAT_MACROS : QUICK_ATHLETE;
   const q=document.getElementById('chatQuick');
-  q.innerHTML = quick.map(x=>`<button>${x}</button>`).join('');
-  q.querySelectorAll('button').forEach((b,i)=> b.onclick=()=> sendChat(quick[i]));
+  q.innerHTML = quick.map(x=>`<button>${x}</button>`).join('') + (mode==='coach' ? `<button id="chatMacroManage" title="Personnaliser tes réponses rapides"><i class="ic ic-edit"></i> Gérer</button>` : '');
+  q.querySelectorAll('button').forEach((b,i)=>{ if(b.id==='chatMacroManage') b.onclick=manageChatMacros; else b.onclick=()=> sendChat(quick[i]); });
   document.getElementById('chatPeerName').textContent = (mode==='coach')?'Romain D.':'Coach';
   document.getElementById('chatAvatar').textContent = (mode==='coach')?'RD':'CO';
 }
