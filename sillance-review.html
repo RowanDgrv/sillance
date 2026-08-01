@@ -487,6 +487,13 @@ body.grid-on .cal-guides{opacity:1}
 }
 .session:hover .del{opacity:1}
 .session .del:hover{color:var(--run);background:rgba(255,84,112,.12)}
+.session .note-btn{position:absolute;top:6px;right:26px;width:18px;height:18px;border-radius:6px;
+  border:none;background:transparent;color:var(--muted);opacity:0;transition:.15s;
+  display:flex;align-items:center;justify-content:center}
+.session .note-btn .ic{width:11px;height:11px}
+.session:hover .note-btn{opacity:1}
+.session .note-btn:hover{color:var(--swim);background:rgba(70,194,216,.12)}
+.session .note-btn.has-note{opacity:1;color:var(--swim)}
 .session.done{opacity:.55}
 .session.done .t{text-decoration:line-through}
 .done-chip{
@@ -2188,6 +2195,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <section class="calendar" aria-label="Calendrier d'entraînement">
       <div class="wk-int" id="weekIntensity" hidden></div>
       <div class="taper-hint" id="taperHint" hidden></div>
+      <div class="taper-hint" id="weekRiskHint" hidden></div>
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-guides" aria-hidden="true"><div class="cg-cols" id="calCols"></div><div class="cg-rows"></div></div>
     </section>
@@ -2699,8 +2707,30 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 
       <div class="b-fld"><label>Habitudes alimentaires</label><textarea id="profDiet" rows="2" placeholder="Allergies, régime, préférences…"></textarea></div>
       <div class="b-fld"><label>Habitudes de vie / travail</label><textarea id="profWork" rows="2" placeholder="Horaires, métier physique ou sédentaire, contraintes…"></textarea></div>
+      <div class="b-fld"><label>Débriefs de course (remplis par l'athlète)</label><div id="profDebriefs"></div></div>
     </div>
     <button class="btn" id="profileSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer la fiche</button>
+  </div>
+</div>
+
+<div class="overlay" id="debriefOverlay" role="dialog" aria-modal="true" aria-label="Débrief de course">
+  <div class="modal group-modal">
+    <button class="close" id="debriefClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--run)"><i class="ic ic-flag"></i> Débrief de course</span>
+    <h3>Comment s'est passée ta course&nbsp;?</h3>
+    <div class="cr-form">
+      <div class="b-fld"><label>Course</label><input type="text" id="dbRace" placeholder="Ex. Gorillaman Sprint"></div>
+      <div class="b-fld"><label>Date</label><input type="date" id="dbDate"></div>
+      <div class="b-fld"><label>Résultat / temps</label><input type="text" id="dbResult" placeholder="Ex. 1h12, ou position au général"></div>
+      <div class="b-fld"><label>Ressenti général</label><textarea id="dbFelt" rows="2" placeholder="Comment tu t'es senti pendant la course…"></textarea></div>
+      <div class="b-fld"><label>Nutrition suivie comme prévu&nbsp;?</label>
+        <select id="dbNutrition"><option value="oui">Oui</option><option value="partiel">Partiellement</option><option value="non">Non</option></select>
+      </div>
+      <div class="b-fld"><label>Météo</label><input type="text" id="dbWeather" placeholder="Ex. chaud, pluie, vent…"></div>
+      <div class="b-fld"><label>Ce qui a bien marché</label><textarea id="dbGood" rows="2"></textarea></div>
+      <div class="b-fld"><label>Ce qui a coincé</label><textarea id="dbBad" rows="2"></textarea></div>
+    </div>
+    <button class="btn" id="debriefSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer mon débrief</button>
   </div>
 </div>
 
@@ -3557,6 +3587,35 @@ function athleteProfile(aid){
   if(!ATHLETE_PROFILES[aid]) ATHLETE_PROFILES[aid] = {vo2max:null, background:'', records:[], injuries:[], diet:'', work:''};
   return ATHLETE_PROFILES[aid];
 }
+
+/* ============================================================
+   DÉBRIEF POST-COURSE — journal de course de l'athlète
+   ------------------------------------------------------------
+   Indexé par id athlète (comme ATHLETE_PROFILES) : sert à la fois la vue
+   Athlète (ses propres débriefs) et la Fiche athlète du coach (lecture
+   seule). Persisté côté réel (table race_debriefs) ; en démo, un seul
+   débrief d'exemple sur Léa (a1) pour montrer la fonctionnalité.
+   ============================================================ */
+let RACE_DEBRIEFS = { a1: [
+  { race:"Gorillaman · Sprint 2025", date:'2025-06-14', result:"1h12'30",
+    felt:"Très bon négatif split sur la course à pied, jambes fraîches jusqu'au bout.",
+    nutrition:'oui', weather:'Chaud, 27°C, peu de vent',
+    good:'Transition vélo → course fluide, pas de point de côté.',
+    bad:'Crampe au mollet gauche dans les 2 derniers km.' }
+]};
+function debriefsFor(aid){ return RACE_DEBRIEFS[aid] || (RACE_DEBRIEFS[aid]=[]); }
+/* clé de "mes" débriefs en vue Athlète : mon id réel une fois connecté,
+   sinon Léa (a1) en démo (c'est elle qu'incarne la vue Athlète démo). */
+function myDebriefKey(){ return (window.PF?.user) ? PF.user.id : 'a1'; }
+function debriefItemHTML(d){
+  const bits=[]; if(d.result) bits.push(dispoSafe(d.result)); if(d.felt) bits.push(dispoSafe(d.felt));
+  return `<div class="sn-item"><div class="sn-when">${dispoSafe(d.race)} — ${d.date?fmtDateFr(new Date(d.date+'T12:00:00')):''}</div><div class="sn-txt">${bits.join(' · ')||'—'}</div></div>`;
+}
+function debriefsBlockHTML(list, emptyTxt){
+  if(!list || !list.length) return `<p class="club-hint">${emptyTxt}</p>`;
+  const sorted = list.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  return `<div class="sn-block" style="margin-top:0"><div class="sn-head"><i class="ic ic-flag"></i> Débriefs de course</div>${sorted.map(debriefItemHTML).join('')}</div>`;
+}
 function readinessScore(){
   return Math.round((checkin.sommeil + (10-checkin.fatigue) + checkin.motivation)/30*100);
 }
@@ -3733,6 +3792,10 @@ function renderSidebar(){
         </div>
         <button class="btn" id="refsSave" style="width:100%;margin-top:10px">Enregistrer mes références</button>
       </div>
+      <div class="records" id="debriefCard">
+        ${debriefsBlockHTML(debriefsFor(myDebriefKey()), "Pas encore de débrief — remplis-en un après ta prochaine course.")}
+        <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> Ajouter un débrief de course</button>
+      </div>
       <div class="strava-card" id="stravaCard"></div>
       <div class="coach-sub" id="coachSubCard">
         <h2>Mon coaching</h2>
@@ -3814,6 +3877,8 @@ function renderSidebar(){
     if(cv) cv.addEventListener('click', ()=> submitCheckin());
     const rs = document.getElementById('refsSave');
     if(rs) rs.addEventListener('click', ()=> saveMyRefs());
+    const dab = document.getElementById('debriefAddBtn');
+    if(dab) dab.addEventListener('click', ()=> openDebrief());
   }
 }
 
@@ -4904,6 +4969,7 @@ function render(){
   document.getElementById('compliance').innerHTML = `${count?Math.round(doneCount/count*100):0}<em>%</em>`;
   renderWeekIntensity(mon);
   renderTaperHint(race, mon);
+  renderWeekRiskHint(mon);
   if(typeof wireSessionVideos==='function') wireSessionVideos();
 }
 
@@ -4923,6 +4989,36 @@ function renderTaperHint(race, mon){
     Fenêtre recommandée : <span class="k">${race.taperDays} j</span>. Réduis le volume d'environ
     <span class="k">${race.volCut}%</span> ${isCoach?'pour '+who:''} en gardant des <b>rappels d'intensité courts</b>
     (VMA/seuil brefs) et la fréquence des séances — c'est le volume qu'on coupe, pas la vivacité.</div>`;
+}
+/* Optimiseur de répartition hebdo : signale au coach les combinaisons à
+   risque dans la semaine affichée (charge forte cumulée le même jour, ou
+   deux jours forte intensité qui s'enchaînent sans récup entre les deux).
+   Zone Z4/Z5 = seuil haut / VO2max, lue directement sur la séance (pas de
+   déduction par titre : plus fiable, pas de faux positifs). */
+function weekRiskFindings(mon){
+  const isHigh = s => s.zone==='Z4' || s.zone==='Z5';
+  const days = Array.from({length:7},(_,i)=> ({ i, high:(planning[iso(addDays(mon,i))]||[]).filter(isHigh) }));
+  const findings = [];
+  days.forEach(d=>{
+    if(d.high.length>=2){
+      const discs=[...new Set(d.high.map(s=>DISC[s.disc].label))];
+      findings.push(`<b>${DAYS[d.i]}</b> cumule ${d.high.length} séances à forte intensité (${discs.join(' + ')}).`);
+    }
+  });
+  for(let i=0;i<6;i++){
+    if(days[i].high.length && days[i+1].high.length){
+      findings.push(`<b>${DAYS[i]} → ${DAYS[i+1]}</b> deux jours d'affilée à forte intensité, peu de récup entre les deux.`);
+    }
+  }
+  return findings;
+}
+function renderWeekRiskHint(mon){
+  const el = document.getElementById('weekRiskHint'); if(!el) return;
+  if(mode!=='coach'){ el.hidden=true; return; }
+  const findings = weekRiskFindings(mon);
+  if(!findings.length){ el.hidden=true; return; }
+  el.hidden=false;
+  el.innerHTML = `<i class="ic ic-alert-triangle"></i><div class="th-txt"><b>Répartition à vérifier cette semaine.</b> ${findings.slice(0,3).join(' ')}</div>`;
 }
 
 /* ============================================================
@@ -5089,6 +5185,7 @@ function sessionCard(s, dateKey){
     ${sessionProfileHTML(s)}
     ${vid?`<span class="video-chip">${vid.title}</span>`:''}
     ${s.done?'<span class="done-chip"><i class="ic ic-check"></i></span>':''}
+    ${mode==='coach'?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="Note pour l'athlète" title="${s.coachNote?dispoSafe(s.coachNote):`Ajouter une note pour l'athlète (pourquoi ce changement)`}"><i class="ic ic-message-circle"></i></button>`:''}
     ${mode==='coach'?'<button class="del" aria-label="Supprimer"><i class="ic ic-x"></i></button>':''}
     ${mode==='athlete'?`<button class="check-btn">${s.done?'<i class="ic ic-check"></i> Séance faite':'Marquer comme faite'}</button>`:''}
   `;
@@ -5099,6 +5196,15 @@ function sessionCard(s, dateKey){
   });
   el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
   el.addEventListener('click', e=>{
+    if(e.target.closest('.note-btn')){
+      const next = prompt("Note pour l'athlète sur cette séance (pourquoi ce changement, ce qu'il faut savoir) :", s.coachNote||'');
+      if(next!=null){
+        s.coachNote = next.trim() || null;
+        if(window.PF?.user && s.id){ PF.setCoachNote(s.id, s.coachNote).catch(err=>console.warn('[PF] setCoachNote', err)); }
+        render();
+      }
+      return;
+    }
     if(e.target.closest('.del')){
       if(window.PF?.user && s.id){ PF.deleteScheduled(s.id).catch(err=>console.warn('[PF] deleteScheduled', err)); }
       planning[dateKey] = planning[dateKey].filter(x=>x.id!==s.id); render(); return;
@@ -5406,6 +5512,14 @@ const OBJECTIF_META = {
   hyrox:{l:'Hyrox', ic:'ic-dumbbell',
     why:"Travaille la transition course/effort musculaire — le vrai facteur limitant en Hyrox, plus que chaque discipline isolée."}
 };
+/* Note du coach sur CETTE séance (traçabilité d'un ajustement : décalage,
+   allègement, changement de contenu…) — posée via le bouton 💬 de la carte,
+   distincte des consignes par intervalle (sessionNotesHTML) et du texte
+   pédagogique générique (sessionWhyHTML). */
+function sessionCoachNoteHTML(s){
+  if(!s.coachNote) return '';
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> Note de ton coach sur cette séance</div><div class="sn-item"><div class="sn-txt">${dispoSafe(s.coachNote)}</div></div></div>`;
+}
 function sessionWhyHTML(s){
   const type = (s.objectif&&s.objectif.type) || sessionType(s);
   const m = OBJECTIF_META[type]; if(!m) return '';
@@ -5440,6 +5554,7 @@ function openModal(s){
       <div class="cell"><div class="k">Intensité</div><div class="v">${s.zone}</div></div>
     </div>
     <p class="desc">${s.desc||'Séance planifiée.'}</p>
+    ${sessionCoachNoteHTML(s)}
     ${sessionWhyHTML(s)}
     ${sessionNotesHTML(s)}
     ${(()=>{ const n=nutritionForSession(s); return `
@@ -5941,6 +6056,10 @@ function renderProfInjuries(list){
   document.getElementById('profInjuries').innerHTML = list.map((r,i)=>profRowHTML('injury',i,r.date,r.desc)).join('') || '<p class="club-hint">Aucune blessure renseignée.</p>';
   wireProfRows('profInjuries', list, renderProfInjuries);
 }
+function renderProfDebriefs(aid){
+  const el = document.getElementById('profDebriefs'); if(!el) return;
+  el.innerHTML = debriefsBlockHTML(debriefsFor(aid), "Aucun débrief renseigné par l'athlète pour l'instant.");
+}
 function openAthleteProfile(aid){
   const a = ROSTER.find(x=>x.id===aid); if(!a) return;
   profileAthId = aid;
@@ -5952,8 +6071,50 @@ function openAthleteProfile(aid){
   document.getElementById('profWork').value = p.work || '';
   renderProfRecords(p.records);
   renderProfInjuries(p.injuries);
+  renderProfDebriefs(aid);
+  if(window.PF?.user && rosterIsReal){
+    PF.getRaceDebriefs(aid).then(list=>{ RACE_DEBRIEFS[aid]=list; renderProfDebriefs(aid); })
+      .catch(e=> console.warn('[PF] getRaceDebriefs :', e));
+  }
   document.getElementById('profileOverlay').classList.add('open');
 }
+/* ---- débrief de course (athlète) ---- */
+function openDebrief(){
+  ['dbRace','dbResult','dbFelt','dbWeather','dbGood','dbBad'].forEach(id=> document.getElementById(id).value='');
+  document.getElementById('dbDate').value = iso(new Date());
+  document.getElementById('dbNutrition').value = 'oui';
+  document.getElementById('debriefOverlay').classList.add('open');
+}
+function saveDebrief(){
+  const race = document.getElementById('dbRace').value.trim();
+  const date = document.getElementById('dbDate').value;
+  if(!race || !date){ toast('Renseigne au moins le nom de la course et la date'); return; }
+  const d = { race, date,
+    result: document.getElementById('dbResult').value.trim(),
+    felt: document.getElementById('dbFelt').value.trim(),
+    nutrition: document.getElementById('dbNutrition').value,
+    weather: document.getElementById('dbWeather').value.trim(),
+    good: document.getElementById('dbGood').value.trim(),
+    bad: document.getElementById('dbBad').value.trim() };
+  const key = myDebriefKey();
+  const list = debriefsFor(key);
+  const dup = list.findIndex(x=>x.race===d.race && x.date===d.date);
+  if(dup>-1) list[dup]=d; else list.push(d);
+  if(window.PF?.user){
+    PF.saveRaceDebrief({ raceName:d.race, raceDate:d.date, result:d.result, felt:d.felt,
+      nutrition:d.nutrition, weather:d.weather, good:d.good, bad:d.bad })
+      .catch(e=> console.warn('[PF] saveRaceDebrief échoué :', e));
+  }
+  document.getElementById('debriefOverlay').classList.remove('open');
+  renderSidebar();
+  toast('Débrief enregistré');
+}
+(function initDebrief(){
+  const ov=document.getElementById('debriefOverlay'); if(!ov) return;
+  document.getElementById('debriefSave').addEventListener('click', saveDebrief);
+  document.getElementById('debriefClose').addEventListener('click', ()=> ov.classList.remove('open'));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+})();
 function saveAthleteProfile(){
   if(!profileAthId) return;
   const a = ROSTER.find(x=>x.id===profileAthId);
@@ -7064,6 +7225,13 @@ window.__pf_app = {
   getCurrentAthleteId(){ return currentAthleteId; },
   // Masque l'analyse/records de démo pour un compte confirmé sans activité réelle.
   setActivityState,
+  // Injecte les débriefs de course d'un athlète (chargés du cloud) — sert la
+  // vue Athlète (soi-même, à l'hydratation) et redessine la sidebar.
+  setRaceDebriefs(athleteId, list){
+    if(!athleteId) return;
+    RACE_DEBRIEFS[athleteId] = list||[];
+    if(typeof renderSidebar==='function') renderSidebar();
+  },
   // Injecte les zones de travail perso d'un athlète (chargées du cloud).
   setAthleteZones(athleteId, zones){
     if(!athleteId) return;

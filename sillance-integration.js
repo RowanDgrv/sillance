@@ -57,6 +57,7 @@ const mapRefs = (p) => p ? {
 const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s.dur,
   dist: s.dist, tss: s.tss, zone: s.zone, done: s.done, rpe: s.rpe,
   ...(s.rpe_muscle != null ? { rpeMuscle: s.rpe_muscle } : {}), note: esc(s.note),
+  coachNote: esc(s.coach_note),
   blocksV2: s.blocks && s.blocks.length ? { blocks: s.blocks } : undefined });
 const mapMember  = (m) => ({ id: m.id, name: esc(m.display_name) || "Athlète",
   disc: m.disc || "tri", since: esc(m.since) || "", group: m.group_id });
@@ -122,6 +123,11 @@ async function hydrate() {
     // Set inconditionnel : un compte réel sans matériel voit la section vide,
     // pas le matériel de démonstration présenté comme le sien.
     app.setGear?.(items.map(mapGear));
+  });
+
+  await section("raceDebriefs", async () => {
+    const list = await PF.getRaceDebriefs(uid);
+    app.setRaceDebriefs?.(uid, list);
   });
 
   await section("zones", async () => {
