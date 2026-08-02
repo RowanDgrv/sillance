@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<meta name="robots" content="noindex">
+<title>Suivre une course — Sillance</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Archivo:wght@300;400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#0B1120;--panel:#11182b;--ink:#F3F6FC;--soft:#C7D0E0;--muted:#8A93A8;--accent:#46C2D8;--accent2:#FF9A3D;
+    --line-strong:rgba(150,165,200,.30);--display:'Oswald',sans-serif;--ui:'Archivo',sans-serif;--mono:'JetBrains Mono',monospace}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;background:
+      radial-gradient(700px 460px at 78% 12%, rgba(70,194,216,.14), transparent 60%),
+      radial-gradient(560px 440px at 15% 96%, rgba(255,154,61,.09), transparent 62%),
+      var(--paper);
+    color:var(--soft);font-family:var(--ui);display:flex;align-items:flex-start;justify-content:center;
+    padding:52px 20px;-webkit-font-smoothing:antialiased}
+  .box{max-width:480px;width:100%}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);line-height:1.05;text-transform:uppercase;color:var(--ink);letter-spacing:-.01em;margin-bottom:6px}
+  .sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+  .card{background:var(--panel);border:1px solid var(--line-strong);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+  .card h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+  .card p{font-size:15px;line-height:1.55;color:var(--ink);white-space:pre-wrap}
+  .card.muted p{color:var(--muted);font-size:14px}
+  .result .v{font-family:var(--display);font-size:26px;color:var(--accent2);font-weight:700}
+  .foot{margin-top:24px;font-size:12px;color:var(--muted);text-align:center}
+  .foot a{color:var(--accent);text-decoration:none}
+  #state{padding:40px 0;text-align:center;color:var(--muted)}
+</style></head>
+<body>
+  <div class="box">
+    <div id="state">Chargement…</div>
+    <div id="content" hidden>
+      <div class="kicker">Suivi de course</div>
+      <h1 id="raceTitle"></h1>
+      <div class="sub" id="raceSub"></div>
+      <div class="card" id="notesCard" hidden>
+        <h2>Repères laissés par le coach</h2>
+        <p id="notesTxt"></p>
+      </div>
+      <div class="card result" id="resultCard" hidden>
+        <h2>Résultat</h2>
+        <p class="v" id="resultTxt"></p>
+        <p id="feltTxt" style="margin-top:6px;font-size:13px;color:var(--muted)"></p>
+      </div>
+      <div class="card muted" id="pendingCard" hidden>
+        <h2>En cours</h2>
+        <p>Pas encore de résultat — reviens après la course, il apparaîtra ici dès qu'il sera synchronisé.</p>
+      </div>
+      <div class="foot">Pas de suivi GPS en direct — juste les repères et le résultat. <br><a href="./index.html">sillance.app</a></div>
+    </div>
+    <div class="card muted" id="errCard" hidden>
+      <h2>Lien introuvable</h2>
+      <p id="errTxt">Ce lien de suivi n'existe pas ou a expiré.</p>
+    </div>
+  </div>
+<script>
+(function(){
+  var SUPABASE_URL = "https://onbsgohvqejccowfnrbs.supabase.co";
+  var ANON_KEY = "sb_publishable_Tiz8pcjnik-Xj85Jvahivw_dfNqf_TT";
+  var token = new URLSearchParams(location.search).get('token');
+  var stateEl = document.getElementById('state');
+  function show(id){ document.getElementById(id).hidden = false; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function fmtDate(d){ try{ return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }catch(e){ return d; } }
+
+  if(!token){ stateEl.hidden=true; show('errCard'); document.getElementById('errTxt').textContent = 'Lien invalide (aucun jeton).'; }
+  else {
+    fetch(SUPABASE_URL + '/functions/v1/spectator-view?token=' + encodeURIComponent(token), {
+      headers: { apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY }
+    }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, body:j}; }); })
+      .then(function(res){
+        stateEl.hidden = true;
+        if(!res.ok){ show('errCard'); document.getElementById('errTxt').textContent = (res.body && res.body.error) || 'Lien introuvable.'; return; }
+        var d = res.body;
+        document.getElementById('raceTitle').textContent = d.raceName || 'Course';
+        document.getElementById('raceSub').textContent = esc(d.athleteName) + ' — ' + fmtDate(d.raceDate);
+        if(d.pacingNotes){ document.getElementById('notesTxt').textContent = d.pacingNotes; show('notesCard'); }
+        if(d.result){
+          document.getElementById('resultTxt').textContent = d.result;
+          document.getElementById('feltTxt').textContent = d.felt || '';
+          show('resultCard');
+        } else {
+          show('pendingCard');
+        }
+        show('content');
+      }).catch(function(e){
+        stateEl.hidden = true; show('errCard');
+        document.getElementById('errTxt').textContent = 'Impossible de charger ce suivi pour le moment.';
+        console.error(e);
+      });
+  }
+})();
+</script>
+</body></html>
