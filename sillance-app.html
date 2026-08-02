@@ -2796,8 +2796,23 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="b-fld"><label>Habitudes alimentaires</label><textarea id="profDiet" rows="2" placeholder="Allergies, régime, préférences…"></textarea></div>
       <div class="b-fld"><label>Habitudes de vie / travail</label><textarea id="profWork" rows="2" placeholder="Horaires, métier physique ou sédentaire, contraintes…"></textarea></div>
       <div class="b-fld"><label>Débriefs de course (remplis par l'athlète)</label><div id="profDebriefs"></div></div>
+      <div class="b-fld"><label>Équipe de coachs</label><div id="profCoTeam"></div></div>
     </div>
     <button class="btn" id="profileSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer la fiche</button>
+  </div>
+</div>
+
+<div class="overlay" id="coCoachOverlay" role="dialog" aria-modal="true" aria-label="Ajouter un coach">
+  <div class="modal group-modal">
+    <button class="close" id="coCoachClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--swim)"><i class="ic ic-users"></i> Ajouter un coach</span>
+    <h3>Proposer un coach supplémentaire</h3>
+    <div class="cr-form">
+      <div class="b-fld"><label>Email du coach</label><input type="email" id="ccEmail" placeholder="prenom@exemple.com"></div>
+      <div class="b-fld"><label>Rôle (optionnel)</label><input type="text" id="ccRole" placeholder="Ex. Vélo, Course, Nutrition, Data…"></div>
+      <p class="club-hint" id="ccHint"></p>
+    </div>
+    <button class="btn" id="coCoachSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Envoyer la demande</button>
   </div>
 </div>
 
@@ -3705,6 +3720,110 @@ function debriefsBlockHTML(list, emptyTxt){
   const sorted = list.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   return `<div class="sn-block" style="margin-top:0"><div class="sn-head"><i class="ic ic-flag"></i> Débriefs de course</div>${sorted.map(debriefItemHTML).join('')}</div>`;
 }
+
+/* ============================================================
+   ÉQUIPE DE COACHS (co-coaching)
+   ------------------------------------------------------------
+   Un athlète peut avoir plusieurs coachs (coach vélo + coach course,
+   ou nutritionniste/data analyst + entraîneur principal) — DÉCISION :
+   accès complet pour tous les coachs liés, le rôle n'est qu'une
+   étiquette d'affichage (pas de moteur de permissions par domaine).
+   Ajout à double consentement : celui qui n'initie PAS la demande
+   valide (coach existant ↔ athlète) ; le coach visé doit déjà avoir
+   un compte Sillance (pas d'onboarding coach par email en v1).
+   ============================================================ */
+let CO_TEAM = { a1: [
+  {id:'ct1', coachId:'demo-principal', roleLabel:'Principal', coach:{full_name:'Toi (coach démo)'}},
+  {id:'ct2', coachId:'demo-nutri', roleLabel:'Nutrition', coach:{full_name:'Camille Aubert'}},
+]};
+let CO_PENDING = { a1: [
+  {id:'ccr1', coachEmail:'julien.velo@example.com', roleLabel:'Vélo', requestedByRole:'coach'},
+]};
+function coTeamFor(aid){ return CO_TEAM[aid] || (CO_TEAM[aid]=[]); }
+function coPendingFor(aid){ return CO_PENDING[aid] || (CO_PENDING[aid]=[]); }
+function coTeamItemHTML(t){
+  return `<div class="sn-item"><div class="sn-when">${dispoSafe(t.roleLabel||'Coach')}</div><div class="sn-txt">${dispoSafe((t.coach&&(t.coach.full_name||t.coach.email))||'Coach')}</div></div>`;
+}
+/* canDecide = le viewer courant n'est pas à l'origine de la demande donc
+   c'est à lui de valider/refuser ; sinon lecture seule "en attente". */
+function coPendingItemHTML(r, viewerRole, aid){
+  const canDecide = r.requestedByRole !== viewerRole;
+  const who = r.requestedByRole==='coach' ? 'un coach' : "l'athlète";
+  return `<div class="sn-item">
+    <div class="sn-when">${dispoSafe(r.roleLabel||'Coach')}</div>
+    <div class="sn-txt">${dispoSafe(r.coachEmail)} — proposé par ${who}
+      ${canDecide ? `<div style="margin-top:6px;display:flex;gap:8px">
+        <button class="btn" style="padding:5px 12px;font-size:11.5px" data-cc-approve="${r.id}" data-cc-aid="${aid}">Valider</button>
+        <button class="group-edit" style="padding:5px 12px;font-size:11.5px" data-cc-decline="${r.id}" data-cc-aid="${aid}">Refuser</button>
+      </div>` : `<div style="margin-top:4px;color:var(--muted);font-size:11.5px">En attente de validation…</div>`}
+    </div>
+  </div>`;
+}
+function coTeamBlockHTML(aid, viewerRole){
+  const team = coTeamFor(aid), pending = coPendingFor(aid);
+  const teamHtml = team.length ? team.map(coTeamItemHTML).join('') : `<p class="club-hint">Aucun coach supplémentaire pour l'instant.</p>`;
+  const pendingHtml = pending.length ? pending.map(r=>coPendingItemHTML(r,viewerRole,aid)).join('') : '';
+  return `<div class="sn-block" style="margin-top:0">
+    <div class="sn-head"><i class="ic ic-users"></i> Équipe de coachs</div>
+    ${teamHtml}
+    ${pendingHtml}
+    <button class="group-edit" style="margin-top:8px" data-cc-invite="${aid}" data-cc-role="${viewerRole}">+ Proposer un coach</button>
+  </div>`;
+}
+function wireCoTeamActions(container){
+  if(!container) return;
+  container.querySelectorAll('[data-cc-approve]').forEach(b=> b.onclick=()=> decideCoCoach(b.dataset.ccApprove, b.dataset.ccAid, 'approve'));
+  container.querySelectorAll('[data-cc-decline]').forEach(b=> b.onclick=()=> decideCoCoach(b.dataset.ccDecline, b.dataset.ccAid, 'decline'));
+  container.querySelectorAll('[data-cc-invite]').forEach(b=> b.onclick=()=> openCoCoachInvite(b.dataset.ccInvite, b.dataset.ccRole));
+}
+let coCoachTargetAthleteId = null, coCoachViewerRole = null;
+function openCoCoachInvite(athleteId, viewerRole){
+  coCoachTargetAthleteId = athleteId; coCoachViewerRole = viewerRole;
+  document.getElementById('ccEmail').value = '';
+  document.getElementById('ccRole').value = '';
+  const hint = document.getElementById('ccHint');
+  if(hint) hint.textContent = viewerRole==='athlete'
+    ? "Le coach doit déjà avoir un compte Sillance. Un de tes coachs actuels devra valider avant que l'accès soit actif."
+    : "Le coach doit déjà avoir un compte Sillance. L'athlète devra valider avant que l'accès soit actif.";
+  document.getElementById('coCoachOverlay').classList.add('open');
+}
+function saveCoCoachInvite(){
+  const email = document.getElementById('ccEmail').value.trim();
+  const role = document.getElementById('ccRole').value.trim();
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Renseigne un email valide'); return; }
+  const aid = coCoachTargetAthleteId;
+  coPendingFor(aid).unshift({id:'ccr'+Date.now(), coachEmail:email, roleLabel:role||null, requestedByRole:coCoachViewerRole});
+  if(window.PF?.user){
+    PF.requestCoCoach(aid, email, role||null).catch(e=>{ console.warn('[PF] requestCoCoach', e); toast("Demande indisponible pour l'instant"); });
+  }
+  document.getElementById('coCoachOverlay').classList.remove('open');
+  toast('Demande envoyée — en attente de validation');
+  if(document.getElementById('profileOverlay')?.classList.contains('open')) renderProfCoTeam(aid);
+  if(mode==='athlete') renderSidebar();
+}
+function decideCoCoach(id, aid, decision){
+  const list = coPendingFor(aid);
+  const idx = list.findIndex(r=>r.id===id);
+  if(idx>-1){
+    if(decision==='approve'){
+      const r = list[idx];
+      coTeamFor(aid).push({id:'ct'+Date.now(), coachId:null, roleLabel:r.roleLabel, coach:{full_name:r.coachEmail}});
+    }
+    list.splice(idx,1);
+  }
+  if(window.PF?.user){
+    PF.approveCoCoach(id, decision).catch(e=> console.warn('[PF] approveCoCoach', e));
+  }
+  toast(decision==='approve' ? 'Coach ajouté à l\'équipe' : 'Demande refusée');
+  if(document.getElementById('profileOverlay')?.classList.contains('open')) renderProfCoTeam(aid);
+  if(mode==='athlete') renderSidebar();
+}
+(function initCoCoach(){
+  const ov=document.getElementById('coCoachOverlay'); if(!ov) return;
+  document.getElementById('coCoachSave').addEventListener('click', saveCoCoachInvite);
+  document.getElementById('coCoachClose').addEventListener('click', ()=> ov.classList.remove('open'));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+})();
 function readinessScore(){
   return Math.round((checkin.sommeil + (10-checkin.fatigue) + checkin.motivation)/30*100);
 }
@@ -3923,6 +4042,7 @@ function renderSidebar(){
         ${debriefsBlockHTML(debriefsFor(myDebriefKey()), "Pas encore de débrief — remplis-en un après ta prochaine course.")}
         <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> Ajouter un débrief de course</button>
       </div>
+      <div class="records" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}</div>
       <div class="strava-card" id="stravaCard"></div>
       <div class="coach-sub" id="coachSubCard">
         <h2>Mon coaching</h2>
@@ -4006,6 +4126,7 @@ function renderSidebar(){
     if(rs) rs.addEventListener('click', ()=> saveMyRefs());
     const dab = document.getElementById('debriefAddBtn');
     if(dab) dab.addEventListener('click', ()=> openDebrief());
+    wireCoTeamActions(document.getElementById('coTeamCard'));
   }
 }
 
@@ -6338,6 +6459,11 @@ function renderProfDebriefs(aid){
   const el = document.getElementById('profDebriefs'); if(!el) return;
   el.innerHTML = debriefsBlockHTML(debriefsFor(aid), "Aucun débrief renseigné par l'athlète pour l'instant.");
 }
+function renderProfCoTeam(aid){
+  const el = document.getElementById('profCoTeam'); if(!el) return;
+  el.innerHTML = coTeamBlockHTML(aid, 'coach');
+  wireCoTeamActions(el);
+}
 function openAthleteProfile(aid){
   const a = ROSTER.find(x=>x.id===aid); if(!a) return;
   profileAthId = aid;
@@ -6350,9 +6476,15 @@ function openAthleteProfile(aid){
   renderProfRecords(p.records);
   renderProfInjuries(p.injuries);
   renderProfDebriefs(aid);
+  renderProfCoTeam(aid);
   if(window.PF?.user && rosterIsReal){
     PF.getRaceDebriefs(aid).then(list=>{ RACE_DEBRIEFS[aid]=list; renderProfDebriefs(aid); })
       .catch(e=> console.warn('[PF] getRaceDebriefs :', e));
+    Promise.all([PF.getCoTeam(aid), PF.getPendingCoCoachRequests(aid)]).then(([team, pending])=>{
+      CO_TEAM[aid] = team.map(t=>({ id:t.id, coachId:t.coach_id, roleLabel:t.role_label, coach:t.coach }));
+      CO_PENDING[aid] = pending.map(p=>({ id:p.id, coachEmail:p.coach_email, roleLabel:p.role_label, requestedByRole:p.requested_by_role }));
+      renderProfCoTeam(aid);
+    }).catch(e=> console.warn('[PF] getCoTeam/getPendingCoCoachRequests :', e));
   }
   document.getElementById('profileOverlay').classList.add('open');
 }
@@ -7508,6 +7640,13 @@ window.__pf_app = {
   setRaceDebriefs(athleteId, list){
     if(!athleteId) return;
     RACE_DEBRIEFS[athleteId] = list||[];
+    if(typeof renderSidebar==='function') renderSidebar();
+  },
+  // Injecte l'équipe de coachs + les demandes en attente d'un athlète.
+  setCoTeam(athleteId, team, pending){
+    if(!athleteId) return;
+    CO_TEAM[athleteId] = (team||[]).map(t=>({ id:t.id, coachId:t.coach_id, roleLabel:t.role_label, coach:t.coach }));
+    CO_PENDING[athleteId] = (pending||[]).map(p=>({ id:p.id, coachEmail:p.coach_email, roleLabel:p.role_label, requestedByRole:p.requested_by_role }));
     if(typeof renderSidebar==='function') renderSidebar();
   },
   // Injecte les zones de travail perso d'un athlète (chargées du cloud).
