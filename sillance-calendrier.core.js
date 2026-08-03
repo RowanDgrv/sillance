@@ -149,9 +149,9 @@ function nutritionForSession(s){
 /* phrase courte pour la notification "pense à prendre : X" */
 function nutritionReminder(s){
   const n=nutritionForSession(s);
-  if(n.key==='glucides') return 'des glucides (gels, barres, boisson énergétique) pour cette sortie longue';
-  if(n.key==='protéines') return 'des protéines pour la récup (séance intense) + glucides';
-  return 'de quoi bien t\'hydrater';
+  if(n.key==='glucides') return tr('nutriReminder.carbs');
+  if(n.key==='protéines') return tr('nutriReminder.protein');
+  return tr('nutriReminder.hydrate');
 }
 
 /* ============================================================
@@ -280,10 +280,10 @@ function hrvStatus(hrv, base){
   base = base || (typeof ATHLETE_REF!=='undefined' ? ATHLETE_REF.hrvBase : null);
   if(!hrv || !base) return null;
   const r = hrv/base;
-  if(r < 0.85) return {level:'low',  c:'var(--run)',  txt:'HRV basse', pct:Math.round((r-1)*100)};
-  if(r < 0.92) return {level:'warn', c:'var(--bike)', txt:'HRV sous la base', pct:Math.round((r-1)*100)};
-  if(r > 1.08) return {level:'high', c:'var(--good)', txt:'HRV au-dessus', pct:Math.round((r-1)*100)};
-  return {level:'ok', c:'var(--good)', txt:'HRV normale', pct:Math.round((r-1)*100)};
+  if(r < 0.85) return {level:'low',  c:'var(--run)',  txt:tr('hrv.low'), pct:Math.round((r-1)*100)};
+  if(r < 0.92) return {level:'warn', c:'var(--bike)', txt:tr('hrv.warn'), pct:Math.round((r-1)*100)};
+  if(r > 1.08) return {level:'high', c:'var(--good)', txt:tr('hrv.high'), pct:Math.round((r-1)*100)};
+  return {level:'ok', c:'var(--good)', txt:tr('hrv.ok'), pct:Math.round((r-1)*100)};
 }
 
 /* Définition des "modèles de zones" sélectionnables par bloc.
@@ -500,7 +500,7 @@ function cyclePhaseFromDay(d){
   return 'luteal';
 }
 function athCycle(a){ const p=a&&a.checkin&&a.checkin.cyclePhase; return (p&&CYCLE_META[p])?p:null; }
-function athNote(s){ return s==null ? '' : s>=75 ? 'Prêt pour la qualité' : s>=55 ? 'À surveiller' : 'Allègement conseillé'; }
+function athNote(s){ return s==null ? '' : s>=75 ? tr('athNote.ready') : s>=55 ? tr('athNote.watch') : tr('athNote.lighten'); }
 
 function setCoachAthletes(list, defaultId){
   // Appelé uniquement au login réel : on remplace TOUJOURS le roster de démo,
@@ -6264,7 +6264,7 @@ function aiSummary(s, b){
   }
   return {headline, tenu, bullets, recos};
 }
-function aiVerdictMeta(tenu){ return tenu==='oui'?{c:'var(--good)',l:'Objectif tenu'}:tenu==='partiel'?{c:'var(--bike)',l:'Partiellement tenu'}:{c:'var(--run)',l:'Objectif manqué'}; }
+function aiVerdictMeta(tenu){ return tenu==='oui'?{c:'var(--good)',l:tr('aiVerdict.met')}:tenu==='partiel'?{c:'var(--bike)',l:tr('aiVerdict.partial')}:{c:'var(--run)',l:tr('aiVerdict.missed')}; }
 function injectAiCss(){
   if(document.getElementById('pf-ai-css')) return;
   const st=document.createElement('style'); st.id='pf-ai-css';
@@ -7611,22 +7611,22 @@ function scoreReadiness(){
   const global = Math.round(sAcwr*0.32 + sTsb*0.20 + sSubj*0.26 + sRpe*0.22);
 
   return {global, factors:[
-    {key:'Charge (ACWR)',  sub:`ratio ${a.toFixed(2)}`,                 score:sAcwr},
-    {key:'Forme (TSB)',    sub:`${t>=0?'+':''}${t}`,                    score:sTsb},
-    {key:'Ressenti',       sub:`check-in ${sSubj}%`,                    score:sSubj},
-    {key:'RPE récent',     sub:`moy. ${meanRpe.toFixed(1)}/10`,         score:sRpe}
+    {key:tr('ready.acwr'),  sub:`ratio ${a.toFixed(2)}`,                 score:sAcwr},
+    {key:tr('ready.tsb'),    sub:`${t>=0?'+':''}${t}`,                    score:sTsb},
+    {key:tr('ready.subjective'),       sub:`check-in ${sSubj}%`,                    score:sSubj},
+    {key:tr('ready.rpe'),     sub:`moy. ${meanRpe.toFixed(1)}/10`,         score:sRpe}
   ]};
 }
 
 function readinessVerdict(g){
-  if(g>=70) return {flag:'Poursuivre le plan', color:'#39E6A3',
-    advice:"Les signaux sont au vert : charge maîtrisée, ressenti correct. La séance prévue peut être maintenue telle quelle."};
-  if(g>=50) return {flag:'Maintenir, avec vigilance', color:'#FFB13D',
-    advice:"Globalement OK, mais un ou deux signaux se tendent. Garde la séance mais surveille l'intensité, et n'hésite pas à raccourcir si les sensations ne suivent pas."};
-  if(g>=32) return {flag:'Allègement suggéré', color:'#FF8A4D',
-    advice:"Charge élevée et/ou ressenti en baisse. Mieux vaut réduire le volume ou l'intensité aujourd'hui, ou décaler la séance qualité. À valider avec le coach."};
-  return {flag:'Repos recommandé', color:'#FF5470',
-    advice:"Plusieurs signaux d'alerte convergent : risque de surmenage. Privilégie la récupération, et préviens ton coach pour réajuster le bloc."};
+  if(g>=70) return {flag:tr('ready.flag.continue'), color:'#39E6A3',
+    advice:tr('ready.advice.continue')};
+  if(g>=50) return {flag:tr('ready.flag.watch'), color:'#FFB13D',
+    advice:tr('ready.advice.watch')};
+  if(g>=32) return {flag:tr('ready.flag.lighten'), color:'#FF8A4D',
+    advice:tr('ready.advice.lighten')};
+  return {flag:tr('ready.flag.rest'), color:'#FF5470',
+    advice:tr('ready.advice.rest')};
 }
 
 function scoreColor(s){
@@ -7769,11 +7769,11 @@ function renderToday(){
   if(_cbBilanBtn) _cbBilanBtn.onclick = function(){ exportBilan(typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:''); };
 }
 function todayAdvice(fr, risque, s){
-  if(risque==='Élevé') return 'Ta charge récente est haute : privilégie la qualité du sommeil et reste à l\'écoute de ton corps cette semaine.';
-  if(fr<50) return 'Tes signaux de récupération sont bas. Une séance plus douce aujourd\'hui te fera repartir plus fort demain.';
-  if(s && !s.done) return 'Tout est au vert pour ta séance du jour. Pense à t\'hydrater et à bien t\'échauffer.';
-  if(s && s.done) return 'Belle séance bouclée ! Soigne ta récup (collation, étirements, sommeil) pour enchaîner la semaine.';
-  return 'Journée de repos : c\'est là que les progrès se construisent. Repose-toi vraiment.';
+  if(risque==='Élevé') return tr('advice.highLoad');
+  if(fr<50) return tr('advice.lowRecovery');
+  if(s && !s.done) return tr('advice.greenLight');
+  if(s && s.done) return tr('advice.sessionDone');
+  return tr('advice.restDay');
 }
 renderToday();
 

@@ -101,6 +101,24 @@
     "toast.assistantIaActiveDemo": `Assistant IA activé (démo)`,
     "toast.analyseIaIndisponibleResumeLocal": `Analyse IA indisponible, résumé local affiché`,
     "toast.equipementAjouteSuiviDUsure": `Équipement ajouté — suivi d'usure calibré sur ton modèle`,
+
+    "ready.acwr": `Charge (ACWR)`, "ready.tsb": `Forme (TSB)`, "ready.subjective": `Ressenti`, "ready.rpe": `RPE récent`,
+    "ready.flag.continue": `Poursuivre le plan`, "ready.flag.watch": `Maintenir, avec vigilance`, "ready.flag.lighten": `Allègement suggéré`, "ready.flag.rest": `Repos recommandé`,
+    "ready.advice.continue": `Les signaux sont au vert : charge maîtrisée, ressenti correct. La séance prévue peut être maintenue telle quelle.`,
+    "ready.advice.watch": `Globalement OK, mais un ou deux signaux se tendent. Garde la séance mais surveille l'intensité, et n'hésite pas à raccourcir si les sensations ne suivent pas.`,
+    "ready.advice.lighten": `Charge élevée et/ou ressenti en baisse. Mieux vaut réduire le volume ou l'intensité aujourd'hui, ou décaler la séance qualité. À valider avec le coach.`,
+    "ready.advice.rest": `Plusieurs signaux d'alerte convergent : risque de surmenage. Privilégie la récupération, et préviens ton coach pour réajuster le bloc.`,
+    "hrv.low": `HRV basse`, "hrv.warn": `HRV sous la base`, "hrv.high": `HRV au-dessus`, "hrv.ok": `HRV normale`,
+    "aiVerdict.met": `Objectif tenu`, "aiVerdict.partial": `Partiellement tenu`, "aiVerdict.missed": `Objectif manqué`,
+    "athNote.ready": `Prêt pour la qualité`, "athNote.watch": `À surveiller`, "athNote.lighten": `Allègement conseillé`,
+    "advice.highLoad": `Ta charge récente est haute : privilégie la qualité du sommeil et reste à l'écoute de ton corps cette semaine.`,
+    "advice.lowRecovery": `Tes signaux de récupération sont bas. Une séance plus douce aujourd'hui te fera repartir plus fort demain.`,
+    "advice.greenLight": `Tout est au vert pour ta séance du jour. Pense à t'hydrater et à bien t'échauffer.`,
+    "advice.sessionDone": `Belle séance bouclée ! Soigne ta récup (collation, étirements, sommeil) pour enchaîner la semaine.`,
+    "advice.restDay": `Journée de repos : c'est là que les progrès se construisent. Repose-toi vraiment.`,
+    "nutriReminder.carbs": `des glucides (gels, barres, boisson énergétique) pour cette sortie longue`,
+    "nutriReminder.protein": `des protéines pour la récup (séance intense) + glucides`,
+    "nutriReminder.hydrate": `de quoi bien t'hydrater`,
   };
 
   var en = {
@@ -201,6 +219,24 @@
     "toast.assistantIaActiveDemo": `AI Assistant activated (demo)`,
     "toast.analyseIaIndisponibleResumeLocal": `AI analysis unavailable, showing local summary`,
     "toast.equipementAjouteSuiviDUsure": `Gear added — wear tracking calibrated to your model`,
+
+    "ready.acwr": `Load (ACWR)`, "ready.tsb": `Form (TSB)`, "ready.subjective": `Feel`, "ready.rpe": `Recent RPE`,
+    "ready.flag.continue": `Keep the plan`, "ready.flag.watch": `Maintain, with caution`, "ready.flag.lighten": `Lightening suggested`, "ready.flag.rest": `Rest recommended`,
+    "ready.advice.continue": `Signals are green: load under control, feeling good. The planned session can stay as is.`,
+    "ready.advice.watch": `Overall OK, but one or two signals are tightening. Keep the session but watch the intensity, and don't hesitate to shorten it if it doesn't feel right.`,
+    "ready.advice.lighten": `High load and/or feeling dipping. Better to reduce volume or intensity today, or push back the quality session. Check with your coach.`,
+    "ready.advice.rest": `Several warning signs are converging: risk of overtraining. Prioritize recovery, and let your coach know to adjust the block.`,
+    "hrv.low": `Low HRV`, "hrv.warn": `HRV below baseline`, "hrv.high": `HRV above baseline`, "hrv.ok": `Normal HRV`,
+    "aiVerdict.met": `Goal met`, "aiVerdict.partial": `Partially met`, "aiVerdict.missed": `Goal missed`,
+    "athNote.ready": `Ready for quality work`, "athNote.watch": `Keep an eye on it`, "athNote.lighten": `Lightening advised`,
+    "advice.highLoad": `Your recent load is high: prioritize sleep quality and listen to your body this week.`,
+    "advice.lowRecovery": `Your recovery signals are low. An easier session today will help you come back stronger tomorrow.`,
+    "advice.greenLight": `Everything's green for today's session. Remember to hydrate and warm up properly.`,
+    "advice.sessionDone": `Great session done! Take care of your recovery (snack, stretching, sleep) to keep the week going.`,
+    "advice.restDay": `Rest day: this is where progress is built. Actually rest.`,
+    "nutriReminder.carbs": `some carbs (gels, bars, energy drink) for this long outing`,
+    "nutriReminder.protein": `some protein for recovery (intense session) + carbs`,
+    "nutriReminder.hydrate": `something to hydrate well`,
   };
 
   var es = {
@@ -301,6 +337,24 @@
     "toast.assistantIaActiveDemo": `Asistente de IA activado (demo)`,
     "toast.analyseIaIndisponibleResumeLocal": `Análisis de IA no disponible, se muestra el resumen local`,
     "toast.equipementAjouteSuiviDUsure": `Equipo añadido — seguimiento de desgaste calibrado según tu modelo`,
+
+    "ready.acwr": `Carga (ACWR)`, "ready.tsb": `Forma (TSB)`, "ready.subjective": `Sensación`, "ready.rpe": `RPE reciente`,
+    "ready.flag.continue": `Continuar el plan`, "ready.flag.watch": `Mantener, con vigilancia`, "ready.flag.lighten": `Aligeramiento sugerido`, "ready.flag.rest": `Descanso recomendado`,
+    "ready.advice.continue": `Las señales están en verde: carga controlada, buena sensación. La sesión prevista puede mantenerse tal cual.`,
+    "ready.advice.watch": `En general OK, pero una o dos señales se tensan. Mantén la sesión pero vigila la intensidad, y no dudes en acortarla si las sensaciones no acompañan.`,
+    "ready.advice.lighten": `Carga elevada y/o sensación en baja. Mejor reducir el volumen o la intensidad hoy, o aplazar la sesión de calidad. A validar con el entrenador.`,
+    "ready.advice.rest": `Varias señales de alerta convergen: riesgo de sobreentrenamiento. Prioriza la recuperación, y avisa a tu entrenador para reajustar el bloque.`,
+    "hrv.low": `HRV baja`, "hrv.warn": `HRV bajo la base`, "hrv.high": `HRV por encima`, "hrv.ok": `HRV normal`,
+    "aiVerdict.met": `Objetivo cumplido`, "aiVerdict.partial": `Parcialmente cumplido`, "aiVerdict.missed": `Objetivo no alcanzado`,
+    "athNote.ready": `Listo para la calidad`, "athNote.watch": `A vigilar`, "athNote.lighten": `Aligeramiento aconsejado`,
+    "advice.highLoad": `Tu carga reciente es alta: prioriza la calidad del sueño y escucha a tu cuerpo esta semana.`,
+    "advice.lowRecovery": `Tus señales de recuperación están bajas. Una sesión más suave hoy te ayudará a volver más fuerte mañana.`,
+    "advice.greenLight": `Todo en verde para tu sesión de hoy. Recuerda hidratarte y calentar bien.`,
+    "advice.sessionDone": `¡Buena sesión completada! Cuida tu recuperación (tentempié, estiramientos, sueño) para seguir la semana.`,
+    "advice.restDay": `Día de descanso: es ahí donde se construye el progreso. Descansa de verdad.`,
+    "nutriReminder.carbs": `carbohidratos (geles, barritas, bebida energética) para esta salida larga`,
+    "nutriReminder.protein": `proteínas para la recuperación (sesión intensa) + carbohidratos`,
+    "nutriReminder.hydrate": `algo para hidratarte bien`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
