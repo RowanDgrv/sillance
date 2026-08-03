@@ -686,6 +686,10 @@ body.grid-on .cal-guides{opacity:1}
   width:100%;appearance:none;-webkit-appearance:none;height:5px;border-radius:99px;
   background:linear-gradient(90deg,var(--run),var(--bike),var(--good));outline:none;
 }
+/* a11y (audit 03/08/2026) : outline:none ci-dessus retire l'indicateur de
+   focus natif pour styliser le track — restitué au clavier via :focus-visible
+   (silencieux à la souris, visible au clavier/lecteur d'écran). */
+.checkin input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .checkin input[type=range]::-webkit-slider-thumb{
   appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
   background:var(--accent);border:3px solid var(--ink);cursor:pointer;
@@ -1842,6 +1846,8 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .ln-pct{display:flex;align-items:center;gap:6px;flex:1}
 .ln-pct input[type=range]{flex:1;appearance:none;-webkit-appearance:none;height:4px;border-radius:99px;min-width:50px;
   background:linear-gradient(90deg,var(--good),var(--bike),var(--run));outline:none}
+/* a11y (audit 03/08/2026) : idem — focus restitué au clavier uniquement. */
+.ln-pct input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ln-pct input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:13px;height:13px;
   border-radius:50%;background:var(--text);border:2px solid var(--ink);cursor:pointer}
 .ln-pct .pv{font-family:var(--font-data);font-size:11.5px;font-weight:700;min-width:36px;text-align:right}
@@ -2552,7 +2558,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <div class="invite-title">Lien d'invitation du club</div>
           <div class="invite-sub">Partage ce lien à tes athlètes : ils demandent à rejoindre le club, puis tu les affectes au bon groupe.</div>
           <div class="invite-linkrow">
-            <input type="text" id="inviteLink" readonly value="https://sillance.app/rejoindre/muret-goat-squad">
+            <input type="text" id="inviteLink" readonly aria-label="Lien d'invitation à partager" value="https://sillance.app/rejoindre/muret-goat-squad">
             <button class="btn invite-copy" id="inviteCopy"><i class="ic ic-clipboard"></i>Copier</button>
           </div>
           <div class="invite-share">
@@ -2567,7 +2573,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div id="licenceAlert"></div>
 
       <div class="club-actions">
-        <input type="search" id="clubAthleteSearch" class="club-search" placeholder="Rechercher un athlète…">
+        <input type="search" id="clubAthleteSearch" class="club-search" aria-label="Rechercher un athlète" placeholder="Rechercher un athlète…">
       </div>
       <div class="club-athletes" id="clubAthletesList"></div>
     </div>
@@ -2595,7 +2601,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge">Nouveau créneau</span>
     <h3>Créneau collectif</h3>
     <div class="cr-form">
-      <div class="b-fld"><label>Discipline</label>
+      <div class="b-fld"><label for="crDisc">Discipline</label>
         <select id="crDisc">
           <option value="swim">Natation</option>
           <option value="bike">Vélo</option>
@@ -2603,23 +2609,23 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <option value="strength">Renfo</option>
         </select>
       </div>
-      <div class="b-fld"><label>Intitulé</label><input type="text" id="crTitle" placeholder="Ex. Séance piste collective"></div>
+      <div class="b-fld"><label for="crTitle">Intitulé</label><input type="text" id="crTitle" placeholder="Ex. Séance piste collective"></div>
       <div class="cr-row">
-        <div class="b-fld"><label>Jour</label><select id="crDay"></select></div>
-        <div class="b-fld"><label>Heure</label><input type="time" id="crTime" value="18:30"></div>
-        <div class="b-fld"><label>Durée (min)</label><input type="number" id="crDur" value="90" min="15" max="240"></div>
+        <div class="b-fld"><label for="crDay">Jour</label><select id="crDay"></select></div>
+        <div class="b-fld"><label for="crTime">Heure</label><input type="time" id="crTime" value="18:30"></div>
+        <div class="b-fld"><label for="crDur">Durée (min)</label><input type="number" id="crDur" value="90" min="15" max="240"></div>
       </div>
       <div class="cr-row">
-        <div class="b-fld"><label>Lieu</label><input type="text" id="crPlace" placeholder="Ex. Stade / Salle Hyrox"></div>
-        <div class="b-fld"><label>Places max</label><input type="number" id="crCap" value="20" min="1" max="200"></div>
+        <div class="b-fld"><label for="crPlace">Lieu</label><input type="text" id="crPlace" placeholder="Ex. Stade / Salle Hyrox"></div>
+        <div class="b-fld"><label for="crCap">Places max</label><input type="number" id="crCap" value="20" min="1" max="200"></div>
       </div>
       <div class="cr-row">
-        <div class="b-fld"><label>Coach</label><input type="text" id="crCoach" placeholder="Nom du coach"></div>
-        <div class="b-fld"><label>Tarif séance (€)</label><input type="number" id="crPrice" value="0" min="0" step="0.5"></div>
+        <div class="b-fld"><label for="crCoach">Coach</label><input type="text" id="crCoach" placeholder="Nom du coach"></div>
+        <div class="b-fld"><label for="crPrice">Tarif séance (€)</label><input type="number" id="crPrice" value="0" min="0" step="0.5"></div>
       </div>
-      <div class="b-fld"><label>Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage — visible par les inscrits"></textarea></div>
+      <div class="b-fld"><label for="crDesc">Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage — visible par les inscrits"></textarea></div>
       <div class="cr-row">
-        <div class="b-fld"><label>Groupe (contenu réservé)</label><select id="crGroup"><option value="">Tout le club</option></select></div>
+        <div class="b-fld"><label for="crGroup">Groupe (contenu réservé)</label><select id="crGroup"><option value="">Tout le club</option></select></div>
         <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> Inviter tout le groupe</label></div>
       </div>
       <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres — ils n'ont qu'à confirmer leur présence.</p>
@@ -2652,12 +2658,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge" style="background:var(--strength)"><i class="ic ic-shirt"></i> Groupe</span>
     <h3 id="groupModalTitle">Nouveau groupe</h3>
     <div class="cr-form">
-      <div class="b-fld"><label>Nom du groupe</label><input type="text" id="grpName" placeholder="Ex. Adultes Triathlon Ironman"></div>
-      <div class="b-fld"><label>Description (optionnel)</label><input type="text" id="grpDesc" placeholder="Ex. Longue distance, format Ironman"></div>
+      <div class="b-fld"><label for="grpName">Nom du groupe</label><input type="text" id="grpName" placeholder="Ex. Adultes Triathlon Ironman"></div>
+      <div class="b-fld"><label for="grpDesc">Description (optionnel)</label><input type="text" id="grpDesc" placeholder="Ex. Longue distance, format Ironman"></div>
       <div class="b-fld"><label>Couleur</label>
         <div class="grp-colors" id="grpColors"></div>
       </div>
-      <div class="b-fld"><label>Athlètes du groupe</label>
+      <div class="b-fld"><label for="grpMemberSearch">Athlètes du groupe</label>
         <input type="search" id="grpMemberSearch" class="club-search grp-search" placeholder="Rechercher un athlète…">
         <div class="grp-members" id="grpMembers"></div>
       </div>
@@ -2676,8 +2682,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <label class="consent-check"><input type="checkbox" id="consentIsMinor"> <span>Cet athlète est <b>mineur</b> (moins de 18 ans)</span></label>
       <div id="consentFields" hidden>
         <p class="consent-note">En France, le traitement des données d'un mineur suppose l'autorisation de son représentant légal (données de santé incluses). Renseigne son contact et atteste avoir recueilli son autorisation.</p>
-        <div class="b-fld"><label>Nom du représentant légal</label><input type="text" id="consentGuardianName" placeholder="Ex. Claire Rousseau"></div>
-        <div class="b-fld"><label>E-mail du représentant légal</label><input type="email" id="consentGuardianEmail" placeholder="parent@exemple.fr"></div>
+        <div class="b-fld"><label for="consentGuardianName">Nom du représentant légal</label><input type="text" id="consentGuardianName" placeholder="Ex. Claire Rousseau"></div>
+        <div class="b-fld"><label for="consentGuardianEmail">E-mail du représentant légal</label><input type="email" id="consentGuardianEmail" placeholder="parent@exemple.fr"></div>
         <label class="consent-check"><input type="checkbox" id="consentAttest"> <span>J'atteste avoir recueilli l'autorisation écrite du représentant légal pour le traitement des données personnelles (dont données de santé) de ce mineur, conformément à la <a href="./legal.html#confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</span></label>
       </div>
     </div>
@@ -2692,15 +2698,15 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge" style="background:var(--bike)"><i class="ic ic-shield"></i> Licence sportive</span>
     <h3>Licence — <span id="licenceAthName"></span></h3>
     <div class="cr-form">
-      <div class="b-fld"><label>Fédération</label>
+      <div class="b-fld"><label for="licFed">Fédération</label>
         <select id="licFed">
           <option value="FFTri">FFTri — Fédération Française de Triathlon</option>
           <option value="FFC">FFC — Fédération Française de Cyclisme</option>
           <option value="Autre">Autre / aucune</option>
         </select>
       </div>
-      <div class="b-fld"><label>Numéro de licence</label><input type="text" id="licNum" placeholder="Ex. 1234567"></div>
-      <div class="b-fld"><label>Certificat médical valable jusqu'au</label><input type="date" id="licCert"></div>
+      <div class="b-fld"><label for="licNum">Numéro de licence</label><input type="text" id="licNum" placeholder="Ex. 1234567"></div>
+      <div class="b-fld"><label for="licCert">Certificat médical valable jusqu'au</label><input type="date" id="licCert"></div>
       <p class="consent-note">Le certificat médical (ou le questionnaire de santé qui en tient lieu selon les règles de ta fédération) est une donnée de santé, traitée selon la <a href="./legal.html#confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
     </div>
     <button class="btn" id="licSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
@@ -2714,8 +2720,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge" style="background:var(--strength)"><i class="ic ic-user"></i> Fiche athlète</span>
     <h3>Fiche — <span id="profileAthName"></span></h3>
     <div class="cr-form">
-      <div class="b-fld"><label>VO2max (ml/kg/min, optionnel)</label><input type="number" step="0.1" min="0" max="99" id="profVo2max" placeholder="Ex. 58"></div>
-      <div class="b-fld"><label>Parcours sportif</label><textarea id="profBackground" rows="3" placeholder="Depuis quand il/elle pratique, expérience, contexte…"></textarea></div>
+      <div class="b-fld"><label for="profVo2max">VO2max (ml/kg/min, optionnel)</label><input type="number" step="0.1" min="0" max="99" id="profVo2max" placeholder="Ex. 58"></div>
+      <div class="b-fld"><label for="profBackground">Parcours sportif</label><textarea id="profBackground" rows="3" placeholder="Depuis quand il/elle pratique, expérience, contexte…"></textarea></div>
 
       <div class="b-fld"><label>Records personnels</label>
         <div class="prof-list" id="profRecords"></div>
@@ -2727,8 +2733,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
         <button class="group-edit" id="profAddInjury" type="button" style="margin-top:6px">+ Ajouter une blessure</button>
       </div>
 
-      <div class="b-fld"><label>Habitudes alimentaires</label><textarea id="profDiet" rows="2" placeholder="Allergies, régime, préférences…"></textarea></div>
-      <div class="b-fld"><label>Habitudes de vie / travail</label><textarea id="profWork" rows="2" placeholder="Horaires, métier physique ou sédentaire, contraintes…"></textarea></div>
+      <div class="b-fld"><label for="profDiet">Habitudes alimentaires</label><textarea id="profDiet" rows="2" placeholder="Allergies, régime, préférences…"></textarea></div>
+      <div class="b-fld"><label for="profWork">Habitudes de vie / travail</label><textarea id="profWork" rows="2" placeholder="Horaires, métier physique ou sédentaire, contraintes…"></textarea></div>
       <div class="b-fld"><label>Débriefs de course (remplis par l'athlète)</label><div id="profDebriefs"></div></div>
       <div class="b-fld"><label>Équipe de coachs</label><div id="profCoTeam"></div></div>
     </div>
@@ -2742,8 +2748,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge" style="background:var(--swim)"><i class="ic ic-users"></i> Ajouter un coach</span>
     <h3>Proposer un coach supplémentaire</h3>
     <div class="cr-form">
-      <div class="b-fld"><label>Email du coach</label><input type="email" id="ccEmail" placeholder="prenom@exemple.com"></div>
-      <div class="b-fld"><label>Rôle (optionnel)</label><input type="text" id="ccRole" placeholder="Ex. Vélo, Course, Nutrition, Data…"></div>
+      <div class="b-fld"><label for="ccEmail">Email du coach</label><input type="email" id="ccEmail" placeholder="prenom@exemple.com"></div>
+      <div class="b-fld"><label for="ccRole">Rôle (optionnel)</label><input type="text" id="ccRole" placeholder="Ex. Vélo, Course, Nutrition, Data…"></div>
       <p class="club-hint" id="ccHint"></p>
     </div>
     <button class="btn" id="coCoachSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Envoyer la demande</button>
@@ -2756,7 +2762,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge" style="background:var(--bike)"><i class="ic ic-link"></i> Partager la course</span>
     <h3>Lien pour les proches — <span id="specRaceName"></span></h3>
     <div class="cr-form">
-      <div class="b-fld"><label>Repères pour tes proches (optionnel)</label>
+      <div class="b-fld"><label for="specNotes">Repères pour tes proches (optionnel)</label>
         <textarea id="specNotes" rows="3" placeholder="Ex. À 30 km, ralentis si FC > 170. Ravito prévu au km 15."></textarea></div>
       <p class="club-hint">Aucun tracking GPS en direct — juste ces repères, et le résultat dès qu'il est disponible.</p>
     </div>
@@ -2771,16 +2777,16 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge" style="background:var(--run)"><i class="ic ic-flag"></i> Débrief de course</span>
     <h3>Comment s'est passée ta course&nbsp;?</h3>
     <div class="cr-form">
-      <div class="b-fld"><label>Course</label><input type="text" id="dbRace" placeholder="Ex. Gorillaman Sprint"></div>
-      <div class="b-fld"><label>Date</label><input type="date" id="dbDate"></div>
-      <div class="b-fld"><label>Résultat / temps</label><input type="text" id="dbResult" placeholder="Ex. 1h12, ou position au général"></div>
-      <div class="b-fld"><label>Ressenti général</label><textarea id="dbFelt" rows="2" placeholder="Comment tu t'es senti pendant la course…"></textarea></div>
-      <div class="b-fld"><label>Nutrition suivie comme prévu&nbsp;?</label>
+      <div class="b-fld"><label for="dbRace">Course</label><input type="text" id="dbRace" placeholder="Ex. Gorillaman Sprint"></div>
+      <div class="b-fld"><label for="dbDate">Date</label><input type="date" id="dbDate"></div>
+      <div class="b-fld"><label for="dbResult">Résultat / temps</label><input type="text" id="dbResult" placeholder="Ex. 1h12, ou position au général"></div>
+      <div class="b-fld"><label for="dbFelt">Ressenti général</label><textarea id="dbFelt" rows="2" placeholder="Comment tu t'es senti pendant la course…"></textarea></div>
+      <div class="b-fld"><label for="dbNutrition">Nutrition suivie comme prévu&nbsp;?</label>
         <select id="dbNutrition"><option value="oui">Oui</option><option value="partiel">Partiellement</option><option value="non">Non</option></select>
       </div>
-      <div class="b-fld"><label>Météo</label><input type="text" id="dbWeather" placeholder="Ex. chaud, pluie, vent…"></div>
-      <div class="b-fld"><label>Ce qui a bien marché</label><textarea id="dbGood" rows="2"></textarea></div>
-      <div class="b-fld"><label>Ce qui a coincé</label><textarea id="dbBad" rows="2"></textarea></div>
+      <div class="b-fld"><label for="dbWeather">Météo</label><input type="text" id="dbWeather" placeholder="Ex. chaud, pluie, vent…"></div>
+      <div class="b-fld"><label for="dbGood">Ce qui a bien marché</label><textarea id="dbGood" rows="2"></textarea></div>
+      <div class="b-fld"><label for="dbBad">Ce qui a coincé</label><textarea id="dbBad" rows="2"></textarea></div>
     </div>
     <button class="btn" id="debriefSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer mon débrief</button>
   </div>
@@ -2811,23 +2817,23 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <span class="badge"><i class="ic ic-shoe"></i> Équipement</span>
     <h3>Nouvel équipement</h3>
     <div class="cr-form">
-      <div class="b-fld"><label>Type</label>
+      <div class="b-fld"><label for="gearType">Type</label>
         <select id="gearType">
           <option value="shoe">Chaussures de course</option>
           <option value="bike">Vélo</option>
         </select>
       </div>
-      <div class="b-fld" id="shoeSearchFld"><label>Cherche ton modèle</label>
+      <div class="b-fld" id="shoeSearchFld"><label for="gearSearch">Cherche ton modèle</label>
         <input type="text" id="gearSearch" placeholder="Ex. Pegasus, Novablast, Vaporfly…" autocomplete="off">
         <div class="shoe-results" id="shoeResults"></div>
         <div class="shoe-brands" id="shoeBrands"></div>
       </div>
-      <div class="b-fld"><label>Nom / modèle</label><input type="text" id="gearName" placeholder="Ou saisis-le librement s'il n'est pas dans le catalogue"></div>
+      <div class="b-fld"><label for="gearName">Nom / modèle</label><input type="text" id="gearName" placeholder="Ou saisis-le librement s'il n'est pas dans le catalogue"></div>
       <div class="shoe-picked" id="shoePicked" hidden></div>
       <div class="cr-row">
-        <div class="b-fld"><label>Km déjà parcourus</label><input type="number" id="gearKm" value="0" min="0"></div>
-        <div class="b-fld"><label>Durée de vie (km)</label><input type="number" id="gearMax" value="900" min="100"></div>
-        <div class="b-fld"><label>Prix d'achat (€)</label><input type="number" id="gearPrice" value="" min="0" placeholder="160"></div>
+        <div class="b-fld"><label for="gearKm">Km déjà parcourus</label><input type="number" id="gearKm" value="0" min="0"></div>
+        <div class="b-fld"><label for="gearMax">Durée de vie (km)</label><input type="number" id="gearMax" value="900" min="100"></div>
+        <div class="b-fld"><label for="gearPrice">Prix d'achat (€)</label><input type="number" id="gearPrice" value="" min="0" placeholder="160"></div>
       </div>
       <p class="cr-note">La durée de vie se remplit automatiquement selon le modèle choisi : une chaussure carbone de compétition s'use vers 350 km, une paire d'entraînement tient 900 km et plus. Le prix permet de suivre ton coût au kilomètre.</p>
     </div>
@@ -2962,7 +2968,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <button class="close" id="cycleClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
     <span class="badge" id="cycleBadge">Nouveau cycle</span>
     <div class="cy-meta">
-      <input type="text" id="cyName" class="b-title-input" placeholder="Nom du cycle (ex. Endurance hiver, Affûtage course A…)">
+      <input type="text" id="cyName" class="b-title-input" aria-label="Nom du cycle" placeholder="Nom du cycle (ex. Endurance hiver, Affûtage course A…)">
       <select id="cyWeeks" class="b-disc-select" aria-label="Durée du cycle">
         <option value="3">3 semaines</option>
         <option value="4" selected>4 semaines</option>
@@ -2989,7 +2995,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <div class="builder-head">
       <span class="badge" id="builderBadge">Nouvelle séance</span>
       <div class="builder-meta-row">
-        <input type="text" id="bTitle" class="b-title-input" placeholder="Titre de la séance (ex. Seuil 4×8' FTP)">
+        <input type="text" id="bTitle" class="b-title-input" aria-label="Titre de la séance" placeholder="Titre de la séance (ex. Seuil 4×8' FTP)">
         <select id="bDiscPick" class="b-disc-select" aria-label="Sport">
           <option value="swim">Natation</option>
           <option value="bike">Vélo</option>
@@ -2997,7 +3003,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <option value="strength">Renfo</option>
           <option value="hyrox">Hyrox</option>
         </select>
-        <select id="bObjectif" title="Objectif de la séance — sert à l'analyse IA" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:10px;padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
+        <select id="bObjectif" title="Objectif de la séance — sert à l'analyse IA" aria-label="Objectif de la séance" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:10px;padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
           <option value="">Objectif : auto</option>
           <option value="endurance|Z2">Endurance fondamentale (Z2)</option>
           <option value="seuil|Z3">Seuil aérobie · LT1 (Z3)</option>
@@ -3019,8 +3025,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="b-nutri">
         <div class="b-nutri-head"><i class="ic ic-utensils"></i> Consignes nutrition <span id="bNutriAuto" class="b-nutri-auto"></span></div>
         <div class="b-nutri-grid">
-          <div class="b-fld"><label>Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type — ou écris ta consigne"></textarea></div>
-          <div class="b-fld"><label>Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides"></textarea></div>
+          <div class="b-fld"><label for="bNutriPre">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type — ou écris ta consigne"></textarea></div>
+          <div class="b-fld"><label for="bNutriPost">Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides"></textarea></div>
         </div>
         <button class="b-nutri-reset" id="bNutriReset" type="button">↺ Regénérer automatiquement</button>
       </div>
@@ -3075,7 +3081,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <div class="chat-quick" id="chatQuick"></div>
   <div class="chat-body" id="chatBody"></div>
   <div class="chat-input">
-    <input type="text" id="chatText" placeholder="Écris un message…" autocomplete="off">
+    <input type="text" id="chatText" aria-label="Message" placeholder="Écris un message…" autocomplete="off">
     <button id="chatSend" aria-label="Envoyer">➤</button>
   </div>
 </div>
@@ -7569,16 +7575,16 @@ function renderCreneauDetail(){
             <option value="once" ${c.recur==='once'?'selected':''}>Séance ponctuelle (date)</option>
           </select></div>
         <div class="b-fld" id="crdWhenFld">${c.recur==='once'
-          ? `<label>Date</label><input type="date" id="crdDate" value="${c.date||''}">`
-          : `<label>Jour</label><select id="crdDay">${CLUB_DAYS.map((d,i)=>`<option value="${i}" ${i===c.day?'selected':''}>${d}</option>`).join('')}</select>`}</div>
-        <div class="b-fld"><label>Heure</label><input type="time" id="crdTime" value="${c.time}"></div>
-        <div class="b-fld"><label>Durée (min)</label><input type="number" id="crdDur" min="15" max="240" value="${c.dur}"></div>
-        <div class="b-fld"><label>Lieu</label><input type="text" id="crdPlace" value="${c.place}"></div>
-        <div class="b-fld"><label>Places max</label><input type="number" id="crdCap" min="1" max="200" value="${c.cap}"></div>
+          ? `<label for="crdDate">Date</label><input type="date" id="crdDate" value="${c.date||''}">`
+          : `<label for="crdDay">Jour</label><select id="crdDay">${CLUB_DAYS.map((d,i)=>`<option value="${i}" ${i===c.day?'selected':''}>${d}</option>`).join('')}</select>`}</div>
+        <div class="b-fld"><label for="crdTime">Heure</label><input type="time" id="crdTime" value="${c.time}"></div>
+        <div class="b-fld"><label for="crdDur">Durée (min)</label><input type="number" id="crdDur" min="15" max="240" value="${c.dur}"></div>
+        <div class="b-fld"><label for="crdPlace">Lieu</label><input type="text" id="crdPlace" value="${c.place}"></div>
+        <div class="b-fld"><label for="crdCap">Places max</label><input type="number" id="crdCap" min="1" max="200" value="${c.cap}"></div>
         <div class="b-fld"><label>Groupe (contenu réservé)</label>
           <select id="crdGroup"><option value="">Tout le club</option>${CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${gr.id===c.group?'selected':''}>${gr.name}</option>`).join('')}</select></div>
-        <div class="b-fld"><label>Tarif (€)</label><input type="number" id="crdPrice" min="0" step="0.5" value="${c.price}"></div>
-        <div class="b-fld full"><label>Contenu de la séance</label><textarea id="crdDesc" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical">${c.desc||''}</textarea></div>
+        <div class="b-fld"><label for="crdPrice">Tarif (€)</label><input type="number" id="crdPrice" min="0" step="0.5" value="${c.price}"></div>
+        <div class="b-fld full"><label for="crdDesc">Contenu de la séance</label><textarea id="crdDesc" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical">${c.desc||''}</textarea></div>
       </div>
       <button class="btn crd-save" id="crdSave"><i class="ic ic-check"></i> Enregistrer les paramètres</button>`;
     document.getElementById('crdRecur').onchange=e=>{
