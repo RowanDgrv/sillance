@@ -4092,7 +4092,7 @@ const CHECKIN_THRESHOLD = 50;     // seuil orange (vigilance)
 const CHECKIN_URGENT = 30;        // seuil rouge (urgent)
 const ATHLETE_NAME = 'Romain D.'; // démo — vient du profil athlète
 
-function submitCheckin(){
+async function submitCheckin(){
   const score = readinessScore();
   const dispo = checkin.dispo || 'ok';
   const hrvS = hrvStatus(checkin.hrv, ATHLETE_REF.hrvBase);
@@ -4100,15 +4100,25 @@ function submitCheckin(){
   // blessé/HRV effondrée = alerte prioritaire ; malade/fatigué/HRV sous base = alerte simple
   const low = score < CHECKIN_THRESHOLD || dispo !== 'ok' || hrvLow;
   const urgent = score < CHECKIN_URGENT || dispo === 'blesse' || (hrvS && hrvS.level==='low');
-  // Persistance backend (Sillance cloud) — non bloquant, ignoré en mode démo.
+  // Persistance backend (Sillance cloud) — BLOQUANT : un signal comme « je suis
+  // blessé » ne doit jamais afficher un succès si la sauvegarde a échoué.
+  const btn = document.getElementById('checkinValidate');
   if(window.PF?.user){
-    PF.saveCheckin({ sommeil:checkin.sommeil, fatigue:checkin.fatigue,
-      motivation:checkin.motivation, readiness:score,
-      poids:checkin.poids||null, dispo, dispoNote:checkin.dispoNote||null, hrv:checkin.hrv||null,
-      cyclePhase:checkin.cyclePhase||null, cycleDay:checkin.cycleDay||null })
-      .catch(e=> console.warn('[PF] saveCheckin échoué :', e));
+    if(btn) btn.disabled=true;
+    try{
+      await PF.saveCheckin({ sommeil:checkin.sommeil, fatigue:checkin.fatigue,
+        motivation:checkin.motivation, readiness:score,
+        poids:checkin.poids||null, dispo, dispoNote:checkin.dispoNote||null, hrv:checkin.hrv||null,
+        cyclePhase:checkin.cyclePhase||null, cycleDay:checkin.cycleDay||null });
+    } catch(e){
+      console.warn('[PF] saveCheckin échoué :', e);
+      if(btn) btn.disabled=false;
+      toast("Échec de l'envoi — vérifie ta connexion et réessaie");
+      return;
+    }
+    if(btn) btn.disabled=false;
   }
-  // confirmation visuelle athlète
+  // confirmation visuelle athlète (affichée seulement après sauvegarde confirmée, ou en démo)
   toast(dispo==='blesse' ? 'Check-in envoyé — ton coach est alerté de ta blessure'
        : urgent ? 'Check-in envoyé — alerte prioritaire à ton coach'
        : low ? 'Check-in envoyé — ton coach est prévenu'
