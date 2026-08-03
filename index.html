@@ -396,6 +396,16 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
   fallback.style.display = 'none';
   // debug : figer a un instant precis (capture d'ecran)
   window._freeze = function(t){ flow.freeze(t); };
+  // Perf (audit 03/08/2026) : la boucle WebGL tournait en continu même hors
+  // viewport (scroll passé le hero, onglet en arrière-plan). freeze()/resume()
+  // existaient déjà côté sillance-flow.js mais n'étaient jamais appelés.
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      var visible = entries[0].isIntersecting;
+      if(visible) flow.resume(); else flow.freeze(18.0);
+    }, {threshold:0});
+    io.observe(canvas);
+  }
 })();
 
 /* Cartes data : tilt 3D + halo qui suit le curseur */
