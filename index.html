@@ -40,7 +40,13 @@
 }
 </script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Perf (audit 03/08/2026) : la feuille Google Fonts bloquait le rendu avant
+     même le <style> inline de ~2100 lignes qui suit. media="print" + swap au
+     onload = chargée sans bloquer le premier rendu ; display=swap dans l'URL
+     évite le texte invisible pendant le chargement. Fallback <noscript>. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --cols:12; --gutter:24px; --margin:clamp(22px,5vw,72px); --maxw:1240px; --lh:24px;
