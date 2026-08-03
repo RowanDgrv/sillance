@@ -2547,7 +2547,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <div class="vl-guides" aria-hidden="true"><div class="vg-cols" id="vlCols"></div><div class="vg-rows"></div></div>
   </section>
 
-  <!-- ===================== PRÉPA MENTALE ===================== -->
+  <!-- ===================== PRÉPA MENTALE =====================
+       MASQUÉE (03/08/2026) : le lien Calendly d'Éric n'était qu'un
+       placeholder (VOTRE-LIEN-ERIC) jamais rempli, renvoyait 404 en prod.
+       Réactiver dès que le vrai lien Calendly est disponible : décommenter
+       cette section + repointer PREPA_MENTALE[0].calendly plus bas.
   <section class="mental" aria-label="Préparation mentale">
     <div class="mental-glow" aria-hidden="true"></div>
     <div class="mental-txt">
@@ -2557,6 +2561,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     </div>
     <button class="btn mental-btn" id="mentalBtn"><i class="ic ic-calendar"></i>Prendre RDV prépa mentale</button>
   </section>
+  -->
 
   <!-- ===================== RÉSERVATION TEST LACTATE (accueil) ===================== -->
   <section class="lactest" aria-label="Réserver un test lactate">
@@ -11313,7 +11318,7 @@ function openMental(){
   else { showPmPicker(); }
   mentalOverlay.classList.add('open');
 }
-document.getElementById('mentalBtn').addEventListener('click', openMental);
+document.getElementById('mentalBtn')?.addEventListener('click', openMental);
 mentalBack.addEventListener('click', e=>{ e.preventDefault(); showPmPicker(); });
 document.getElementById('mentalClose').addEventListener('click', ()=> mentalOverlay.classList.remove('open'));
 mentalOverlay.addEventListener('click', e=>{ if(e.target===mentalOverlay) mentalOverlay.classList.remove('open') });
