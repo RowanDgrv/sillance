@@ -82,7 +82,7 @@
   .card .hint{color:var(--muted);font-size:12.5px;margin:0 0 14px}
   .row{display:flex;align-items:center;gap:12px}
   .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
-  @media(max-width:880px){.cols{grid-template-columns:1fr}}
+  @media(max-width:880px){.cols{grid-template-columns:minmax(0,1fr)}}
 
   /* slot list */
   .slot{display:grid;grid-template-columns:54px 1fr auto;gap:13px;align-items:center;padding:12px 0;border-bottom:1px dashed #1b232b}
@@ -131,6 +131,20 @@
     color:var(--ink);padding:11px 18px;border-radius:11px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .demoflag{display:inline-block;font-size:10.5px;color:var(--warn);border:1px solid rgba(255,177,61,.4);border-radius:99px;padding:2px 9px;margin-left:8px;vertical-align:middle}
+
+  /* Mobile (audit 03/08/2026 : aucun breakpoint sur ce layout sidebar fixe,
+     débordement horizontal confirmé à 320px) : la sidebar passe en flux
+     normal au-dessus du contenu plutôt qu'en colonne fixe de 232px. Placé en
+     fin de feuille pour gagner sur les règles non conditionnelles de main/aside
+     déclarées plus haut (même spécificité, l'ordre de cascade décide). */
+  @media(max-width:680px){
+    .app{grid-template-columns:minmax(0,1fr)}
+    aside{position:static; height:auto; overflow:visible; border-right:none; border-bottom:1px solid var(--line)}
+    main{padding:18px 16px 40px; max-width:100%}
+    .card{padding:16px 14px}
+    .slot{grid-template-columns:44px minmax(0,1fr) auto; gap:8px}
+    .slot .btn.sm{padding:5px 8px; font-size:11px}
+  }
 </style>
 </head>
 <body>

@@ -309,7 +309,7 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 /* ---------- Layout principal ---------- */
 .planner{display:grid;grid-template-columns:236px 1fr;gap:20px;align-items:start}
 @media (max-width:980px){
-  .planner{grid-template-columns:1fr}
+  .planner{grid-template-columns:minmax(0,1fr)}
   /* mobile : le CALENDRIER d'abord, le panneau (bibliothèque / espace athlète) ensuite —
      sinon on scrolle une colonne interminable avant de voir les séances */
   .planner .calendar{order:1}
@@ -784,13 +784,14 @@ body:not([data-athview]):not([data-clubview]) .gear-card .gear-del{display:none}
 .cb-race b{font-family:var(--font-data);color:var(--accent,#46C2D8)}
 .cb-race .ic{width:12px;height:12px;color:var(--muted)}
 .cb-forme{display:flex;align-items:center;gap:var(--space-4);position:relative;justify-self:center}
+.cb-fdetail{min-width:0}
 .cb-ring{position:relative;width:72px;height:72px;flex:none}
 .cb-ring svg{transform:rotate(-90deg)}
 .cb-ring .pct{position:absolute;inset:0;display:grid;place-items:center;
   font-family:var(--font-data);font-weight:700;font-size:var(--fs-xl)}
 .cb-fdetail .cb-kicker{margin-bottom:5px}
 .cb-note{font-weight:700;font-size:var(--fs-lg);margin-bottom:6px}
-.cb-checkin{display:flex;gap:var(--space-3);font-family:var(--font-data);font-size:var(--fs-sm);color:var(--muted)}
+.cb-checkin{display:flex;flex-wrap:wrap;gap:var(--space-3) 10px;font-family:var(--font-data);font-size:var(--fs-sm);color:var(--muted)}
 .cb-checkin span{display:flex;align-items:center;gap:var(--space-1)}
 .cb-checkin .ic{width:11px;height:11px}
 .cb-flags{display:flex;flex-direction:column;gap:7px;align-items:flex-end;position:relative;max-width:280px}
@@ -802,6 +803,7 @@ body:not([data-athview]):not([data-clubview]) .gear-card .gear-del{display:none}
 .cb-flag.ok{background:rgba(57,230,163,.07);border:1px solid rgba(57,230,163,.18);color:var(--good)}
 @media(max-width:880px){
   .coach-band{grid-template-columns:1fr;gap:18px}
+  .cb-id,.cb-forme,.cb-flags{min-width:0;max-width:100%}
   .cb-forme{justify-self:start}
   .cb-flags{align-items:flex-start}
 }
