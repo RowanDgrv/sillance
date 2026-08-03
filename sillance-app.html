@@ -2,6 +2,12 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<!-- Anti-clickjacking (audit 03/08/2026) : GitHub Pages ne permet pas de
+     poser un header X-Frame-Options/frame-ancestors (nécessite un proxy,
+     ex. Cloudflare, devant GitHub Pages — hors de portée sans accès DNS).
+     Frame-buster JS en mitigation partielle en attendant : moins robuste
+     qu'un vrai header, mais couvre le cas courant (iframe non-sandboxée). -->
+<script>try{ if(window.top!==window.self) window.top.location=window.self.location.href; }catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <!-- CSP : app (polices Google + module supabase-js via esm.sh + API supabase + iframe Calendly).
@@ -7552,8 +7558,12 @@ document.getElementById('clubAddGroup').onclick=()=> openGroupModal(null);
 document.getElementById('groupClose').onclick=()=> groupOverlay.classList.remove('open');
 groupOverlay.addEventListener('click', e=>{ if(e.target===groupOverlay) groupOverlay.classList.remove('open'); });
 document.getElementById('grpSave').onclick=()=>{
-  const name=document.getElementById('grpName').value.trim()||'Nouveau groupe';
-  const desc=document.getElementById('grpDesc').value.trim();
+  // Échappés à la saisie (écriture optimiste locale, avant tout aller-retour
+  // DB) : CLUB_GROUPS est ensuite affiché à de nombreux endroits via
+  // innerHTML sans ré-échapper — sans ça, un nom de groupe contenant du
+  // HTML/JS s'exécuterait immédiatement dans la session de celui qui l'a tapé.
+  const name=dispoSafe(document.getElementById('grpName').value.trim()||'Nouveau groupe');
+  const desc=dispoSafe(document.getElementById('grpDesc').value.trim());
   const color=(document.querySelector('.grp-color.sel')?.dataset.c)||GROUP_COLORS[0];
   const isEdit=!!editingGroupId;
   let gid=editingGroupId;
@@ -7699,18 +7709,21 @@ document.getElementById('clubAddCreneau').onclick=()=>{
 document.getElementById('creneauClose').onclick=()=> creneauOverlay.classList.remove('open');
 creneauOverlay.addEventListener('click', e=>{ if(e.target===creneauOverlay) creneauOverlay.classList.remove('open'); });
 document.getElementById('crSave').onclick=()=>{
+  // title/place/coach/desc échappés à la saisie : renderCreneaux() les
+  // interpole ensuite tels quels dans du innerHTML (écriture optimiste
+  // locale, avant tout aller-retour DB).
   const c={
     id:'c'+Date.now(),
     disc:document.getElementById('crDisc').value,
-    title:document.getElementById('crTitle').value||'Créneau collectif',
+    title:dispoSafe(document.getElementById('crTitle').value||'Créneau collectif'),
     day:+document.getElementById('crDay').value,
     time:document.getElementById('crTime').value,
     dur:+document.getElementById('crDur').value,
-    place:document.getElementById('crPlace').value||'À définir',
+    place:dispoSafe(document.getElementById('crPlace').value||'À définir'),
     cap:+document.getElementById('crCap').value,
-    coach:document.getElementById('crCoach').value||'Coach',
+    coach:dispoSafe(document.getElementById('crCoach').value||'Coach'),
     price:+document.getElementById('crPrice').value,
-    desc:document.getElementById('crDesc').value.trim(),
+    desc:dispoSafe(document.getElementById('crDesc').value.trim()),
     group:document.getElementById('crGroup').value||null,
     invited:[],
     attendees:[]
@@ -7823,7 +7836,9 @@ let CHAT_MACROS = (()=>{ try{ const s=JSON.parse(localStorage.getItem('sil_chat_
 function manageChatMacros(){
   const next = prompt('Tes réponses rapides (une par ligne) :', CHAT_MACROS.join('\n'));
   if(next==null) return;
-  CHAT_MACROS = next.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8);
+  // Échappé à la saisie : rendu ensuite en boutons via innerHTML sans
+  // ré-échapper (`<button>${x}</button>`).
+  CHAT_MACROS = next.split('\n').map(s=>dispoSafe(s.trim())).filter(Boolean).slice(0,8);
   localStorage.setItem('sil_chat_macros', JSON.stringify(CHAT_MACROS));
   renderChat();
 }
@@ -7844,7 +7859,9 @@ function renderChat(){
 }
 function sendChat(text){
   text=(text||'').trim(); if(!text) return;
-  CHAT_MSGS.push({from:'me', text, t:nowHM()});
+  // Échappé à la saisie : renderChat() interpole m.text tel quel dans du
+  // innerHTML, sans ré-échapper (écriture optimiste locale, chat 100% front).
+  CHAT_MSGS.push({from:'me', text:dispoSafe(text), t:nowHM()});
   document.getElementById('chatText').value=''; renderChat();
   setTimeout(()=>{ CHAT_MSGS.push({from:'them', text:'Bien reçu, merci coach !', t:nowHM()}); renderChat(); }, 1400);
 }
@@ -11262,10 +11279,12 @@ document.getElementById('gearType').addEventListener('change', e=>{
 
 document.getElementById('gearSave').onclick=()=>{
   const type=document.getElementById('gearType').value;
+  // name échappé à la saisie : renderGear() l'interpole ensuite tel quel
+  // dans du innerHTML (écriture optimiste locale, avant tout aller-retour DB).
   const g={
     id:'g'+Date.now(),
     type,
-    name:document.getElementById('gearName').value||'Équipement',
+    name:dispoSafe(document.getElementById('gearName').value||'Équipement'),
     km:+document.getElementById('gearKm').value||0,
     max:+document.getElementById('gearMax').value||1000,
     price:+document.getElementById('gearPrice').value||null,
