@@ -385,6 +385,14 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .cy-start input{background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px}
 .cy-actions{margin-left:auto;display:flex;gap:9px}
 .btn.cy-ghost{background:transparent;color:var(--text);border:1px solid var(--line-strong);box-shadow:none}
+/* Bouton secondaire générique (audit 03/08/2026 : 26 boutons au même style
+   fort-contraste, aucune vraie hiérarchie primary/secondary). Généralise le
+   style déjà existant sous 2 noms différents (.cy-ghost et .adh-open-btn
+   font la même chose) pour les nouveaux usages, sans toucher aux usages
+   existants qui fonctionnent déjà — pas de churn inutile sur du code qui
+   marche. */
+.btn.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--line-strong);box-shadow:none}
+.btn.btn-secondary:hover{border-color:var(--accent)}
 #cyPicker{position:fixed;z-index:80;width:250px;max-height:280px;overflow-y:auto;background:var(--panel-2);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow-2);padding:6px}
 #cyPicker .g{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:7px 8px 3px}
 #cyPicker .it{padding:6px 8px;border-radius:7px;font-size:12px;cursor:pointer;display:flex;gap:6px;align-items:center}
@@ -2580,7 +2588,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <div class="invite-sub">Partage ce lien à tes athlètes : ils demandent à rejoindre le club, puis tu les affectes au bon groupe.</div>
           <div class="invite-linkrow">
             <input type="text" id="inviteLink" readonly aria-label="Lien d'invitation à partager" value="https://sillance.app/rejoindre/muret-goat-squad">
-            <button class="btn invite-copy" id="inviteCopy"><i class="ic ic-clipboard"></i>Copier</button>
+            <button class="btn invite-copy btn-secondary" id="inviteCopy"><i class="ic ic-clipboard"></i>Copier</button>
           </div>
           <div class="invite-share">
             <button class="invite-wa" id="inviteWhatsapp">Partager sur WhatsApp</button>
@@ -5078,7 +5086,7 @@ function settingsStructureHtml(){
     <div class="set-upsell">
       <b>⭐ Passe ta structure en COACH PRO</b>
       <p>Active les fonctionnalités PRO pour tous les coachs de ta structure et l'Assistant IA pour tes athlètes.</p>
-      <button class="btn" id="setProBtn">Découvrir</button>
+      <button class="btn btn-secondary" id="setProBtn">Découvrir</button>
     </div>`;
 }
 function settingsCoachHtml(){
@@ -6599,7 +6607,7 @@ async function generateSpectatorLink(){
     const base = location.href.replace(/[^/]*$/, '');
     const url = `${base}spectateur.html?token=${row.token}`;
     resEl.innerHTML = `<input type="text" readonly value="${url}" style="width:100%;box-sizing:border-box;margin-bottom:6px" onclick="this.select()">
-      <button class="btn" id="specCopy" type="button" style="width:100%">Copier le lien</button>`;
+      <button class="btn btn-secondary" id="specCopy" type="button" style="width:100%">Copier le lien</button>`;
     document.getElementById('specCopy').onclick = ()=>{ navigator.clipboard.writeText(url).then(()=> toast('Lien copié')); };
   }catch(e){ console.warn('[PF] getOrCreateSpectatorLink :', e); resEl.innerHTML = `<p class="club-hint">Lien indisponible pour le moment.</p>`; }
 }
