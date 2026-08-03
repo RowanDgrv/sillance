@@ -119,6 +119,26 @@
     "nutriReminder.carbs": `des glucides (gels, barres, boisson énergétique) pour cette sortie longue`,
     "nutriReminder.protein": `des protéines pour la récup (séance intense) + glucides`,
     "nutriReminder.hydrate": `de quoi bien t'hydrater`,
+
+    "chartCat.charge": `Charge & puissance`, "chartCat.physio": `Physio`, "chartCat.biomeca": `Biomécanique`, "chartCat.hyrox": `Hyrox`,
+    "chart.loadstack": `Charge cumulée`, "chart.load": `Charge & forme`, "chart.ftp": `FTP & PMA`, "chart.dist": `Distance hebdo`,
+    "chart.mmp": `Puissance–durée`, "chart.durab": `Durabilité`, "chart.loadmix": `Méthode de charge`,
+    "chart.hr": `Zones FC`, "chart.lactate": `Lactate & seuils`,
+    "chart.runDyn": `Dynamiques de foulée`, "chart.runTiles": `Foulée & puissance`, "chart.runSym": `Symétrie G/D`, "chart.runTrend": `Tendance cadence`,
+    "chart.hyrox": `Profil Hyrox`,
+
+    "objectif.endurance.l": `Endurance fondamentale`,
+    "objectif.endurance.why": `Construit ta base aérobie : plus de mitochondries, un cœur plus efficace, une meilleure utilisation des graisses. C'est le socle qui rend les séances dures payantes plus tard.`,
+    "objectif.seuil.l": `Seuil`,
+    "objectif.seuil.why": `Repousse la vitesse/puissance que tu peux tenir longtemps sans t'effondrer — le levier le plus direct pour progresser sur les distances moyennes à longues.`,
+    "objectif.vo2.l": `VMA / VO2max`,
+    "objectif.vo2.why": `Développe ta capacité aérobie maximale, ta « cylindrée ». Séance courte et intense : elle élève le plafond sur lequel tout le reste s'appuie.`,
+    "objectif.recup.l": `Récupération`,
+    "objectif.recup.why": `Laisse le corps encaisser la charge des jours précédents. Sauter ces séances n'accélère pas la progression, ça l'annule.`,
+    "objectif.hyrox.l": `Hyrox`,
+    "objectif.hyrox.why": `Travaille la transition course/effort musculaire — le vrai facteur limitant en Hyrox, plus que chaque discipline isolée.`,
+    "lineType.warmup": `Échauffement`, "lineType.exo": `Exercice`, "lineType.contre": `Contre-effort`,
+    "lineType.recov": `Récupération`, "lineType.cooldown": `Retour calme`, "lineType.interval": `Intervalle`,
   };
 
   var en = {
@@ -237,6 +257,26 @@
     "nutriReminder.carbs": `some carbs (gels, bars, energy drink) for this long outing`,
     "nutriReminder.protein": `some protein for recovery (intense session) + carbs`,
     "nutriReminder.hydrate": `something to hydrate well`,
+
+    "chartCat.charge": `Load & power`, "chartCat.physio": `Physio`, "chartCat.biomeca": `Biomechanics`, "chartCat.hyrox": `Hyrox`,
+    "chart.loadstack": `Cumulative load`, "chart.load": `Load & form`, "chart.ftp": `FTP & MAP`, "chart.dist": `Weekly distance`,
+    "chart.mmp": `Power–duration`, "chart.durab": `Durability`, "chart.loadmix": `Load method`,
+    "chart.hr": `HR zones`, "chart.lactate": `Lactate & thresholds`,
+    "chart.runDyn": `Running dynamics`, "chart.runTiles": `Stride & power`, "chart.runSym": `L/R symmetry`, "chart.runTrend": `Cadence trend`,
+    "chart.hyrox": `Hyrox profile`,
+
+    "objectif.endurance.l": `Foundational endurance`,
+    "objectif.endurance.why": `Builds your aerobic base: more mitochondria, a more efficient heart, better fat utilization. It's the foundation that makes hard sessions pay off later.`,
+    "objectif.seuil.l": `Threshold`,
+    "objectif.seuil.why": `Pushes the speed/power you can hold for a long time without cracking — the most direct lever for progressing on middle to long distances.`,
+    "objectif.vo2.l": `VO2max`,
+    "objectif.vo2.why": `Develops your maximal aerobic capacity, your "engine size". Short, intense session: it raises the ceiling everything else builds on.`,
+    "objectif.recup.l": `Recovery`,
+    "objectif.recup.why": `Lets the body absorb the load from previous days. Skipping these sessions doesn't speed up progress — it cancels it out.`,
+    "objectif.hyrox.l": `Hyrox`,
+    "objectif.hyrox.why": `Works the run/strength transition — the real limiting factor in Hyrox, more than any single discipline.`,
+    "lineType.warmup": `Warm-up`, "lineType.exo": `Exercise`, "lineType.contre": `Counter-effort`,
+    "lineType.recov": `Recovery`, "lineType.cooldown": `Cool-down`, "lineType.interval": `Interval`,
   };
 
   var es = {
@@ -355,6 +395,26 @@
     "nutriReminder.carbs": `carbohidratos (geles, barritas, bebida energética) para esta salida larga`,
     "nutriReminder.protein": `proteínas para la recuperación (sesión intensa) + carbohidratos`,
     "nutriReminder.hydrate": `algo para hidratarte bien`,
+
+    "chartCat.charge": `Carga & potencia`, "chartCat.physio": `Fisio`, "chartCat.biomeca": `Biomecánica`, "chartCat.hyrox": `Hyrox`,
+    "chart.loadstack": `Carga acumulada`, "chart.load": `Carga & forma`, "chart.ftp": `FTP & PAM`, "chart.dist": `Distancia semanal`,
+    "chart.mmp": `Potencia–duración`, "chart.durab": `Durabilidad`, "chart.loadmix": `Método de carga`,
+    "chart.hr": `Zonas de FC`, "chart.lactate": `Lactato & umbrales`,
+    "chart.runDyn": `Dinámicas de zancada`, "chart.runTiles": `Zancada & potencia`, "chart.runSym": `Simetría I/D`, "chart.runTrend": `Tendencia de cadencia`,
+    "chart.hyrox": `Perfil Hyrox`,
+
+    "objectif.endurance.l": `Resistencia de base`,
+    "objectif.endurance.why": `Construye tu base aeróbica: más mitocondrias, un corazón más eficiente, mejor uso de las grasas. Es la base que hace que las sesiones duras den sus frutos más tarde.`,
+    "objectif.seuil.l": `Umbral`,
+    "objectif.seuil.why": `Aumenta la velocidad/potencia que puedes mantener mucho tiempo sin desplomarte — la palanca más directa para progresar en distancias medias a largas.`,
+    "objectif.vo2.l": `VAM / VO2max`,
+    "objectif.vo2.why": `Desarrolla tu capacidad aeróbica máxima, tu «cilindrada». Sesión corta e intensa: eleva el techo sobre el que se apoya todo lo demás.`,
+    "objectif.recup.l": `Recuperación`,
+    "objectif.recup.why": `Deja que el cuerpo asimile la carga de los días anteriores. Saltarse estas sesiones no acelera el progreso, lo anula.`,
+    "objectif.hyrox.l": `Hyrox`,
+    "objectif.hyrox.why": `Trabaja la transición carrera/esfuerzo muscular — el verdadero factor limitante en Hyrox, más que cada disciplina por separado.`,
+    "lineType.warmup": `Calentamiento`, "lineType.exo": `Ejercicio`, "lineType.contre": `Contraesfuerzo`,
+    "lineType.recov": `Recuperación`, "lineType.cooldown": `Vuelta a la calma`, "lineType.interval": `Intervalo`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

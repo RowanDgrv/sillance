@@ -2770,21 +2770,21 @@ function lineLabel(ln){
   if(ln.type==='station'){ const st=hyroxStation(ln.station)||HYROX_STATIONS[0]; return st.name; }
   const T=LINE_TYPES[ln.type];
   const amt = (ln.metric==='dist') ? `${ln.dist||0} m` : `${(ln.dur&&ln.dur.m)||0}'`;
-  return `${T?T.l:'Intervalle'} · ${amt}`;
+  return `${T?T.l:tr('lineType.interval')} · ${amt}`;
 }
 /* section "Consignes du coach par intervalle" : liste les intervalles porteurs
    d'une note. Additif — n'apparaît que si au moins un commentaire existe. */
 const OBJECTIF_META = {
-  endurance:{l:'Endurance fondamentale', ic:'ic-mountain',
-    why:"Construit ta base aérobie : plus de mitochondries, un cœur plus efficace, une meilleure utilisation des graisses. C'est le socle qui rend les séances dures payantes plus tard."},
-  seuil:{l:'Seuil', ic:'ic-zap',
-    why:"Repousse la vitesse/puissance que tu peux tenir longtemps sans t'effondrer — le levier le plus direct pour progresser sur les distances moyennes à longues."},
-  vo2:{l:'VMA / VO2max', ic:'ic-chart',
-    why:"Développe ta capacité aérobie maximale, ta « cylindrée ». Séance courte et intense : elle élève le plafond sur lequel tout le reste s'appuie."},
-  recup:{l:'Récupération', ic:'ic-moon',
-    why:"Laisse le corps encaisser la charge des jours précédents. Sauter ces séances n'accélère pas la progression, ça l'annule."},
-  hyrox:{l:'Hyrox', ic:'ic-dumbbell',
-    why:"Travaille la transition course/effort musculaire — le vrai facteur limitant en Hyrox, plus que chaque discipline isolée."}
+  endurance:{get l(){return tr('objectif.endurance.l')}, ic:'ic-mountain',
+    get why(){return tr('objectif.endurance.why')}},
+  seuil:{get l(){return tr('objectif.seuil.l')}, ic:'ic-zap',
+    get why(){return tr('objectif.seuil.why')}},
+  vo2:{get l(){return tr('objectif.vo2.l')}, ic:'ic-chart',
+    get why(){return tr('objectif.vo2.why')}},
+  recup:{get l(){return tr('objectif.recup.l')}, ic:'ic-moon',
+    get why(){return tr('objectif.recup.why')}},
+  hyrox:{get l(){return tr('objectif.hyrox.l')}, ic:'ic-dumbbell',
+    get why(){return tr('objectif.hyrox.why')}}
 };
 /* Note du coach sur CETTE séance (traçabilité d'un ajustement : décalage,
    allègement, changement de contenu…) — posée via le bouton 💬 de la carte,
@@ -4941,11 +4941,11 @@ let builderState = null;
 let builderUid = 1;
 
 const LINE_TYPES = {
-  warmup:   {l:'Échauffement', c:'#39E6A3'},
-  exo:      {l:'Exercice',     c:'#FF5470'},
-  contre:   {l:'Contre-effort',c:'#FFB13D'},
-  recov:    {l:'Récupération',  c:'#2FD9FF'},
-  cooldown: {l:'Retour calme', c:'#9D7BFF'}
+  warmup:   {get l(){return tr('lineType.warmup')}, c:'#39E6A3'},
+  exo:      {get l(){return tr('lineType.exo')},     c:'#FF5470'},
+  contre:   {get l(){return tr('lineType.contre')},c:'#FFB13D'},
+  recov:    {get l(){return tr('lineType.recov')},  c:'#2FD9FF'},
+  cooldown: {get l(){return tr('lineType.cooldown')}, c:'#9D7BFF'}
 };
 
 /* références activables par sport (le coach coche celles qu'il veut voir) */
@@ -6946,22 +6946,22 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
    Biomécanique / Hyrox) → l'utilisateur coche ce qu'il affiche. Persisté. */
 (function initChartFilter(){
   const box=document.getElementById('chartFilter'); if(!box) return;
-  const CATS=[['charge','Charge & puissance'],['physio','Physio'],['biomeca','Biomécanique'],['hyrox','Hyrox']];
+  const CATS=[['charge',tr('chartCat.charge')],['physio',tr('chartCat.physio')],['biomeca',tr('chartCat.biomeca')],['hyrox',tr('chartCat.hyrox')]];
   const REG=[
-    {key:'loadstack', label:'Charge cumulée',   a:'loadStackChart', cat:'charge'},
-    {key:'load',      label:'Charge & forme',   a:'loadChart',      cat:'charge'},
-    {key:'ftp',       label:'FTP & PMA',        a:'ftpChart',       cat:'charge'},
-    {key:'dist',      label:'Distance hebdo',   a:'distChart',      cat:'charge'},
-    {key:'mmp',       label:'Puissance–durée',  a:'mmpChart',       cat:'charge'},
-    {key:'durab',     label:'Durabilité',       a:'durabChart',     cat:'charge'},
-    {key:'loadmix',   label:'Méthode de charge',a:'loadMixBody',    cat:'charge'},
-    {key:'hr',        label:'Zones FC',         a:'hrChart',        cat:'physio'},
-    {key:'lactate',   label:'Lactate & seuils', a:'lactateBike',    cat:'physio'},
-    {key:'runDyn',    label:'Dynamiques de foulée', a:'runDynBody', cat:'biomeca'},
-    {key:'runTiles',  label:'Foulée & puissance',   a:'runTilesBody', cat:'biomeca'},
-    {key:'runSym',    label:'Symétrie G/D',     a:'runSymBody',     cat:'biomeca'},
-    {key:'runTrend',  label:'Tendance cadence', a:'runTrendChart',  cat:'biomeca'},
-    {key:'hyrox',     label:'Profil Hyrox',     a:'hyroxBody',      cat:'hyrox'},
+    {key:'loadstack', get label(){return tr('chart.loadstack')},   a:'loadStackChart', cat:'charge'},
+    {key:'load',      get label(){return tr('chart.load')},   a:'loadChart',      cat:'charge'},
+    {key:'ftp',       get label(){return tr('chart.ftp')},        a:'ftpChart',       cat:'charge'},
+    {key:'dist',      get label(){return tr('chart.dist')},   a:'distChart',      cat:'charge'},
+    {key:'mmp',       get label(){return tr('chart.mmp')},  a:'mmpChart',       cat:'charge'},
+    {key:'durab',     get label(){return tr('chart.durab')},       a:'durabChart',     cat:'charge'},
+    {key:'loadmix',   get label(){return tr('chart.loadmix')},a:'loadMixBody',    cat:'charge'},
+    {key:'hr',        get label(){return tr('chart.hr')},         a:'hrChart',        cat:'physio'},
+    {key:'lactate',   get label(){return tr('chart.lactate')}, a:'lactateBike',    cat:'physio'},
+    {key:'runDyn',    get label(){return tr('chart.runDyn')}, a:'runDynBody', cat:'biomeca'},
+    {key:'runTiles',  get label(){return tr('chart.runTiles')},   a:'runTilesBody', cat:'biomeca'},
+    {key:'runSym',    get label(){return tr('chart.runSym')},     a:'runSymBody',     cat:'biomeca'},
+    {key:'runTrend',  get label(){return tr('chart.runTrend')}, a:'runTrendChart',  cat:'biomeca'},
+    {key:'hyrox',     get label(){return tr('chart.hyrox')},     a:'hyroxBody',      cat:'hyrox'},
   ];
   const DEFAULT=['loadstack','load','hr'];   // sélection de départ resserrée
   let sel; try{ sel=new Set(JSON.parse(localStorage.getItem('sil_chart_filter'))); if(!sel.size) sel=new Set(DEFAULT); }
