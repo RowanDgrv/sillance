@@ -6,7 +6,7 @@
 <!-- CSP : app (polices Google + module supabase-js via esm.sh + API supabase + iframe Calendly).
      unsafe-inline requis (gros scripts/styles inline, site statique sans nonce).
      frame-ancestors/X-Frame-Options non applicables via <meta> (en-tête HTTP requis). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co wss://onbsgohvqejccowfnrbs.supabase.co https://esm.sh https://api.open-meteo.com https://geocoding-api.open-meteo.com; frame-src https://calendly.com; base-uri 'self'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co wss://onbsgohvqejccowfnrbs.supabase.co https://esm.sh; frame-src https://calendly.com; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2198,7 +2198,6 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="taper-hint" id="taperHint" hidden></div>
       <div class="taper-hint" id="weekRiskHint" hidden></div>
       <div class="sn-block" id="weekPulse" style="margin:0 0 12px" hidden></div>
-      <div class="taper-hint" id="weatherHint" hidden></div>
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-guides" aria-hidden="true"><div class="cg-cols" id="calCols"></div><div class="cg-rows"></div></div>
     </section>
@@ -3276,9 +3275,7 @@ const ATHLETE_REF = {
   hrvBase: 62,
   // Dernière modification des références physio (demo : ancienne, pour
   // illustrer le rappel de retest). En prod, vient de athlete_profiles.updated_at.
-  updatedAt: new Date(Date.now()-1000*60*60*24*132).toISOString(),
-  // Localisation (démo : Toulouse) — sert l'alerte météo → swap séance.
-  city: 'Toulouse', lat: 43.6047, lon: 1.4442
+  updatedAt: new Date(Date.now()-1000*60*60*24*132).toISOString()
 };
 /* Statut HRV du matin par rapport à la base 7 j : une baisse marquée
    (< 92 % de la base) = stress/fatigue/début d'infection → à surveiller. */
@@ -3968,14 +3965,6 @@ function renderSidebar(){
             <input type="number" step="any" data-ref="${k}" value="${ATHLETE_REF[k]??''}" style="width:100%;box-sizing:border-box"></label>`).join('')}
         </div>
         <button class="btn" id="refsSave" style="width:100%;margin-top:10px">Enregistrer mes références</button>
-        <div style="margin-top:12px;display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)">
-          <span>Ma ville <em style="font-style:normal;opacity:.65">pour l'alerte météo</em></span>
-          <div style="display:flex;gap:6px">
-            <input type="text" id="refsCity" value="${ATHLETE_REF.city||''}" placeholder="Ex. Toulouse" style="flex:1;box-sizing:border-box">
-            <button class="btn" id="refsCitySave" type="button" style="padding:0 14px;white-space:nowrap;flex:none">Localiser</button>
-          </div>
-          ${ATHLETE_REF.lat!=null ? `<span style="margin-top:2px">Localisé ✓</span>` : ''}
-        </div>
       </div>
       <div class="records" id="debriefCard">
         ${debriefsBlockHTML(debriefsFor(myDebriefKey()), "Pas encore de débrief — remplis-en un après ta prochaine course.")}
@@ -4064,8 +4053,6 @@ function renderSidebar(){
     if(cv) cv.addEventListener('click', ()=> submitCheckin());
     const rs = document.getElementById('refsSave');
     if(rs) rs.addEventListener('click', ()=> saveMyRefs());
-    const rcs = document.getElementById('refsCitySave');
-    if(rcs) rcs.addEventListener('click', ()=> saveCity());
     const dab = document.getElementById('debriefAddBtn');
     if(dab) dab.addEventListener('click', ()=> openDebrief());
     wireCoTeamActions(document.getElementById('coTeamCard'));
@@ -4091,86 +4078,6 @@ function saveMyRefs(){
   }
   render();
   toast('Références mises à jour');
-}
-
-/* Géocode la ville saisie via l'API gratuite Open-Meteo (sans clé), stocke
-   lat/lon — sert uniquement l'alerte météo, pas d'autre usage. */
-async function saveCity(){
-  const city = document.getElementById('refsCity').value.trim();
-  if(!city){ toast('Renseigne une ville'); return; }
-  try{
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=fr`);
-    const j = await res.json();
-    const hit = j.results && j.results[0];
-    if(!hit){ toast('Ville introuvable'); return; }
-    ATHLETE_REF.city = city; ATHLETE_REF.lat = hit.latitude; ATHLETE_REF.lon = hit.longitude;
-    WEATHER_CACHE = null; // force un nouveau relevé météo pour la nouvelle position
-    if(window.PF?.user){
-      PF.saveAthleteRefs({ city: ATHLETE_REF.city, lat: ATHLETE_REF.lat, lon: ATHLETE_REF.lon })
-        .catch(e=> console.warn('[PF] saveAthleteRefs (ville) :', e));
-    }
-    toast(`Localisé : ${hit.name}`);
-    renderSidebar(); render();
-  }catch(e){ console.error('[weather] géocodage', e); toast('Géolocalisation indisponible pour le moment'); }
-}
-
-/* ============================================================
-   ALERTE MÉTÉO → PROPOSITION D'INVERSION DE SÉANCE
-   ------------------------------------------------------------
-   Sortie extérieure (vélo/course) planifiée sous alerte pluie/vent
-   fort → bannière suggérant d'intervertir avec une séance indoor de
-   la même semaine. Prévisions Open-Meteo (API publique, sans clé),
-   nécessite que l'athlète ait renseigné sa ville. Cache 3h pour ne
-   pas re-fetch à chaque re-render.
-   ============================================================ */
-let WEATHER_CACHE = null; // { fetchedAt, byDate:{ 'YYYY-MM-DD': {precipProb, windMax} } }
-async function fetchWeatherIfNeeded(){
-  if(ATHLETE_REF.lat==null || ATHLETE_REF.lon==null) return null;
-  const now = Date.now();
-  if(WEATHER_CACHE && now - WEATHER_CACHE.fetchedAt < 1000*60*60*3) return WEATHER_CACHE;
-  try{
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ATHLETE_REF.lat}&longitude=${ATHLETE_REF.lon}&daily=precipitation_probability_max,windspeed_10m_max&timezone=auto&forecast_days=16`;
-    const res = await fetch(url);
-    const j = await res.json();
-    const byDate = {};
-    (j.daily && j.daily.time || []).forEach((d,i)=>{ byDate[d] = { precipProb:j.daily.precipitation_probability_max[i], windMax:j.daily.windspeed_10m_max[i] }; });
-    WEATHER_CACHE = { fetchedAt: now, byDate };
-    return WEATHER_CACHE;
-  }catch(e){ console.warn('[weather] prévisions indisponibles :', e); return null; }
-}
-function weatherRiskFor(dateKey, sessions){
-  if(!WEATHER_CACHE) return null;
-  const w = WEATHER_CACHE.byDate[dateKey]; if(!w) return null;
-  if(!(w.precipProb>=70 || w.windMax>=40)) return null;
-  const outdoor = (sessions||[]).filter(s=> (s.disc==='bike'||s.disc==='run') && !s.done);
-  if(!outdoor.length) return null;
-  return { w, outdoor };
-}
-function renderWeatherHint(mon){
-  const el = document.getElementById('weatherHint'); if(!el) return;
-  // ATHLETE_REF est un singleton "athlète affiché" qui n'est PAS rechargé par
-  // athlète quand le coach change de sélection dans son roster (contrairement
-  // au planning/matériel/zones) -> réservé à la vue Athlète pour ne jamais
-  // montrer la météo du mauvais endroit sous une fausse étiquette.
-  if(mode!=='athlete' || ATHLETE_REF.lat==null){ el.hidden=true; return; }
-  if(!WEATHER_CACHE){
-    el.hidden = true;
-    fetchWeatherIfNeeded().then(()=> renderWeatherHint(mondayOf(weekOffset)));
-    return;
-  }
-  const weekDays = Array.from({length:7},(_,i)=>({ i, key: iso(addDays(mon,i)) }));
-  const findings = [];
-  weekDays.forEach(({i,key})=>{
-    const risk = weatherRiskFor(key, planning[key]);
-    if(!risk) return;
-    const indoorAlt = weekDays.map(d=>planning[d.key]||[]).flat().find(s=> s.disc==='strength' && !s.done);
-    const names = risk.outdoor.map(s=>s.title).join(', ');
-    const cond = risk.w.precipProb>=70 ? `${risk.w.precipProb}% de pluie` : `vent ${Math.round(risk.w.windMax)} km/h`;
-    findings.push(`<b>${DAYS[i]}</b> — ${cond} : ${dispoSafe(names)} risque d'être compromise${indoorAlt?`, envisage d'intervertir avec « ${dispoSafe(indoorAlt.title)} ».`:'.'}`);
-  });
-  if(!findings.length){ el.hidden=true; return; }
-  el.hidden=false;
-  el.innerHTML = `<i class="ic ic-wind"></i><div class="th-txt"><b>Météo à surveiller cette semaine.</b> ${findings.slice(0,2).join(' ')}</div>`;
 }
 
 /* ============================================================
@@ -5243,7 +5150,6 @@ function render(){
   renderTaperHint(race, mon);
   renderWeekRiskHint(mon);
   renderWeekPulse(mon);
-  renderWeatherHint(mon);
   if(typeof wireSessionVideos==='function') wireSessionVideos();
 }
 
