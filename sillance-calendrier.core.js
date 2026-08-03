@@ -58,12 +58,19 @@ if(!Array.prototype.at){
    plus aucun onclick= en dur dans le HTML, tout est attaché en JS.
    ============================================================ */
 (function(){
+/* i18n (03/08/2026) : raccourci vers SilI18n.t — nommé "tr" (pas "t") car
+   "t" est déjà utilisé partout dans ce fichier comme paramètre local pour
+   "template" (tplCard(t,z), t.disc, t.title…). Ne traduit que le texte pur
+   affiché à l'écran — jamais les valeurs qui servent aussi de clé de
+   données (ex. noms de zones dans INTENSITY_MODELS, laissés en français
+   volontairement : les toucher demanderait de séparer affichage/logique). */
+function tr(key, vars){ return window.SilI18n ? SilI18n.t(key, vars) : key; }
 const DISC = {
-  swim:     {label:'Natation', ico:'ic-waves',    color:'var(--swim)', gear:['maillot de bain','bonnet','lunettes']},
-  bike:     {label:'Vélo',     ico:'ic-bike',     color:'var(--bike)', gear:['vélo','casque','tenue vélo','bidon']},
-  run:      {label:'Course',   ico:'ic-run',      color:'var(--run)', gear:['chaussures de course','tenue running']},
-  strength: {label:'Renfo',    ico:'ic-dumbbell', color:'var(--strength)', gear:['tapis','tenue confortable']},
-  hyrox:    {label:'Hyrox',    ico:'ic-zap',      color:'#FF8A3D', gear:['chaussures','gants','tenue','eau']}
+  swim:     {get label(){return tr('disc.swim')}, ico:'ic-waves',    color:'var(--swim)', get gear(){return [tr('gear.swim1'),tr('gear.swim2'),tr('gear.swim3')]}},
+  bike:     {get label(){return tr('disc.bike')}, ico:'ic-bike',     color:'var(--bike)', get gear(){return [tr('gear.bike1'),tr('gear.bike2'),tr('gear.bike3'),tr('gear.bike4')]}},
+  run:      {get label(){return tr('disc.run')},  ico:'ic-run',      color:'var(--run)', get gear(){return [tr('gear.run1'),tr('gear.run2')]}},
+  strength: {get label(){return tr('disc.strength')}, ico:'ic-dumbbell', color:'var(--strength)', get gear(){return [tr('gear.strength1'),tr('gear.strength2')]}},
+  hyrox:    {get label(){return tr('disc.hyrox')}, ico:'ic-zap',      color:'#FF8A3D', get gear(){return [tr('gear.hyrox1'),tr('gear.hyrox2'),tr('gear.hyrox3'),tr('gear.hyrox4')]}}
 };
 /* Icône HTML d'une discipline (usage innerHTML uniquement — pas dans <option>/textContent/SVG). */
 function discIcon(d){ return d && d.ico ? `<i class="ic ${d.ico}"></i>` : ''; }
@@ -458,10 +465,10 @@ function athFormeColor(s){ return s==null ? 'var(--muted)' : s>=75 ? 'var(--good
 /* Journal dispo/blessure : l'athlète signale sa disponibilité au check-in,
    le coach la voit (bandeau, sélecteur, table de suivi). */
 const DISPO_META = {
-  ok:     {l:'OK',      c:'var(--good)', ic:'ic-check'},
-  fatigue:{l:'Fatigué', c:'var(--bike)', ic:'ic-battery'},
-  malade: {l:'Malade',  c:'#FF8A4D',     ic:'ic-thermometer'},
-  blesse: {l:'Blessé',  c:'var(--run)',  ic:'ic-alert-triangle'}
+  ok:     {get l(){return tr('dispo.ok')},      c:'var(--good)', ic:'ic-check'},
+  fatigue:{get l(){return tr('dispo.fatigue')}, c:'var(--bike)', ic:'ic-battery'},
+  malade: {get l(){return tr('dispo.malade')},  c:'#FF8A4D',     ic:'ic-thermometer'},
+  blesse: {get l(){return tr('dispo.blesse')},  c:'var(--run)',  ic:'ic-alert-triangle'}
 };
 function athDispo(a){ const d=a&&a.checkin&&a.checkin.dispo; return (d&&DISPO_META[d])?d:null; }
 function dispoSafe(t){ return String(t||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
@@ -475,14 +482,14 @@ function dispoSafe(t){ return String(t||'').replace(/[<>&"]/g, c=>({'<':'&lt;','
    avec le ressenti — la réponse est très individuelle).
    ============================================================ */
 const CYCLE_META = {
-  menstrual: {l:'Règles',      short:'J1–5',   c:'#DD5C72', ic:'ic-waves',
-    tip:"Symptômes possibles (fatigue, crampes) : intensité selon les sensations, rien d'imposé."},
-  follicular:{l:'Folliculaire', short:'J6–13',  c:'#35C58C', ic:'ic-zap',
-    tip:"Fenêtre souvent favorable : bon moment pour le travail intense (VMA, seuil, force) et les gros volumes."},
-  ovulation: {l:'Ovulation',    short:'~J14',   c:'#46C2D8', ic:'ic-target',
-    tip:"Force au plus haut, mais laxité ligamentaire accrue → échauffement soigné, vigilance blessure (genou/cheville)."},
-  luteal:    {l:'Lutéale',      short:'J15–28', c:'#D9962F', ic:'ic-thermometer',
-    tip:"Effort perçu et température plus élevés en fin de phase : récup allongée, hydratation/chaleur surveillées, plutôt endurance/technique."}
+  menstrual: {get l(){return tr('cycle.menstrual.l')},  short:'J1–5',   c:'#DD5C72', ic:'ic-waves',
+    get tip(){return tr('cycle.menstrual.tip')}},
+  follicular:{get l(){return tr('cycle.follicular.l')}, short:'J6–13',  c:'#35C58C', ic:'ic-zap',
+    get tip(){return tr('cycle.follicular.tip')}},
+  ovulation: {get l(){return tr('cycle.ovulation.l')},  short:'~J14',   c:'#46C2D8', ic:'ic-target',
+    get tip(){return tr('cycle.ovulation.tip')}},
+  luteal:    {get l(){return tr('cycle.luteal.l')},     short:'J15–28', c:'#D9962F', ic:'ic-thermometer',
+    get tip(){return tr('cycle.luteal.tip')}}
 };
 /* phase auto-déduite du jour de cycle (repère 28 j, ajusté au ressenti) */
 function cyclePhaseFromDay(d){
@@ -1393,7 +1400,7 @@ const STRAVA_DEMO_SETS = {
     {disc:'bike', name:'Home-trainer sweet spot',     dur:75,  dist:36.0, date:'il y a 3 j',src:'garmin'}
   ]
 };
-const DEMO_SET_LABELS = { triathlete:'Triathlète', course:'Course', hyrox:'Hyrox', velo:'Vélo' };
+const DEMO_SET_LABELS = { get triathlete(){return tr('demoSet.triathlete')}, get course(){return tr('demoSet.course')}, get hyrox(){return tr('demoSet.hyrox')}, get velo(){return tr('demoSet.velo')} };
 let stravaDemoSet = 'triathlete';   // profil démo actif (changeable via le sélecteur)
 
 function renderStravaCard(){
@@ -2211,7 +2218,7 @@ function renderWeekRiskHint(mon){
    de semaine ISO, comme les débriefs de course.
    ============================================================ */
 let WEEK_PULSES = {}; // clé "athleteId|weekMondayIso" -> {athleteFeel, athleteNote, coachNote}
-const WEEK_FEELS = { hard:{l:'Trop dur', c:'var(--run)'}, ok:{l:'Bien calibré', c:'var(--good)'}, easy:{l:'Trop facile', c:'var(--bike)'} };
+const WEEK_FEELS = { hard:{get l(){return tr('weekFeel.hard')}, c:'var(--run)'}, ok:{get l(){return tr('weekFeel.ok')}, c:'var(--good)'}, easy:{get l(){return tr('weekFeel.easy')}, c:'var(--bike)'} };
 /* id de l'athlète concerné par la vue courante : soi-même en vue Athlète,
    l'athlète suivi en vue Coach (démo ou réel). null en vue Club. */
 function activeAthleteKey(){
@@ -3641,7 +3648,7 @@ const DEMO_NAMES = ['Antoine Roche','Julie Vasseur','Nadia Lefort','Paul Chevali
 let demoNameIdx = 0;
 
 function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
-const CLUB_DISC_LABEL = {tri:'Tri', run:'Course', swim:'Natation', bike:'Vélo'};
+const CLUB_DISC_LABEL = {get tri(){return tr('clubDisc.tri')}, get run(){return tr('clubDisc.run')}, get swim(){return tr('clubDisc.swim')}, get bike(){return tr('clubDisc.bike')}};
 
 function renderClubStats(){
   const el = document.getElementById('clubStats'); if(!el) return; // bandeau retiré : no-op
@@ -4052,7 +4059,7 @@ function renderClubAthletes(filter){
         ${minorChip(a)}
         ${licenceChip(a)}
       </div>
-      <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||'Tri'}</span>
+      <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||tr('clubDisc.tri')}</span>
     </div>`;
   }).join('') || '<p class="club-hint">Aucun athlète trouvé.</p>';
   box.innerHTML = banner + rows;
@@ -4219,7 +4226,7 @@ function renderJoinRequests(){
       <div class="join-req" data-id="${r.id}">
         <div class="join-av">${initials(r.name)}</div>
         <div class="join-i">
-          <div class="join-n">${r.name} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||'Tri'}</span></div>
+          <div class="join-n">${r.name} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||tr('clubDisc.tri')}</span></div>
           <div class="join-m">${r.msg||'Souhaite rejoindre le club'}</div>
         </div>
         <div class="join-acts">
@@ -7876,7 +7883,7 @@ const SHOE_CATALOG = [
  {b:'Kiprun',m:'KS900',cat:'daily',life:850,comm:800},
  {b:'Kiprun',m:'KD900X LD',cat:'race',life:450,comm:410}
 ];
-const SHOE_CAT_LABEL = {daily:'Entraînement', tempo:'Dynamique', race:'Compétition', trail:'Trail'};
+const SHOE_CAT_LABEL = {get daily(){return tr('shoeCat.daily')}, get tempo(){return tr('shoeCat.tempo')}, get race(){return tr('shoeCat.race')}, get trail(){return tr('shoeCat.trail')}};
 const SHOE_CAT_ICON  = {daily:'ic-run', tempo:'ic-zap', race:'ic-flag', trail:'ic-mountain'};
 const SHOE_CAT_COLOR = {daily:'var(--good)', tempo:'var(--bike)', race:'var(--run)', trail:'var(--strength)'};
 
