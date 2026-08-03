@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="robots" content="noindex">
 <title>Page introuvable — Sillance</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
@@ -40,18 +40,6 @@
     </div>
   </div>
 <script src="./sillance-flow.js"></script>
-<script>
-/* fond flux partagé (soufflerie / torpille) — le dégradé CSS reste en fallback */
-(function(){
-  var c=document.getElementById('flow404');
-  if(!c || !window.SillanceFlow) return;
-  var flow=SillanceFlow.attach(c,{src:[0.55,0.05],dim:[0,0]});
-  if(!flow) return;
-  // Perf (audit 03/08/2026) : fond plein écran (position:fixed), coupe la
-  // boucle GPU quand l'onglet est en arrière-plan (visibilitychange).
-  document.addEventListener('visibilitychange', function(){
-    if(document.hidden) flow.freeze(18.0); else flow.resume();
-  });
-})();
-</script>
+<!-- fond flux partagé (soufflerie / torpille) — le dégradé CSS reste en fallback -->
+<script src="./sillance-404.js"></script>
 </body></html>
