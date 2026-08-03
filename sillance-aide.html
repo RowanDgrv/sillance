@@ -79,6 +79,19 @@
     <a href="#import-fit">Importer un fichier .FIT</a>
     <a href="#ajouter-chaussure">Ajouter des chaussures</a>
     <a href="#refs-physio">Éditer ses références physio</a>
+    <div class="lbl">Nouveautés</div>
+    <a href="#retest-physio">Rappel de retest physio</a>
+    <a href="#macros-chat">Réponses rapides du chat</a>
+    <a href="#pourquoi-seance">Pourquoi cette séance</a>
+    <a href="#optimiseur-hebdo">Répartition de la semaine</a>
+    <a href="#note-seance">Note sur une séance</a>
+    <a href="#debrief-course">Débrief de course</a>
+    <a href="#bilan-hebdo">Bilan hebdomadaire croisé</a>
+    <a href="#etude-de-cas">Étude de cas</a>
+    <a href="#radar-coach">Qui a besoin de toi</a>
+    <a href="#equipe-coachs">Équipe de coachs</a>
+    <a href="#alerte-meteo">Alerte météo</a>
+    <a href="#partager-course">Partager une course</a>
   </nav>
 
   <!-- CONTENU -->
@@ -328,6 +341,180 @@
         <figcaption><span class="dot">●</span> Modifie les valeurs, puis « Enregistrer mes références ».</figcaption>
       </figure>
       <div class="tip"><b>Tu ne connais pas toutes tes valeurs ?</b> Remplis seulement celles que tu as. Elles s'affinent avec le temps, au fil de tes tests et de tes séances importées.</div>
+    </section>
+
+    <!-- ============ NOUVEAUTÉS ============ -->
+    <div class="role-h">Nouveautés</div>
+
+    <section class="tuto" id="retest-physio">
+      <h2><span class="no">15</span> Rappel de retest physio</h2>
+      <p class="lead">Des références physio trop anciennes faussent tes zones et tes analyses — Sillance te le rappelle.</p>
+      <ol class="steps">
+        <li>En rôle <b>Athlète</b>, descends jusqu'à <b>Mes références physio</b>.</li>
+        <li>Sous le titre, une ligne indique <b>depuis combien de temps</b> tu ne les as pas mises à jour.</li>
+        <li>Au-delà de <b>90 jours</b>, le message devient un rappel explicite à retester tes zones.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-retest-physio.png" alt="Ligne « Dernière mise à jour : il y a 132 j — pense à retester tes zones » encadrée sous le titre des références physio" loading="lazy">
+        <figcaption><span class="dot">●</span> Le même rappel apparaît côté coach, dans le bandeau de l'athlète suivi, une fois 90 jours dépassés.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="macros-chat">
+      <h2><span class="no">16</span> Personnaliser tes réponses rapides dans le chat</h2>
+      <p class="lead">Gagne du temps sur les messages qui reviennent tout le temps, avec 20 ou 30 athlètes à suivre.</p>
+      <ol class="steps">
+        <li>En rôle <b>Coach</b>, ouvre la <b>messagerie</b> (bulle en bas à droite).</li>
+        <li>Dans la barre de réponses rapides, clique <span class="hlword">✎ Gérer</span> tout à droite.</li>
+        <li>Tape tes réponses, <b>une par ligne</b> (blessure signalée, question nutrition récurrente, etc.), puis valide.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-macros-chat.png" alt="Chip « Gérer » encadré à droite de la barre de réponses rapides, dans le panneau de messagerie" loading="lazy">
+        <figcaption><span class="dot">●</span> Les réponses rapides restent mémorisées sur cet appareil.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="pourquoi-seance">
+      <h2><span class="no">17</span> Comprendre pourquoi une séance est là</h2>
+      <p class="lead">Chaque séance affiche désormais le raisonnement physiologique derrière elle, pas seulement les chiffres.</p>
+      <ol class="steps">
+        <li>En rôle <b>Athlète</b>, clique sur une séance de ton calendrier pour ouvrir sa fiche.</li>
+        <li>Le bloc <b>Pourquoi cette séance</b> explique en deux phrases ce que ce type d'effort travaille (endurance, seuil, VMA, récupération…).</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-pourquoi-seance.png" alt="Bloc « Pourquoi cette séance » encadré dans la fiche d'une séance de course à pied" loading="lazy">
+        <figcaption><span class="dot">●</span> Le texte s'adapte au type de séance (objectif choisi par le coach, ou déduit du titre sinon).</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="optimiseur-hebdo">
+      <h2><span class="no">18</span> Repérer une semaine mal répartie</h2>
+      <p class="lead">Deux séances à forte intensité le même jour, ou deux jours d'affilée, laissent trop peu de récupération — Sillance le signale avant que tu ne le découvres trop tard.</p>
+      <ol class="steps">
+        <li>En rôle <b>Coach</b>, la bannière apparaît automatiquement <b>au-dessus du calendrier</b> quand la semaine affichée pose problème.</li>
+        <li>Elle précise le ou les jours concernés et les séances impliquées.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-optimiseur-hebdo.png" alt="Bannière orange « Répartition à vérifier cette semaine » encadrée au-dessus du calendrier coach" loading="lazy">
+        <figcaption><span class="dot">●</span> Détection basée sur les zones d'intensité réelles des séances (Z4/Z5), pas sur leur titre.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="note-seance">
+      <h2><span class="no">19</span> Expliquer un ajustement à ton athlète</h2>
+      <p class="lead">Quand tu décales ou allèges une séance, une note courte suffit à montrer que ce n'est pas un algorithme qui décide — c'est toi.</p>
+      <ol class="steps">
+        <li>En rôle <b>Coach</b>, survole une carte de séance dans le calendrier : une icône <span class="hlword">💬</span> apparaît en haut à droite.</li>
+        <li>Clique dessus et écris ta raison (<i>« Allégé : ta forme du matin était basse »</i>).</li>
+        <li>La note apparaît en tête de la fiche séance, côté athlète.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-note-seance.png" alt="Icône de note encadrée en haut à droite d'une carte de séance, dans le calendrier coach" loading="lazy">
+        <figcaption><span class="dot">●</span> L'icône reste visible (teintée) une fois une note posée, pour la retrouver d'un coup d'œil.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="debrief-course">
+      <h2><span class="no">20</span> Remplir un débrief de course</h2>
+      <p class="lead">Un rituel d'après-course qui alimente le cycle suivant, au lieu de laisser l'expérience se perdre.</p>
+      <ol class="steps">
+        <li>En rôle <b>Athlète</b>, repère la carte <b>Débriefs de course</b> dans le panneau de gauche.</li>
+        <li>Clique <span class="hlword">+ Ajouter un débrief de course</span>.</li>
+        <li>Renseigne résultat, ressenti, nutrition suivie, météo, ce qui a marché ou coincé.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-debrief-course.png" alt="Carte « Débriefs de course » encadrée, avec un débrief existant et le bouton « Ajouter un débrief de course »" loading="lazy">
+        <figcaption><span class="dot">●</span> Visible aussi par ton coach, en lecture seule, dans ta Fiche athlète.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="bilan-hebdo">
+      <h2><span class="no">21</span> Croiser vos ressentis de la semaine</h2>
+      <p class="lead">Au-delà du chat libre, un bilan structuré où chacun répond de son côté — et voit la réponse de l'autre.</p>
+      <ol class="steps">
+        <li>Sous le calendrier (rôle <b>Coach</b> ou <b>Athlète</b>), la carte <b>Bilan de la semaine</b> propose : ressenti de charge (trop dur / bien calibré / trop facile) + note côté athlète, note libre côté coach.</li>
+        <li>Chacun remplit sa partie ; l'autre la voit en lecture seule, semaine par semaine.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-bilan-hebdo.png" alt="Carte « Bilan de la semaine » encadrée : ressenti de l'athlète rempli, champ de note du coach" loading="lazy">
+        <figcaption><span class="dot">●</span> Le bilan est propre à la semaine affichée dans le calendrier — navigue pour consulter les précédentes.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="etude-de-cas">
+      <h2><span class="no">22</span> Générer une fiche de progression partageable</h2>
+      <p class="lead">De quoi te vendre auprès d'un prospect : records battus, charge absorbée, adhérence — en un PDF propre.</p>
+      <ol class="steps">
+        <li>En rôle <b>Coach</b>, dans le bandeau de l'athlète suivi, clique <span class="hlword">Étude de cas</span>.</li>
+        <li>Ajoute une citation courte sur le cycle écoulé (optionnel).</li>
+        <li>Le PDF s'ouvre : records améliorés, delta de charge sur 12 semaines, adhérence, ta citation.</li>
+      </ol>
+      <div class="tip"><b>Différent du Bilan PDF.</b> Le Bilan est un état des lieux du jour ; l'Étude de cas raconte un avant/après sur la durée — pensée pour être montrée, pas juste consultée.</div>
+    </section>
+
+    <section class="tuto" id="radar-coach">
+      <h2><span class="no">23</span> Voir qui a besoin de toi cette semaine</h2>
+      <p class="lead">Plutôt que de cliquer chaque athlète un par un, ton roster est trié par urgence dès que tu ouvres l'app.</p>
+      <ol class="steps">
+        <li>En rôle <b>Coach</b>, le bloc <b>Qui a besoin de toi cette semaine</b> apparaît en tête du panneau de gauche.</li>
+        <li>Chaque ligne indique la raison : blessure, maladie, fatigue, forme basse, HRV basse, ou zones jamais retestées.</li>
+        <li>Clique un nom pour basculer directement sur son suivi.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-radar-coach.png" alt="Bloc « Qui a besoin de toi cette semaine » encadré, listant plusieurs athlètes avec leurs signaux d'alerte" loading="lazy">
+        <figcaption><span class="dot">●</span> Basé uniquement sur des signaux fiables (dispo, forme, HRV, fraîcheur des refs) — jamais sur l'adhérence, propre à la démo.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="equipe-coachs">
+      <h2><span class="no">24</span> Ajouter un coach supplémentaire (co-coaching)</h2>
+      <p class="lead">Un athlète peut avoir plusieurs coachs — coach vélo et coach course, ou entraîneur principal et nutritionniste. Tous ont un accès complet ; le rôle n'est qu'une étiquette.</p>
+      <ol class="steps">
+        <li>Coach comme athlète peuvent proposer un ajout : depuis la <b>Fiche athlète</b> (coach) ou la carte <b>Équipe de coachs</b> (athlète), clique <span class="hlword">+ Proposer un coach</span>.</li>
+        <li>Renseigne l'email du coach (il doit déjà avoir un compte Sillance) et son rôle libre.</li>
+        <li><b>Double consentement</b> : la partie qui n'a pas initié la demande (l'athlète si un coach a proposé, un coach existant si c'est l'athlète) doit valider avant que l'accès soit actif.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-equipe-coachs.png" alt="Bloc « Équipe de coachs » encadré dans la Fiche athlète : coachs actifs avec leur rôle, demande en attente de validation" loading="lazy">
+        <figcaption><span class="dot">●</span> Une demande en attente s'affiche en lecture seule tant que ce n'est pas à toi de valider.</figcaption>
+      </figure>
+    </section>
+
+    <section class="tuto" id="alerte-meteo">
+      <h2><span class="no">25</span> Activer l'alerte météo</h2>
+      <p class="lead">Une sortie longue sous alerte pluie ou vent fort ? Sillance te le signale et propose une inversion avec une séance indoor de la semaine.</p>
+      <ol class="steps">
+        <li>En rôle <b>Athlète</b>, renseigne <span class="hlword">Ma ville</span> sous tes références physio, puis clique <span class="hlword">Localiser</span>.</li>
+        <li>Dès qu'une sortie vélo ou course de ta semaine tombe sur un jour à risque, une bannière apparaît au-dessus du calendrier.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-meteo-ville.png" alt="Champ « Ma ville » et bouton « Localiser » encadrés, sous les références physio" loading="lazy">
+        <figcaption><span class="dot">●</span> Géolocalisation par nom de ville (API Open-Meteo, gratuite).</figcaption>
+      </figure>
+      <figure>
+        <img src="./aide-img/nv-meteo-banniere.png" alt="Bannière météo encadrée au-dessus du calendrier, signalant une sortie longue vélo compromise par la pluie" loading="lazy">
+        <figcaption><span class="dot">●</span> La bannière précise la séance à risque et une éventuelle séance indoor à intervertir.</figcaption>
+      </figure>
+      <div class="tip"><b>Pas de tracking GPS live.</b> Cette alerte s'appuie sur les prévisions météo de ta ville, pas sur ta position en direct.</div>
+    </section>
+
+    <section class="tuto" id="partager-course">
+      <h2><span class="no">26</span> Partager une course avec tes proches</h2>
+      <p class="lead">Un lien public, sans compte à créer, pour que la famille suive les repères de course et le résultat dès qu'il tombe.</p>
+      <ol class="steps">
+        <li>Coach ou athlète : dans le bandeau de l'athlète suivi (ou la sidebar athlète), clique <span class="hlword">Partager la course</span> — visible dès qu'une course à venir est enregistrée.</li>
+        <li>Ajoute des repères pour les proches si tu veux (<i>« À 30 km, ralentis si FC &gt; 170 »</i>).</li>
+        <li>Clique <span class="hlword">Générer le lien</span> et copie-le : aucune connexion requise pour l'ouvrir.</li>
+      </ol>
+      <figure>
+        <img src="./aide-img/nv-spectateur-btn.png" alt="Bouton « Partager la course » encadré dans le bandeau de l'athlète suivi" loading="lazy">
+        <figcaption><span class="dot">●</span> Le bouton n'apparaît que si une course à venir est enregistrée pour cet athlète.</figcaption>
+      </figure>
+      <figure>
+        <img src="./aide-img/nv-spectateur-modal.png" alt="Fenêtre « Partager la course » : champ de repères pour les proches et bouton Générer le lien" loading="lazy">
+        <figcaption><span class="dot">●</span> La page publique affiche les repères puis, dès qu'il est disponible, le résultat.</figcaption>
+      </figure>
+      <div class="tip"><b>Pas de suivi GPS en direct.</b> L'API Strava n'expose pas la position en temps réel — ce lien donne les repères de course et le résultat dès sa synchronisation, pas un point qui bouge sur une carte.</div>
     </section>
 
   </main>
