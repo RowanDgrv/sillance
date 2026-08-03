@@ -168,6 +168,50 @@
     "video.h6.title": `Farmers Carry`, "video.h6.desc": `Port de charges lourdes, gainage et grip sous fatigue.`,
     "video.h7.title": `Sandbag Lunges`, "video.h7.desc": `Fentes marchées avec sac lesté sur les épaules.`,
     "video.h8.title": `Wall Balls — technique`, "video.h8.desc": `Squat puis lancer cible, coordination et cadence.`,
+
+    "sidebar.myAthletesTracking": `Suivi de mes athlètes`, "sidebar.inviteAthlete": `Inviter un athlète`,
+    "sidebar.library": `Bibliothèque`, "sidebar.libraryHint": `Tes séances types, prêtes à réutiliser.`, "sidebar.createSession": `+ Créer une séance`,
+    "sidebar.cycles": `Cycles`, "sidebar.cyclesHint": `Tes blocs d'entraînement types, prêts à assigner.`, "sidebar.createCycle": `+ Créer un cycle`,
+    "sidebar.coachTip": `Astuce coach`, "sidebar.coachTipText": `Clique sur un athlète pour voir son détail, ou glisse-dépose une séance de la bibliothèque sur son calendrier.`,
+    "sidebar.athleteFreshness": `Fraîcheur athlète (check-in du jour)`,
+    "sidebar.sillanceSub": `⭐ Abonnement Sillance`, "sidebar.subActive": `Abonnement actif`, "sidebar.manageSub": `Gérer mon abonnement`,
+    "sidebar.unlockCoach": `Débloque l'espace coach en illimité.`, "sidebar.subscribe": `S'abonner`, "sidebar.perMonth": `mois`,
+    "sidebar.aiAssistant": `Assistant IA coach`, "sidebar.comingSoon": `Bientôt disponible`,
+    "sidebar.aiAssistantText": `Analyse automatique des séances de tes athlètes et suggestions d'ajustement.`,
+    "sidebar.getPaid": `Fais-toi payer`, "sidebar.getPaidText": `Relie Stripe pour facturer tes athlètes directement depuis Sillance.`,
+    "sidebar.connectStripe": `Relier Stripe`, "sidebar.seeInvoices": `Voir mes factures`,
+    "sidebar.trackingRate": `Tarif du suivi`, "sidebar.edit": `modifier`,
+    "sidebar.pricePrompt": `Tarif de ton suivi coaching (€/mois) :`,
+
+    "checkin.title": `Check-in du jour`, "checkin.hint": `30 secondes pour adapter ta séance à ta forme réelle.`,
+    "checkin.sleep": `Sommeil`, "checkin.legFatigue": `Jambes lourdes`, "checkin.motivation": `Motivation`,
+    "checkin.weight": `Poids`, "checkin.weightAria": `Poids en kilogrammes`,
+    "checkin.hrvMorning": `HRV du matin`, "checkin.hrvOptional": `Facultatif — depuis ta montre ou une appli dédiée.`, "checkin.hrvAria": `Variabilité de la fréquence cardiaque en millisecondes`,
+    "checkin.availability": `Disponibilité`, "checkin.availabilityAria": `Disponibilité du jour`, "checkin.notePlaceholder": `Une précision ? (douleur, fatigue, contexte…)`,
+    "checkin.cycleTitle": `Cycle menstruel`, "checkin.cycleStopTracking": `Arrêter le suivi de mon cycle`, "checkin.hide": `masquer`,
+    "checkin.cycleDay": `Jour du cycle`, "checkin.cycleDayAria": `Jour du cycle menstruel`,
+    "checkin.cycleOrChoose": `ou choisis la phase :`, "checkin.cyclePhaseAria": `Phase du cycle menstruel`,
+    "checkin.cycleOptin": `Suivre mon cycle menstruel`,
+    "checkin.cycleNote": `Facultatif et privé — aide ton coach à adapter les séances au bon moment du cycle.`,
+    "checkin.freshness": `Fraîcheur`, "checkin.validate": `Valider mon check-in`,
+
+    "records.title": `Records personnels`, "records.empty": `Aucun record pour l'instant — importe ou synchronise une première activité.`,
+
+    "refs.title": `Mes références physio`, "refs.never": `Jamais renseignées.`,
+    "refs.lastUpdate": `Dernière mise à jour&nbsp;: il y a {days}&nbsp;j`, "refs.retest": `pense à retester tes zones`,
+    "refs.map": `PMA`, "refs.bikeCp": `CP vélo`, "refs.vVo2max": `VMA`, "refs.threshold": `Seuil`,
+    "refs.maxHr": `FC max`, "refs.restHr": `FC repos`, "refs.save": `Enregistrer mes références`,
+
+    "debrief.empty": `Pas encore de débrief — remplis-en un après ta prochaine course.`, "debrief.add": `Ajouter un débrief de course`,
+    "race.shareWithLoved": `Partager ma course avec mes proches`,
+
+    "coachSub.title": `Mon coaching`, "coachSub.text": `Suivi personnalisé : ton coach lit tes données et adapte tes séances selon ta forme.`,
+    "coachSub.subscribe": `S'abonner au suivi`,
+
+    "morning.title": `Rappel du matin`, "morning.text": `Reçois chaque jour ton récap + le matériel.`,
+    "morning.sendTime": `Heure d'envoi`, "morning.wantToReceive": `Je veux recevoir`,
+    "morning.push": `Notification (téléphone / PC)`, "morning.email": `Email`, "morning.both": `Les deux`,
+    "morning.activate": `Activer le rappel`, "morning.howTo": `Comment recevoir ma notification&nbsp;?`,
   };
 
   var en = {
@@ -335,6 +379,50 @@
     "video.h6.title": `Farmers Carry`, "video.h6.desc": `Heavy carry, core bracing and grip under fatigue.`,
     "video.h7.title": `Sandbag Lunges`, "video.h7.desc": `Walking lunges with a weighted bag on the shoulders.`,
     "video.h8.title": `Wall Balls — Technique`, "video.h8.desc": `Squat then target throw, coordination and cadence.`,
+
+    "sidebar.myAthletesTracking": `My athletes' tracking`, "sidebar.inviteAthlete": `Invite an athlete`,
+    "sidebar.library": `Library`, "sidebar.libraryHint": `Your template sessions, ready to reuse.`, "sidebar.createSession": `+ Create a session`,
+    "sidebar.cycles": `Cycles`, "sidebar.cyclesHint": `Your template training blocks, ready to assign.`, "sidebar.createCycle": `+ Create a cycle`,
+    "sidebar.coachTip": `Coach tip`, "sidebar.coachTipText": `Click an athlete to see their detail, or drag a session from the library onto their calendar.`,
+    "sidebar.athleteFreshness": `Athlete freshness (today's check-in)`,
+    "sidebar.sillanceSub": `⭐ Sillance subscription`, "sidebar.subActive": `Active subscription`, "sidebar.manageSub": `Manage my subscription`,
+    "sidebar.unlockCoach": `Unlock unlimited coach space.`, "sidebar.subscribe": `Subscribe`, "sidebar.perMonth": `month`,
+    "sidebar.aiAssistant": `AI coach assistant`, "sidebar.comingSoon": `Coming soon`,
+    "sidebar.aiAssistantText": `Automatic analysis of your athletes' sessions and adjustment suggestions.`,
+    "sidebar.getPaid": `Get paid`, "sidebar.getPaidText": `Connect Stripe to bill your athletes directly from Sillance.`,
+    "sidebar.connectStripe": `Connect Stripe`, "sidebar.seeInvoices": `See my invoices`,
+    "sidebar.trackingRate": `Coaching rate`, "sidebar.edit": `edit`,
+    "sidebar.pricePrompt": `Your coaching rate (€/month):`,
+
+    "checkin.title": `Today's check-in`, "checkin.hint": `30 seconds to adapt your session to how you actually feel.`,
+    "checkin.sleep": `Sleep`, "checkin.legFatigue": `Heavy legs`, "checkin.motivation": `Motivation`,
+    "checkin.weight": `Weight`, "checkin.weightAria": `Weight in kilograms`,
+    "checkin.hrvMorning": `Morning HRV`, "checkin.hrvOptional": `Optional — from your watch or a dedicated app.`, "checkin.hrvAria": `Heart rate variability in milliseconds`,
+    "checkin.availability": `Availability`, "checkin.availabilityAria": `Today's availability`, "checkin.notePlaceholder": `Anything to add? (pain, fatigue, context…)`,
+    "checkin.cycleTitle": `Menstrual cycle`, "checkin.cycleStopTracking": `Stop tracking my cycle`, "checkin.hide": `hide`,
+    "checkin.cycleDay": `Cycle day`, "checkin.cycleDayAria": `Menstrual cycle day`,
+    "checkin.cycleOrChoose": `or choose the phase:`, "checkin.cyclePhaseAria": `Menstrual cycle phase`,
+    "checkin.cycleOptin": `Track my menstrual cycle`,
+    "checkin.cycleNote": `Optional and private — helps your coach adapt sessions to the right point in your cycle.`,
+    "checkin.freshness": `Freshness`, "checkin.validate": `Submit my check-in`,
+
+    "records.title": `Personal records`, "records.empty": `No records yet — import or sync a first activity.`,
+
+    "refs.title": `My physio references`, "refs.never": `Never entered.`,
+    "refs.lastUpdate": `Last updated&nbsp;: {days}&nbsp;day(s) ago`, "refs.retest": `consider retesting your zones`,
+    "refs.map": `MAP`, "refs.bikeCp": `Bike CP`, "refs.vVo2max": `vVO2max`, "refs.threshold": `Threshold`,
+    "refs.maxHr": `Max HR`, "refs.restHr": `Resting HR`, "refs.save": `Save my references`,
+
+    "debrief.empty": `No debrief yet — fill one in after your next race.`, "debrief.add": `Add a race debrief`,
+    "race.shareWithLoved": `Share my race with my loved ones`,
+
+    "coachSub.title": `My coaching`, "coachSub.text": `Personalized tracking: your coach reads your data and adapts your sessions to your form.`,
+    "coachSub.subscribe": `Subscribe to coaching`,
+
+    "morning.title": `Morning reminder`, "morning.text": `Get your daily recap + gear list.`,
+    "morning.sendTime": `Send time`, "morning.wantToReceive": `I want to receive`,
+    "morning.push": `Notification (phone / computer)`, "morning.email": `Email`, "morning.both": `Both`,
+    "morning.activate": `Enable reminder`, "morning.howTo": `How do I receive my notification?`,
   };
 
   var es = {
@@ -502,6 +590,50 @@
     "video.h6.title": `Farmers Carry`, "video.h6.desc": `Transporte de cargas pesadas, core y agarre bajo fatiga.`,
     "video.h7.title": `Sandbag Lunges`, "video.h7.desc": `Zancadas caminando con saco lastrado sobre los hombros.`,
     "video.h8.title": `Wall Balls — Técnica`, "video.h8.desc": `Sentadilla y lanzamiento a diana, coordinación y cadencia.`,
+
+    "sidebar.myAthletesTracking": `Seguimiento de mis atletas`, "sidebar.inviteAthlete": `Invitar a un atleta`,
+    "sidebar.library": `Biblioteca`, "sidebar.libraryHint": `Tus sesiones tipo, listas para reutilizar.`, "sidebar.createSession": `+ Crear una sesión`,
+    "sidebar.cycles": `Ciclos`, "sidebar.cyclesHint": `Tus bloques de entrenamiento tipo, listos para asignar.`, "sidebar.createCycle": `+ Crear un ciclo`,
+    "sidebar.coachTip": `Consejo de coach`, "sidebar.coachTipText": `Haz clic en un atleta para ver su detalle, o arrastra una sesión de la biblioteca a su calendario.`,
+    "sidebar.athleteFreshness": `Frescura del atleta (check-in del día)`,
+    "sidebar.sillanceSub": `⭐ Suscripción Sillance`, "sidebar.subActive": `Suscripción activa`, "sidebar.manageSub": `Gestionar mi suscripción`,
+    "sidebar.unlockCoach": `Desbloquea el espacio coach ilimitado.`, "sidebar.subscribe": `Suscribirse`, "sidebar.perMonth": `mes`,
+    "sidebar.aiAssistant": `Asistente IA coach`, "sidebar.comingSoon": `Próximamente`,
+    "sidebar.aiAssistantText": `Análisis automático de las sesiones de tus atletas y sugerencias de ajuste.`,
+    "sidebar.getPaid": `Cobra por tu trabajo`, "sidebar.getPaidText": `Conecta Stripe para facturar a tus atletas directamente desde Sillance.`,
+    "sidebar.connectStripe": `Conectar Stripe`, "sidebar.seeInvoices": `Ver mis facturas`,
+    "sidebar.trackingRate": `Tarifa de seguimiento`, "sidebar.edit": `editar`,
+    "sidebar.pricePrompt": `Tarifa de tu seguimiento de coaching (€/mes):`,
+
+    "checkin.title": `Check-in del día`, "checkin.hint": `30 segundos para adaptar tu sesión a tu forma real.`,
+    "checkin.sleep": `Sueño`, "checkin.legFatigue": `Piernas cargadas`, "checkin.motivation": `Motivación`,
+    "checkin.weight": `Peso`, "checkin.weightAria": `Peso en kilogramos`,
+    "checkin.hrvMorning": `HRV de la mañana`, "checkin.hrvOptional": `Opcional — desde tu reloj o una app dedicada.`, "checkin.hrvAria": `Variabilidad de la frecuencia cardiaca en milisegundos`,
+    "checkin.availability": `Disponibilidad`, "checkin.availabilityAria": `Disponibilidad del día`, "checkin.notePlaceholder": `¿Algo que precisar? (dolor, fatiga, contexto…)`,
+    "checkin.cycleTitle": `Ciclo menstrual`, "checkin.cycleStopTracking": `Dejar de seguir mi ciclo`, "checkin.hide": `ocultar`,
+    "checkin.cycleDay": `Día del ciclo`, "checkin.cycleDayAria": `Día del ciclo menstrual`,
+    "checkin.cycleOrChoose": `o elige la fase:`, "checkin.cyclePhaseAria": `Fase del ciclo menstrual`,
+    "checkin.cycleOptin": `Seguir mi ciclo menstrual`,
+    "checkin.cycleNote": `Opcional y privado — ayuda a tu coach a adaptar las sesiones al momento adecuado del ciclo.`,
+    "checkin.freshness": `Frescura`, "checkin.validate": `Validar mi check-in`,
+
+    "records.title": `Récords personales`, "records.empty": `Aún no hay récords — importa o sincroniza una primera actividad.`,
+
+    "refs.title": `Mis referencias fisiológicas`, "refs.never": `Nunca registradas.`,
+    "refs.lastUpdate": `Última actualización&nbsp;: hace {days}&nbsp;día(s)`, "refs.retest": `piensa en volver a testear tus zonas`,
+    "refs.map": `PAM`, "refs.bikeCp": `CP ciclismo`, "refs.vVo2max": `VAM`, "refs.threshold": `Umbral`,
+    "refs.maxHr": `FC máx`, "refs.restHr": `FC reposo`, "refs.save": `Guardar mis referencias`,
+
+    "debrief.empty": `Aún no hay debrief — completa uno después de tu próxima carrera.`, "debrief.add": `Añadir un debrief de carrera`,
+    "race.shareWithLoved": `Compartir mi carrera con mis allegados`,
+
+    "coachSub.title": `Mi coaching`, "coachSub.text": `Seguimiento personalizado: tu coach lee tus datos y adapta tus sesiones según tu forma.`,
+    "coachSub.subscribe": `Suscribirse al seguimiento`,
+
+    "morning.title": `Recordatorio matutino`, "morning.text": `Recibe cada día tu resumen + el material.`,
+    "morning.sendTime": `Hora de envío`, "morning.wantToReceive": `Quiero recibir`,
+    "morning.push": `Notificación (teléfono / PC)`, "morning.email": `Email`, "morning.both": `Ambos`,
+    "morning.activate": `Activar recordatorio`, "morning.howTo": `¿Cómo recibo mi notificación?`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

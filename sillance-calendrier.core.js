@@ -813,40 +813,40 @@ function needRadarHTML(){
 function renderSidebar(){
   if(mode==='coach'){
     sidebarContent.innerHTML = coachGuideHTML() + needRadarHTML() + `
-      <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> Suivi de mes athlètes</button>
-      <button class="btn adh-open-btn" id="inviteAthOpen" style="margin-top:8px"><i class="ic ic-user-plus"></i> Inviter un athlète</button>
-      <h2>Bibliothèque</h2>
-      <p class="hint">Glissez une séance sur un jour →</p>
-      <button class="create-btn" id="createSessionBtn">+ Créer une séance</button>
+      <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> ${tr('sidebar.myAthletesTracking')}</button>
+      <button class="btn adh-open-btn" id="inviteAthOpen" style="margin-top:8px"><i class="ic ic-user-plus"></i> ${tr('sidebar.inviteAthlete')}</button>
+      <h2>${tr('sidebar.library')}</h2>
+      <p class="hint">${tr('sidebar.libraryHint')}</p>
+      <button class="create-btn" id="createSessionBtn">+ ${tr('sidebar.createSession')}</button>
       <div id="tplList" style="margin-top:12px"></div>
-      <h2 style="margin-top:20px">Cycles</h2>
-      <p class="hint">Un programme complet posé en un clic</p>
-      <button class="create-btn" id="createCycleBtn">+ Créer un cycle</button>
+      <h2 style="margin-top:20px">${tr('sidebar.cycles')}</h2>
+      <p class="hint">${tr('sidebar.cyclesHint')}</p>
+      <button class="create-btn" id="createCycleBtn">+ ${tr('sidebar.createCycle')}</button>
       <div id="cycleList" style="margin-top:12px"></div>
-      <div class="lib-note"><i class="ic ic-lightbulb"></i> <b>Astuce coach</b> — déplacez aussi les séances d'un jour à l'autre directement dans le calendrier.</div>
+      <div class="lib-note"><i class="ic ic-lightbulb"></i> <b>${tr('sidebar.coachTip')}</b> ${tr('sidebar.coachTipText')}</div>
       <div class="readiness" style="margin-top:14px">
-        <div class="lbl">Fraîcheur athlète (check-in du jour)</div>
+        <div class="lbl">${tr('sidebar.athleteFreshness')}</div>
         <div class="score" style="color:${readinessAdvice(readinessScore()).c}">${readinessScore()}%</div>
       </div>
       <div class="coach-connect" style="margin-top:14px">
-        <div class="cc-t"><b>⭐ Abonnement Sillance</b></div>
+        <div class="cc-t"><b>⭐ ${tr('sidebar.sillanceSub')}</b></div>
         ${window.__pf_subscribed
-          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> Ton abonnement Sillance est actif. Merci !</div>
-             <button class="cc-btn" id="coachManageBtn">Gérer mon abonnement</button>`
-          : `<div class="cc-s">Débloque ton espace coach complet — choisis le palier selon ton nombre d'athlètes.</div>
+          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> ${tr('sidebar.subActive')}</div>
+             <button class="cc-btn" id="coachManageBtn">${tr('sidebar.manageSub')}</button>`
+          : `<div class="cc-s">${tr('sidebar.unlockCoach')}</div>
              ${coachTiersHTML()}
-             <button class="cc-btn" id="coachSubscribeBtn" style="margin-top:10px">S'abonner — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/mois</button>`}
+             <button class="cc-btn" id="coachSubscribeBtn" style="margin-top:10px">${tr('sidebar.subscribe')} — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/${tr('sidebar.perMonth')}</button>`}
       </div>
       <div class="coach-connect" style="margin-top:14px;opacity:.7">
-        <div class="cc-t"><b><i class="ic ic-brain"></i> Assistant IA coach</b> <span class="cc-soon">Bientôt disponible</span></div>
-        <div class="cc-s">Vérifiera automatiquement que chaque séance réalisée respecte ce qui était prévu : zones cibles, dérive cardiaque, découplage FC. En finalisation, disponible très prochainement.</div>
+        <div class="cc-t"><b><i class="ic ic-brain"></i> ${tr('sidebar.aiAssistant')}</b> <span class="cc-soon">${tr('sidebar.comingSoon')}</span></div>
+        <div class="cc-s">${tr('sidebar.aiAssistantText')}</div>
       </div>
       <div class="coach-connect" style="margin-top:14px">
-        <div class="cc-t"><b><i class="ic ic-credit-card"></i> Fais-toi payer</b></div>
-        <div class="cc-s">Relie ton compte Stripe pour facturer tes athlètes.</div>
-        <div class="cc-price">Tarif du suivi : <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/mois</small> · <a href="#" id="coachPriceEdit">modifier</a></div>
-        <button class="cc-btn" id="coachConnectBtn">Relier Stripe</button>
-        <button class="cc-btn" id="coachInvoicesBtn" style="margin-top:8px">Voir mes factures</button>
+        <div class="cc-t"><b><i class="ic ic-credit-card"></i> ${tr('sidebar.getPaid')}</b></div>
+        <div class="cc-s">${tr('sidebar.getPaidText')}</div>
+        <div class="cc-price">${tr('sidebar.trackingRate')} <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/${tr('sidebar.perMonth')}</small> · <a href="#" id="coachPriceEdit">${tr('sidebar.edit')}</a></div>
+        <button class="cc-btn" id="coachConnectBtn">${tr('sidebar.connectStripe')}</button>
+        <button class="cc-btn" id="coachInvoicesBtn" style="margin-top:8px">${tr('sidebar.seeInvoices')}</button>
       </div>`;
     buildTemplates(document.getElementById('tplList'));
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
@@ -886,7 +886,7 @@ function renderSidebar(){
     const cpe=document.getElementById('coachPriceEdit');
     if(cpe) cpe.onclick=(ev)=>{
       ev.preventDefault();
-      const v=prompt('Tarif de ton suivi coaching (€/mois) :', COACH_OFFER.price);
+      const v=prompt(tr('sidebar.pricePrompt'), COACH_OFFER.price);
       if(v!==null && !isNaN(+v) && v!==''){
         COACH_OFFER.price=+v;
         const pv=document.getElementById('coachPriceVal'); if(pv) pv.textContent=COACH_OFFER.price+' €';
@@ -897,103 +897,103 @@ function renderSidebar(){
   } else {
     const s = readinessScore(), adv = readinessAdvice(s);
     sidebarContent.innerHTML = `
-      <h2>Check-in du jour</h2>
-      <p class="hint">30 secondes chaque matin — ton coach adapte le plan.</p>
+      <h2>${tr('checkin.title')}</h2>
+      <p class="hint">${tr('checkin.hint')}</p>
       <div class="checkin">
-        ${[['sommeil','Sommeil','ic-moon'],['fatigue','Fatigue jambes','ic-battery'],['motivation','Motivation','ic-zap']].map(([k,l,ic])=>`
+        ${[['sommeil',tr('checkin.sleep'),'ic-moon'],['fatigue',tr('checkin.legFatigue'),'ic-battery'],['motivation',tr('checkin.motivation'),'ic-zap']].map(([k,l,ic])=>`
         <div class="row">
           <label><i class="ic ${ic}"></i> ${l}<span class="val" id="val-${k}">${checkin[k]}/10</span></label>
           <input type="range" min="1" max="10" value="${checkin[k]}" data-k="${k}" aria-label="${l}">
         </div>`).join('')}
         <div class="row ck-weight">
-          <label>Poids<span class="val" id="val-poids">${checkin.poids} kg</span></label>
+          <label>${tr('checkin.weight')}<span class="val" id="val-poids">${checkin.poids} kg</span></label>
           <div class="ck-wrow">
-            <input type="number" min="30" max="150" step="0.1" value="${checkin.poids}" id="ckPoids" aria-label="Poids en kilogrammes">
+            <input type="number" min="30" max="150" step="0.1" value="${checkin.poids}" id="ckPoids" aria-label="${tr('checkin.weightAria')}">
             <span class="ck-wkg" id="ckWkg">${ATHLETE_REF.ftp?(ATHLETE_REF.ftp/checkin.poids).toFixed(2)+' W/kg':''}</span>
           </div>
         </div>
         <div class="row ck-hrv">
-          <label><i class="ic ic-refresh"></i> HRV du matin <span class="ck-hrv-opt">montre / bracelet · facultatif</span></label>
+          <label><i class="ic ic-refresh"></i> ${tr('checkin.hrvMorning')} <span class="ck-hrv-opt">${tr('checkin.hrvOptional')}</span></label>
           <div class="ck-wrow">
-            <input type="number" min="10" max="200" step="1" value="${checkin.hrv||''}" id="ckHrv" placeholder="rMSSD (ms)" aria-label="HRV du matin en millisecondes">
+            <input type="number" min="10" max="200" step="1" value="${checkin.hrv||''}" id="ckHrv" placeholder="rMSSD (ms)" aria-label="${tr('checkin.hrvAria')}">
             <span class="ck-hrv-stat" id="ckHrvStat"></span>
           </div>
         </div>
         <div class="row ck-dispo">
-          <label><i class="ic ic-clipboard"></i> Disponibilité</label>
-          <div class="ck-dispo-seg" id="ckDispoSeg" role="group" aria-label="Disponibilité du jour">
+          <label><i class="ic ic-clipboard"></i> ${tr('checkin.availability')}</label>
+          <div class="ck-dispo-seg" id="ckDispoSeg" role="group" aria-label="${tr('checkin.availabilityAria')}">
             ${Object.entries(DISPO_META).map(([k,d])=>`<button type="button" data-dispo="${k}" class="${(checkin.dispo||'ok')===k?'sel':''}" style="--dc:${d.c}"><i class="ic ${d.ic}"></i>${d.l}</button>`).join('')}
           </div>
-          <textarea id="ckDispoNote" rows="2" placeholder="Précise pour ton coach (ex. douleur mollet droit depuis mardi)…" ${(checkin.dispo||'ok')==='ok'?'hidden':''}>${dispoSafe(checkin.dispoNote)}</textarea>
+          <textarea id="ckDispoNote" rows="2" placeholder="${tr('checkin.notePlaceholder')}" ${(checkin.dispo||'ok')==='ok'?'hidden':''}>${dispoSafe(checkin.dispoNote)}</textarea>
         </div>
         ${(()=>{ const on = localStorage.getItem('sil_track_cycle')==='1' || checkin.cyclePhase; return `
         <div class="row ck-cycle">
           ${on ? `
-          <label><i class="ic ic-waves"></i> Cycle menstruel <button type="button" class="ck-cycle-off" id="ckCycleOff" title="Ne plus suivre">masquer</button></label>
+          <label><i class="ic ic-waves"></i> ${tr('checkin.cycleTitle')} <button type="button" class="ck-cycle-off" id="ckCycleOff" title="${tr('checkin.cycleStopTracking')}">${tr('checkin.hide')}</button></label>
           <div class="ck-cycle-day">
-            <span>Jour du cycle</span>
-            <input type="number" min="1" max="40" value="${checkin.cycleDay||''}" id="ckCycleDay" placeholder="J—" aria-label="Jour du cycle">
-            <span class="ck-cycle-hint">ou choisis la phase :</span>
+            <span>${tr('checkin.cycleDay')}</span>
+            <input type="number" min="1" max="40" value="${checkin.cycleDay||''}" id="ckCycleDay" placeholder="J—" aria-label="${tr('checkin.cycleDayAria')}">
+            <span class="ck-cycle-hint">${tr('checkin.cycleOrChoose')}</span>
           </div>
-          <div class="ck-cycle-seg" id="ckCycleSeg" role="group" aria-label="Phase du cycle">
+          <div class="ck-cycle-seg" id="ckCycleSeg" role="group" aria-label="${tr('checkin.cyclePhaseAria')}">
             ${Object.entries(CYCLE_META).map(([k,d])=>`<button type="button" data-cyc="${k}" class="${checkin.cyclePhase===k?'sel':''}" style="--cc:${d.c}"><i class="ic ${d.ic}"></i>${d.l}<small>${d.short}</small></button>`).join('')}
           </div>
           <div class="ck-cycle-tip" id="ckCycleTip">${checkin.cyclePhase?CYCLE_META[checkin.cyclePhase].tip:''}</div>
-          ` : `<button type="button" class="ck-cycle-optin" id="ckCycleOptin"><i class="ic ic-waves"></i> Suivre mon cycle menstruel</button>
-               <div class="ck-cycle-note">Facultatif et privé — aide ton coach à adapter les séances au bon moment du cycle.</div>`}
+          ` : `<button type="button" class="ck-cycle-optin" id="ckCycleOptin"><i class="ic ic-waves"></i> ${tr('checkin.cycleOptin')}</button>
+               <div class="ck-cycle-note">${tr('checkin.cycleNote')}</div>`}
         </div>`; })()}
         <div class="readiness">
-          <div class="lbl">Fraîcheur</div>
+          <div class="lbl">${tr('checkin.freshness')}</div>
           <div class="score" id="readyScore" style="color:${adv.c}">${s}%</div>
           <div class="advice" id="readyAdvice" style="color:${adv.c}">${adv.t}</div>
         </div>
-        <button class="btn checkin-validate" id="checkinValidate" style="width:100%;margin-top:10px">Valider mon check-in</button>
+        <button class="btn checkin-validate" id="checkinValidate" style="width:100%;margin-top:10px">${tr('checkin.validate')}</button>
       </div>
       <div class="records">
-        <h2>Records personnels</h2>
-        ${RECORDS.length ? RECORDS.map(r=>`<div class="pb"><span class="d">${r.d}</span>${r.isNew?'<span class="new">NEW</span>':''}<span class="v">${r.v}</span></div>`).join('') : `<p class="club-hint">Aucun record pour l'instant — importe ou synchronise une première activité.</p>`}
+        <h2>${tr('records.title')}</h2>
+        ${RECORDS.length ? RECORDS.map(r=>`<div class="pb"><span class="d">${r.d}</span>${r.isNew?'<span class="new">NEW</span>':''}<span class="v">${r.v}</span></div>`).join('') : `<p class="club-hint">${tr('records.empty')}</p>`}
       </div>
       <div class="records" id="refsBlock">
-        <h2>Mes références physio</h2>
-        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return "Jamais renseignées."; const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return `Dernière mise à jour&nbsp;: il y a ${days}&nbsp;j${days>=90?' — pense à retester tes zones':''}`; })()}</p>
+        <h2>${tr('refs.title')}</h2>
+        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return tr('refs.never'); const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return tr('refs.lastUpdate', {days}) + (days>=90?' — '+tr('refs.retest'):''); })()}</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-          ${[['ftp','FTP','W'],['pma','PMA','W'],['cpBike','CP vélo','W'],['vma','VMA','km/h'],['cv','VC','km/h'],['seuilRun','Seuil','s/km'],['css','CSS','s/100m'],['fcMax','FC max','bpm'],['fcRepos','FC repos','bpm']].map(([k,l,u])=>`
+          ${[['ftp','FTP','W'],['pma',tr('refs.map'),'W'],['cpBike',tr('refs.bikeCp'),'W'],['vma',tr('refs.vVo2max'),'km/h'],['cv','CV','km/h'],['seuilRun',tr('refs.threshold'),'s/km'],['css','CSS','s/100m'],['fcMax',tr('refs.maxHr'),'bpm'],['fcRepos',tr('refs.restHr'),'bpm']].map(([k,l,u])=>`
           <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)"><span>${l} <em style="font-style:normal;opacity:.65">${u}</em></span>
             <input type="number" step="any" data-ref="${k}" value="${ATHLETE_REF[k]??''}" style="width:100%;box-sizing:border-box"></label>`).join('')}
         </div>
-        <button class="btn" id="refsSave" style="width:100%;margin-top:10px">Enregistrer mes références</button>
+        <button class="btn" id="refsSave" style="width:100%;margin-top:10px">${tr('refs.save')}</button>
       </div>
       <div class="records" id="debriefCard">
-        ${debriefsBlockHTML(debriefsFor(myDebriefKey()), "Pas encore de débrief — remplis-en un après ta prochaine course.")}
-        <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> Ajouter un débrief de course</button>
+        ${debriefsBlockHTML(debriefsFor(myDebriefKey()), tr('debrief.empty'))}
+        <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> ${tr('debrief.add')}</button>
       </div>
       <div class="records" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}</div>
-      ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn"><i class="ic ic-link"></i> Partager ma course avec mes proches</button>` : ''}
+      ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
       <div class="strava-card" id="stravaCard"></div>
       <div class="coach-sub" id="coachSubCard">
-        <h2>Mon coaching</h2>
-        <p class="hint" style="margin-bottom:10px">Suivi personnalisé : ton coach lit tes données et adapte tes séances selon ta forme.</p>
-        <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/mois</small></span></div>
-        <button class="btn coach-sub-btn" id="coachSubBtn">S'abonner au suivi</button>
+        <h2>${tr('coachSub.title')}</h2>
+        <p class="hint" style="margin-bottom:10px">${tr('coachSub.text')}</p>
+        <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/${tr('sidebar.perMonth')}</small></span></div>
+        <button class="btn coach-sub-btn" id="coachSubBtn">${tr('coachSub.subscribe')}</button>
       </div>
       <div class="morning-card">
-        <h2>Rappel du matin</h2>
-        <p class="hint" style="margin-bottom:10px">Reçois chaque jour ton récap + le matériel.</p>
+        <h2>${tr('morning.title')}</h2>
+        <p class="hint" style="margin-bottom:10px">${tr('morning.text')}</p>
         <div class="morning-pre" id="morningPre"></div>
         <div class="morning-time">
-          <label for="morningHour">Heure d'envoi</label>
+          <label for="morningHour">${tr('morning.sendTime')}</label>
           <input type="time" id="morningHour" value="07:00" step="900">
         </div>
         <div class="morning-time">
-          <label for="morningChannel">Je veux recevoir</label>
+          <label for="morningChannel">${tr('morning.wantToReceive')}</label>
           <select id="morningChannel">
-            <option value="push">Notification (téléphone / PC)</option>
-            <option value="email">Email</option>
-            <option value="both">Les deux</option>
+            <option value="push">${tr('morning.push')}</option>
+            <option value="email">${tr('morning.email')}</option>
+            <option value="both">${tr('morning.both')}</option>
           </select>
         </div>
-        <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> Activer le rappel</button>
-        <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">Comment recevoir ma notification&nbsp;?</a>
+        <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> ${tr('morning.activate')}</button>
+        <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">${tr('morning.howTo')}</a>
       </div>`;
     sidebarContent.querySelectorAll('input[type=range]').forEach(inp=>{
       inp.addEventListener('input', ()=>{
