@@ -1,0 +1,49 @@
+name: Vérifier le déploiement GitHub Pages
+
+# Constat audit pré-prod (03/08/2026) : déploiement GitHub Pages sans CI ni
+# vérification post-deploy. Un build a échoué puis réussi 15s après sur le
+# même commit sans qu'aucune alerte n'existe pour le détecter. Ce workflow
+# ne fait pas le déploiement (GitHub Pages le déclenche déjà tout seul sur
+# push vers main) — il vérifie juste que ce déploiement automatique a bien
+# abouti, et échoue (donc alerte par email/notification GitHub) sinon.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Attendre la fin du build Pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Laisse le temps au build de démarrer côté GitHub Pages.
+          sleep 15
+          for i in $(seq 1 30); do
+            resp=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/pages/builds/latest")
+            status=$(echo "$resp" | jq -r '.status // "unknown"')
+            commit=$(echo "$resp" | jq -r '.commit // "?"')
+            echo "Tentative $i — statut: $status (commit $commit)"
+            if [ "$status" = "built" ]; then
+              echo "Déploiement Pages OK."
+              exit 0
+            fi
+            if [ "$status" = "errored" ]; then
+              echo "::error::Le build GitHub Pages a échoué."
+              echo "$resp" | jq '.error // .'
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "::error::Timeout (5 min) en attendant la fin du build GitHub Pages — voir https://github.com/${{ github.repository }}/settings/pages"
+          exit 1
