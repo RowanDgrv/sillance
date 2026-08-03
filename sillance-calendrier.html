@@ -9791,8 +9791,6 @@ function smoothPath(pts){
   }
   return d;
 }
-function pacefmt(v){ const m=Math.floor(v), s=Math.round((v-m)*60); return `${m}'${String(s).padStart(2,'0')}"` } /* utile pour vos futurs graphiques d'allure */
-
 /* ---- 1b. FTP & PMA — double courbe watts ---- */
 /* ============================================================
    CURSEUR SYNCHRONISÉ entre les graphes temporels (#4 finition)
@@ -10439,7 +10437,6 @@ function sessionLoad(s){
   return Math.round(s.rpe*s.dur*0.24);                     // sRPE → TSS-équivalent
 }
 const HYROX_DEMO = { aero:78, musc:64, runs:[245,248,251,254,258,262,268,276], freshPace:241, fatiguePace:262 };
-function fmtPace(s){ const m=Math.floor(s/60), x=s%60; return `${m}'${String(x).padStart(2,'0')}"`; }
 function injectLoadHxCss(){
   if(document.getElementById('pf-loadhx-css')) return;
   const st=document.createElement('style'); st.id='pf-loadhx-css';
@@ -10545,35 +10542,6 @@ const REC_RUN_DIST = [
 const REC_DATES = ['12 juin','3 mai','21 avr.','8 mars','17 fév.','29 janv.','5 janv.','14 déc.'];
 function recDate(i){ return REC_DATES[i % REC_DATES.length]; }
 
-/* — Puissance vélo (W) selon la durée — modèle plausible autour du FTP/PMA — */
-function powerForDuration(sec){
-  const ftp=ATHLETE_REF.ftp, pma=ATHLETE_REF.pma;
-  // sprint très court : bien au-dessus de la PMA
-  if(sec<=1) return Math.round(pma*2.9);
-  if(sec<=5) return Math.round(pma*(2.9 - 0.18*Math.log2(sec)));   // ~2.9→2.5× PMA
-  if(sec<=60){ // de 5s à 1min : descend de ~2.4×PMA à ~1.5×PMA
-    const f = 2.4 - (sec-5)/(60-5)*(2.4-1.5); return Math.round(pma*f);
-  }
-  if(sec<=300){ // 1→5min : ~PMA à ~FTP*1.18
-    const f = (pma) - (sec-60)/(300-60)*(pma - ftp*1.18); return Math.round(f);
-  }
-  if(sec<=3600){ // 5min→1h : converge vers ~FTP
-    const f = ftp*1.18 - (sec-300)/(3600-300)*(ftp*1.18 - ftp*0.98); return Math.round(f);
-  }
-  // au-delà d'1h : lente décroissance d'endurance
-  const hours = sec/3600;
-  const f = ftp*0.98 * Math.pow(0.955, hours-1);
-  return Math.round(f);
-}
-/* — Natation : allure au 100m (sec) selon la durée d'effort — autour du CSS — */
-function swimPaceForDuration(sec){
-  const css=ATHLETE_REF.css; // s/100m au seuil
-  if(sec<=15) return css*0.80;          // sprint pur, bien plus rapide
-  if(sec<=60) return css*(0.80 + (sec-15)/(60-15)*0.10);   // 0.80→0.90
-  if(sec<=300) return css*(0.90 + (sec-60)/(300-60)*0.08);  // 0.90→0.98
-  if(sec<=1800) return css*(0.98 + (sec-300)/(1800-300)*0.06); // →1.04
-  return css*(1.04 + Math.min(0.18,(sec-1800)/3600*0.05));  // dérive longue
-}
 /* — Vélo : vitesse moyenne (km/h) soutenable selon la distance — décroît avec la distance — */
 function bikeSpeedForDistance(km){
   if(km<=20) return 42;
@@ -10596,7 +10564,6 @@ function runPaceForDistance(m){
   return 3600/kmh; // s/km
 }
 function fmtPace(sPerKm){ const s=Math.round(sPerKm); return Math.floor(s/60)+"'"+String(s%60).padStart(2,'0')+'"'; }
-function fmtSwim(sec){ const s=Math.round(sec); return Math.floor(s/60)+"'"+String(s%60).padStart(2,'0')+'"'; }
 
 let recTab='bike';
 function renderRecords(){
