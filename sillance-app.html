@@ -3158,6 +3158,44 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 <script src="./sillance-flow.js"></script>
 <script>
 /* ============================================================
+   TÉLÉMÉTRIE D'ERREUR — capture window.onerror / unhandledrejection
+   et logue via PF.logClientError (table client_errors, cf. migration
+   0034). Best-effort, plafonné, jamais bloquant. window.PF n'est pas
+   encore prêt à ce stade (sillance-integration.js est un module chargé
+   en fin de page) → mise en file d'attente + vidage dès que possible.
+   ============================================================ */
+(function(){
+  const MAX_REPORTS = 20;
+  let sent = 0;
+  const seen = new Set();
+  const queue = [];
+  function report(message, stack, context){
+    if(sent >= MAX_REPORTS) return;
+    const key = String(message).slice(0,200);
+    if(seen.has(key)) return;   // évite le flood si une erreur boucle
+    seen.add(key);
+    const payload = { message, stack, url: location.href, context };
+    if(window.PF?.logClientError){ sent++; window.PF.logClientError(payload).catch(()=>{}); }
+    else queue.push(payload);
+  }
+  let tries = 0;
+  const flush = setInterval(()=>{
+    tries++;
+    if(window.PF?.logClientError){
+      while(queue.length && sent < MAX_REPORTS){ sent++; window.PF.logClientError(queue.shift()).catch(()=>{}); }
+      clearInterval(flush);
+    } else if(tries > 20) clearInterval(flush);   // ~10s, abandonne (mode démo sans cloud probable)
+  }, 500);
+  window.addEventListener('error', e=>{
+    report(e.message || 'Erreur inconnue', e.error?.stack || null, { line:e.lineno, col:e.colno, file:e.filename });
+  });
+  window.addEventListener('unhandledrejection', e=>{
+    const reason = e.reason;
+    report(reason?.message || String(reason), reason?.stack || null, { kind:'unhandledrejection' });
+  });
+})();
+
+/* ============================================================
    Sillance — logique
    ============================================================ */
 const DISC = {
