@@ -6793,6 +6793,7 @@ function coachTiersHTML(){
 function wireCoachTiers(root){
   root.querySelectorAll('.csub-tier').forEach(el=>{
     el.onclick=()=>{ selectedCoachTier=+el.dataset.tier; renderSidebar(); };
+    el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } };
   });
 }
 
@@ -11375,6 +11376,56 @@ window.loadStravaData = function(data){
   if(typeof renderReadiness==='function') renderReadiness();
   location.hash = '#analytics';
 };
+
+/* ============================================================
+   FOCUS TRAP GÉNÉRIQUE — toutes les .overlay (19 dialogs).
+   Piège le focus clavier tant qu'une overlay a la classe .open,
+   le restitue à la fermeture, ferme sur Escape. Générique et
+   automatique : pas besoin de câbler chaque point d'ouverture
+   individuellement (audit sécurité/accessibilité 03/08/2026).
+   ============================================================ */
+(function(){
+  const FOCUSABLE = 'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  let active = null, lastFocused = null;
+
+  function focusables(ov){ return [...ov.querySelectorAll(FOCUSABLE)].filter(n=> n.offsetParent !== null); }
+
+  function onOpen(ov){
+    active = ov;
+    lastFocused = document.activeElement;
+    if(!ov.hasAttribute('tabindex')) ov.setAttribute('tabindex','-1');
+    const nodes = focusables(ov);
+    (nodes[0] || ov).focus({preventScroll:true});
+  }
+  function onClose(ov){
+    if(active===ov) active=null;
+    if(lastFocused && document.body.contains(lastFocused) && typeof lastFocused.focus==='function') lastFocused.focus({preventScroll:true});
+    lastFocused=null;
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(!active) return;
+    if(e.key==='Escape'){ e.preventDefault(); active.classList.remove('open'); return; }
+    if(e.key!=='Tab') return;
+    const nodes = focusables(active);
+    if(!nodes.length) return;
+    const first=nodes[0], last=nodes[nodes.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  }, true);
+
+  const mo = new MutationObserver(muts=>{
+    for(const m of muts){
+      const el = m.target;
+      if(!(el instanceof Element) || !el.classList.contains('overlay')) continue;
+      const isOpen = el.classList.contains('open');
+      const was = m.oldValue ? m.oldValue.split(/\s+/).includes('open') : false;
+      if(isOpen && !was) onOpen(el);
+      else if(!isOpen && was) onClose(el);
+    }
+  });
+  document.querySelectorAll('.overlay').forEach(ov=> mo.observe(ov, {attributes:true, attributeFilter:['class'], attributeOldValue:true}));
+})();
 </script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
