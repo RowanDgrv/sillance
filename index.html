@@ -6,19 +6,23 @@
      (en-tête HTTP requis, indisponible sur GitHub Pages). -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Sillance — Logiciel de coaching triathlon &amp; Hyrox</title>
-<meta name="description" content="Sillance, la plateforme de coaching qui met ton entraînement dans le sillage de ton coach. Triathlon, Hyrox, course à pied — data, planning, facturation.">
+<title data-i18n="meta.title">Sillance — Logiciel de coaching triathlon &amp; Hyrox</title>
+<meta name="description" data-i18n-attr="content:meta.description" content="Sillance, la plateforme de coaching qui met ton entraînement dans le sillage de ton coach. Triathlon, Hyrox, course à pied — data, planning, facturation.">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="canonical" href="https://sillance.app/">
+<link rel="alternate" hreflang="fr" href="https://sillance.app/?lang=fr">
+<link rel="alternate" hreflang="en" href="https://sillance.app/?lang=en">
+<link rel="alternate" hreflang="es" href="https://sillance.app/?lang=es">
+<link rel="alternate" hreflang="x-default" href="https://sillance.app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sillance">
-<meta property="og:title" content="Sillance, entre dans le sillage">
-<meta property="og:description" content="La plateforme qui fait progresser coach et athlète, dans le sillage l'un de l'autre. Triathlon, Hyrox, course à pied.">
+<meta property="og:title" data-i18n-attr="content:meta.ogTitle" content="Sillance, entre dans le sillage">
+<meta property="og:description" data-i18n-attr="content:meta.ogDescription" content="La plateforme qui fait progresser coach et athlète, dans le sillage l'un de l'autre. Triathlon, Hyrox, course à pied.">
 <meta property="og:image" content="https://sillance.app/og-image.png">
 <meta property="og:url" content="https://sillance.app/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Sillance, entre dans le sillage">
-<meta name="twitter:description" content="La plateforme qui fait progresser coach et athlète. Triathlon, Hyrox, course à pied.">
+<meta name="twitter:title" data-i18n-attr="content:meta.ogTitle" content="Sillance, entre dans le sillage">
+<meta name="twitter:description" data-i18n-attr="content:meta.ogDescription" content="La plateforme qui fait progresser coach et athlète. Triathlon, Hyrox, course à pied.">
 <meta name="twitter:image" content="https://sillance.app/og-image.png">
 <script type="application/ld+json">
 {
@@ -92,12 +96,18 @@ main,.nav,footer{position:relative;z-index:1}
 .btn.primary:hover{filter:brightness(1.07)}
 .btn.ghost{border-color:var(--line-strong);color:var(--soft)}
 .btn.ghost:hover{border-color:var(--accent);color:var(--text)}
+.lang-switch{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;padding:2px}
+.lang-switch button{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.04em;padding:6px 9px;
+  border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:.15s;line-height:1}
+.lang-switch button:hover{color:var(--soft)}
+.lang-switch button.active{background:var(--accent);color:#062028}
 @media(max-width:760px){.nav-links{display:none}}
 @media(max-width:520px){
   .nav-right .btn.ghost{display:none}
   .beta-badge{display:none}
   .nav .wrap{gap:10px}
   .btn.primary{padding:12px 16px;font-size:13px}
+  .lang-switch button{padding:6px 7px;font-size:10px}
 }
 
 /* ---------- type ---------- */
@@ -203,16 +213,21 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 <body>
 
 <nav class="nav"><div class="wrap">
-  <a class="brand" href="#top"><svg class="brandmark" width="22" height="22" viewBox="0 0 96 96" fill="none" aria-hidden="true" style="vertical-align:middle"><defs><linearGradient id="lmFuse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#46C2D8"/></linearGradient></defs><path d="M76 48 C56 34 36 28 8 24" stroke="#FF9A3D" stroke-width="10" stroke-linecap="round"/><path d="M76 48 C56 62 36 68 8 72" stroke="#46C2D8" stroke-width="10" stroke-linecap="round"/><circle cx="76" cy="48" r="11" fill="url(#lmFuse)"/><path d="M31 48 A7.5 7.5 0 0 1 46 48 Z" fill="#FF9A3D"/><path d="M46 48 A7.5 7.5 0 0 1 31 48 Z" fill="#46C2D8"/></svg><span class="wm">Sill<b>ance</b></span><span class="beta-badge">Bêta</span></a>
+  <a class="brand" href="#top"><svg class="brandmark" width="22" height="22" viewBox="0 0 96 96" fill="none" aria-hidden="true" style="vertical-align:middle"><defs><linearGradient id="lmFuse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#46C2D8"/></linearGradient></defs><path d="M76 48 C56 34 36 28 8 24" stroke="#FF9A3D" stroke-width="10" stroke-linecap="round"/><path d="M76 48 C56 62 36 68 8 72" stroke="#46C2D8" stroke-width="10" stroke-linecap="round"/><circle cx="76" cy="48" r="11" fill="url(#lmFuse)"/><path d="M31 48 A7.5 7.5 0 0 1 46 48 Z" fill="#FF9A3D"/><path d="M46 48 A7.5 7.5 0 0 1 31 48 Z" fill="#46C2D8"/></svg><span class="wm">Sill<b>ance</b></span><span class="beta-badge" data-i18n="nav.beta">Bêta</span></a>
   <div class="nav-links">
-    <a href="#roles">Pour qui</a>
-    <a href="#how">Comment ça marche</a>
-    <a href="#data">La plateforme</a>
-    <a href="#pricing">Tarifs</a>
+    <a href="#roles" data-i18n="nav.links.roles">Pour qui</a>
+    <a href="#how" data-i18n="nav.links.how">Comment ça marche</a>
+    <a href="#data" data-i18n="nav.links.data">La plateforme</a>
+    <a href="#pricing" data-i18n="nav.links.pricing">Tarifs</a>
   </div>
   <div class="nav-right">
-    <a class="btn ghost" href="./sillance-app.html?login=1">Connexion</a>
-    <a class="btn primary" href="./sillance-app.html">Découvrir la démo</a>
+    <div class="lang-switch" role="group" aria-label="Language / Langue / Idioma">
+      <button type="button" data-lang-btn="fr">FR</button>
+      <button type="button" data-lang-btn="en">EN</button>
+      <button type="button" data-lang-btn="es">ES</button>
+    </div>
+    <a class="btn ghost" href="./sillance-app.html?login=1" data-i18n="nav.connexion">Connexion</a>
+    <a class="btn primary" href="./sillance-app.html" data-i18n="nav.demo">Découvrir la démo</a>
   </div>
 </div></nav>
 
@@ -223,43 +238,43 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <canvas class="hero-canvas" id="heroGl" aria-hidden="true"></canvas>
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="wrap">
-    <span class="kicker">Triathlon · Hyrox · Course à pied</span>
-    <h1 class="h1">Sillance,<br>ton <span class="alt2">sillage</span></h1>
-    <p class="lede">Dans l'eau, dans une roue, le sillage porte l'effort à ta place. Ton coach fait de même avec ton entraînement&nbsp;: il calcule la charge, gère la récupération, ajuste la suite, et il ne te reste qu'à suivre le plan.</p>
+    <span class="kicker" data-i18n="hero.kicker">Triathlon · Hyrox · Course à pied</span>
+    <h1 class="h1" data-i18n-html="hero.title">Sillance,<br>ton <span class="alt2">sillage</span></h1>
+    <p class="lede" data-i18n-html="hero.lede">Dans l'eau, dans une roue, le sillage porte l'effort à ta place. Ton coach fait de même avec ton entraînement&nbsp;: il calcule la charge, gère la récupération, ajuste la suite, et il ne te reste qu'à suivre le plan.</p>
     <div class="cta-row">
-      <a class="btn primary" href="./sillance-app.html">Découvrir la démo</a>
-      <a class="btn ghost" href="#roles">En savoir plus</a>
+      <a class="btn primary" href="./sillance-app.html" data-i18n="hero.cta1">Découvrir la démo</a>
+      <a class="btn ghost" href="#roles" data-i18n="hero.cta2">En savoir plus</a>
     </div>
   </div>
-  <div class="scrollcue"><span>Défiler</span><span class="ln"></span></div>
+  <div class="scrollcue"><span data-i18n="hero.scroll">Défiler</span><span class="ln"></span></div>
   </section>
 
   <!-- RÔLES -->
   <section class="section" id="roles"><div class="wrap">
     <div class="sec-head">
-      <span class="kicker">Pour qui</span>
-      <h2 class="h2">Trois rôles, une même plateforme</h2>
+      <span class="kicker" data-i18n="roles.kicker">Pour qui</span>
+      <h2 class="h2" data-i18n="roles.title">Trois rôles, une même plateforme</h2>
     </div>
     <div class="grid">
       <div class="role">
-        <span class="rk">Coachs</span>
-        <h3>Coach</h3>
-        <p>Planifiez les séances, suivez vos athlètes et analysez leurs données réelles. L'assistant IA synthétise chaque séance et oriente la suite du plan.</p>
-        <a href="./sillance-app.html">Voir l'espace coach</a>
-        <a href="./sillance-app.html?login=1&role=coach" style="margin-top:2px;opacity:.7;font-size:12px">Déjà client ? Se connecter</a>
+        <span class="rk" data-i18n="roles.coach.kicker">Coachs</span>
+        <h3 data-i18n="roles.coach.title">Coach</h3>
+        <p data-i18n="roles.coach.text">Planifiez les séances, suivez vos athlètes et analysez leurs données réelles. L'assistant IA synthétise chaque séance et oriente la suite du plan.</p>
+        <a href="./sillance-app.html" data-i18n="roles.coach.link">Voir l'espace coach</a>
+        <a href="./sillance-app.html?login=1&role=coach" style="margin-top:2px;opacity:.7;font-size:12px" data-i18n="roles.loginCta">Déjà client ? Se connecter</a>
       </div>
       <div class="role">
-        <span class="rk">Clubs &amp; box</span>
-        <h3>Club</h3>
-        <p>Créneaux, adhérents, présences et facturation réunis au même endroit. Trois formules, de la séance à la carte au suivi premium. Conçu pour les structures et les box Hyrox.</p>
-        <a href="./sillance-club.html">Voir l'espace club</a>
-        <a href="./sillance-app.html?login=1&role=club" style="margin-top:2px;opacity:.7;font-size:12px">Déjà client ? Se connecter</a>
+        <span class="rk" data-i18n="roles.club.kicker">Clubs &amp; box</span>
+        <h3 data-i18n="roles.club.title">Club</h3>
+        <p data-i18n="roles.club.text">Créneaux, adhérents, présences et facturation réunis au même endroit. Trois formules, de la séance à la carte au suivi premium. Conçu pour les structures et les box Hyrox.</p>
+        <a href="./sillance-club.html" data-i18n="roles.club.link">Voir l'espace club</a>
+        <a href="./sillance-app.html?login=1&role=club" style="margin-top:2px;opacity:.7;font-size:12px" data-i18n="roles.loginCta">Déjà client ? Se connecter</a>
       </div>
       <div class="role">
-        <span class="rk">Athlètes</span>
-        <h3>Athlète</h3>
-        <p>Votre programme, vos données, votre progression. Importez vos séances et accédez à la même lecture que votre coach.</p>
-        <a href="./sillance-app.html">Voir l'espace athlète</a>
+        <span class="rk" data-i18n="roles.athlete.kicker">Athlètes</span>
+        <h3 data-i18n="roles.athlete.title">Athlète</h3>
+        <p data-i18n="roles.athlete.text">Votre programme, vos données, votre progression. Importez vos séances et accédez à la même lecture que votre coach.</p>
+        <a href="./sillance-app.html" data-i18n="roles.athlete.link">Voir l'espace athlète</a>
       </div>
     </div>
   </div></section>
@@ -267,132 +282,134 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
   <!-- COMMENT ÇA MARCHE -->
   <section class="section" id="how"><div class="wrap">
     <div class="sec-head">
-      <span class="kicker">Comment ça marche</span>
-      <h2 class="h2">Planifier, voir, ajuster, être payé</h2>
+      <span class="kicker" data-i18n="how.kicker">Comment ça marche</span>
+      <h2 class="h2" data-i18n="how.title">Planifier, voir, ajuster, être payé</h2>
     </div>
     <div class="steps">
-      <div class="step"><div class="sn">01</div><h3>Tu planifies</h3><p>Pose les séances de la semaine en quelques clics, ou un cycle complet d'un coup. Chaque athlète a son plan.</p></div>
-      <div class="step"><div class="sn">02</div><h3>L'athlète exécute</h3><p>Il suit son programme. Sa montre Garmin ou Coros, ou son fichier .FIT, remonte la séance réalisée.</p></div>
-      <div class="step"><div class="sn">03</div><h3>Sillance analyse</h3><p>La donnée brute devient lisible : charge, fraîcheur, respect du plan. L'assistant IA en fait la synthèse.</p></div>
-      <div class="step"><div class="sn">04</div><h3>Tu ajustes, tu encaisses</h3><p>Tu adaptes la suite sur du concret, et tes athlètes te paient automatiquement via la plateforme.</p></div>
+      <div class="step"><div class="sn">01</div><h3 data-i18n="how.step1.title">Tu planifies</h3><p data-i18n="how.step1.text">Pose les séances de la semaine en quelques clics, ou un cycle complet d'un coup. Chaque athlète a son plan.</p></div>
+      <div class="step"><div class="sn">02</div><h3 data-i18n="how.step2.title">L'athlète exécute</h3><p data-i18n="how.step2.text">Il suit son programme. Sa montre Garmin ou Coros, ou son fichier .FIT, remonte la séance réalisée.</p></div>
+      <div class="step"><div class="sn">03</div><h3 data-i18n="how.step3.title">Sillance analyse</h3><p data-i18n="how.step3.text">La donnée brute devient lisible : charge, fraîcheur, respect du plan. L'assistant IA en fait la synthèse.</p></div>
+      <div class="step"><div class="sn">04</div><h3 data-i18n="how.step4.title">Tu ajustes, tu encaisses</h3><p data-i18n="how.step4.text">Tu adaptes la suite sur du concret, et tes athlètes te paient automatiquement via la plateforme.</p></div>
     </div>
   </div></section>
 
   <!-- DATA -->
   <section class="section" id="data"><div class="wrap">
     <div class="sec-head">
-      <span class="kicker">La donnée qui compte</span>
-      <h2 class="h2">Une lecture au-delà des chiffres bruts</h2>
+      <span class="kicker" data-i18n="data.kicker">La donnée qui compte</span>
+      <h2 class="h2" data-i18n="data.title">Une lecture au-delà des chiffres bruts</h2>
     </div>
     <div class="grid">
-      <div class="feat"><div class="num">01</div><div><h3>Charge d'entraînement</h3><p>Forme, fatigue et fraîcheur réunies sur une seule métrique, commune au vélo, à la course, à la natation et au Hyrox. Tu sais quand pousser et quand relâcher.</p></div></div>
-      <div class="feat"><div class="num">02</div><div><h3>Multi-capteurs</h3><p>Garmin, Coros, ou l'import de tes fichiers .FIT : la donnée de tes athlètes revient chez toi, quel que soit leur écosystème. La réponse au trou laissé par Strava.</p></div></div>
-      <div class="feat"><div class="num">03</div><div><h3>Assistant IA</h3><p>Une synthèse claire de chaque séance et des recommandations concrètes, évaluées au regard de l'objectif que tu as fixé.</p></div></div>
-      <div class="feat"><div class="num">04</div><div><h3>Découplage &amp; durabilité</h3><p>Les marqueurs fins de l'endurance : dérive cardiaque et puissance tenue sous fatigue. Pour affiner quand tu veux aller plus loin.</p></div></div>
+      <div class="feat"><div class="num">01</div><div><h3 data-i18n="data.feat1.title">Charge d'entraînement</h3><p data-i18n="data.feat1.text">Forme, fatigue et fraîcheur réunies sur une seule métrique, commune au vélo, à la course, à la natation et au Hyrox. Tu sais quand pousser et quand relâcher.</p></div></div>
+      <div class="feat"><div class="num">02</div><div><h3 data-i18n="data.feat2.title">Multi-capteurs</h3><p data-i18n="data.feat2.text">Garmin, Coros, ou l'import de tes fichiers .FIT : la donnée de tes athlètes revient chez toi, quel que soit leur écosystème. La réponse au trou laissé par Strava.</p></div></div>
+      <div class="feat"><div class="num">03</div><div><h3 data-i18n="data.feat3.title">Assistant IA</h3><p data-i18n="data.feat3.text">Une synthèse claire de chaque séance et des recommandations concrètes, évaluées au regard de l'objectif que tu as fixé.</p></div></div>
+      <div class="feat"><div class="num">04</div><div><h3 data-i18n-html="data.feat4.title">Découplage &amp; durabilité</h3><p data-i18n="data.feat4.text">Les marqueurs fins de l'endurance : dérive cardiaque et puissance tenue sous fatigue. Pour affiner quand tu veux aller plus loin.</p></div></div>
     </div>
   </div></section>
 
   <!-- TARIFS -->
   <section class="section" id="pricing"><div class="wrap">
     <div class="sec-head">
-      <span class="kicker">Tarifs</span>
-      <h2 class="h2">Des prix pensés pour durer</h2>
-      <p class="sub" style="color:var(--soft);font-weight:300;margin-top:14px">Le coach indépendant facture ses athlètes dans l'app. Les clubs prennent une licence à la saison, au nombre d'athlètes réellement suivis. <b style="color:var(--text);font-weight:600">Entraîneurs illimités à tous les paliers.</b></p>
-      <p class="sub" style="color:var(--muted);font-weight:300;font-size:12.5px;margin-top:10px">Sillance est en bêta — paiement disponible dans quelques jours, le temps de finaliser notre immatriculation.</p>
+      <span class="kicker" data-i18n="pricing.kicker">Tarifs</span>
+      <h2 class="h2" data-i18n="pricing.title">Des prix pensés pour durer</h2>
+      <p class="sub" style="color:var(--soft);font-weight:300;margin-top:14px" data-i18n-html="pricing.sub1">Le coach indépendant facture ses athlètes dans l'app. Les clubs prennent une licence à la saison, au nombre d'athlètes réellement suivis. <b style="color:var(--text);font-weight:600">Entraîneurs illimités à tous les paliers.</b></p>
+      <p class="sub" style="color:var(--muted);font-weight:300;font-size:12.5px;margin-top:10px" data-i18n="pricing.sub2">Sillance est en bêta — paiement disponible dans quelques jours, le temps de finaliser notre immatriculation.</p>
     </div>
 
     <div class="sec-head" style="margin-top:0">
-      <span class="kicker">Coach indépendant</span>
-      <p class="sub" style="color:var(--soft);font-weight:300;margin-top:6px">Planifie, analyse la donnée réelle de tes athlètes, et fais-toi payer par eux directement dans l'app. Le palier suit ton nombre d'athlètes coachés, pas ton chiffre d'affaires.</p>
+      <span class="kicker" data-i18n="pricing.coachKicker">Coach indépendant</span>
+      <p class="sub" style="color:var(--soft);font-weight:300;margin-top:6px" data-i18n="pricing.coachText">Planifie, analyse la donnée réelle de tes athlètes, et fais-toi payer par eux directement dans l'app. Le palier suit ton nombre d'athlètes coachés, pas ton chiffre d'affaires.</p>
     </div>
     <div class="grid" style="margin-bottom:44px">
       <div class="price">
-        <span class="tier">Coach solo</span>
-        <div class="amt">19 €<span class="per">/ mois</span></div>
-        <div class="cap">1 à 10 athlètes coachés</div>
+        <span class="tier" data-i18n="pricing.coachTier">Coach solo</span>
+        <div class="amt">19 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="cap" data-i18n="pricing.coach1.cap">1 à 10 athlètes coachés</div>
       </div>
       <div class="price feature">
-        <span class="tier">Coach solo</span>
-        <div class="amt">29 €<span class="per">/ mois</span></div>
-        <div class="cap">11 à 30 athlètes coachés</div>
+        <span class="tier" data-i18n="pricing.coachTier">Coach solo</span>
+        <div class="amt">29 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="cap" data-i18n="pricing.coach2.cap">11 à 30 athlètes coachés</div>
       </div>
       <div class="price">
-        <span class="tier">Coach solo</span>
-        <div class="amt">49 €<span class="per">/ mois</span></div>
-        <div class="cap">31+ athlètes coachés</div>
+        <span class="tier" data-i18n="pricing.coachTier">Coach solo</span>
+        <div class="amt">49 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="cap" data-i18n="pricing.coach3.cap">31+ athlètes coachés</div>
       </div>
     </div>
 
     <div class="grid">
       <div class="price">
-        <span class="tier">Club</span>
-        <div class="amt">600 €<span class="per">/ saison</span></div>
-        <div class="cap">jusqu'à 50 athlètes activés — moins d'1 €/mois par athlète</div>
-        <div class="founder"><b>Clubs fondateurs : 300 €</b> (10 premiers)</div>
+        <span class="tier" data-i18n="pricing.club1.tier">Club</span>
+        <div class="amt">600 €<span class="per" data-i18n="pricing.perSeason">/ saison</span></div>
+        <div class="cap" data-i18n="pricing.club1.cap">jusqu'à 50 athlètes activés — moins d'1 €/mois par athlète</div>
+        <div class="founder" data-i18n-html="pricing.club1.founder"><b>Clubs fondateurs : 300 €</b> (10 premiers)</div>
         <ul>
-          <li>Planning, adhérents, créneaux &amp; présences</li>
-          <li>Entraîneurs illimités</li>
-          <li>Analyse de la charge réservée au suivi premium</li>
+          <li data-i18n="pricing.club1.f1">Planning, adhérents, créneaux &amp; présences</li>
+          <li data-i18n="pricing.unlimitedCoaches">Entraîneurs illimités</li>
+          <li data-i18n="pricing.club1.f3">Analyse de la charge réservée au suivi premium</li>
         </ul>
       </div>
       <div class="price feature">
-        <span class="tier">Grand club</span>
-        <div class="amt">1 350 €<span class="per">/ saison</span></div>
-        <div class="cap">jusqu'à 150 athlètes activés — 0,75 €/mois par athlète</div>
-        <div class="founder"><b>Clubs fondateurs : 675 €</b> (10 premiers)</div>
+        <span class="tier" data-i18n="pricing.club2.tier">Grand club</span>
+        <div class="amt">1 350 €<span class="per" data-i18n="pricing.perSeason">/ saison</span></div>
+        <div class="cap" data-i18n="pricing.club2.cap">jusqu'à 150 athlètes activés — 0,75 €/mois par athlète</div>
+        <div class="founder" data-i18n-html="pricing.club2.founder"><b>Clubs fondateurs : 675 €</b> (10 premiers)</div>
         <ul>
-          <li>Tout le palier Club</li>
-          <li>Groupes &amp; contenus par niveau</li>
-          <li>Facturation adhérents intégrée</li>
+          <li data-i18n="pricing.club2.f1">Tout le palier Club</li>
+          <li data-i18n="pricing.club2.f2">Groupes &amp; contenus par niveau</li>
+          <li data-i18n="pricing.club2.f3">Facturation adhérents intégrée</li>
         </ul>
       </div>
       <div class="price">
-        <span class="tier">Club illimité</span>
-        <div class="amt">1 800 €<span class="per">/ saison</span></div>
-        <div class="cap">jusqu'à 300 athlètes activés — 0,50 €/mois par athlète</div>
-        <div class="founder"><b>Clubs fondateurs : 900 €</b> (10 premiers)</div>
+        <span class="tier" data-i18n="pricing.club3.tier">Club illimité</span>
+        <div class="amt">1 800 €<span class="per" data-i18n="pricing.perSeason">/ saison</span></div>
+        <div class="cap" data-i18n="pricing.club3.cap">jusqu'à 300 athlètes activés — 0,50 €/mois par athlète</div>
+        <div class="founder" data-i18n-html="pricing.club3.founder"><b>Clubs fondateurs : 900 €</b> (10 premiers)</div>
         <ul>
-          <li>Tout le palier Grand club</li>
-          <li>Volume adapté aux grosses structures</li>
-          <li>Accompagnement à la mise en route</li>
+          <li data-i18n="pricing.club3.f1">Tout le palier Grand club</li>
+          <li data-i18n="pricing.club3.f2">Volume adapté aux grosses structures</li>
+          <li data-i18n="pricing.club3.f3">Accompagnement à la mise en route</li>
         </ul>
       </div>
     </div>
 
-    <div class="price-note">
+    <div class="price-note" data-i18n-html="pricing.note">
       « Athlète activé » = mis dans un groupe d'entraînement (reçoit son planning) — les licenciés non suivis ne comptent pas.<br>
       <b>Facturé une fois par saison</b> (1<sup>er</sup> septembre, par virement) · signature à tout moment = <b>gratuit jusqu'à la rentrée</b> · le tarif fondateur reste acquis tant que le club reste abonné.
     </div>
 
     <div class="cta-row" style="margin-top:30px">
-      <a class="btn primary" href="./sillance-club.html">Découvrir l'espace club</a>
-      <a class="btn ghost" href="./sillance-app.html">Voir la démo coach</a>
+      <a class="btn primary" href="./sillance-club.html" data-i18n="pricing.cta1">Découvrir l'espace club</a>
+      <a class="btn ghost" href="./sillance-app.html" data-i18n="pricing.cta2">Voir la démo coach</a>
     </div>
   </div></section>
 
   <!-- CTA -->
   <section class="cta"><div class="wrap">
-    <h2 class="h2">Prêt à trouver ton sillage ?</h2>
-    <p>Explorez la démonstration — coach, club et athlète — sans inscription.</p>
+    <h2 class="h2" data-i18n="cta.title">Prêt à trouver ton sillage ?</h2>
+    <p data-i18n="cta.text">Explorez la démonstration — coach, club et athlète — sans inscription.</p>
     <div class="cta-row">
-      <a class="btn primary" href="./sillance-app.html">Découvrir la démo</a>
-      <a class="btn ghost" href="./sillance-club.html">Espace club</a>
+      <a class="btn primary" href="./sillance-app.html" data-i18n="hero.cta1">Découvrir la démo</a>
+      <a class="btn ghost" href="./sillance-club.html" data-i18n="cta.club">Espace club</a>
     </div>
   </div></section>
 </main>
 
 <footer><div class="wrap">
   <div class="brand" style="font-size:18px"><svg class="brandmark" width="22" height="22" viewBox="0 0 96 96" fill="none" aria-hidden="true" style="vertical-align:middle"><defs><linearGradient id="lmFuse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#46C2D8"/></linearGradient></defs><path d="M76 48 C56 34 36 28 8 24" stroke="#FF9A3D" stroke-width="10" stroke-linecap="round"/><path d="M76 48 C56 62 36 68 8 72" stroke="#46C2D8" stroke-width="10" stroke-linecap="round"/><circle cx="76" cy="48" r="11" fill="url(#lmFuse)"/><path d="M31 48 A7.5 7.5 0 0 1 46 48 Z" fill="#FF9A3D"/><path d="M46 48 A7.5 7.5 0 0 1 31 48 Z" fill="#46C2D8"/></svg><span class="wm">Sill<b>ance</b></span></div>
-  <div class="fmono">Entre dans le sillage — Triathlon · Hyrox · Course à pied</div>
+  <div class="fmono" data-i18n="footer.tagline">Entre dans le sillage — Triathlon · Hyrox · Course à pied</div>
   <div class="fmono">© 2026 Sillance</div>
 </div>
 <div class="wrap"><nav class="legal-links" aria-label="Informations légales">
-  <a href="./sillance-aide.html">Aide &amp; guide</a>
-  <a href="./legal.html#mentions">Mentions légales</a>
-  <a href="./legal.html#cgu">CGU / CGV</a>
-  <a href="./legal.html#confidentialite">Politique de confidentialité</a>
+  <a href="./sillance-aide.html" data-i18n="footer.aide">Aide &amp; guide</a>
+  <a href="./legal.html#mentions" data-i18n="footer.mentions">Mentions légales</a>
+  <a href="./legal.html#cgu" data-i18n="footer.cgu">CGU / CGV</a>
+  <a href="./legal.html#confidentialite" data-i18n="footer.confidentialite">Politique de confidentialité</a>
 </nav></div></footer>
 
+<script src="./sillance-i18n.js"></script>
+<script src="./sillance-i18n-index.js"></script>
 <script src="./sillance-flow.js"></script>
 <script src="./sillance-index.js"></script>
 </body></html>
