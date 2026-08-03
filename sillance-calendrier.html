@@ -3113,7 +3113,17 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 
 /* ============================================================
    Sillance — logique
+   ------------------------------------------------------------
+   Enveloppé dans une IIFE (03/08/2026, constat architecture/perf de
+   l'audit pré-prod : script applicatif entier en portée globale). Toute
+   communication vers l'extérieur passe déjà par des assignations
+   explicites à window (window.__pf_app, window.PF, window.loadStravaData,
+   window.exportBilan…) — inchangées, elles continuent de fonctionner
+   depuis l'intérieur d'une closure. Seul point vérifié qui dépendait de
+   la portée globale implicite : l'attribut HTML onclick="exportBilan(…)"
+   (carte bilan PDF côté athlète) — ré-exposé explicitement plus bas.
    ============================================================ */
+(function(){
 const DISC = {
   swim:     {label:'Natation', ico:'ic-waves',    color:'var(--swim)', gear:['maillot de bain','bonnet','lunettes']},
   bike:     {label:'Vélo',     ico:'ic-bike',     color:'var(--bike)', gear:['vélo','casque','tenue vélo','bidon']},
@@ -11318,6 +11328,13 @@ window.loadStravaData = function(data){
   if(typeof renderReadiness==='function') renderReadiness();
   location.hash = '#analytics';
 };
+
+// Seule dépendance connue à la portée globale implicite (voir en-tête de
+// l'IIFE) : carte bilan PDF athlète, onclick="exportBilan(...)" en dur dans
+// le HTML plutôt qu'attaché en JS — trop risqué de toucher au template à
+// cette occasion, on ré-expose juste la fonction.
+window.exportBilan = exportBilan;
+})(); // fin IIFE Sillance — logique
 
 /* ============================================================
    FOCUS TRAP GÉNÉRIQUE — toutes les .overlay (19 dialogs).
