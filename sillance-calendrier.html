@@ -52,6 +52,17 @@
   --lh:24px;           /* interligne = 3 × baseline */
   --v-cols:12;         /* colonnes de la bibliothèque vidéo */
   --v-gutter:24px;     /* gouttière = 3 × baseline */
+  /* Échelles typo/espacement (audit 03/08/2026 : 32 tailles de police et 99
+     paires de padding en dur, aucune variable). Fondation posée ici pour les
+     futurs styles — n'affecte aucune règle existante (retrofit des ~130
+     valeurs en dur volontairement hors scope : trop risqué à faire sans QA
+     visuelle exhaustive sur un fichier de cette taille). Espacement calé sur
+     --bl, déjà la source de vérité du système de grille ci-dessus. */
+  --fs-2xs:9px; --fs-xs:10px; --fs-sm:11px; --fs-base:12px; --fs-md:13px;
+  --fs-lg:14px; --fs-xl:16px; --fs-2xl:19px; --fs-3xl:24px; --fs-4xl:32px;
+  --space-1:calc(var(--bl)*.5); --space-2:var(--bl); --space-3:calc(var(--bl)*1.5);
+  --space-4:calc(var(--bl)*2); --space-5:calc(var(--bl)*3); --space-6:calc(var(--bl)*4);
+  --space-7:calc(var(--bl)*5);
   --shadow-1:0 1px 2px rgba(0,0,0,.45);
   --shadow-2:0 10px 30px -12px rgba(0,0,0,.6);
   --shadow-3:0 24px 60px -20px rgba(0,0,0,.7);
