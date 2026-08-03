@@ -51,7 +51,7 @@
 :root{
   --cols:12; --gutter:24px; --margin:clamp(22px,5vw,72px); --maxw:1240px; --lh:24px;
   --paper:#0B1120; --panel:#121A2B; --panel-2:#18213400;
-  --ink:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8;
+  --text:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8;
   --line:rgba(150,165,200,.14); --line-strong:rgba(150,165,200,.28);
   --accent:#46C2D8;
   --accent2:#FF9A3D;
@@ -60,7 +60,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 a{color:inherit;text-decoration:none}
 html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:var(--lh);
+body{background:var(--paper);color:var(--text);font-family:var(--ui);font-size:16px;line-height:var(--lh);
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--margin)}
 
@@ -84,13 +84,13 @@ main,.nav,footer{position:relative;z-index:1}
 .beta-badge{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--accent2);
   border:1px solid var(--accent2);border-radius:99px;padding:2px 9px;margin-left:2px;vertical-align:middle;text-transform:uppercase}
 .nav-links{display:flex;gap:26px;margin-left:28px;font-size:14px;color:var(--soft)}
-.nav-links a:hover{color:var(--ink)}
+.nav-links a:hover{color:var(--text)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
 .btn{font-family:var(--ui);font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:9px;line-height:1}
 .btn.primary{background:var(--accent);color:#062028}
 .btn.primary:hover{filter:brightness(1.07)}
 .btn.ghost{border-color:var(--line-strong);color:var(--soft)}
-.btn.ghost:hover{border-color:var(--accent);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--text)}
 @media(max-width:760px){.nav-links{display:none}}
 
 /* ---------- type ---------- */
@@ -157,7 +157,7 @@ main,.nav,footer{position:relative;z-index:1}
 .price.feature{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset,0 24px 60px -30px rgba(70,194,216,.5)}
 .price .tier{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
 .price.feature .tier{color:var(--accent)}
-.price .amt{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;color:var(--ink);margin-top:4px}
+.price .amt{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;color:var(--text);margin-top:4px}
 .price .amt .per{font-family:var(--ui);font-size:14px;font-weight:400;color:var(--muted);margin-left:4px}
 .price .cap{color:var(--soft);font-size:13px;font-weight:300;line-height:1.5}
 .price .founder{font-family:var(--mono);font-size:12.5px;color:var(--accent2);margin-top:2px}
@@ -290,7 +290,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <div class="sec-head">
       <span class="kicker">Tarifs</span>
       <h2 class="h2">Des prix pensés pour durer</h2>
-      <p class="sub" style="color:var(--soft);font-weight:300;margin-top:14px">Le coach indépendant facture ses athlètes dans l'app. Les clubs prennent une licence à la saison, au nombre d'athlètes réellement suivis. <b style="color:var(--ink);font-weight:600">Entraîneurs illimités à tous les paliers.</b></p>
+      <p class="sub" style="color:var(--soft);font-weight:300;margin-top:14px">Le coach indépendant facture ses athlètes dans l'app. Les clubs prennent une licence à la saison, au nombre d'athlètes réellement suivis. <b style="color:var(--text);font-weight:600">Entraîneurs illimités à tous les paliers.</b></p>
       <p class="sub" style="color:var(--muted);font-weight:300;font-size:12.5px;margin-top:10px">Sillance est en bêta — paiement disponible dans quelques jours, le temps de finaliser notre immatriculation.</p>
     </div>
 

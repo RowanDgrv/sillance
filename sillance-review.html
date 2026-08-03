@@ -349,6 +349,9 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .cycle-card{position:relative}
 .cycle-card .cy-del{position:absolute;top:6px;right:6px;width:18px;height:18px;border:none;background:transparent;color:var(--muted);opacity:0;transition:.15s;font-size:11px}
 .cycle-card:hover .cy-del{opacity:1}
+/* a11y/mobile (audit 03/08/2026) : invisible sans hover, donc introuvable au
+   tactile (usage principal de l'app) — toujours visible sur pointeur grossier. */
+@media(pointer:coarse){.cycle-card .cy-del{opacity:1}}
 .cycle-card .cy-del:hover{color:var(--run)}
 .cycle-card .cy-apply{margin-top:7px;width:100%;padding:5px;border-radius:7px;font-size:11px;font-weight:600;border:1px solid var(--line-strong);background:transparent;color:var(--muted);transition:.2s}
 .cycle-card .cy-apply:hover{border-color:var(--accent);color:var(--accent)}
@@ -509,6 +512,9 @@ body.grid-on .cal-guides{opacity:1}
 .session:hover .note-btn{opacity:1}
 .session .note-btn:hover{color:var(--swim);background:rgba(70,194,216,.12)}
 .session .note-btn.has-note{opacity:1;color:var(--swim)}
+/* a11y/mobile (audit 03/08/2026) : suppression/note invisibles sans hover,
+   introuvables au tactile — toujours visibles sur pointeur grossier. */
+@media(pointer:coarse){.session .del,.session .note-btn{opacity:1}}
 .session.done{opacity:.55}
 .session.done .t{text-decoration:line-through}
 .done-chip{
@@ -1965,6 +1971,9 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
   background:var(--panel);color:var(--muted);font-size:14px;line-height:1;opacity:0;transition:.15s;z-index:2}
 .day:hover .day-add{opacity:1}
 .day-add:hover{color:var(--swim);border-color:var(--swim)}
+/* a11y/mobile (audit 03/08/2026) : bouton "+" par jour invisible sans hover,
+   introuvable au tactile — toujours visible sur pointeur grossier. */
+@media(pointer:coarse){.day-add{opacity:1}}
 
 /* ---------- Analytics ---------- */
 .analytics{margin-top:42px}
@@ -3806,7 +3815,7 @@ function saveCoCoachInvite(){
   const aid = coCoachTargetAthleteId;
   coPendingFor(aid).unshift({id:'ccr'+Date.now(), coachEmail:email, roleLabel:role||null, requestedByRole:coCoachViewerRole});
   if(window.PF?.user){
-    PF.requestCoCoach(aid, email, role||null).catch(e=>{ console.warn('[PF] requestCoCoach', e); toast("Demande indisponible pour l'instant"); });
+    PF.requestCoCoach(aid, email, role||null).catch(e=>{ console.warn('[PF] requestCoCoach', e); toast("Demande indisponible pour l'instant", 'error'); });
   }
   document.getElementById('coCoachOverlay').classList.remove('open');
   toast('Demande envoyée — en attente de validation');
@@ -3950,14 +3959,14 @@ function renderSidebar(){
     /* Assistant IA — essai 14 jours (checkout Stripe connecté, déverrouillage en démo) */
     const aiT=document.getElementById('aiTrialBtn');
     if(aiT) aiT.onclick=()=>{
-      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>{console.warn('[PF] ai-addon:',e); toast('Stripe indisponible');}); return; }
+      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>{console.warn('[PF] ai-addon:',e); toast('Stripe indisponible', 'error');}); return; }
       window.__pf_aiDemo=true; window.__pf_aiDemoStart=Date.now(); renderSidebar(); toast('Assistant IA activé — essai 14 jours (démo)');
     };
     const aiM=document.getElementById('aiManageBtn');
     if(aiM) aiM.onclick=()=> openSettings('coach');
     const ccb=document.getElementById('coachConnectBtn');
     if(ccb) ccb.onclick=()=>{
-      if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast('Stripe indisponible');});
+      if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast('Stripe indisponible', 'error');});
       else toast('Connecte ton espace coach pour relier Stripe');
     };
     const cib=document.getElementById('coachInvoicesBtn');
@@ -3965,7 +3974,7 @@ function renderSidebar(){
     wireCoachTiers(sidebarContent);
     const csb=document.getElementById('coachSubscribeBtn');
     if(csb) csb.onclick=()=>{
-      if(window.PF?.user){ toast('Redirection vers le paiement…'); PF.startCheckout('coach', selectedCoachTier).catch(e=>{console.warn(e);toast('Paiement indisponible');}); }
+      if(window.PF?.user){ toast('Redirection vers le paiement…'); PF.startCheckout('coach', selectedCoachTier).catch(e=>{console.warn(e);toast('Paiement indisponible', 'error');}); }
       else toast('Connecte ton espace coach pour t\'abonner');
     };
     const cmb=document.getElementById('coachManageBtn');
@@ -4130,7 +4139,7 @@ function renderSidebar(){
     renderStravaCard();
     const csb=document.getElementById('coachSubBtn');
     if(csb) csb.onclick=()=>{
-      if(window.PF?.user) PF.subscribeToCoach().catch(e=>{console.warn('subscribeToCoach',e);toast('Suivi indisponible (démo)');});
+      if(window.PF?.user) PF.subscribeToCoach().catch(e=>{console.warn('subscribeToCoach',e);toast('Suivi indisponible (démo)', 'error');});
       else toast('Suivi coaching — disponible une fois connecté à ton coach (démo)');
     };
     const cv = document.getElementById('checkinValidate');
@@ -4197,7 +4206,7 @@ async function submitCheckin(){
     } catch(e){
       console.warn('[PF] saveCheckin échoué :', e);
       if(btn) btn.disabled=false;
-      toast("Échec de l'envoi — vérifie ta connexion et réessaie");
+      toast("Échec de l'envoi — vérifie ta connexion et réessaie", 'error');
       return;
     }
     if(btn) btn.disabled=false;
@@ -4413,7 +4422,7 @@ function buildMorningPreview(){
         }
       }catch(e){
         console.warn('[notif]', e);
-        toast(e && e.message ? e.message : 'Activation impossible sur ce navigateur');
+        toast(e && e.message ? e.message : 'Activation impossible sur ce navigateur', 'error');
       }finally{ btn.disabled = false; }
     });
   }
@@ -4555,7 +4564,7 @@ function ensureFitInput(){
   return inp;
 }
 function importActivityFile(file){
-  if(typeof PFFit==='undefined'){ toast('Module d\'import indisponible'); return; }
+  if(typeof PFFit==='undefined'){ toast('Module d\'import indisponible', 'error'); return; }
   const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
   toast('Lecture du fichier…');
   PFFit.parseFile(file, {ftp}).then(res=>{
@@ -4583,9 +4592,9 @@ function openStravaAnalysis(act){
     if(!points || !points.length){ toast('Pas de détail seconde-par-seconde pour cette activité'); return; }
     const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
     const res = PFFit.buildFromRaw(points, act.disc, [], {ftp});
-    if(!res.ok){ toast(res.error||'Analyse impossible'); return; }
+    if(!res.ok){ toast(res.error||'Analyse impossible', 'error'); return; }
     openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
-  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast('Récupération du détail Strava impossible'); });
+  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast('Récupération du détail Strava impossible', 'error'); });
 }
 
 function connectStrava(){
@@ -4596,7 +4605,7 @@ function connectStrava(){
     PF.connectDevice('strava').then(r=>{
       if(r&&r.pending){ if(btn) btn.disabled=false; renderStravaCard(); toast(r.message||'Intégration bientôt disponible'); }
       // sinon : redirection en cours vers Strava.
-    }).catch(e=>{ console.warn('[PF] connectDevice:',e); if(btn) btn.disabled=false; renderStravaCard(); toast('Connexion Strava impossible'); });
+    }).catch(e=>{ console.warn('[PF] connectDevice:',e); if(btn) btn.disabled=false; renderStravaCard(); toast('Connexion Strava impossible', 'error'); });
     return;
   }
   // DÉMO : simule le retour de l'autorisation OAuth.
@@ -4613,7 +4622,7 @@ function syncStrava(){
     PF.syncDevice('strava')
       .then(()=> refreshDeviceState())
       .then(()=> toast(`${stravaActivities.length} activités synchronisées`))
-      .catch(e=>{ console.warn('[PF] syncDevice:',e); renderStravaCard(); toast('Synchro Strava impossible'); });
+      .catch(e=>{ console.warn('[PF] syncDevice:',e); renderStravaCard(); toast('Synchro Strava impossible', 'error'); });
     return;
   }
   // DÉMO : charge le profil d'activités sélectionné.
@@ -4652,7 +4661,7 @@ async function refreshDeviceState(){
 function connectProvider(p){
   if(!window.PF?.user){ toast('Connecte-toi au cloud puis réessaie'); return; }
   PF.connectDevice(p).then(r=>{ if(r&&r.pending) toast(r.message||'Intégration bientôt disponible'); })
-    .catch(e=>{ console.warn('[PF] connectDevice:',e); toast('Connexion impossible'); });
+    .catch(e=>{ console.warn('[PF] connectDevice:',e); toast('Connexion impossible', 'error'); });
 }
 
 function fmtActDate(iso){
@@ -5098,21 +5107,21 @@ function renderSettings(){
   const body=document.getElementById('setBody');
   body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsCoachHtml();
   const portal=document.getElementById('setPortalBtn');
-  if(portal) portal.onclick=()=>{ if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast('Portail indisponible')); } else toast('Portail Stripe (démo)'); };
+  if(portal) portal.onclick=()=>{ if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast('Portail indisponible', 'error')); } else toast('Portail Stripe (démo)'); };
   const subB=document.getElementById('setSubscribeBtn');
-  if(subB) subB.onclick=()=>{ if(window.PF?.user && PF.startCheckout){ PF.startCheckout('coach').catch(()=>toast('Stripe indisponible')); } else toast('Checkout Stripe (démo)'); };
+  if(subB) subB.onclick=()=>{ if(window.PF?.user && PF.startCheckout){ PF.startCheckout('coach').catch(()=>toast('Stripe indisponible', 'error')); } else toast('Checkout Stripe (démo)'); };
   const pro=document.getElementById('setProBtn');
   if(pro) pro.onclick=()=>toast('COACH PRO — bientôt disponible');
   const st=document.getElementById('setAiStart');
   if(st) st.onclick=()=>{
-    if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(()=>toast('Stripe indisponible')); return; }
+    if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(()=>toast('Stripe indisponible', 'error')); return; }
     window.__pf_aiDemo=true; window.__pf_aiDemoStart=Date.now();
     renderSettings(); if(mode==='coach') renderSidebar();
     toast('Assistant IA activé — essai 14 jours (démo)');
   };
   const rv=document.getElementById('setAiRevoke');
   if(rv) rv.onclick=()=>{
-    if(window.PF?.user && window.__pf_aiAddon===true && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast('Portail indisponible')); return; }
+    if(window.PF?.user && window.__pf_aiAddon===true && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast('Portail indisponible', 'error')); return; }
     window.__pf_aiDemo=false; window.__pf_aiDemoStart=null;
     renderSettings(); if(mode==='coach') renderSidebar();
     toast('Accès à l\'assistant IA révoqué');
@@ -6153,7 +6162,7 @@ function openInviteAthlete(){
       try{
         const {inviteUrl, emailed} = await PF.inviteAthlete(email);
         showResult(inviteUrl, emailed, email);
-      }catch(e){ console.warn('[PF] inviteAthlete:',e); toast('Invitation impossible pour le moment'); }
+      }catch(e){ console.warn('[PF] inviteAthlete:',e); toast('Invitation impossible pour le moment', 'error'); }
     } else {
       const demoUrl = `${location.origin}${location.pathname}?invite=demo-${Date.now()}`;
       showResult(demoUrl, false, email);
@@ -6306,7 +6315,7 @@ ${gearRows?('<h2>Matériel — usure</h2>'+gearRows):''}
     w.document.write(html); w.document.close();
     const go=()=>{ try{ w.focus(); w.print(); }catch(e){} };
     if(w.document.readyState==='complete') setTimeout(go,300); else w.onload=()=>setTimeout(go,300);
-  }catch(e){ console.error('exportBilan',e); if(typeof toast==='function') toast('Export du bilan indisponible'); }
+  }catch(e){ console.error('exportBilan',e); if(typeof toast==='function') toast('Export du bilan indisponible', 'error'); }
 }
 
 /* Fiche de progression partageable ("case study") : ce que le coach peut
@@ -6368,7 +6377,7 @@ ${quote?(`<div class="quote">« ${esc(quote)} »<br><span style="font-style:norm
     w.document.write(html); w.document.close();
     const go=()=>{ try{ w.focus(); w.print(); }catch(e){} };
     if(w.document.readyState==='complete') setTimeout(go,300); else w.onload=()=>setTimeout(go,300);
-  }catch(e){ console.error('exportCaseStudy',e); if(typeof toast==='function') toast('Export indisponible'); }
+  }catch(e){ console.error('exportCaseStudy',e); if(typeof toast==='function') toast('Export indisponible', 'error'); }
 }
 
 function renderCoachBand(){
@@ -6947,7 +6956,7 @@ function renderClubOffres(){
   });
   const cc=document.getElementById('clubConnectBtn');
   if(cc) cc.onclick=()=>{
-    if(window.PF?.user && window.__pf_clubId) PF.connectClubStripe(window.__pf_clubId).catch(e=>{console.warn(e);toast('Stripe indisponible');});
+    if(window.PF?.user && window.__pf_clubId) PF.connectClubStripe(window.__pf_clubId).catch(e=>{console.warn(e);toast('Stripe indisponible', 'error');});
     else toast('Connecte ton espace club pour relier Stripe');
   };
 }
@@ -7168,7 +7177,7 @@ function renderClubAthletes(filter){
     renderClubAthletes(filter); renderClubStats();
     toast(`${a.name} → ${clubOffer(a.offer).name}`);
     if(window.PF?.user && window.__pf_clubId && (a.offer==='sub'||a.offer==='coach')){
-      PF.subscribeToClubOffer(window.__pf_clubId, a.id, a.offer).catch(e=>{console.warn('subscribe',e);toast('Paiement indisponible (démo)');});
+      PF.subscribeToClubOffer(window.__pf_clubId, a.id, a.offer).catch(e=>{console.warn('subscribe',e);toast('Paiement indisponible (démo)', 'error');});
     }
   });
   box.querySelectorAll('.club-ath-vid').forEach(el=>el.onclick=()=>{
@@ -7288,7 +7297,7 @@ function saveConsent(){
   toast(on ? (attest?`Consentement parental enregistré pour ${a.name}`:`${a.name} marqué mineur`) : `${a.name} : statut mineur retiré`);
   if(window.PF?.user){
     PF.setParentalConsent(a.id, {is_minor:on, guardian_name:gName, guardian_email:gMail, consent:attest})
-      .catch(e=>{console.warn('consent',e); toast('Enregistrement indisponible (démo)');});
+      .catch(e=>{console.warn('consent',e); toast('Enregistrement indisponible (démo)', 'error');});
   }
 }
 (function initConsent(){
@@ -7954,7 +7963,7 @@ function openVideo(v){
   if(!v) return;
   // Gate premium : contenu payant verrouillé tant que l'utilisateur n'est pas abonné.
   if(v.premium && !window.__pf_subscribed){
-    if(window.PF?.user){ toast('Contenu Premium — redirection vers l\'abonnement…'); PF.startCheckout('athlete').catch(e=>{ console.warn(e); toast('Abonnement indisponible'); }); }
+    if(window.PF?.user){ toast('Contenu Premium — redirection vers l\'abonnement…'); PF.startCheckout('athlete').catch(e=>{ console.warn(e); toast('Abonnement indisponible', 'error'); }); }
     else { toast('Contenu Premium — réservé aux abonnés'); }
     return;
   }
@@ -9442,7 +9451,7 @@ function renderAi(s, data){
     }).then(r=>{
       if(r && r.error){
         if(r.error==='add_on_required') window.__pf_aiAddon=false;
-        else toast('Analyse IA indisponible, résumé local affiché');
+        else toast('Analyse IA indisponible, résumé local affiché', 'error');
         const rl=aiSummary(s, b); body.innerHTML=aiResultHtml(s, b, rl, true);
         return;
       }
@@ -9729,14 +9738,20 @@ document.getElementById('analysisClose').addEventListener('click', ()=> analysis
 analysisOverlay.addEventListener('click', e=>{ if(e.target===analysisOverlay) analysisOverlay.classList.remove('open'); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') analysisOverlay.classList.remove('open'); });
 
-/* petit toast de confirmation */
-function toast(msg){
+/* petit toast de confirmation — différencié par sévérité (audit 03/08/2026:
+   succès/erreur avaient exactement le même style visuel). type = 'ok' (déf.)
+   | 'error' | 'warn'. Rétrocompatible : tout appel toast(msg) existant sans
+   2e argument garde l'apparence par défaut (liseré vert, comme avant mais
+   désormais explicite plutôt qu'absent). */
+function toast(msg, type='ok'){
   let t=document.getElementById('apexToast');
   if(!t){ t=document.createElement('div'); t.id='apexToast'; document.body.appendChild(t);
     t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);z-index:80;'+
-      'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:12px;padding:13px 20px;'+
+      'background:var(--panel-2);border:1px solid var(--line-strong);border-left:4px solid var(--good);border-radius:12px;padding:13px 20px;'+
       'font-size:14px;font-weight:600;color:var(--text);box-shadow:0 12px 34px rgba(0,0,0,.5);opacity:0;transition:.25s';
   }
+  const TOAST_COLORS={ok:'var(--good)', error:'var(--run)', warn:'var(--bike)'};
+  t.style.borderLeftColor=TOAST_COLORS[type]||TOAST_COLORS.ok;
   t.textContent=msg; requestAnimationFrame(()=>{ t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
   clearTimeout(t._h); t._h=setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; }, 2200);
 }
