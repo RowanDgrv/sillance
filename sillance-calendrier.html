@@ -3091,6 +3091,16 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 <script src="./sillance-fit.js"></script>
 <script src="./sillance-tour.js"></script>
 <script>
+/* Polyfill Array.prototype.at (audit 03/08/2026) : indisponible sur Safari
+   < 15.4 (mars 2022), utilisé 16 fois dans ce fichier (courbes MMP, CTL/ATL,
+   FTP…). Ne remplace rien s'il existe déjà nativement. */
+if(!Array.prototype.at){
+  Array.prototype.at=function(n){
+    n=Math.trunc(n)||0; if(n<0) n+=this.length;
+    return (n<0||n>=this.length)?undefined:this[n];
+  };
+}
+
 /* ============================================================
    TÉLÉMÉTRIE D'ERREUR — capture window.onerror / unhandledrejection
    et logue via PF.logClientError (table client_errors, cf. migration
