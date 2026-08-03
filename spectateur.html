@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="robots" content="noindex">
-<title>Suivre une course — Sillance</title>
+<title data-i18n="spec.title">Suivre une course — Sillance</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Archivo:wght@300;400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -32,30 +32,32 @@
 </style></head>
 <body>
   <div class="box">
-    <div id="state">Chargement…</div>
+    <div id="state" data-i18n="spec.loading">Chargement…</div>
     <div id="content" hidden>
-      <div class="kicker">Suivi de course</div>
+      <div class="kicker" data-i18n="spec.kicker">Suivi de course</div>
       <h1 id="raceTitle"></h1>
       <div class="sub" id="raceSub"></div>
       <div class="card" id="notesCard" hidden>
-        <h2>Repères laissés par le coach</h2>
+        <h2 data-i18n="spec.notesTitle">Repères laissés par le coach</h2>
         <p id="notesTxt"></p>
       </div>
       <div class="card result" id="resultCard" hidden>
-        <h2>Résultat</h2>
+        <h2 data-i18n="spec.resultTitle">Résultat</h2>
         <p class="v" id="resultTxt"></p>
         <p id="feltTxt" style="margin-top:6px;font-size:13px;color:var(--muted)"></p>
       </div>
       <div class="card muted" id="pendingCard" hidden>
-        <h2>En cours</h2>
-        <p>Pas encore de résultat — reviens après la course, il apparaîtra ici dès qu'il sera synchronisé.</p>
+        <h2 data-i18n="spec.pendingTitle">En cours</h2>
+        <p data-i18n="spec.pendingText">Pas encore de résultat — reviens après la course, il apparaîtra ici dès qu'il sera synchronisé.</p>
       </div>
-      <div class="foot">Pas de suivi GPS en direct — juste les repères et le résultat. <br><a href="./index.html">sillance.app</a></div>
+      <div class="foot" data-i18n-html="spec.foot">Pas de suivi GPS en direct — juste les repères et le résultat. <br><a href="./index.html">sillance.app</a></div>
     </div>
     <div class="card muted" id="errCard" hidden>
-      <h2>Lien introuvable</h2>
-      <p id="errTxt">Ce lien de suivi n'existe pas ou a expiré.</p>
+      <h2 data-i18n="spec.errTitle">Lien introuvable</h2>
+      <p id="errTxt" data-i18n="spec.errDefault">Ce lien de suivi n'existe pas ou a expiré.</p>
     </div>
   </div>
+<script src="./sillance-i18n.js"></script>
+<script src="./sillance-i18n-spectateur.js"></script>
 <script src="./sillance-spectateur.js"></script>
 </body></html>

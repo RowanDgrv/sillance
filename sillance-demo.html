@@ -16,7 +16,7 @@
 <meta name="twitter:title" content="Sillance — L'entraînement autrement">
 <meta name="twitter:description" content="La plateforme qui fait progresser coach & athlète. Triathlon, Hyrox, multisport.">
 <meta name="twitter:image" content="https://sillance.app/og-image.png">
-<title>Sillance — Démo (front + back-end)</title>
+<title data-i18n="demo.title">Sillance — Démo (front + back-end)</title>
 <style>
   :root{--bg:#0b0e12;--card:#11151a;--line:#222a32;--muted:#8a949e;--ink:#e7edf3;--accent:#46C2D8;--good:#39e6a3;--bike:#ffb13d}
   *{box-sizing:border-box}
@@ -72,47 +72,47 @@
   <header>
     <div class="logo">S</div>
     <div>
-      <div class="tag">Coaching triathlon · Hyrox</div>
+      <div class="tag" data-i18n="demo.tag">Coaching triathlon · Hyrox</div>
       <h1>Sillance</h1>
     </div>
   </header>
-  <p class="lead">Plateforme de coaching pour les 3 rôles — <b>coach</b>, <b>athlète</b> et
+  <p class="lead" data-i18n-html="demo.lead">Plateforme de coaching pour les 3 rôles — <b>coach</b>, <b>athlète</b> et
   <b>club</b> — avec synchronisation des montres connectées. Ci-dessous : l'application
   (front) et l'architecture back-end, prêtes à présenter.</p>
 
   <div class="stat">
-    <div><div class="n">16+</div><div class="l">tables Postgres (RLS)</div></div>
-    <div><div class="n">16</div><div class="l">edge functions</div></div>
-    <div><div class="n">3</div><div class="l">intégrations montres</div></div>
-    <div><div class="n">Stripe</div><div class="l">abonnements + à la carte</div></div>
+    <div><div class="n">16+</div><div class="l" data-i18n="demo.stat.tables">tables Postgres (RLS)</div></div>
+    <div><div class="n">16</div><div class="l" data-i18n="demo.stat.functions">edge functions</div></div>
+    <div><div class="n">3</div><div class="l" data-i18n="demo.stat.devices">intégrations montres</div></div>
+    <div><div class="n">Stripe</div><div class="l" data-i18n="demo.stat.stripe">abonnements + à la carte</div></div>
   </div>
 
-  <div class="sec-title">Le produit (front)</div>
+  <div class="sec-title" data-i18n="demo.frontTitle">Le produit (front)</div>
   <div class="grid apps">
     <a class="app" href="./sillance-calendrier.html">
-      <h3>App coach &amp; athlète</h3>
-      <p>Calendrier d'entraînement, builder de séances, check-in de fraîcheur,
+      <h3 data-i18n="demo.appCard.title">App coach &amp; athlète</h3>
+      <p data-i18n="demo.appCard.text">Calendrier d'entraînement, builder de séances, check-in de fraîcheur,
       bibliothèque vidéo, espace club &amp; créneaux.</p>
-      <span class="go">Ouvrir l'app →</span>
+      <span class="go" data-i18n="demo.appCard.cta">Ouvrir l'app →</span>
     </a>
     <a class="app" href="./sillance-app.html">
-      <h3>Démo testeurs</h3>
-      <p>Même application, variante utilisée pour les retours testeurs.</p>
-      <span class="go">Ouvrir la démo →</span>
+      <h3 data-i18n="demo.demoCard.title">Démo testeurs</h3>
+      <p data-i18n="demo.demoCard.text">Même application, variante utilisée pour les retours testeurs.</p>
+      <span class="go" data-i18n="demo.demoCard.cta">Ouvrir la démo →</span>
     </a>
   </div>
-  <p class="sub">Astuce démo : badge <b>☁︎</b> en haut à droite → crée un compte (coach /
+  <p class="sub" data-i18n-html="demo.tip">Astuce démo : badge <b>☁︎</b> en haut à droite → crée un compte (coach /
   athlète / club). Sans connexion, l'app tourne en <b>mode démo</b> avec des données d'exemple.</p>
 
-  <div class="sec-title">L'infrastructure (back-end Supabase)</div>
-  <p class="sub">Postgres + Auth + Storage + Edge Functions (Deno). Sécurité par Row-Level
+  <div class="sec-title" data-i18n="demo.backendTitle">L'infrastructure (back-end Supabase)</div>
+  <p class="sub" data-i18n="demo.backendText">Postgres + Auth + Storage + Edge Functions (Deno). Sécurité par Row-Level
   Security ; les abonnements ont pour source de vérité le webhook Stripe.</p>
   <div class="grid cards">
     <div class="card">
-      <h4>📦 Données</h4>
+      <h4 data-i18n="demo.data.title">📦 Données</h4>
       <ul>
-        <li><code>profiles</code> · rôles</li>
-        <li><code>athlete_profiles</code> · refs physio</li>
+        <li><code>profiles</code> · <span data-i18n="demo.data.roles">rôles</span></li>
+        <li><code>athlete_profiles</code> · <span data-i18n="demo.data.physio">refs physio</span></li>
         <li><code>sessions</code> / <code>scheduled_sessions</code></li>
         <li><code>checkins</code> · <code>records</code></li>
         <li><code>clubs</code> / <code>groups</code> / <code>creneaux</code></li>
@@ -121,10 +121,10 @@
       </ul>
     </div>
     <div class="card">
-      <h4>⚙️ Edge Functions</h4>
+      <h4 data-i18n="demo.functions.title">⚙️ Edge Functions</h4>
       <ul>
         <li>stripe-checkout / portal / webhook</li>
-        <li>invite-athlete <span class="pill ok">email</span></li>
+        <li>invite-athlete <span class="pill ok" data-i18n="demo.functions.email">email</span></li>
         <li>creneau-checkout · video-url</li>
         <li>device-connect · device-sync</li>
         <li>strava-oauth-callback / webhook</li>
@@ -132,20 +132,20 @@
       </ul>
     </div>
     <div class="card">
-      <h4>⌚ Montres connectées</h4>
+      <h4 data-i18n="demo.devices.title">⌚ Montres connectées</h4>
       <ul>
-        <li>Strava <span class="pill ok">prêt</span></li>
-        <li>Coros (OAuth2) <span class="pill pend">clés</span></li>
-        <li>Garmin (OAuth1.0a) <span class="pill pend">clés</span></li>
-        <li>Activités normalisées</li>
-        <li>Import auto (webhooks)</li>
-        <li>Lecture seule</li>
+        <li>Strava <span class="pill ok" data-i18n="demo.devices.ready">prêt</span></li>
+        <li>Coros (OAuth2) <span class="pill pend" data-i18n="demo.devices.keys">clés</span></li>
+        <li>Garmin (OAuth1.0a) <span class="pill pend" data-i18n="demo.devices.keys">clés</span></li>
+        <li data-i18n="demo.devices.normalized">Activités normalisées</li>
+        <li data-i18n="demo.devices.autoImport">Import auto (webhooks)</li>
+        <li data-i18n="demo.devices.readOnly">Lecture seule</li>
       </ul>
     </div>
   </div>
 
-  <div class="sec-title">Flux de synchronisation Strava (live)</div>
-  <div class="flow">
+  <div class="sec-title" data-i18n="demo.flowTitle">Flux de synchronisation Strava (live)</div>
+  <div class="flow" data-i18n-html="demo.flowText">
     <b>Athlète</b> <span class="arrow">→</span> « Se connecter avec Strava »
     <span class="arrow">→</span> autorisation OAuth Strava
     <span class="arrow">→</span> <b>strava-oauth-callback</b> (échange du code, stockage chiffré des jetons)
@@ -154,10 +154,12 @@
     Puis chaque nouvelle sortie est poussée en temps réel par <b>strava-webhook</b>.
   </div>
 
-  <footer>
+  <footer data-i18n-html="demo.footer">
     Sillance — démo locale. Détails de mise en ligne : <code>~/pairform-backend/DEPLOY.md</code>.
   </footer>
 </div>
+<script src="./sillance-i18n.js"></script>
+<script src="./sillance-i18n-demo.js"></script>
 <script src="./sillance-flow.js"></script>
 <!-- fond flux partagé (soufflerie / torpille), voilé par le dégradé au-dessus -->
 <script src="./sillance-demo.js"></script>
