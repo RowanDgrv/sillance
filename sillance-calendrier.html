@@ -4417,11 +4417,12 @@ function renderStravaCard(){
     document.getElementById('stravaConnectBtn').onclick=connectStrava;
     box.querySelectorAll('.dev-mini').forEach(b=> b.onclick=()=> connectProvider(b.dataset.p));
   } else {
+    const escAct=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const actsHtml = stravaActivities.length? `<div class="strava-acts">${stravaActivities.slice(0,6).map((a,i)=>{
       const D=DISC[a.disc]||DISC.run;
-      const src = a.src? ` · ${SRC[a.src]||a.src}` : '';
+      const src = a.src? ` · ${escAct(SRC[a.src]||a.src)}` : '';
       const clickable = a.id && a.src==='strava';
-      return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="Voir l'analyse détaillée"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${a.name}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${a.date}${src}</div></div></div>`;
+      return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="Voir l'analyse détaillée"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${escAct(a.name)}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${escAct(a.date)}${src}</div></div></div>`;
     }).join('')}</div>` : `<p class="hint" style="margin-top:9px">Aucune activité encore importée.</p>`;
     const linked = providers.length? providers.map(p=>SRC[p]||p).join(' · ') : 'Strava';
     box.innerHTML=`
