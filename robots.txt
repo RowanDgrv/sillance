@@ -6,5 +6,7 @@ Allow: /
 Disallow: /sillance-app.html
 Disallow: /sillance-calendrier.html
 Disallow: /sillance-review.html
+Disallow: /sillance-club.html
+Disallow: /sillance-demo.html
 
 Sitemap: https://sillance.app/sitemap.xml
