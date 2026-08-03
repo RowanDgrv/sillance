@@ -172,58 +172,58 @@ function nutritionReminder(s){
    ============================================================ */
 const VIDEOS = [
   // --- Natation ---
-  {id:'v1', disc:'swim', title:'Crawl — rattrapé', dur:'1:24', level:'Inter',
-   desc:'Une main attend l\'autre devant : améliore le timing et l\'allonge.', tags:['rattrapé','rattrape'], src:''},
-  {id:'v2', disc:'swim', title:'Crawl — poings fermés', dur:'0:58', level:'Inter',
-   desc:'Nager poings fermés pour sentir l\'appui de l\'avant-bras.', tags:['poings fermés','poings'], src:''},
-  {id:'v3', disc:'swim', title:'Crawl — battements planche', dur:'1:10', level:'Débutant',
-   desc:'Renforce le battement et le gainage, planche devant.', tags:['battement','planche'], src:''},
-  {id:'v4', disc:'swim', title:'Respiration 3 temps', dur:'1:05', level:'Débutant',
-   desc:'Alterner le côté de respiration pour équilibrer le crawl.', tags:['respiration','3 temps'], src:''},
-  {id:'v5', disc:'swim', title:'Virage culbute', dur:'1:32', level:'Avancé',
-   desc:'Technique de virage rapide en bassin.', tags:['virage','culbute'], src:''},
-  {id:'v6', disc:'swim', title:'Pull-buoy & plaquettes', dur:'1:18', level:'Inter',
-   desc:'Travail de force et de trajet moteur avec matériel.', tags:['plaquette','pull-buoy','pull'], src:''},
+  {id:'v1', disc:'swim', get title(){return tr('video.v1.title')}, dur:'1:24', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v1.desc')}, tags:['rattrapé','rattrape'], src:''},
+  {id:'v2', disc:'swim', get title(){return tr('video.v2.title')}, dur:'0:58', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v2.desc')}, tags:['poings fermés','poings'], src:''},
+  {id:'v3', disc:'swim', get title(){return tr('video.v3.title')}, dur:'1:10', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v3.desc')}, tags:['battement','planche'], src:''},
+  {id:'v4', disc:'swim', get title(){return tr('video.v4.title')}, dur:'1:05', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v4.desc')}, tags:['respiration','3 temps'], src:''},
+  {id:'v5', disc:'swim', get title(){return tr('video.v5.title')}, dur:'1:32', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.v5.desc')}, tags:['virage','culbute'], src:''},
+  {id:'v6', disc:'swim', get title(){return tr('video.v6.title')}, dur:'1:18', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v6.desc')}, tags:['plaquette','pull-buoy','pull'], src:''},
   // --- Course ---
-  {id:'v7', disc:'run', title:'Gammes — montées de genoux', dur:'0:48', level:'Débutant',
-   desc:'Éducatif de foulée, fréquence et posture.', tags:['gammes','montées de genoux','genoux'], src:''},
-  {id:'v8', disc:'run', title:'Gammes — talons-fesses', dur:'0:44', level:'Débutant',
-   desc:'Active les ischios et le cycle arrière.', tags:['talons-fesses','gammes'], src:''},
-  {id:'v9', disc:'run', title:'Foulées bondissantes', dur:'1:02', level:'Avancé',
-   desc:'Travail de puissance et d\'élasticité.', tags:['bondissantes','foulées','foulee'], src:''},
-  {id:'v10', disc:'run', title:'Lignes droites (strides)', dur:'0:55', level:'Inter',
-   desc:'Accélérations progressives pour la vitesse et la relâche.', tags:['lignes droites','strides','ligne'], src:''},
+  {id:'v7', disc:'run', get title(){return tr('video.v7.title')}, dur:'0:48', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v7.desc')}, tags:['gammes','montées de genoux','genoux'], src:''},
+  {id:'v8', disc:'run', get title(){return tr('video.v8.title')}, dur:'0:44', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v8.desc')}, tags:['talons-fesses','gammes'], src:''},
+  {id:'v9', disc:'run', get title(){return tr('video.v9.title')}, dur:'1:02', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.v9.desc')}, tags:['bondissantes','foulées','foulee'], src:''},
+  {id:'v10', disc:'run', get title(){return tr('video.v10.title')}, dur:'0:55', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v10.desc')}, tags:['lignes droites','strides','ligne'], src:''},
   // --- Vélo ---
-  {id:'v11', disc:'bike', title:'Pédalage — vélocité', dur:'1:15', level:'Inter',
-   desc:'Travail de cadence élevée et de fluidité du coup de pédale.', tags:['vélocité','cadence'], src:''},
-  {id:'v12', disc:'bike', title:'Position aéro & posture', dur:'1:40', level:'Inter',
-   desc:'Optimiser sa position pour l\'aérodynamisme et le confort.', tags:['aéro','position','posture'], src:''},
-  {id:'v13', disc:'bike', title:'Montée en danseuse', dur:'1:08', level:'Avancé',
-   desc:'Technique de relance et de grimpe debout.', tags:['danseuse','montée','grimpe'], src:''},
+  {id:'v11', disc:'bike', get title(){return tr('video.v11.title')}, dur:'1:15', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v11.desc')}, tags:['vélocité','cadence'], src:''},
+  {id:'v12', disc:'bike', get title(){return tr('video.v12.title')}, dur:'1:40', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v12.desc')}, tags:['aéro','position','posture'], src:''},
+  {id:'v13', disc:'bike', get title(){return tr('video.v13.title')}, dur:'1:08', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.v13.desc')}, tags:['danseuse','montée','grimpe'], src:''},
   // --- Renfo ---
-  {id:'v14', disc:'strength', title:'Gainage — la planche', dur:'1:00', level:'Débutant',
-   desc:'Placement correct du gainage ventral.', tags:['gainage','planche'], src:''},
-  {id:'v15', disc:'strength', title:'Squat — technique', dur:'1:22', level:'Inter',
-   desc:'Exécution propre du squat, genoux et dos.', tags:['squat'], src:''},
-  {id:'v16', disc:'strength', title:'Fentes avant', dur:'0:52', level:'Inter',
-   desc:'Renforcement unilatéral des quadriceps et fessiers.', tags:['fente','fentes'], src:''},
+  {id:'v14', disc:'strength', get title(){return tr('video.v14.title')}, dur:'1:00', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v14.desc')}, tags:['gainage','planche'], src:''},
+  {id:'v15', disc:'strength', get title(){return tr('video.v15.title')}, dur:'1:22', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v15.desc')}, tags:['squat'], src:''},
+  {id:'v16', disc:'strength', get title(){return tr('video.v16.title')}, dur:'0:52', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v16.desc')}, tags:['fente','fentes'], src:''},
   // --- Hyrox (les 8 stations) ---
-  {id:'h1', disc:'hyrox', title:'SkiErg — technique', dur:'1:20', level:'Inter',
-   desc:'Engagement du tronc et des dorsaux, mouvement complet du SkiErg.', tags:['ski','skierg'], src:''},
-  {id:'h2', disc:'hyrox', title:'Sled Push — posture', dur:'1:05', level:'Inter',
-   desc:'Position basse, bras tendus, poussée par les jambes.', tags:['sled push','sledpush','traîneau'], src:''},
-  {id:'h3', disc:'hyrox', title:'Sled Pull — technique', dur:'1:12', level:'Inter',
-   desc:'Tirage du traîneau à la corde, jeu de hanches et de bras.', tags:['sled pull','sledpull','tirage'], src:''},
-  {id:'h4', disc:'hyrox', title:'Burpee Broad Jump', dur:'0:58', level:'Avancé',
-   desc:'Burpee suivi d\'un saut en longueur, efficacité et économie.', tags:['burpee','broad jump'], src:''},
-  {id:'h5', disc:'hyrox', title:'Rowing — technique', dur:'1:15', level:'Débutant',
-   desc:'Séquence jambes-tronc-bras au rameur, rythme et puissance.', tags:['row','rowing','rameur'], src:''},
-  {id:'h6', disc:'hyrox', title:'Farmers Carry', dur:'0:50', level:'Débutant',
-   desc:'Port de charges lourdes, gainage et grip sous fatigue.', tags:['farmer','farmers carry','port'], src:''},
-  {id:'h7', disc:'hyrox', title:'Sandbag Lunges', dur:'1:08', level:'Avancé',
-   desc:'Fentes marchées avec sac lesté sur les épaules.', tags:['lunges','sandbag','fentes lestées'], src:''},
-  {id:'h8', disc:'hyrox', title:'Wall Balls — technique', dur:'1:00', level:'Inter',
-   desc:'Squat puis lancer cible, coordination et cadence.', tags:['wallball','wall balls','wall ball'], src:''}
+  {id:'h1', disc:'hyrox', get title(){return tr('video.h1.title')}, dur:'1:20', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h1.desc')}, tags:['ski','skierg'], src:''},
+  {id:'h2', disc:'hyrox', get title(){return tr('video.h2.title')}, dur:'1:05', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h2.desc')}, tags:['sled push','sledpush','traîneau'], src:''},
+  {id:'h3', disc:'hyrox', get title(){return tr('video.h3.title')}, dur:'1:12', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h3.desc')}, tags:['sled pull','sledpull','tirage'], src:''},
+  {id:'h4', disc:'hyrox', get title(){return tr('video.h4.title')}, dur:'0:58', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.h4.desc')}, tags:['burpee','broad jump'], src:''},
+  {id:'h5', disc:'hyrox', get title(){return tr('video.h5.title')}, dur:'1:15', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.h5.desc')}, tags:['row','rowing','rameur'], src:''},
+  {id:'h6', disc:'hyrox', get title(){return tr('video.h6.title')}, dur:'0:50', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.h6.desc')}, tags:['farmer','farmers carry','port'], src:''},
+  {id:'h7', disc:'hyrox', get title(){return tr('video.h7.title')}, dur:'1:08', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.h7.desc')}, tags:['lunges','sandbag','fentes lestées'], src:''},
+  {id:'h8', disc:'hyrox', get title(){return tr('video.h8.title')}, dur:'1:00', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h8.desc')}, tags:['wallball','wall balls','wall ball'], src:''}
 ];
 /* trouve la vidéo liée à une séance d'après son titre/description */
 function videoForSession(s){
@@ -5998,14 +5998,14 @@ function sessionType(s){
 const SIM_METRICS = {
   bike:[ {k:'np',label:'NP',fmt:v=>Math.round(v)+' W',better:'high'},
          {k:'ifv',label:'IF',fmt:v=>(+v).toFixed(2),better:'high'},
-         {k:'avgHr',label:'FC moy',fmt:v=>Math.round(v)+' bpm',better:'low'},
-         {k:'dist',label:'Distance',fmt:v=>(+v).toFixed(0)+' km',better:'high'} ],
-  run:[  {k:'pace',label:'Allure',fmt:v=>fmtPace(v)+'/km',better:'low'},
-         {k:'avgHr',label:'FC moy',fmt:v=>Math.round(v)+' bpm',better:'low'},
-         {k:'dist',label:'Distance',fmt:v=>(+v).toFixed(1)+' km',better:'high'} ],
-  hyrox:[{k:'total',label:'Temps total',fmt:v=>fmtClock(v/60),better:'low'},
+         {k:'avgHr',get label(){return tr('simMetric.avgHr')},fmt:v=>Math.round(v)+' bpm',better:'low'},
+         {k:'dist',get label(){return tr('simMetric.dist')},fmt:v=>(+v).toFixed(0)+' km',better:'high'} ],
+  run:[  {k:'pace',get label(){return tr('simMetric.pace')},fmt:v=>fmtPace(v)+'/km',better:'low'},
+         {k:'avgHr',get label(){return tr('simMetric.avgHr')},fmt:v=>Math.round(v)+' bpm',better:'low'},
+         {k:'dist',get label(){return tr('simMetric.dist2')},fmt:v=>(+v).toFixed(1)+' km',better:'high'} ],
+  hyrox:[{k:'total',get label(){return tr('simMetric.total')},fmt:v=>fmtClock(v/60),better:'low'},
          {k:'wbtime',label:'Wall balls',fmt:v=>fmtClock(v/60),better:'low'},
-         {k:'avgHr',label:'FC moy',fmt:v=>Math.round(v)+' bpm',better:'low'} ],
+         {k:'avgHr',get label(){return tr('simMetric.avgHr')},fmt:v=>Math.round(v)+' bpm',better:'low'} ],
 };
 function currentSimMetrics(s, data){
   if(s.disc==='bike'){ const ftp=lapFTPval();
@@ -6895,8 +6895,8 @@ const RUN_ZONES = {
 };
 function renderRunDynamics(){
   const box=document.getElementById('runDynBody'); if(!box) return;
-  const metrics=[['Cadence','cadence','pas/min'],['Oscillation verticale','vertOsc','cm'],
-    ['Ratio vertical','vertRatio','%'],['Temps de contact au sol','gct','ms']];
+  const metrics=[[tr('runDyn.cadence'),'cadence','pas/min'],[tr('runDyn.vertOsc'),'vertOsc','cm'],
+    [tr('runDyn.vertRatio'),'vertRatio','%'],[tr('runDyn.gct'),'gct','ms']];
   box.innerHTML=metrics.map(([name,key,unit])=>{
     const z=RUN_ZONES[key], val=RUN_DYN[key];
     const sMin=z.min, sMax=z.zones[z.zones.length-1][1];
@@ -6905,7 +6905,7 @@ function renderRunDynamics(){
     const markPct=Math.max(1,Math.min(99,(val-sMin)/(sMax-sMin)*100));
     const curZone=z.zones.find(zz=>val<=zz[1])||z.zones[z.zones.length-1];
     return `<div class="rd-metric">
-      <div class="rd-top"><span class="rd-name">${name}<em>${z.better==='low'?'↓ = mieux':'↑ = mieux'}</em></span>
+      <div class="rd-top"><span class="rd-name">${name}<em>${z.better==='low'?tr('runDyn.lowerBetter'):tr('runDyn.higherBetter')}</em></span>
         <span class="rd-val" style="color:${curZone[2]}">${val}<small>${unit}</small></span></div>
       <div class="rd-bar">${segs}<span class="rd-mark" style="left:${markPct}%"></span></div>
     </div>`;
