@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sillance — Aide &amp; guide d'utilisation (coach, club, athlète)</title>
-<meta name="description" content="Guide pas-à-pas Sillance : créer une séance, planifier, suivre l'adhérence (coach), connecter sa montre (athlète), gérer les créneaux (club).">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title data-i18n="aide.pageTitle">Sillance — Aide &amp; guide d'utilisation (coach, club, athlète)</title>
+<meta name="description" data-i18n-attr="content:aide.metaDescription" content="Guide pas-à-pas Sillance : créer une séance, planifier, suivre l'adhérence (coach), connecter sa montre (athlète), gérer les créneaux (club).">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sillance">
-<meta property="og:title" content="Sillance — Aide & guide d'utilisation">
-<meta property="og:description" content="Guide pas-à-pas Sillance : créer une séance, suivre l'adhérence, connecter sa montre, gérer les créneaux du club.">
+<meta property="og:title" data-i18n-attr="content:aide.ogTitle" content="Sillance — Aide & guide d'utilisation">
+<meta property="og:description" data-i18n-attr="content:aide.metaDescription2" content="Guide pas-à-pas Sillance : créer une séance, suivre l'adhérence, connecter sa montre, gérer les créneaux du club.">
 <meta property="og:image" content="https://sillance.app/og-image.png">
 <meta property="og:url" content="https://sillance.app/sillance-aide.html">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Sillance — Aide & guide d'utilisation">
-<meta name="twitter:description" content="Guide pas-à-pas Sillance : créer une séance, suivre l'adhérence, connecter sa montre, gérer les créneaux.">
+<meta name="twitter:title" data-i18n-attr="content:aide.ogTitle" content="Sillance — Aide & guide d'utilisation">
+<meta name="twitter:description" data-i18n-attr="content:aide.metaDescription2" content="Guide pas-à-pas Sillance : créer une séance, suivre l'adhérence, connecter sa montre, gérer les créneaux.">
 <meta name="twitter:image" content="https://sillance.app/og-image.png">
 <link rel="canonical" href="https://sillance.app/sillance-aide.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -29,6 +30,10 @@
   .wm b{color:var(--accent)}
   .top .cta{font-family:'Archivo';font-size:13px;font-weight:600;border:1px solid var(--line-strong);border-radius:8px;padding:9px 16px;color:var(--soft)}
   .top .cta:hover{border-color:var(--accent);color:var(--ink)}
+  .lang-switch{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;padding:2px}
+  .lang-switch button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;padding:6px 9px;
+    border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer}
+  .lang-switch button.active{background:var(--accent);color:#062028}
   .wrap{max-width:1080px;margin:0 auto;padding:42px 22px 90px;display:grid;grid-template-columns:210px 1fr;gap:44px}
   @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:24px}.toc{position:static!important;display:none}}
   /* sommaire */
@@ -65,456 +70,465 @@
 
 <div class="top"><div class="in">
   <a class="wm" href="index.html">Sill<b>ance</b></a>
-  <a class="cta" href="sillance-app.html">← Retour à l'app</a>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="lang-switch" role="group" aria-label="Language / Langue / Idioma">
+      <button type="button" data-lang-btn="fr">FR</button>
+      <button type="button" data-lang-btn="en">EN</button>
+      <button type="button" data-lang-btn="es">ES</button>
+    </div>
+    <a class="cta" href="sillance-app.html" data-i18n="aide.backToApp">← Retour à l'app</a>
+  </div>
 </div></div>
 
 <div class="wrap">
 
   <!-- SOMMAIRE -->
   <nav class="toc" aria-label="Sommaire">
-    <div class="lbl">Coach</div>
-    <a href="#creer-seance">Créer une séance</a>
-    <a href="#planifier">Planifier dans le calendrier</a>
-    <a href="#attribuer-plusieurs">Attribuer à plusieurs athlètes</a>
-    <a href="#adherence">Suivre l'adhérence</a>
-    <a href="#gerer-abonnement">Gérer son abonnement</a>
-    <div class="lbl">Club</div>
-    <a href="#creer-groupe">Créer un groupe</a>
-    <a href="#deplacer-athlete">Déplacer un adhérent de groupe</a>
-    <a href="#creneau">Créer un créneau &amp; inviter</a>
-    <div class="lbl">Athlète</div>
-    <a href="#checkin">Faire son check-in</a>
-    <a href="#dispo-blessure">Signaler une blessure / indispo</a>
-    <a href="#connecter-montre">Connecter une montre</a>
-    <a href="#import-fit">Importer un fichier .FIT</a>
-    <a href="#ajouter-chaussure">Ajouter des chaussures</a>
-    <a href="#refs-physio">Éditer ses références physio</a>
-    <div class="lbl">Nouveautés</div>
-    <a href="#retest-physio">Rappel de retest physio</a>
-    <a href="#macros-chat">Réponses rapides du chat</a>
-    <a href="#pourquoi-seance">Pourquoi cette séance</a>
-    <a href="#optimiseur-hebdo">Répartition de la semaine</a>
-    <a href="#note-seance">Note sur une séance</a>
-    <a href="#debrief-course">Débrief de course</a>
-    <a href="#bilan-hebdo">Bilan hebdomadaire croisé</a>
-    <a href="#etude-de-cas">Étude de cas</a>
-    <a href="#radar-coach">Qui a besoin de toi</a>
-    <a href="#equipe-coachs">Équipe de coachs</a>
-    <a href="#partager-course">Partager une course</a>
+    <div class="lbl" data-i18n="aide.roleCoach">Coach</div>
+    <a href="#creer-seance" data-i18n="aide.toc.creerSeance">Créer une séance</a>
+    <a href="#planifier" data-i18n="aide.toc.planifier">Planifier dans le calendrier</a>
+    <a href="#attribuer-plusieurs" data-i18n="aide.toc.attribuerPlusieurs">Attribuer à plusieurs athlètes</a>
+    <a href="#adherence" data-i18n="aide.toc.adherence">Suivre l'adhérence</a>
+    <a href="#gerer-abonnement" data-i18n="aide.toc.gererAbonnement">Gérer son abonnement</a>
+    <div class="lbl" data-i18n="aide.roleClub">Club</div>
+    <a href="#creer-groupe" data-i18n="aide.toc.creerGroupe">Créer un groupe</a>
+    <a href="#deplacer-athlete" data-i18n="aide.toc.deplacerAthlete">Déplacer un adhérent de groupe</a>
+    <a href="#creneau" data-i18n-html="aide.toc.creneau">Créer un créneau &amp; inviter</a>
+    <div class="lbl" data-i18n="aide.roleAthlete">Athlète</div>
+    <a href="#checkin" data-i18n="aide.toc.checkin">Faire son check-in</a>
+    <a href="#dispo-blessure" data-i18n="aide.toc.dispoBlessure">Signaler une blessure / indispo</a>
+    <a href="#connecter-montre" data-i18n="aide.toc.connecterMontre">Connecter une montre</a>
+    <a href="#import-fit" data-i18n="aide.toc.importFit">Importer un fichier .FIT</a>
+    <a href="#ajouter-chaussure" data-i18n="aide.toc.ajouterChaussure">Ajouter des chaussures</a>
+    <a href="#refs-physio" data-i18n="aide.toc.refsPhysio">Éditer ses références physio</a>
+    <div class="lbl" data-i18n="aide.roleNews">Nouveautés</div>
+    <a href="#retest-physio" data-i18n="aide.toc.retestPhysio">Rappel de retest physio</a>
+    <a href="#macros-chat" data-i18n="aide.toc.macrosChat">Réponses rapides du chat</a>
+    <a href="#pourquoi-seance" data-i18n="aide.toc.pourquoiSeance">Pourquoi cette séance</a>
+    <a href="#optimiseur-hebdo" data-i18n="aide.toc.optimiseurHebdo">Répartition de la semaine</a>
+    <a href="#note-seance" data-i18n="aide.toc.noteSeance">Note sur une séance</a>
+    <a href="#debrief-course" data-i18n="aide.toc.debriefCourse">Débrief de course</a>
+    <a href="#bilan-hebdo" data-i18n="aide.toc.bilanHebdo">Bilan hebdomadaire croisé</a>
+    <a href="#etude-de-cas" data-i18n="aide.toc.etudeDeCas">Étude de cas</a>
+    <a href="#radar-coach" data-i18n="aide.toc.radarCoach">Qui a besoin de toi</a>
+    <a href="#equipe-coachs" data-i18n="aide.toc.equipeCoachs">Équipe de coachs</a>
+    <a href="#partager-course" data-i18n="aide.toc.partagerCourse">Partager une course</a>
   </nav>
 
   <!-- CONTENU -->
   <main>
-    <h1>Aide &amp; guide d'utilisation</h1>
-    <p class="intro">Les tâches les plus courantes, pas à pas. Sur chaque capture, <span class="hlword">l'élément à utiliser est encadré en orange</span>.</p>
+    <h1 data-i18n="aide.h1">Aide &amp; guide d'utilisation</h1>
+    <p class="intro" data-i18n-html="aide.intro">Les tâches les plus courantes, pas à pas. Sur chaque capture, <span class="hlword">l'élément à utiliser est encadré en orange</span>.</p>
 
-    <div class="roles-note"><b>Changer de rôle.</b> En haut de l'application, les trois boutons <b>Coach</b>, <b>Athlète</b> et <b>Club</b> font basculer l'affichage. Chaque guide ci-dessous précise le rôle à activer.</div>
+    <div class="roles-note" data-i18n-html="aide.rolesNote"><b>Changer de rôle.</b> En haut de l'application, les trois boutons <b>Coach</b>, <b>Athlète</b> et <b>Club</b> font basculer l'affichage. Chaque guide ci-dessous précise le rôle à activer.</div>
 
     <!-- ============ COACH ============ -->
-    <div class="role-h">Espace coach</div>
+    <div class="role-h" data-i18n="aide.spaceCoach">Espace coach</div>
 
     <section class="tuto" id="creer-seance">
-      <h2><span class="no">01</span> Créer une séance</h2>
-      <p class="lead">Construis une séance dans ta bibliothèque, puis pose-la sur le calendrier.</p>
+      <h2><span class="no">01</span> <span data-i18n="aide.toc.creerSeance">Créer une séance</span></h2>
+      <p class="lead" data-i18n="aide.s1.lead">Construis une séance dans ta bibliothèque, puis pose-la sur le calendrier.</p>
       <ol class="steps">
-        <li>Active le rôle <b>Coach</b>. Le panneau <b>Bibliothèque</b> apparaît à gauche.</li>
-        <li>Clique sur <span class="hlword">+ Créer une séance</span>.</li>
-        <li>Renseigne la discipline, la durée, l'objectif, puis ajoute les blocs (échauffement, intervalles, retour au calme).</li>
-        <li>Enregistre : la séance rejoint ta bibliothèque, prête à être planifiée.</li>
+        <li data-i18n-html="aide.s1.li1">Active le rôle <b>Coach</b>. Le panneau <b>Bibliothèque</b> apparaît à gauche.</li>
+        <li data-i18n-html="aide.s1.li2">Clique sur <span class="hlword">+ Créer une séance</span>.</li>
+        <li data-i18n="aide.s1.li3">Renseigne la discipline, la durée, l'objectif, puis ajoute les blocs (échauffement, intervalles, retour au calme).</li>
+        <li data-i18n="aide.s1.li4">Enregistre : la séance rejoint ta bibliothèque, prête à être planifiée.</li>
       </ol>
       <figure>
-        <img src="./aide-img/creer-seance.png" width="1220" height="920" alt="Bouton « + Créer une séance » encadré dans le panneau Bibliothèque du mode coach" loading="lazy">
-        <figcaption><span class="dot">●</span> Le bouton « + Créer une séance » en haut de la bibliothèque.</figcaption>
+        <img src="./aide-img/creer-seance.png" width="1220" height="920" data-i18n-attr="alt:aide.s1.imgAlt" alt="Bouton « + Créer une séance » encadré dans le panneau Bibliothèque du mode coach" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s1.caption">Le bouton « + Créer une séance » en haut de la bibliothèque.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="planifier">
-      <h2><span class="no">02</span> Planifier une séance dans le calendrier</h2>
-      <p class="lead">Une fois la séance créée, place-la sur le bon jour.</p>
+      <h2><span class="no">02</span> <span data-i18n="aide.s2.title">Planifier une séance dans le calendrier</span></h2>
+      <p class="lead" data-i18n="aide.s2.lead">Une fois la séance créée, place-la sur le bon jour.</p>
       <ol class="steps">
-        <li>Depuis la <b>Bibliothèque</b>, <b>glisse</b> une séance et dépose-la sur le jour voulu du calendrier.</li>
-        <li>Autre méthode : survole un jour et clique le <b>+</b> qui apparaît dans son en-tête pour créer une séance directement à cette date.</li>
-        <li>Une séance planifiée peut être re-déplacée d'un jour à l'autre par glisser-déposer.</li>
+        <li data-i18n-html="aide.s2.li1">Depuis la <b>Bibliothèque</b>, <b>glisse</b> une séance et dépose-la sur le jour voulu du calendrier.</li>
+        <li data-i18n-html="aide.s2.li2">Autre méthode : survole un jour et clique le <b>+</b> qui apparaît dans son en-tête pour créer une séance directement à cette date.</li>
+        <li data-i18n="aide.s2.li3">Une séance planifiée peut être re-déplacée d'un jour à l'autre par glisser-déposer.</li>
       </ol>
-      <div class="tip"><b>Astuce.</b> Pour poser un programme complet d'un coup, utilise <b>+ Créer un cycle</b> sous la bibliothèque : plusieurs semaines de séances en un clic.</div>
+      <div class="tip" data-i18n-html="aide.s2.tip"><b>Astuce.</b> Pour poser un programme complet d'un coup, utilise <b>+ Créer un cycle</b> sous la bibliothèque : plusieurs semaines de séances en un clic.</div>
     </section>
 
     <section class="tuto" id="attribuer-plusieurs">
-      <h2><span class="no">03</span> Attribuer une séance ou un cycle à plusieurs athlètes</h2>
-      <p class="lead">Plutôt que de replanifier la même séance athlète par athlète, pose-la sur tout un groupe — ou une sélection — en une fois.</p>
+      <h2><span class="no">03</span> <span data-i18n="aide.s3.title">Attribuer une séance ou un cycle à plusieurs athlètes</span></h2>
+      <p class="lead" data-i18n="aide.s3.lead">Plutôt que de replanifier la même séance athlète par athlète, pose-la sur tout un groupe — ou une sélection — en une fois.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, dans la <b>Bibliothèque</b>, survole une <b>séance</b> et clique la petite icône <span class="hlword">Attribuer à plusieurs</span> (deux silhouettes) en haut de la carte. Pour un <b>cycle</b>, utilise le bouton <span class="hlword">Attribuer à plusieurs</span> sous la carte.</li>
-        <li>Choisis la <b>date</b> (ou la semaine de départ pour un cycle).</li>
-        <li>Coche les athlètes un par un, ou clique un <b>groupe de club</b> pour sélectionner tous ses membres d'un coup. « Tout sélectionner » coche l'ensemble du roster.</li>
-        <li>Clique <span class="hlword">Attribuer à N athlètes</span>. La séance (ou tout le cycle) est posée sur le calendrier de chacun. Les cibles en % des références s'adaptent au niveau de chaque athlète.</li>
+        <li data-i18n-html="aide.s3.li1">En rôle <b>Coach</b>, dans la <b>Bibliothèque</b>, survole une <b>séance</b> et clique la petite icône <span class="hlword">Attribuer à plusieurs</span> (deux silhouettes) en haut de la carte. Pour un <b>cycle</b>, utilise le bouton <span class="hlword">Attribuer à plusieurs</span> sous la carte.</li>
+        <li data-i18n-html="aide.s3.li2">Choisis la <b>date</b> (ou la semaine de départ pour un cycle).</li>
+        <li data-i18n-html="aide.s3.li3">Coche les athlètes un par un, ou clique un <b>groupe de club</b> pour sélectionner tous ses membres d'un coup. « Tout sélectionner » coche l'ensemble du roster.</li>
+        <li data-i18n-html="aide.s3.li4">Clique <span class="hlword">Attribuer à N athlètes</span>. La séance (ou tout le cycle) est posée sur le calendrier de chacun. Les cibles en % des références s'adaptent au niveau de chaque athlète.</li>
       </ol>
       <figure>
-        <img src="./aide-img/assign-btn.png" width="1240" height="977" alt="Icône « Attribuer à plusieurs » encadrée sur une carte de séance, et bouton équivalent sous une carte de cycle" loading="lazy">
-        <figcaption><span class="dot">●</span> L'icône sur une séance (au survol) et le bouton « Attribuer à plusieurs » sous un cycle.</figcaption>
+        <img src="./aide-img/assign-btn.png" width="1240" height="977" data-i18n-attr="alt:aide.s3.img1Alt" alt="Icône « Attribuer à plusieurs » encadrée sur une carte de séance, et bouton équivalent sous une carte de cycle" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s3.caption1">L'icône sur une séance (au survol) et le bouton « Attribuer à plusieurs » sous un cycle.</span></figcaption>
       </figure>
       <figure>
-        <img src="./aide-img/assign-modal.png" width="1240" height="977" alt="Fenêtre d'attribution : date, raccourcis par groupe de club encadrés, liste des athlètes à cocher, bouton Attribuer" loading="lazy">
-        <figcaption><span class="dot">●</span> Les raccourcis par groupe cochent tous les membres du groupe ; le bouton indique le nombre d'athlètes ciblés.</figcaption>
+        <img src="./aide-img/assign-modal.png" width="1240" height="977" data-i18n-attr="alt:aide.s3.img2Alt" alt="Fenêtre d'attribution : date, raccourcis par groupe de club encadrés, liste des athlètes à cocher, bouton Attribuer" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s3.caption2">Les raccourcis par groupe cochent tous les membres du groupe ; le bouton indique le nombre d'athlètes ciblés.</span></figcaption>
       </figure>
-      <div class="tip"><b>Groupes de club.</b> Les raccourcis par groupe n'apparaissent que pour les athlètes rangés dans un groupe. Range-les via l'onglet <a href="#creer-groupe">Groupes</a> du mode Club pour cibler « tout un groupe » d'un clic.</div>
+      <div class="tip" data-i18n-html="aide.s3.tip"><b>Groupes de club.</b> Les raccourcis par groupe n'apparaissent que pour les athlètes rangés dans un groupe. Range-les via l'onglet <a href="#creer-groupe">Groupes</a> du mode Club pour cibler « tout un groupe » d'un clic.</div>
     </section>
 
     <section class="tuto" id="adherence">
-      <h2><span class="no">04</span> Suivre l'adhérence de mes athlètes</h2>
-      <p class="lead">Vois d'un coup d'œil qui suit son plan et qui décroche.</p>
+      <h2><span class="no">04</span> <span data-i18n="aide.s4.title">Suivre l'adhérence de mes athlètes</span></h2>
+      <p class="lead" data-i18n="aide.s4.lead">Vois d'un coup d'œil qui suit son plan et qui décroche.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, clique <span class="hlword">Suivi de mes athlètes</span>, en haut du panneau de gauche.</li>
-        <li>Le tableau liste tout ton roster : <b>forme du jour</b>, <b>adhérence</b> (séances réalisées vs prévues), <b>prochaine course</b> et un <b>statut</b>.</li>
-        <li>Repère les athlètes en rouge (« Décroche ») pour les relancer en priorité.</li>
+        <li data-i18n-html="aide.s4.li1">En rôle <b>Coach</b>, clique <span class="hlword">Suivi de mes athlètes</span>, en haut du panneau de gauche.</li>
+        <li data-i18n-html="aide.s4.li2">Le tableau liste tout ton roster : <b>forme du jour</b>, <b>adhérence</b> (séances réalisées vs prévues), <b>prochaine course</b> et un <b>statut</b>.</li>
+        <li data-i18n="aide.s4.li3">Repère les athlètes en rouge (« Décroche ») pour les relancer en priorité.</li>
       </ol>
       <figure>
-        <img src="./aide-img/adherence.png" width="1220" height="900" alt="Bouton « Suivi de mes athlètes » encadré en bas du panneau coach" loading="lazy">
-        <figcaption><span class="dot">●</span> « Suivi de mes athlètes » ouvre le tableau d'adhérence.</figcaption>
+        <img src="./aide-img/adherence.png" width="1220" height="900" data-i18n-attr="alt:aide.s4.imgAlt" alt="Bouton « Suivi de mes athlètes » encadré en bas du panneau coach" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n-html="aide.s4.caption">« Suivi de mes athlètes » ouvre le tableau d'adhérence.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="gerer-abonnement">
-      <h2><span class="no">05</span> Gérer son abonnement</h2>
-      <p class="lead">Ton abonnement coach, l'option Assistant IA et l'encaissement de tes athlètes, réunis en bas du panneau coach.</p>
+      <h2><span class="no">05</span> <span data-i18n="aide.toc.gererAbonnement">Gérer son abonnement</span></h2>
+      <p class="lead" data-i18n="aide.s5.lead">Ton abonnement coach, l'option Assistant IA et l'encaissement de tes athlètes, réunis en bas du panneau coach.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, descends le panneau de gauche jusqu'aux cartes d'abonnement.</li>
-        <li><b>Abonnement Sillance</b> (29 €/mois) : clique <span class="hlword">S'abonner à Sillance</span>. Une fois abonné, le bouton devient <b>Gérer mon abonnement</b> et ouvre ton espace de facturation (changer de carte, résilier).</li>
-        <li><b>Assistant IA coach</b> : <b>Commencer l'essai 14 jours</b> pour activer l'analyse automatique des séances (puis 12 €/mois, résiliable pendant l'essai).</li>
-        <li><b>Fais-toi payer</b> : <b>Relier Stripe</b> pour encaisser tes athlètes, et <b>modifier</b> le tarif de ton suivi.</li>
+        <li data-i18n-html="aide.s5.li1">En rôle <b>Coach</b>, descends le panneau de gauche jusqu'aux cartes d'abonnement.</li>
+        <li data-i18n-html="aide.s5.li2"><b>Abonnement Sillance</b> (29 €/mois) : clique <span class="hlword">S'abonner à Sillance</span>. Une fois abonné, le bouton devient <b>Gérer mon abonnement</b> et ouvre ton espace de facturation (changer de carte, résilier).</li>
+        <li data-i18n-html="aide.s5.li3"><b>Assistant IA coach</b> : <b>Commencer l'essai 14 jours</b> pour activer l'analyse automatique des séances (puis 12 €/mois, résiliable pendant l'essai).</li>
+        <li data-i18n-html="aide.s5.li4"><b>Fais-toi payer</b> : <b>Relier Stripe</b> pour encaisser tes athlètes, et <b>modifier</b> le tarif de ton suivi.</li>
       </ol>
       <figure>
-        <img src="./aide-img/gerer-abonnement.png" width="392" height="536" alt="Cartes d'abonnement du panneau coach : Abonnement Sillance, Assistant IA, Fais-toi payer" loading="lazy">
-        <figcaption><span class="dot">●</span> Les trois cartes d'abonnement, en bas du panneau coach.</figcaption>
+        <img src="./aide-img/gerer-abonnement.png" width="392" height="536" data-i18n-attr="alt:aide.s5.imgAlt" alt="Cartes d'abonnement du panneau coach : Abonnement Sillance, Assistant IA, Fais-toi payer" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s5.caption">Les trois cartes d'abonnement, en bas du panneau coach.</span></figcaption>
       </figure>
     </section>
 
     <!-- ============ CLUB ============ -->
-    <div class="role-h">Espace club</div>
+    <div class="role-h" data-i18n="aide.spaceClub">Espace club</div>
 
     <section class="tuto" id="creer-groupe">
-      <h2><span class="no">06</span> Créer un groupe</h2>
-      <p class="lead">Organise tes licenciés par niveau ou objectif (jeunes, compétition, Ironman, Hyrox…).</p>
+      <h2><span class="no">06</span> <span data-i18n="aide.toc.creerGroupe">Créer un groupe</span></h2>
+      <p class="lead" data-i18n="aide.s6.lead">Organise tes licenciés par niveau ou objectif (jeunes, compétition, Ironman, Hyrox…).</p>
       <ol class="steps">
-        <li>Active le rôle <b>Club</b>, puis ouvre l'onglet <b>Groupes</b>.</li>
-        <li>Clique <span class="hlword">+ Créer un groupe</span>.</li>
-        <li>Donne-lui un <b>nom</b>, une couleur, et une description si tu veux.</li>
-        <li>Dans <b>Athlètes du groupe</b>, coche les adhérents à y placer.</li>
-        <li>Clique <span class="hlword">Enregistrer le groupe</span>.</li>
+        <li data-i18n-html="aide.s6.li1">Active le rôle <b>Club</b>, puis ouvre l'onglet <b>Groupes</b>.</li>
+        <li data-i18n-html="aide.s6.li2">Clique <span class="hlword">+ Créer un groupe</span>.</li>
+        <li data-i18n-html="aide.s6.li3">Donne-lui un <b>nom</b>, une couleur, et une description si tu veux.</li>
+        <li data-i18n-html="aide.s6.li4">Dans <b>Athlètes du groupe</b>, coche les adhérents à y placer.</li>
+        <li data-i18n-html="aide.s6.li5">Clique <span class="hlword">Enregistrer le groupe</span>.</li>
       </ol>
       <figure>
-        <img src="./aide-img/groupe-creer.png" width="1150" height="600" alt="Bouton « + Créer un groupe » encadré dans l'onglet Groupes" loading="lazy">
-        <figcaption><span class="dot">●</span> Étape 2 : « + Créer un groupe », en haut de l'onglet Groupes.</figcaption>
+        <img src="./aide-img/groupe-creer.png" width="1150" height="600" data-i18n-attr="alt:aide.s6.img1Alt" alt="Bouton « + Créer un groupe » encadré dans l'onglet Groupes" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s6.caption1">Étape 2 : « + Créer un groupe », en haut de l'onglet Groupes.</span></figcaption>
       </figure>
       <figure>
-        <img src="./aide-img/groupe-modal.png" width="820" height="900" alt="Fenêtre de création de groupe : nom, athlètes à cocher, bouton Enregistrer encadrés" loading="lazy">
-        <figcaption><span class="dot">●</span> Étapes 3 à 5 : nom, couleur, athlètes à cocher, puis « Enregistrer le groupe ».</figcaption>
+        <img src="./aide-img/groupe-modal.png" width="820" height="900" data-i18n-attr="alt:aide.s6.img2Alt" alt="Fenêtre de création de groupe : nom, athlètes à cocher, bouton Enregistrer encadrés" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s6.caption2">Étapes 3 à 5 : nom, couleur, athlètes à cocher, puis « Enregistrer le groupe ».</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="deplacer-athlete">
-      <h2><span class="no">07</span> Déplacer un adhérent d'un groupe à l'autre</h2>
-      <p class="lead">Un adhérent appartient à un seul groupe. Pour le déplacer, on le rattache au groupe d'arrivée.</p>
+      <h2><span class="no">07</span> <span data-i18n="aide.s7.title">Déplacer un adhérent d'un groupe à l'autre</span></h2>
+      <p class="lead" data-i18n="aide.s7.lead">Un adhérent appartient à un seul groupe. Pour le déplacer, on le rattache au groupe d'arrivée.</p>
       <ol class="steps">
-        <li>Active le rôle <b>Club</b>, puis ouvre l'onglet <b>Groupes</b>.</li>
-        <li>Sur le <b>groupe d'arrivée</b>, clique <span class="hlword">Modifier</span>.</li>
-        <li>Dans <b>Athlètes du groupe</b>, <span class="hlword">coche</span> l'adhérent à déplacer. Le cocher ici le retire automatiquement de son ancien groupe.</li>
-        <li>Clique <span class="hlword">Enregistrer le groupe</span>.</li>
+        <li data-i18n-html="aide.s6.li1">Active le rôle <b>Club</b>, puis ouvre l'onglet <b>Groupes</b>.</li>
+        <li data-i18n-html="aide.s7.li2">Sur le <b>groupe d'arrivée</b>, clique <span class="hlword">Modifier</span>.</li>
+        <li data-i18n-html="aide.s7.li3">Dans <b>Athlètes du groupe</b>, <span class="hlword">coche</span> l'adhérent à déplacer. Le cocher ici le retire automatiquement de son ancien groupe.</li>
+        <li data-i18n-html="aide.s6.li5">Clique <span class="hlword">Enregistrer le groupe</span>.</li>
       </ol>
       <figure>
-        <img src="./aide-img/groupe-modifier.png" width="1150" height="720" alt="Bouton « Modifier » encadré sur une carte de groupe, onglet Groupes" loading="lazy">
-        <figcaption><span class="dot">●</span> Étape 2 : « Modifier » sur le groupe d'arrivée.</figcaption>
+        <img src="./aide-img/groupe-modifier.png" width="1150" height="720" data-i18n-attr="alt:aide.s7.img1Alt" alt="Bouton « Modifier » encadré sur une carte de groupe, onglet Groupes" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s7.caption1">Étape 2 : « Modifier » sur le groupe d'arrivée.</span></figcaption>
       </figure>
       <figure>
-        <img src="./aide-img/groupe-membres.png" width="820" height="880" alt="Liste des athlètes à cocher et bouton Enregistrer encadrés dans la fenêtre du groupe" loading="lazy">
-        <figcaption><span class="dot">●</span> Étapes 3 et 4 : cocher l'adhérent, puis « Enregistrer le groupe ».</figcaption>
+        <img src="./aide-img/groupe-membres.png" width="820" height="880" data-i18n-attr="alt:aide.s7.img2Alt" alt="Liste des athlètes à cocher et bouton Enregistrer encadrés dans la fenêtre du groupe" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s7.caption2">Étapes 3 et 4 : cocher l'adhérent, puis « Enregistrer le groupe ».</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="creneau">
-      <h2><span class="no">08</span> Créer un créneau et y inviter les athlètes</h2>
-      <p class="lead">Un créneau collectif, récurrent, avec ses athlètes déjà invités.</p>
+      <h2><span class="no">08</span> <span data-i18n="aide.s8.title">Créer un créneau et y inviter les athlètes</span></h2>
+      <p class="lead" data-i18n="aide.s8.lead">Un créneau collectif, récurrent, avec ses athlètes déjà invités.</p>
       <ol class="steps">
-        <li>Rôle <b>Club</b>, onglet <b>Créneaux</b>, clique <span class="hlword">+ Créer un créneau</span>.</li>
-        <li>Choisis la discipline, l'intitulé, le jour et l'heure, le lieu et la capacité. Le créneau se répète <b>chaque semaine</b>.</li>
-        <li>Renseigne le <b>contenu de la séance</b> : il sera visible par les inscrits.</li>
-        <li>Dans <span class="hlword">Groupe (contenu réservé)</span>, choisis un groupe pour que seul ce groupe voie le contenu (ou laisse « Tout le club »).</li>
-        <li>Coche <span class="hlword">Inviter tout le groupe</span> pour <b>ajouter d'un coup tous les athlètes</b> du groupe : ils n'ont plus qu'à confirmer leur présence en un clic.</li>
-        <li>Clique <span class="hlword">Publier le créneau</span>.</li>
+        <li data-i18n-html="aide.s8.li1">Rôle <b>Club</b>, onglet <b>Créneaux</b>, clique <span class="hlword">+ Créer un créneau</span>.</li>
+        <li data-i18n-html="aide.s8.li2">Choisis la discipline, l'intitulé, le jour et l'heure, le lieu et la capacité. Le créneau se répète <b>chaque semaine</b>.</li>
+        <li data-i18n-html="aide.s8.li3">Renseigne le <b>contenu de la séance</b> : il sera visible par les inscrits.</li>
+        <li data-i18n-html="aide.s8.li4">Dans <span class="hlword">Groupe (contenu réservé)</span>, choisis un groupe pour que seul ce groupe voie le contenu (ou laisse « Tout le club »).</li>
+        <li data-i18n-html="aide.s8.li5">Coche <span class="hlword">Inviter tout le groupe</span> pour <b>ajouter d'un coup tous les athlètes</b> du groupe : ils n'ont plus qu'à confirmer leur présence en un clic.</li>
+        <li data-i18n-html="aide.s8.li6">Clique <span class="hlword">Publier le créneau</span>.</li>
       </ol>
       <figure>
-        <img src="./aide-img/creneau.png" width="1150" height="1300" alt="Bouton « + Créer un créneau » encadré dans l'onglet Créneaux" loading="lazy">
-        <figcaption><span class="dot">●</span> Étape 1 : « + Créer un créneau », au-dessus de la liste des créneaux existants.</figcaption>
+        <img src="./aide-img/creneau.png" width="1150" height="1300" data-i18n-attr="alt:aide.s8.img1Alt" alt="Bouton « + Créer un créneau » encadré dans l'onglet Créneaux" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s8.caption1">Étape 1 : « + Créer un créneau », au-dessus de la liste des créneaux existants.</span></figcaption>
       </figure>
       <figure>
-        <img src="./aide-img/creneau-inviter.png" width="800" height="1090" alt="Fenêtre du créneau : choix du groupe, « Inviter tout le groupe » et « Publier » encadrés" loading="lazy">
-        <figcaption><span class="dot">●</span> Étapes 4 à 6 : le groupe, « Inviter tout le groupe » pour ajouter les athlètes, puis « Publier ».</figcaption>
+        <img src="./aide-img/creneau-inviter.png" width="800" height="1090" data-i18n-attr="alt:aide.s8.img2Alt" alt="Fenêtre du créneau : choix du groupe, « Inviter tout le groupe » et « Publier » encadrés" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s8.caption2">Étapes 4 à 6 : le groupe, « Inviter tout le groupe » pour ajouter les athlètes, puis « Publier ».</span></figcaption>
       </figure>
-      <div class="tip"><b>Suivre les présences.</b> Un clic sur un créneau existant ouvre sa fiche, onglet <b>Participants</b> : tu vois qui a confirmé et qui reste à relancer.</div>
+      <div class="tip" data-i18n-html="aide.s8.tip"><b>Suivre les présences.</b> Un clic sur un créneau existant ouvre sa fiche, onglet <b>Participants</b> : tu vois qui a confirmé et qui reste à relancer.</div>
     </section>
 
     <!-- ============ ATHLÈTE ============ -->
-    <div class="role-h">Espace athlète</div>
+    <div class="role-h" data-i18n="aide.spaceAthlete">Espace athlète</div>
 
     <section class="tuto" id="checkin">
-      <h2><span class="no">09</span> Faire son check-in du matin</h2>
-      <p class="lead">Trente secondes chaque matin pour que le coach adapte le plan.</p>
+      <h2><span class="no">09</span> <span data-i18n="aide.s9.title">Faire son check-in du matin</span></h2>
+      <p class="lead" data-i18n="aide.s9.lead">Trente secondes chaque matin pour que le coach adapte le plan.</p>
       <ol class="steps">
-        <li>Active le rôle <b>Athlète</b>. Le panneau <b>Check-in du jour</b> est à gauche.</li>
-        <li>Règle les curseurs <b>Sommeil</b>, <b>Fatigue</b> et <b>Motivation</b>, et renseigne ton <b>poids</b> (le rapport W/kg se met à jour en direct).</li>
-        <li>Indique ta <b>disponibilité</b> du jour — OK, fatigué, malade ou blessé (détail au guide suivant).</li>
-        <li>Ta <b>fraîcheur</b> se calcule automatiquement en dessous.</li>
-        <li>Clique <span class="hlword">Valider mon check-in</span>. Si ta forme est basse, ton coach est prévenu.</li>
+        <li data-i18n-html="aide.s9.li1">Active le rôle <b>Athlète</b>. Le panneau <b>Check-in du jour</b> est à gauche.</li>
+        <li data-i18n-html="aide.s9.li2">Règle les curseurs <b>Sommeil</b>, <b>Fatigue</b> et <b>Motivation</b>, et renseigne ton <b>poids</b> (le rapport W/kg se met à jour en direct).</li>
+        <li data-i18n-html="aide.s9.li3">Indique ta <b>disponibilité</b> du jour — OK, fatigué, malade ou blessé (détail au guide suivant).</li>
+        <li data-i18n-html="aide.s9.li4">Ta <b>fraîcheur</b> se calcule automatiquement en dessous.</li>
+        <li data-i18n-html="aide.s9.li5">Clique <span class="hlword">Valider mon check-in</span>. Si ta forme est basse, ton coach est prévenu.</li>
       </ol>
       <figure>
-        <img src="./aide-img/checkin.png" width="1220" height="1097" alt="Panneau de check-in encadré : curseurs, poids, disponibilité, fraîcheur et bouton Valider" loading="lazy">
-        <figcaption><span class="dot">●</span> Le panneau de check-in : curseurs, poids et disponibilité.</figcaption>
+        <img src="./aide-img/checkin.png" width="1220" height="1097" data-i18n-attr="alt:aide.s9.imgAlt" alt="Panneau de check-in encadré : curseurs, poids, disponibilité, fraîcheur et bouton Valider" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s9.caption">Le panneau de check-in : curseurs, poids et disponibilité.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="dispo-blessure">
-      <h2><span class="no">10</span> Signaler une blessure ou une indisponibilité</h2>
-      <p class="lead">Une douleur, un rhume, une grosse semaine de boulot ? Dis-le à ton coach en deux clics — il adapte le plan au lieu de découvrir le problème trop tard.</p>
+      <h2><span class="no">10</span> <span data-i18n="aide.s10.title">Signaler une blessure ou une indisponibilité</span></h2>
+      <p class="lead" data-i18n="aide.s10.lead">Une douleur, un rhume, une grosse semaine de boulot ? Dis-le à ton coach en deux clics — il adapte le plan au lieu de découvrir le problème trop tard.</p>
       <ol class="steps">
-        <li>Dans le <b>Check-in du jour</b> (rôle <b>Athlète</b>), repère la ligne <span class="hlword">Disponibilité</span>.</li>
-        <li>Choisis ton état : <b>OK</b>, <b>Fatigué</b>, <b>Malade</b> ou <b>Blessé</b>.</li>
-        <li>Dès que ce n'est pas « OK », un champ de note apparaît : précise l'essentiel (<i>« douleur mollet droit depuis mardi »</i>).</li>
-        <li>Clique <span class="hlword">Valider mon check-in</span>. Si tu es blessé, ton coach reçoit une <b>alerte prioritaire</b> avec ta note.</li>
+        <li data-i18n-html="aide.s10.li1">Dans le <b>Check-in du jour</b> (rôle <b>Athlète</b>), repère la ligne <span class="hlword">Disponibilité</span>.</li>
+        <li data-i18n-html="aide.s10.li2">Choisis ton état : <b>OK</b>, <b>Fatigué</b>, <b>Malade</b> ou <b>Blessé</b>.</li>
+        <li data-i18n-html="aide.s10.li3">Dès que ce n'est pas « OK », un champ de note apparaît : précise l'essentiel (<i>« douleur mollet droit depuis mardi »</i>).</li>
+        <li data-i18n-html="aide.s10.li4">Clique <span class="hlword">Valider mon check-in</span>. Si tu es blessé, ton coach reçoit une <b>alerte prioritaire</b> avec ta note.</li>
       </ol>
       <figure>
-        <img src="./aide-img/dispo-checkin.png" width="1220" height="1097" alt="Ligne Disponibilité encadrée dans le check-in : boutons OK, Fatigué, Malade, Blessé et champ de note" loading="lazy">
-        <figcaption><span class="dot">●</span> La ligne Disponibilité : l'état « Blessé » sélectionné fait apparaître le champ de note.</figcaption>
+        <img src="./aide-img/dispo-checkin.png" width="1220" height="1097" data-i18n-attr="alt:aide.s10.img1Alt" alt="Ligne Disponibilité encadrée dans le check-in : boutons OK, Fatigué, Malade, Blessé et champ de note" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s10.caption1">La ligne Disponibilité : l'état « Blessé » sélectionné fait apparaître le champ de note.</span></figcaption>
       </figure>
       <figure>
-        <img src="./aide-img/dispo-coach.png" width="1220" height="1097" alt="Bandeau coach : le signalement « Blessé » de l'athlète encadré en tête des alertes" loading="lazy">
-        <figcaption><span class="dot">●</span> Côté coach : le signalement arrive en tête du bandeau de l'athlète, et dans la colonne « Dispo » du tableau <a href="#adherence">Suivi de mes athlètes</a>.</figcaption>
+        <img src="./aide-img/dispo-coach.png" width="1220" height="1097" data-i18n-attr="alt:aide.s10.img2Alt" alt="Bandeau coach : le signalement « Blessé » de l'athlète encadré en tête des alertes" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n-html="aide.s10.caption2">Côté coach : le signalement arrive en tête du bandeau de l'athlète, et dans la colonne « Dispo » du tableau <a href="#adherence">Suivi de mes athlètes</a>.</span></figcaption>
       </figure>
-      <div class="tip"><b>Pourquoi c'est important.</b> S'entraîner sur une douleur qui s'installe transforme une gêne en blessure longue. Un signalement honnête chaque matin vaut mieux qu'une séance forcée.</div>
+      <div class="tip" data-i18n-html="aide.s10.tip"><b>Pourquoi c'est important.</b> S'entraîner sur une douleur qui s'installe transforme une gêne en blessure longue. Un signalement honnête chaque matin vaut mieux qu'une séance forcée.</div>
     </section>
 
     <section class="tuto" id="connecter-montre">
-      <h2><span class="no">11</span> Connecter une montre</h2>
-      <p class="lead">Fais remonter tes activités dans Sillance automatiquement.</p>
+      <h2><span class="no">11</span> <span data-i18n="aide.toc.connecterMontre">Connecter une montre</span></h2>
+      <p class="lead" data-i18n="aide.s11.lead">Fais remonter tes activités dans Sillance automatiquement.</p>
       <ol class="steps">
-        <li>En rôle <b>Athlète</b>, va au panneau <b>Synchronisation</b> (bas du panneau de gauche).</li>
-        <li>Clique <span class="hlword">Se connecter avec Strava</span>, ou <span class="hlword">⌚ Garmin</span> / <span class="hlword">⌚ Coros</span> selon ta montre.</li>
-        <li>Autorise l'accès dans la fenêtre qui s'ouvre. Tes activités se synchronisent ensuite toutes seules.</li>
+        <li data-i18n-html="aide.s11.li1">En rôle <b>Athlète</b>, va au panneau <b>Synchronisation</b> (bas du panneau de gauche).</li>
+        <li data-i18n-html="aide.s11.li2">Clique <span class="hlword">Se connecter avec Strava</span>, ou <span class="hlword">⌚ Garmin</span> / <span class="hlword">⌚ Coros</span> selon ta montre.</li>
+        <li data-i18n="aide.s11.li3">Autorise l'accès dans la fenêtre qui s'ouvre. Tes activités se synchronisent ensuite toutes seules.</li>
       </ol>
-      <div class="tip"><b>À savoir.</b> Les données <b>Strava</b> restent personnelles à l'athlète (conditions Strava) et <b>ne sont pas partagées avec le coach</b>. Pour que ton coach voie tes séances, connecte plutôt <b>Garmin</b> ou <b>Coros</b>, ou importe tes fichiers (ci-dessous).</div>
+      <div class="tip" data-i18n-html="aide.s11.tip"><b>À savoir.</b> Les données <b>Strava</b> restent personnelles à l'athlète (conditions Strava) et <b>ne sont pas partagées avec le coach</b>. Pour que ton coach voie tes séances, connecte plutôt <b>Garmin</b> ou <b>Coros</b>, ou importe tes fichiers (ci-dessous).</div>
       <figure>
-        <img src="./aide-img/connecter-montre.png" width="392" height="296" alt="Panneau Synchronisation : boutons Strava, Garmin et Coros encadrés" loading="lazy">
-        <figcaption><span class="dot">●</span> Les boutons de connexion, dans le panneau Synchronisation.</figcaption>
+        <img src="./aide-img/connecter-montre.png" width="392" height="296" data-i18n-attr="alt:aide.s11.imgAlt" alt="Panneau Synchronisation : boutons Strava, Garmin et Coros encadrés" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s11.caption">Les boutons de connexion, dans le panneau Synchronisation.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="import-fit">
-      <h2><span class="no">12</span> Importer un fichier .FIT</h2>
-      <p class="lead">Pas de montre connectée ? Importe le fichier exporté de ta montre.</p>
+      <h2><span class="no">12</span> <span data-i18n="aide.toc.importFit">Importer un fichier .FIT</span></h2>
+      <p class="lead" data-i18n="aide.s12.lead">Pas de montre connectée ? Importe le fichier exporté de ta montre.</p>
       <ol class="steps">
-        <li>Dans le panneau <b>Synchronisation</b>, clique <span class="hlword">Importer un fichier</span>.</li>
-        <li>Choisis le fichier <b>.FIT</b>, <b>.TCX</b> ou <b>.GPX</b> exporté depuis ta montre (Garmin Connect, Coros, etc.).</li>
-        <li>L'activité est analysée et ajoutée à tes séances — et devient visible par ton coach.</li>
+        <li data-i18n-html="aide.s12.li1">Dans le panneau <b>Synchronisation</b>, clique <span class="hlword">Importer un fichier</span>.</li>
+        <li data-i18n-html="aide.s12.li2">Choisis le fichier <b>.FIT</b>, <b>.TCX</b> ou <b>.GPX</b> exporté depuis ta montre (Garmin Connect, Coros, etc.).</li>
+        <li data-i18n="aide.s12.li3">L'activité est analysée et ajoutée à tes séances — et devient visible par ton coach.</li>
       </ol>
       <figure>
-        <img src="./aide-img/import-fit.png" width="392" height="296" alt="Bouton « Importer un fichier » encadré dans le panneau Synchronisation" loading="lazy">
-        <figcaption><span class="dot">●</span> « Importer un fichier » accepte les formats .FIT, .TCX et .GPX.</figcaption>
+        <img src="./aide-img/import-fit.png" width="392" height="296" data-i18n-attr="alt:aide.s12.imgAlt" alt="Bouton « Importer un fichier » encadré dans le panneau Synchronisation" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s12.caption">« Importer un fichier » accepte les formats .FIT, .TCX et .GPX.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="ajouter-chaussure">
-      <h2><span class="no">13</span> Ajouter des chaussures</h2>
-      <p class="lead">Ajoute tes chaussures pour suivre leur usure et être alerté avant que l'amorti ne se dégrade.</p>
+      <h2><span class="no">13</span> <span data-i18n="aide.toc.ajouterChaussure">Ajouter des chaussures</span></h2>
+      <p class="lead" data-i18n="aide.s13.lead">Ajoute tes chaussures pour suivre leur usure et être alerté avant que l'amorti ne se dégrade.</p>
       <ol class="steps">
-        <li>En rôle <b>Athlète</b>, va à la section <b>Mon matériel</b> et clique <b>+ Ajouter un équipement</b>.</li>
-        <li>Laisse le type sur <b>Chaussures de course</b>.</li>
-        <li><span class="hlword">Cherche ton modèle</span> dans le catalogue, ou <span class="hlword">parcours par marque</span> (Nike, Asics, Hoka…). La durée de vie se remplit automatiquement selon le modèle.</li>
-        <li>Indique les <b>km déjà parcourus</b> et, si tu veux, le prix d'achat (pour suivre ton coût au kilomètre).</li>
-        <li>Clique <span class="hlword">Ajouter</span> : la paire rejoint ta bibliothèque, avec son suivi d'usure.</li>
+        <li data-i18n-html="aide.s13.li1">En rôle <b>Athlète</b>, va à la section <b>Mon matériel</b> et clique <b>+ Ajouter un équipement</b>.</li>
+        <li data-i18n-html="aide.s13.li2">Laisse le type sur <b>Chaussures de course</b>.</li>
+        <li data-i18n-html="aide.s13.li3"><span class="hlword">Cherche ton modèle</span> dans le catalogue, ou <span class="hlword">parcours par marque</span> (Nike, Asics, Hoka…). La durée de vie se remplit automatiquement selon le modèle.</li>
+        <li data-i18n-html="aide.s13.li4">Indique les <b>km déjà parcourus</b> et, si tu veux, le prix d'achat (pour suivre ton coût au kilomètre).</li>
+        <li data-i18n-html="aide.s13.li5">Clique <span class="hlword">Ajouter</span> : la paire rejoint ta bibliothèque, avec son suivi d'usure.</li>
       </ol>
       <figure>
-        <img src="./aide-img/ajouter-chaussure.png" width="800" height="880" alt="Fenêtre d'ajout d'équipement : recherche de modèle, marques et bouton Ajouter encadrés" loading="lazy">
-        <figcaption><span class="dot">●</span> Cherche ton modèle ou parcours le catalogue par marque, puis « Ajouter ».</figcaption>
+        <img src="./aide-img/ajouter-chaussure.png" width="800" height="880" data-i18n-attr="alt:aide.s13.imgAlt" alt="Fenêtre d'ajout d'équipement : recherche de modèle, marques et bouton Ajouter encadrés" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s13.caption">Cherche ton modèle ou parcours le catalogue par marque, puis « Ajouter ».</span></figcaption>
       </figure>
-      <div class="tip"><b>Modèle absent du catalogue ?</b> Saisis son nom librement dans le champ <b>Nom / modèle</b> et ajuste la durée de vie à la main.</div>
+      <div class="tip" data-i18n-html="aide.s13.tip"><b>Modèle absent du catalogue ?</b> Saisis son nom librement dans le champ <b>Nom / modèle</b> et ajuste la durée de vie à la main.</div>
     </section>
 
     <section class="tuto" id="refs-physio">
-      <h2><span class="no">14</span> Éditer ses références physio</h2>
-      <p class="lead">Tes seuils personnels servent à calculer tes zones et à analyser tes séances : garde-les à jour.</p>
+      <h2><span class="no">14</span> <span data-i18n="aide.toc.refsPhysio">Éditer ses références physio</span></h2>
+      <p class="lead" data-i18n="aide.s14.lead">Tes seuils personnels servent à calculer tes zones et à analyser tes séances : garde-les à jour.</p>
       <ol class="steps">
-        <li>En rôle <b>Athlète</b>, descends le panneau de gauche jusqu'à <b>Mes références physio</b>.</li>
-        <li>Renseigne les valeurs que tu connais : <b>FTP</b> et <b>PMA</b> (vélo, en watts), <b>CP vélo</b>, <b>VMA</b> et <b>VC</b> (course), <b>Seuil</b> (allure), <b>CSS</b> (natation), <b>FC max</b> et <b>FC repos</b>.</li>
-        <li>Clique <span class="hlword">Enregistrer mes références</span>. Tes zones et analyses se recalculent aussitôt.</li>
+        <li data-i18n-html="aide.s14.li1">En rôle <b>Athlète</b>, descends le panneau de gauche jusqu'à <b>Mes références physio</b>.</li>
+        <li data-i18n-html="aide.s14.li2">Renseigne les valeurs que tu connais : <b>FTP</b> et <b>PMA</b> (vélo, en watts), <b>CP vélo</b>, <b>VMA</b> et <b>VC</b> (course), <b>Seuil</b> (allure), <b>CSS</b> (natation), <b>FC max</b> et <b>FC repos</b>.</li>
+        <li data-i18n-html="aide.s14.li3">Clique <span class="hlword">Enregistrer mes références</span>. Tes zones et analyses se recalculent aussitôt.</li>
       </ol>
       <figure>
-        <img src="./aide-img/refs-physio.png" width="392" height="360" alt="Bloc « Mes références physio » : champs FTP, PMA, VMA… et bouton Enregistrer encadré" loading="lazy">
-        <figcaption><span class="dot">●</span> Modifie les valeurs, puis « Enregistrer mes références ».</figcaption>
+        <img src="./aide-img/refs-physio.png" width="392" height="360" data-i18n-attr="alt:aide.s14.imgAlt" alt="Bloc « Mes références physio » : champs FTP, PMA, VMA… et bouton Enregistrer encadré" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s14.caption">Modifie les valeurs, puis « Enregistrer mes références ».</span></figcaption>
       </figure>
-      <div class="tip"><b>Tu ne connais pas toutes tes valeurs ?</b> Remplis seulement celles que tu as. Elles s'affinent avec le temps, au fil de tes tests et de tes séances importées.</div>
+      <div class="tip" data-i18n-html="aide.s14.tip"><b>Tu ne connais pas toutes tes valeurs ?</b> Remplis seulement celles que tu as. Elles s'affinent avec le temps, au fil de tes tests et de tes séances importées.</div>
     </section>
 
     <!-- ============ NOUVEAUTÉS ============ -->
-    <div class="role-h">Nouveautés</div>
+    <div class="role-h" data-i18n="aide.roleNews">Nouveautés</div>
 
     <section class="tuto" id="retest-physio">
-      <h2><span class="no">15</span> Rappel de retest physio</h2>
-      <p class="lead">Des références physio trop anciennes faussent tes zones et tes analyses — Sillance te le rappelle.</p>
+      <h2><span class="no">15</span> <span data-i18n="aide.toc.retestPhysio">Rappel de retest physio</span></h2>
+      <p class="lead" data-i18n="aide.s15.lead">Des références physio trop anciennes faussent tes zones et tes analyses — Sillance te le rappelle.</p>
       <ol class="steps">
-        <li>En rôle <b>Athlète</b>, descends jusqu'à <b>Mes références physio</b>.</li>
-        <li>Sous le titre, une ligne indique <b>depuis combien de temps</b> tu ne les as pas mises à jour.</li>
-        <li>Au-delà de <b>90 jours</b>, le message devient un rappel explicite à retester tes zones.</li>
+        <li data-i18n-html="aide.s15.li1">En rôle <b>Athlète</b>, descends jusqu'à <b>Mes références physio</b>.</li>
+        <li data-i18n-html="aide.s15.li2">Sous le titre, une ligne indique <b>depuis combien de temps</b> tu ne les as pas mises à jour.</li>
+        <li data-i18n-html="aide.s15.li3">Au-delà de <b>90 jours</b>, le message devient un rappel explicite à retester tes zones.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-retest-physio.png" width="392" height="456" alt="Ligne « Dernière mise à jour : il y a 132 j — pense à retester tes zones » encadrée sous le titre des références physio" loading="lazy">
-        <figcaption><span class="dot">●</span> Le même rappel apparaît côté coach, dans le bandeau de l'athlète suivi, une fois 90 jours dépassés.</figcaption>
+        <img src="./aide-img/nv-retest-physio.png" width="392" height="456" data-i18n-attr="alt:aide.s15.imgAlt" alt="Ligne « Dernière mise à jour : il y a 132 j — pense à retester tes zones » encadrée sous le titre des références physio" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s15.caption">Le même rappel apparaît côté coach, dans le bandeau de l'athlète suivi, une fois 90 jours dépassés.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="macros-chat">
-      <h2><span class="no">16</span> Personnaliser tes réponses rapides dans le chat</h2>
-      <p class="lead">Gagne du temps sur les messages qui reviennent tout le temps, avec 20 ou 30 athlètes à suivre.</p>
+      <h2><span class="no">16</span> <span data-i18n="aide.s16.title">Personnaliser tes réponses rapides dans le chat</span></h2>
+      <p class="lead" data-i18n="aide.s16.lead">Gagne du temps sur les messages qui reviennent tout le temps, avec 20 ou 30 athlètes à suivre.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, ouvre la <b>messagerie</b> (bulle en bas à droite).</li>
-        <li>Dans la barre de réponses rapides, clique <span class="hlword">✎ Gérer</span> tout à droite.</li>
-        <li>Tape tes réponses, <b>une par ligne</b> (blessure signalée, question nutrition récurrente, etc.), puis valide.</li>
+        <li data-i18n-html="aide.s16.li1">En rôle <b>Coach</b>, ouvre la <b>messagerie</b> (bulle en bas à droite).</li>
+        <li data-i18n-html="aide.s16.li2">Dans la barre de réponses rapides, clique <span class="hlword">✎ Gérer</span> tout à droite.</li>
+        <li data-i18n-html="aide.s16.li3">Tape tes réponses, <b>une par ligne</b> (blessure signalée, question nutrition récurrente, etc.), puis valide.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-macros-chat.png" width="370" height="560" alt="Chip « Gérer » encadré à droite de la barre de réponses rapides, dans le panneau de messagerie" loading="lazy">
-        <figcaption><span class="dot">●</span> Les réponses rapides restent mémorisées sur cet appareil.</figcaption>
+        <img src="./aide-img/nv-macros-chat.png" width="370" height="560" data-i18n-attr="alt:aide.s16.imgAlt" alt="Chip « Gérer » encadré à droite de la barre de réponses rapides, dans le panneau de messagerie" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s16.caption">Les réponses rapides restent mémorisées sur cet appareil.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="pourquoi-seance">
-      <h2><span class="no">17</span> Comprendre pourquoi une séance est là</h2>
-      <p class="lead">Chaque séance affiche désormais le raisonnement physiologique derrière elle, pas seulement les chiffres.</p>
+      <h2><span class="no">17</span> <span data-i18n="aide.s17.title">Comprendre pourquoi une séance est là</span></h2>
+      <p class="lead" data-i18n="aide.s17.lead">Chaque séance affiche désormais le raisonnement physiologique derrière elle, pas seulement les chiffres.</p>
       <ol class="steps">
-        <li>En rôle <b>Athlète</b>, clique sur une séance de ton calendrier pour ouvrir sa fiche.</li>
-        <li>Le bloc <b>Pourquoi cette séance</b> explique en deux phrases ce que ce type d'effort travaille (endurance, seuil, VMA, récupération…).</li>
+        <li data-i18n-html="aide.s17.li1">En rôle <b>Athlète</b>, clique sur une séance de ton calendrier pour ouvrir sa fiche.</li>
+        <li data-i18n-html="aide.s17.li2">Le bloc <b>Pourquoi cette séance</b> explique en deux phrases ce que ce type d'effort travaille (endurance, seuil, VMA, récupération…).</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-pourquoi-seance.png" width="478" height="699" alt="Bloc « Pourquoi cette séance » encadré dans la fiche d'une séance de course à pied" loading="lazy">
-        <figcaption><span class="dot">●</span> Le texte s'adapte au type de séance (objectif choisi par le coach, ou déduit du titre sinon).</figcaption>
+        <img src="./aide-img/nv-pourquoi-seance.png" width="478" height="699" data-i18n-attr="alt:aide.s17.imgAlt" alt="Bloc « Pourquoi cette séance » encadré dans la fiche d'une séance de course à pied" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s17.caption">Le texte s'adapte au type de séance (objectif choisi par le coach, ou déduit du titre sinon).</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="optimiseur-hebdo">
-      <h2><span class="no">18</span> Repérer une semaine mal répartie</h2>
-      <p class="lead">Deux séances à forte intensité le même jour, ou deux jours d'affilée, laissent trop peu de récupération — Sillance le signale avant que tu ne le découvres trop tard.</p>
+      <h2><span class="no">18</span> <span data-i18n="aide.s18.title">Repérer une semaine mal répartie</span></h2>
+      <p class="lead" data-i18n="aide.s18.lead">Deux séances à forte intensité le même jour, ou deux jours d'affilée, laissent trop peu de récupération — Sillance le signale avant que tu ne le découvres trop tard.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, la bannière apparaît automatiquement <b>au-dessus du calendrier</b> quand la semaine affichée pose problème.</li>
-        <li>Elle précise le ou les jours concernés et les séances impliquées.</li>
+        <li data-i18n-html="aide.s18.li1">En rôle <b>Coach</b>, la bannière apparaît automatiquement <b>au-dessus du calendrier</b> quand la semaine affichée pose problème.</li>
+        <li data-i18n="aide.s18.li2">Elle précise le ou les jours concernés et les séances impliquées.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-optimiseur-hebdo.png" width="1892" height="216" alt="Bannière orange « Répartition à vérifier cette semaine » encadrée au-dessus du calendrier coach" loading="lazy">
-        <figcaption><span class="dot">●</span> Détection basée sur les zones d'intensité réelles des séances (Z4/Z5), pas sur leur titre.</figcaption>
+        <img src="./aide-img/nv-optimiseur-hebdo.png" width="1892" height="216" data-i18n-attr="alt:aide.s18.imgAlt" alt="Bannière orange « Répartition à vérifier cette semaine » encadrée au-dessus du calendrier coach" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s18.caption">Détection basée sur les zones d'intensité réelles des séances (Z4/Z5), pas sur leur titre.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="note-seance">
-      <h2><span class="no">19</span> Expliquer un ajustement à ton athlète</h2>
-      <p class="lead">Quand tu décales ou allèges une séance, une note courte suffit à montrer que ce n'est pas un algorithme qui décide — c'est toi.</p>
+      <h2><span class="no">19</span> <span data-i18n="aide.s19.title">Expliquer un ajustement à ton athlète</span></h2>
+      <p class="lead" data-i18n="aide.s19.lead">Quand tu décales ou allèges une séance, une note courte suffit à montrer que ce n'est pas un algorithme qui décide — c'est toi.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, survole une carte de séance dans le calendrier : une icône <span class="hlword">💬</span> apparaît en haut à droite.</li>
-        <li>Clique dessus et écris ta raison (<i>« Allégé : ta forme du matin était basse »</i>).</li>
-        <li>La note apparaît en tête de la fiche séance, côté athlète.</li>
+        <li data-i18n-html="aide.s19.li1">En rôle <b>Coach</b>, survole une carte de séance dans le calendrier : une icône <span class="hlword">💬</span> apparaît en haut à droite.</li>
+        <li data-i18n-html="aide.s19.li2">Clique dessus et écris ta raison (<i>« Allégé : ta forme du matin était basse »</i>).</li>
+        <li data-i18n="aide.s19.li3">La note apparaît en tête de la fiche séance, côté athlète.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-note-seance.png" width="196" height="196" alt="Icône de note encadrée en haut à droite d'une carte de séance, dans le calendrier coach" loading="lazy">
-        <figcaption><span class="dot">●</span> L'icône reste visible (teintée) une fois une note posée, pour la retrouver d'un coup d'œil.</figcaption>
+        <img src="./aide-img/nv-note-seance.png" width="196" height="196" data-i18n-attr="alt:aide.s19.imgAlt" alt="Icône de note encadrée en haut à droite d'une carte de séance, dans le calendrier coach" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s19.caption">L'icône reste visible (teintée) une fois une note posée, pour la retrouver d'un coup d'œil.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="debrief-course">
-      <h2><span class="no">20</span> Remplir un débrief de course</h2>
-      <p class="lead">Un rituel d'après-course qui alimente le cycle suivant, au lieu de laisser l'expérience se perdre.</p>
+      <h2><span class="no">20</span> <span data-i18n="aide.s20.title">Remplir un débrief de course</span></h2>
+      <p class="lead" data-i18n="aide.s20.lead">Un rituel d'après-course qui alimente le cycle suivant, au lieu de laisser l'expérience se perdre.</p>
       <ol class="steps">
-        <li>En rôle <b>Athlète</b>, repère la carte <b>Débriefs de course</b> dans le panneau de gauche.</li>
-        <li>Clique <span class="hlword">+ Ajouter un débrief de course</span>.</li>
-        <li>Renseigne résultat, ressenti, nutrition suivie, météo, ce qui a marché ou coincé.</li>
+        <li data-i18n-html="aide.s20.li1">En rôle <b>Athlète</b>, repère la carte <b>Débriefs de course</b> dans le panneau de gauche.</li>
+        <li data-i18n-html="aide.s20.li2">Clique <span class="hlword">+ Ajouter un débrief de course</span>.</li>
+        <li data-i18n="aide.s20.li3">Renseigne résultat, ressenti, nutrition suivie, météo, ce qui a marché ou coincé.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-debrief-course.png" width="392" height="355" alt="Carte « Débriefs de course » encadrée, avec un débrief existant et le bouton « Ajouter un débrief de course »" loading="lazy">
-        <figcaption><span class="dot">●</span> Visible aussi par ton coach, en lecture seule, dans ta Fiche athlète.</figcaption>
+        <img src="./aide-img/nv-debrief-course.png" width="392" height="355" data-i18n-attr="alt:aide.s20.imgAlt" alt="Carte « Débriefs de course » encadrée, avec un débrief existant et le bouton « Ajouter un débrief de course »" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s20.caption">Visible aussi par ton coach, en lecture seule, dans ta Fiche athlète.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="bilan-hebdo">
-      <h2><span class="no">21</span> Croiser vos ressentis de la semaine</h2>
-      <p class="lead">Au-delà du chat libre, un bilan structuré où chacun répond de son côté — et voit la réponse de l'autre.</p>
+      <h2><span class="no">21</span> <span data-i18n="aide.s21.title">Croiser vos ressentis de la semaine</span></h2>
+      <p class="lead" data-i18n="aide.s21.lead">Au-delà du chat libre, un bilan structuré où chacun répond de son côté — et voit la réponse de l'autre.</p>
       <ol class="steps">
-        <li>Sous le calendrier (rôle <b>Coach</b> ou <b>Athlète</b>), la carte <b>Bilan de la semaine</b> propose : ressenti de charge (trop dur / bien calibré / trop facile) + note côté athlète, note libre côté coach.</li>
-        <li>Chacun remplit sa partie ; l'autre la voit en lecture seule, semaine par semaine.</li>
+        <li data-i18n-html="aide.s21.li1">Sous le calendrier (rôle <b>Coach</b> ou <b>Athlète</b>), la carte <b>Bilan de la semaine</b> propose : ressenti de charge (trop dur / bien calibré / trop facile) + note côté athlète, note libre côté coach.</li>
+        <li data-i18n="aide.s21.li2">Chacun remplit sa partie ; l'autre la voit en lecture seule, semaine par semaine.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-bilan-hebdo.png" width="946" height="260" alt="Carte « Bilan de la semaine » encadrée : ressenti de l'athlète rempli, champ de note du coach" loading="lazy">
-        <figcaption><span class="dot">●</span> Le bilan est propre à la semaine affichée dans le calendrier — navigue pour consulter les précédentes.</figcaption>
+        <img src="./aide-img/nv-bilan-hebdo.png" width="946" height="260" data-i18n-attr="alt:aide.s21.imgAlt" alt="Carte « Bilan de la semaine » encadrée : ressenti de l'athlète rempli, champ de note du coach" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s21.caption">Le bilan est propre à la semaine affichée dans le calendrier — navigue pour consulter les précédentes.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="etude-de-cas">
-      <h2><span class="no">22</span> Générer une fiche de progression partageable</h2>
-      <p class="lead">De quoi te vendre auprès d'un prospect : records battus, charge absorbée, adhérence — en un PDF propre.</p>
+      <h2><span class="no">22</span> <span data-i18n="aide.s22.title">Générer une fiche de progression partageable</span></h2>
+      <p class="lead" data-i18n="aide.s22.lead">De quoi te vendre auprès d'un prospect : records battus, charge absorbée, adhérence — en un PDF propre.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, dans le bandeau de l'athlète suivi, clique <span class="hlword">Étude de cas</span>.</li>
-        <li>Ajoute une citation courte sur le cycle écoulé (optionnel).</li>
-        <li>Le PDF s'ouvre : records améliorés, delta de charge sur 12 semaines, adhérence, ta citation.</li>
+        <li data-i18n-html="aide.s22.li1">En rôle <b>Coach</b>, dans le bandeau de l'athlète suivi, clique <span class="hlword">Étude de cas</span>.</li>
+        <li data-i18n="aide.s22.li2">Ajoute une citation courte sur le cycle écoulé (optionnel).</li>
+        <li data-i18n="aide.s22.li3">Le PDF s'ouvre : records améliorés, delta de charge sur 12 semaines, adhérence, ta citation.</li>
       </ol>
-      <div class="tip"><b>Différent du Bilan PDF.</b> Le Bilan est un état des lieux du jour ; l'Étude de cas raconte un avant/après sur la durée — pensée pour être montrée, pas juste consultée.</div>
+      <div class="tip" data-i18n-html="aide.s22.tip"><b>Différent du Bilan PDF.</b> Le Bilan est un état des lieux du jour ; l'Étude de cas raconte un avant/après sur la durée — pensée pour être montrée, pas juste consultée.</div>
     </section>
 
     <section class="tuto" id="radar-coach">
-      <h2><span class="no">23</span> Voir qui a besoin de toi cette semaine</h2>
-      <p class="lead">Plutôt que de cliquer chaque athlète un par un, ton roster est trié par urgence dès que tu ouvres l'app.</p>
+      <h2><span class="no">23</span> <span data-i18n="aide.s23.title">Voir qui a besoin de toi cette semaine</span></h2>
+      <p class="lead" data-i18n="aide.s23.lead">Plutôt que de cliquer chaque athlète un par un, ton roster est trié par urgence dès que tu ouvres l'app.</p>
       <ol class="steps">
-        <li>En rôle <b>Coach</b>, le bloc <b>Qui a besoin de toi cette semaine</b> apparaît en tête du panneau de gauche.</li>
-        <li>Chaque ligne indique la raison : blessure, maladie, fatigue, forme basse, HRV basse, ou zones jamais retestées.</li>
-        <li>Clique un nom pour basculer directement sur son suivi.</li>
+        <li data-i18n-html="aide.s23.li1">En rôle <b>Coach</b>, le bloc <b>Qui a besoin de toi cette semaine</b> apparaît en tête du panneau de gauche.</li>
+        <li data-i18n="aide.s23.li2">Chaque ligne indique la raison : blessure, maladie, fatigue, forme basse, HRV basse, ou zones jamais retestées.</li>
+        <li data-i18n="aide.s23.li3">Clique un nom pour basculer directement sur son suivi.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-radar-coach.png" width="500" height="1100" alt="Bloc « Qui a besoin de toi cette semaine » encadré, listant plusieurs athlètes avec leurs signaux d'alerte" loading="lazy">
-        <figcaption><span class="dot">●</span> Basé uniquement sur des signaux fiables (dispo, forme, HRV, fraîcheur des refs) — jamais sur l'adhérence, propre à la démo.</figcaption>
+        <img src="./aide-img/nv-radar-coach.png" width="500" height="1100" data-i18n-attr="alt:aide.s23.imgAlt" alt="Bloc « Qui a besoin de toi cette semaine » encadré, listant plusieurs athlètes avec leurs signaux d'alerte" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s23.caption">Basé uniquement sur des signaux fiables (dispo, forme, HRV, fraîcheur des refs) — jamais sur l'adhérence, propre à la démo.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="equipe-coachs">
-      <h2><span class="no">24</span> Ajouter un coach supplémentaire (co-coaching)</h2>
-      <p class="lead">Un athlète peut avoir plusieurs coachs — coach vélo et coach course, ou entraîneur principal et nutritionniste. Tous ont un accès complet ; le rôle n'est qu'une étiquette.</p>
+      <h2><span class="no">24</span> <span data-i18n="aide.s24.title">Ajouter un coach supplémentaire (co-coaching)</span></h2>
+      <p class="lead" data-i18n="aide.s24.lead">Un athlète peut avoir plusieurs coachs — coach vélo et coach course, ou entraîneur principal et nutritionniste. Tous ont un accès complet ; le rôle n'est qu'une étiquette.</p>
       <ol class="steps">
-        <li>Coach comme athlète peuvent proposer un ajout : depuis la <b>Fiche athlète</b> (coach) ou la carte <b>Équipe de coachs</b> (athlète), clique <span class="hlword">+ Proposer un coach</span>.</li>
-        <li>Renseigne l'email du coach (il doit déjà avoir un compte Sillance) et son rôle libre.</li>
-        <li><b>Double consentement</b> : la partie qui n'a pas initié la demande (l'athlète si un coach a proposé, un coach existant si c'est l'athlète) doit valider avant que l'accès soit actif.</li>
+        <li data-i18n-html="aide.s24.li1">Coach comme athlète peuvent proposer un ajout : depuis la <b>Fiche athlète</b> (coach) ou la carte <b>Équipe de coachs</b> (athlète), clique <span class="hlword">+ Proposer un coach</span>.</li>
+        <li data-i18n="aide.s24.li2">Renseigne l'email du coach (il doit déjà avoir un compte Sillance) et son rôle libre.</li>
+        <li data-i18n-html="aide.s24.li3"><b>Double consentement</b> : la partie qui n'a pas initié la demande (l'athlète si un coach a proposé, un coach existant si c'est l'athlète) doit valider avant que l'accès soit actif.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-equipe-coachs.png" width="534" height="246" alt="Bloc « Équipe de coachs » encadré dans la Fiche athlète : coachs actifs avec leur rôle, demande en attente de validation" loading="lazy">
-        <figcaption><span class="dot">●</span> Une demande en attente s'affiche en lecture seule tant que ce n'est pas à toi de valider.</figcaption>
+        <img src="./aide-img/nv-equipe-coachs.png" width="534" height="246" data-i18n-attr="alt:aide.s24.imgAlt" alt="Bloc « Équipe de coachs » encadré dans la Fiche athlète : coachs actifs avec leur rôle, demande en attente de validation" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s24.caption">Une demande en attente s'affiche en lecture seule tant que ce n'est pas à toi de valider.</span></figcaption>
       </figure>
     </section>
 
     <section class="tuto" id="partager-course">
-      <h2><span class="no">25</span> Partager une course avec tes proches</h2>
-      <p class="lead">Un lien public, sans compte à créer, pour que la famille suive les repères de course et le résultat dès qu'il tombe.</p>
+      <h2><span class="no">25</span> <span data-i18n="aide.s25.title">Partager une course avec tes proches</span></h2>
+      <p class="lead" data-i18n="aide.s25.lead">Un lien public, sans compte à créer, pour que la famille suive les repères de course et le résultat dès qu'il tombe.</p>
       <ol class="steps">
-        <li>Coach ou athlète : dans le bandeau de l'athlète suivi (ou la sidebar athlète), clique <span class="hlword">Partager la course</span> — visible dès qu'une course à venir est enregistrée.</li>
-        <li>Ajoute des repères pour les proches si tu veux (<i>« À 30 km, ralentis si FC &gt; 170 »</i>).</li>
-        <li>Clique <span class="hlword">Générer le lien</span> et copie-le : aucune connexion requise pour l'ouvrir.</li>
+        <li data-i18n-html="aide.s25.li1">Coach ou athlète : dans le bandeau de l'athlète suivi (ou la sidebar athlète), clique <span class="hlword">Partager la course</span> — visible dès qu'une course à venir est enregistrée.</li>
+        <li data-i18n-html="aide.s25.li2">Ajoute des repères pour les proches si tu veux (<i>« À 30 km, ralentis si FC &gt; 170 »</i>).</li>
+        <li data-i18n-html="aide.s25.li3">Clique <span class="hlword">Générer le lien</span> et copie-le : aucune connexion requise pour l'ouvrir.</li>
       </ol>
       <figure>
-        <img src="./aide-img/nv-spectateur-btn.png" width="1196" height="221" alt="Bouton « Partager la course » encadré dans le bandeau de l'athlète suivi" loading="lazy">
-        <figcaption><span class="dot">●</span> Le bouton n'apparaît que si une course à venir est enregistrée pour cet athlète.</figcaption>
+        <img src="./aide-img/nv-spectateur-btn.png" width="1196" height="221" data-i18n-attr="alt:aide.s25.img1Alt" alt="Bouton « Partager la course » encadré dans le bandeau de l'athlète suivi" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s25.caption1">Le bouton n'apparaît que si une course à venir est enregistrée pour cet athlète.</span></figcaption>
       </figure>
       <figure>
-        <img src="./aide-img/nv-spectateur-modal.png" width="540" height="322" alt="Fenêtre « Partager la course » : champ de repères pour les proches et bouton Générer le lien" loading="lazy">
-        <figcaption><span class="dot">●</span> La page publique affiche les repères puis, dès qu'il est disponible, le résultat.</figcaption>
+        <img src="./aide-img/nv-spectateur-modal.png" width="540" height="322" data-i18n-attr="alt:aide.s25.img2Alt" alt="Fenêtre « Partager la course » : champ de repères pour les proches et bouton Générer le lien" loading="lazy">
+        <figcaption><span class="dot">●</span> <span data-i18n="aide.s25.caption2">La page publique affiche les repères puis, dès qu'il est disponible, le résultat.</span></figcaption>
       </figure>
-      <div class="tip"><b>Pas de suivi GPS en direct.</b> L'API Strava n'expose pas la position en temps réel — ce lien donne les repères de course et le résultat dès sa synchronisation, pas un point qui bouge sur une carte.</div>
+      <div class="tip" data-i18n-html="aide.s25.tip"><b>Pas de suivi GPS en direct.</b> L'API Strava n'expose pas la position en temps réel — ce lien donne les repères de course et le résultat dès sa synchronisation, pas un point qui bouge sur une carte.</div>
     </section>
 
   </main>
 </div>
 
 <footer>
-  <span>Sillance — aide &amp; guide d'utilisation</span>
-  <span><a href="index.html">Accueil</a> · <a href="legal.html">Informations légales</a> · <a href="mailto:rowandegraeve@gmail.com">Nous écrire</a></span>
+  <span data-i18n="aide.footerTag">Sillance — aide &amp; guide d'utilisation</span>
+  <span data-i18n-html="aide.footerLinks"><a href="index.html">Accueil</a> · <a href="legal.html">Informations légales</a> · <a href="mailto:rowandegraeve@gmail.com">Nous écrire</a></span>
 </footer>
 
+<script src="./sillance-i18n.js"></script>
+<script src="./sillance-i18n-aide.js"></script>
 </body>
 </html>
