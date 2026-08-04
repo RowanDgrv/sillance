@@ -3669,32 +3669,32 @@ function renderClubStats(){
    (ops + argent, zéro analyse : la data reste côté coach)
    =========================================================== */
 const CLUB_OFFERS = [
-  {id:'sub', name:'Abonnement club', price:59, unit:'/ mois', feature:false,
-   pitch:'Toutes les séances collectives incluses.',
-   inc:['Créneaux collectifs illimités','Réservation prioritaire','Suivi des présences'],
-   who:'Le cœur du club — le volume.'},
-  {id:'coach', name:'Coaching +', price:119, unit:'/ mois', feature:true,
-   pitch:'Abonnement + un coach qui lit tes données et adapte tes séances.',
-   inc:["Tout l'abonnement club",'Coach dédié + plan perso','Check-in du matin → séance ajustée','Analyse montre (Garmin / Coros / .FIT)'],
-   who:'Athlètes engagés, prépa course ou triathlon compétition.'}
+  {id:'sub', get name(){return tr('clubOffer.sub.name')}, price:59, unit:'/ mois', feature:false,
+   get pitch(){return tr('clubOffer.sub.pitch')},
+   get inc(){return [tr('clubOffer.sub.inc1'),tr('clubOffer.sub.inc2'),tr('clubOffer.sub.inc3')]},
+   get who(){return tr('clubOffer.sub.who')}},
+  {id:'coach', get name(){return tr('clubOffer.coach.name')}, price:119, unit:'/ mois', feature:true,
+   get pitch(){return tr('clubOffer.coach.pitch')},
+   get inc(){return [tr('clubOffer.coach.inc1'),tr('clubOffer.coach.inc2'),tr('clubOffer.coach.inc3'),tr('clubOffer.coach.inc4')]},
+   get who(){return tr('clubOffer.coach.who')}}
 ];
 const clubOffer = id => CLUB_OFFERS.find(o=>o.id===id) || CLUB_OFFERS[0];
-const COACH_OFFER = { name:'Suivi coaching', price:99 };
+const COACH_OFFER = { get name(){return tr('coachOffer.name')}, price:99 };
 
 /* Abonnement Sillance du COACH (SaaS pour utiliser l'app) : 3 paliers selon
    le nombre d'athlètes coachés, auto-déclarés (pas de compteur bloquant). */
 const COACH_TIERS = [
-  {id:1, name:'1 à 10 athlètes',  price:19},
-  {id:2, name:'11 à 30 athlètes', price:29},
-  {id:3, name:'31+ athlètes',     price:49},
+  {id:1, get name(){return tr('coachTier.t1')},  price:19},
+  {id:2, get name(){return tr('coachTier.t2')}, price:29},
+  {id:3, get name(){return tr('coachTier.t3')},     price:49},
 ];
 let selectedCoachTier = (ROSTER && ROSTER.length > 30) ? 3 : (ROSTER && ROSTER.length > 10) ? 2 : 1;
 function coachTiersHTML(){
   return `<div class="csub-tiers">
     ${COACH_TIERS.map(t=>`<div class="csub-tier ${t.id===selectedCoachTier?'cur':''}" data-tier="${t.id}" role="button" tabindex="0">
-      ${t.id===selectedCoachTier?'<span class="csub-badge">Sélectionné</span>':''}
+      ${t.id===selectedCoachTier?`<span class="csub-badge">${tr('tier.selected')}</span>`:''}
       <div class="csub-name">${t.name}</div>
-      <div class="csub-price">${t.price} €<small>/mois</small></div>
+      <div class="csub-price">${t.price} €<small>/${tr('sidebar.perMonth')}</small></div>
     </div>`).join('')}
   </div>`;
 }
@@ -3710,9 +3710,9 @@ function wireCoachTiers(root){
    Facturation à la saison, par virement (pas de carte) → cette carte est
    informative + retient la formule ; l'encaissement réel se fait hors app. */
 const CLUB_TIERS = [
-  {id:'club',  name:'Club',          cap:"jusqu'à 50 athlètes",  max:50,       price:600,  perM:'0,99 €'},
-  {id:'grand', name:'Grand club',    cap:"jusqu'à 150 athlètes", max:150,      price:1350, perM:'0,75 €'},
-  {id:'illim', name:'Club illimité', cap:'athlètes illimités',   max:Infinity, price:1800, perM:'0,50 €'}
+  {id:'club',  get name(){return tr('clubTier.club.name')},          get cap(){return tr('clubTier.club.cap')},  max:50,       price:600,  perM:'0,99 €'},
+  {id:'grand', get name(){return tr('clubTier.grand.name')},    get cap(){return tr('clubTier.grand.cap')}, max:150,      price:1350, perM:'0,75 €'},
+  {id:'illim', get name(){return tr('clubTier.illim.name')}, get cap(){return tr('clubTier.illim.cap')},   max:Infinity, price:1800, perM:'0,50 €'}
 ];
 let clubFounder = true; // démo : on présente le tarif « club fondateur » (−50 %)
 function clubActivated(){ return CLUB_ATHLETES.filter(a=>a.group).length; }
@@ -3725,32 +3725,32 @@ function clubSillanceCardHTML(){
   <div class="csub">
     <div class="csub-head">
       <div>
-        <div class="csub-t"><i class="ic ic-star"></i> Abonnement Sillance</div>
-        <div class="csub-s">Ce que le club paie pour la plateforme — distinct de ce que tu factures à tes adhérents ci-dessous.</div>
+        <div class="csub-t"><i class="ic ic-star"></i> ${tr('sidebar.sillanceSub')}</div>
+        <div class="csub-s">${tr('clubSub.subtitle')}</div>
       </div>
-      <label class="csub-toggle"><input type="checkbox" id="clubFounderTgl" ${clubFounder?'checked':''}> Tarif club fondateur <b>−50 %</b></label>
+      <label class="csub-toggle"><input type="checkbox" id="clubFounderTgl" ${clubFounder?'checked':''}> ${tr('clubSub.founderRate')} <b>−50 %</b></label>
     </div>
     <div class="csub-body">
       <div class="csub-count">
         <div class="csub-n">${n}</div>
-        <div class="csub-nl">athlètes activés<span>placés dans un groupe</span></div>
+        <div class="csub-nl">${tr('clubSub.activatedAthletes')}<span>${tr('clubSub.placedInGroup')}</span></div>
       </div>
       <div class="csub-tiers">
         ${CLUB_TIERS.map(t=>{
           const cur=t.id===tier.id, fnd=Math.round(t.price/2);
           return `<div class="csub-tier ${cur?'cur':''}">
-            ${cur?'<span class="csub-badge">Ta formule</span>':''}
+            ${cur?`<span class="csub-badge">${tr('clubSub.yourPlan')}</span>`:''}
             <div class="csub-name">${t.name}</div>
             <div class="csub-cap">${t.cap}</div>
-            <div class="csub-price">${clubFounder?`<s>${t.price} €</s> ${fnd} €`:`${t.price} €`}<small>/saison</small></div>
-            <div class="csub-per">${t.perM} /mois/athlète</div>
+            <div class="csub-price">${clubFounder?`<s>${t.price} €</s> ${fnd} €`:`${t.price} €`}<small>/${tr('clubSub.perSeason')}</small></div>
+            <div class="csub-per">${t.perM} /${tr('sidebar.perMonth')}/${tr('adherence.athlete').toLowerCase()}</div>
           </div>`;
         }).join('')}
       </div>
     </div>
     <div class="csub-foot">
-      <div class="csub-terms"><i class="ic ic-calendar"></i><span>Facturé à la saison (sept. → août), une facture en septembre, par virement. Tu démarres aujourd'hui — la facture ne part qu'à la rentrée.</span></div>
-      <button class="cc-btn" id="clubChooseBtn">Choisir la formule ${tier.name}</button>
+      <div class="csub-terms"><i class="ic ic-calendar"></i><span>${tr('clubSub.terms')}</span></div>
+      <button class="cc-btn" id="clubChooseBtn">${tr('clubSub.choosePlan', {name:tier.name})}</button>
     </div>
   </div>`;
 }
@@ -3760,7 +3760,7 @@ function wireClubSillance(){
   const btn=document.getElementById('clubChooseBtn');
   if(btn) btn.onclick=()=>{
     const t=clubTierFor(clubActivated()), p=clubTierPrice(t);
-    toast(`Formule ${t.name} retenue — ${p} €/saison${clubFounder?' (fondateur)':''}. Facture envoyée en septembre.`);
+    toast(tr('clubSub.planChosenToast', {name:t.name, p, founder: clubFounder?tr('clubSub.founderSuffix'):''}));
     if(window.PF?.user && window.__pf_clubId && PF.saveClubPlan) PF.saveClubPlan(window.__pf_clubId, t.id, clubFounder).catch(e=>console.warn('saveClubPlan',e));
   };
 }
@@ -3770,13 +3770,13 @@ function wireClubSillance(){
 function clubBills(){
   const bills=[];
   CLUB_ATHLETES.forEach(a=>{
-    if(a.offer==='coach') bills.push({m:a.id, why:'Coaching + — juin', type:'sub', amt:clubOffer('coach').price, ok:true});
-    else if(a.offer==='sub') bills.push({m:a.id, why:'Abonnement club — juin', type:'sub', amt:clubOffer('sub').price, ok:true});
+    if(a.offer==='coach') bills.push({m:a.id, why:tr('billing.coachPlusJune'), type:'sub', amt:clubOffer('coach').price, ok:true});
+    else if(a.offer==='sub') bills.push({m:a.id, why:tr('billing.clubSubJune'), type:'sub', amt:clubOffer('sub').price, ok:true});
   });
   CRENEAUX.filter(c=>c.price>0).forEach(c=>{
     c.attendees.forEach(id=>{
       if(!CLUB_ATHLETES.find(x=>x.id===id)) return;
-      bills.push({m:id, why:`${c.title} — à la carte`, type:'card', amt:c.price, ok:true});
+      bills.push({m:id, why:`${c.title} — ${tr('club.aLaCarte')}`, type:'card', amt:c.price, ok:true});
     });
   });
   if(bills[2]) bills[2].ok=false;   // démo : 2 paiements en attente
@@ -3793,10 +3793,10 @@ function renderClubDash(){
   const rev=bills.filter(b=>b.ok).reduce((a,b)=>a+b.amt,0);
   const coachN=CLUB_ATHLETES.filter(a=>a.offer==='coach').length;
   const kpis=[
-    {v:avgFill+'%', k:'Remplissage moyen', c:'acc'},
-    {v:totalIns, k:'Inscriptions actives', c:''},
-    {v:rev+' €', k:'CA du mois', c:'good'},
-    {v:CLUB_ATHLETES.length, k:'Adhérents', c:'str', d:coachN+' en Coaching +'}
+    {v:avgFill+'%', k:tr('clubDash.avgFill'), c:'acc'},
+    {v:totalIns, k:tr('clubDash.activeRegistrations'), c:''},
+    {v:rev+' €', k:tr('clubDash.monthRevenue'), c:'good'},
+    {v:CLUB_ATHLETES.length, k:tr('clubDash.members'), c:'str', d:tr('clubDash.nInCoachPlus', {n:coachN})}
   ];
   const top=CRENEAUX.slice().sort((a,b)=>(b.attendees.length/b.cap)-(a.attendees.length/a.cap)).slice(0,4);
   const mix=CLUB_OFFERS.map(o=>({o, n:CLUB_ATHLETES.filter(a=>a.offer===o.id).length}));
@@ -3805,13 +3805,13 @@ function renderClubDash(){
     <div class="cdash-kpis">${kpis.map(k=>`<div class="cdash-kpi"><div class="v ${k.c}">${k.v}</div><div class="k">${k.k}</div>${k.d?`<div class="d">${k.d}</div>`:''}</div>`).join('')}</div>
     <div class="cdash-cols">
       <div class="cdash-card">
-        <h4>Créneaux les plus remplis</h4>
-        ${top.map(c=>{const D=DISC[c.disc];const pct=Math.round(100*c.attendees.length/c.cap);return `<div class="cdash-slot"><span class="ci" style="color:${D.color}">${discIcon(D)}</span><div class="cs-b"><div class="cs-t">${c.title}</div><div class="cs-m">${CLUB_DAYS[c.day]} ${c.time} · ${c.attendees.length}/${c.cap} inscrits</div><div class="cs-fill ${pct>=85?'hot':''}"><i style="width:${pct}%"></i></div></div><span class="cprice ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':'inclus'}</span></div>`;}).join('')}
+        <h4>${tr('clubDash.fullestSlots')}</h4>
+        ${top.map(c=>{const D=DISC[c.disc];const pct=Math.round(100*c.attendees.length/c.cap);return `<div class="cdash-slot"><span class="ci" style="color:${D.color}">${discIcon(D)}</span><div class="cs-b"><div class="cs-t">${c.title}</div><div class="cs-m">${CLUB_DAYS[c.day]} ${c.time} · ${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</div><div class="cs-fill ${pct>=85?'hot':''}"><i style="width:${pct}%"></i></div></div><span class="cprice ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':tr('clubDash.included')}</span></div>`;}).join('')}
       </div>
       <div class="cdash-card">
-        <h4>Répartition par formule</h4>
+        <h4>${tr('clubDash.planBreakdown')}</h4>
         ${mix.map(({o,n})=>{const pct=Math.round(100*n/tot);const col=o.id==='coach'?'var(--accent)':o.id==='sub'?'var(--good)':'var(--bike)';return `<div class="cmix"><div class="cmix-h"><span><b>${o.name}</b> · ${o.price}€</span><span style="color:var(--muted)">${n} · ${pct}%</span></div><div class="cs-fill"><i style="width:${pct}%;background:${col}"></i></div></div>`;}).join('')}
-        <p class="cdash-note">Le mix « Coaching + » est ta marge : suivi premium facturé plus cher.</p>
+        <p class="cdash-note">${tr('clubDash.coachPlusMarginNote')}</p>
       </div>
     </div>`;
 }
@@ -3823,15 +3823,15 @@ function renderClubBill(){
   const wait=bills.filter(b=>!b.ok).reduce((a,b)=>a+b.amt,0);
   const rec=bills.filter(b=>b.type==='sub'&&b.ok).length;
   box.innerHTML=clubSillanceCardHTML()+`
-    <p class="club-hint" style="margin:0 0 12px"><b>Revenus des adhérents</b> — ce que le club encaisse (distinct de l'abonnement Sillance ci-dessus).</p>
+    <p class="club-hint" style="margin:0 0 12px"><b>${tr('clubBill.memberRevenue')}</b> — ${tr('clubBill.memberRevenueNote')}</p>
     <div class="cdash-kpis cols3">
-      <div class="cdash-kpi"><div class="v good">${tot} €</div><div class="k">Encaissé ce mois</div></div>
-      <div class="cdash-kpi"><div class="v" style="color:var(--bike)">${wait} €</div><div class="k">En attente</div></div>
-      <div class="cdash-kpi"><div class="v acc">${rec}</div><div class="k">Abonnements actifs</div></div>
+      <div class="cdash-kpi"><div class="v good">${tot} €</div><div class="k">${tr('clubBill.collectedThisMonth')}</div></div>
+      <div class="cdash-kpi"><div class="v" style="color:var(--bike)">${wait} €</div><div class="k">${tr('clubBill.pending')}</div></div>
+      <div class="cdash-kpi"><div class="v acc">${rec}</div><div class="k">${tr('clubBill.activeSubs')}</div></div>
     </div>
-    <p class="club-hint" style="margin:4px 0 12px">Abonnements mensuels + réservations à la carte. Encaissé par Stripe, directement sur le compte du club.</p>
-    <table class="cbill"><thead><tr><th>Adhérent</th><th>Motif</th><th>Type</th><th>Montant</th><th>Statut</th></tr></thead><tbody>
-    ${bills.map(b=>{const a=CLUB_ATHLETES.find(x=>x.id===b.m);return `<tr><td><span class="cbav">${a?initials(a.name):'?'}</span>${a?a.name:'—'}</td><td>${b.why}</td><td>${b.type==='sub'?'Abonnement':'À la carte'}</td><td><b>${b.amt} €</b></td><td>${b.ok?'<span class="cpay ok">payé</span>':'<span class="cpay wait">en attente</span>'}</td></tr>`;}).join('')}
+    <p class="club-hint" style="margin:4px 0 12px">${tr('clubBill.stripeNote')}</p>
+    <table class="cbill"><thead><tr><th>${tr('clubBill.member')}</th><th>${tr('clubBill.reason')}</th><th>${tr('clubBill.type')}</th><th>${tr('invoices.amount')}</th><th>${tr('adherence.status')}</th></tr></thead><tbody>
+    ${bills.map(b=>{const a=CLUB_ATHLETES.find(x=>x.id===b.m);return `<tr><td><span class="cbav">${a?initials(a.name):'?'}</span>${a?a.name:'—'}</td><td>${b.why}</td><td>${b.type==='sub'?tr('sidebar.subscribe'):tr('club.aLaCarte')}</td><td><b>${b.amt} €</b></td><td>${b.ok?`<span class="cpay ok">${tr('clubBill.paid')}</span>`:`<span class="cpay wait">${tr('clubBill.waiting')}</span>`}</td></tr>`;}).join('')}
     </tbody></table>`;
   wireClubSillance();
 }

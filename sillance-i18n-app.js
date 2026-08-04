@@ -427,6 +427,45 @@
 
     "day.mon": `Lundi`, "day.tue": `Mardi`, "day.wed": `Mercredi`, "day.thu": `Jeudi`, "day.fri": `Vendredi`, "day.sat": `Samedi`, "day.sun": `Dimanche`,
     "day.monShort": `Lun`, "day.tueShort": `Mar`, "day.wedShort": `Mer`, "day.thuShort": `Jeu`, "day.friShort": `Ven`, "day.satShort": `Sam`, "day.sunShort": `Dim`,
+
+    "clubOffer.sub.name": `Abonnement club`, "clubOffer.sub.pitch": `Toutes les séances collectives incluses.`,
+    "clubOffer.sub.inc1": `Créneaux collectifs illimités`, "clubOffer.sub.inc2": `Réservation prioritaire`, "clubOffer.sub.inc3": `Suivi des présences`,
+    "clubOffer.sub.who": `Le cœur du club — le volume.`,
+    "clubOffer.coach.name": `Coaching +`, "clubOffer.coach.pitch": `Abonnement + un coach qui lit tes données et adapte tes séances.`,
+    "clubOffer.coach.inc1": `Tout l'abonnement club`, "clubOffer.coach.inc2": `Coach dédié + plan perso`,
+    "clubOffer.coach.inc3": `Check-in du matin → séance ajustée`, "clubOffer.coach.inc4": `Analyse montre (Garmin / Coros / .FIT)`,
+    "clubOffer.coach.who": `Athlètes engagés, prépa course ou triathlon compétition.`,
+
+    "coachOffer.name": `Suivi coaching`,
+
+    "coachTier.t1": `1 à 10 athlètes`, "coachTier.t2": `11 à 30 athlètes`, "coachTier.t3": `31+ athlètes`,
+
+    "clubTier.club.name": `Club`, "clubTier.club.cap": `jusqu'à 50 athlètes`,
+    "clubTier.grand.name": `Grand club`, "clubTier.grand.cap": `jusqu'à 150 athlètes`,
+    "clubTier.illim.name": `Club illimité`, "clubTier.illim.cap": `athlètes illimités`,
+
+    "tier.selected": `Sélectionné`,
+
+    "clubSub.subtitle": `Ce que le club paie pour la plateforme — distinct de ce que tu factures à tes adhérents ci-dessous.`,
+    "clubSub.founderRate": `Tarif club fondateur`, "clubSub.activatedAthletes": `athlètes activés`, "clubSub.placedInGroup": `placés dans un groupe`,
+    "clubSub.yourPlan": `Ta formule`, "clubSub.perSeason": `saison`,
+    "clubSub.terms": `Facturé à la saison (sept. → août), une facture en septembre, par virement. Tu démarres aujourd'hui — la facture ne part qu'à la rentrée.`,
+    "clubSub.choosePlan": `Choisir la formule {name}`,
+    "clubSub.planChosenToast": `Formule {name} retenue — {p} €/saison{founder}. Facture envoyée en septembre.`,
+    "clubSub.founderSuffix": ` (fondateur)`,
+
+    "billing.coachPlusJune": `Coaching + — juin`, "billing.clubSubJune": `Abonnement club — juin`,
+
+    "clubDash.avgFill": `Remplissage moyen`, "clubDash.activeRegistrations": `Inscriptions actives`,
+    "clubDash.monthRevenue": `CA du mois`, "clubDash.members": `Adhérents`, "clubDash.nInCoachPlus": `{n} en Coaching +`,
+    "clubDash.fullestSlots": `Créneaux les plus remplis`, "clubDash.nRegistered": `{n}/{cap} inscrits`,
+    "clubDash.included": `inclus`, "clubDash.planBreakdown": `Répartition par formule`,
+    "clubDash.coachPlusMarginNote": `Le mix « Coaching + » est ta marge : suivi premium facturé plus cher.`,
+
+    "clubBill.memberRevenue": `Revenus des adhérents`, "clubBill.memberRevenueNote": `ce que le club encaisse (distinct de l'abonnement Sillance ci-dessus).`,
+    "clubBill.collectedThisMonth": `Encaissé ce mois`, "clubBill.pending": `En attente`, "clubBill.activeSubs": `Abonnements actifs`,
+    "clubBill.stripeNote": `Abonnements mensuels + réservations à la carte. Encaissé par Stripe, directement sur le compte du club.`,
+    "clubBill.member": `Adhérent`, "clubBill.reason": `Motif`, "clubBill.type": `Type`, "clubBill.paid": `payé`, "clubBill.waiting": `en attente`,
   };
 
   var en = {
@@ -853,6 +892,45 @@
 
     "day.mon": `Monday`, "day.tue": `Tuesday`, "day.wed": `Wednesday`, "day.thu": `Thursday`, "day.fri": `Friday`, "day.sat": `Saturday`, "day.sun": `Sunday`,
     "day.monShort": `Mon`, "day.tueShort": `Tue`, "day.wedShort": `Wed`, "day.thuShort": `Thu`, "day.friShort": `Fri`, "day.satShort": `Sat`, "day.sunShort": `Sun`,
+
+    "clubOffer.sub.name": `Club membership`, "clubOffer.sub.pitch": `All group sessions included.`,
+    "clubOffer.sub.inc1": `Unlimited group slots`, "clubOffer.sub.inc2": `Priority booking`, "clubOffer.sub.inc3": `Attendance tracking`,
+    "clubOffer.sub.who": `The heart of the club — the volume.`,
+    "clubOffer.coach.name": `Coaching +`, "clubOffer.coach.pitch": `Membership + a coach who reads your data and adapts your sessions.`,
+    "clubOffer.coach.inc1": `Everything in the club membership`, "clubOffer.coach.inc2": `Dedicated coach + personal plan`,
+    "clubOffer.coach.inc3": `Morning check-in → adjusted session`, "clubOffer.coach.inc4": `Watch analysis (Garmin / Coros / .FIT)`,
+    "clubOffer.coach.who": `Committed athletes, race prep or competitive triathlon.`,
+
+    "coachOffer.name": `Coaching tracking`,
+
+    "coachTier.t1": `1 to 10 athletes`, "coachTier.t2": `11 to 30 athletes`, "coachTier.t3": `31+ athletes`,
+
+    "clubTier.club.name": `Club`, "clubTier.club.cap": `up to 50 athletes`,
+    "clubTier.grand.name": `Large club`, "clubTier.grand.cap": `up to 150 athletes`,
+    "clubTier.illim.name": `Unlimited club`, "clubTier.illim.cap": `unlimited athletes`,
+
+    "tier.selected": `Selected`,
+
+    "clubSub.subtitle": `What the club pays for the platform — separate from what you bill your members below.`,
+    "clubSub.founderRate": `Founding club rate`, "clubSub.activatedAthletes": `activated athletes`, "clubSub.placedInGroup": `placed in a group`,
+    "clubSub.yourPlan": `Your plan`, "clubSub.perSeason": `season`,
+    "clubSub.terms": `Billed per season (Sep → Aug), one invoice in September, by bank transfer. You start today — the invoice only goes out at the start of the season.`,
+    "clubSub.choosePlan": `Choose the {name} plan`,
+    "clubSub.planChosenToast": `{name} plan selected — €{p}/season{founder}. Invoice sent in September.`,
+    "clubSub.founderSuffix": ` (founder)`,
+
+    "billing.coachPlusJune": `Coaching + — June`, "billing.clubSubJune": `Club membership — June`,
+
+    "clubDash.avgFill": `Average fill rate`, "clubDash.activeRegistrations": `Active registrations`,
+    "clubDash.monthRevenue": `Monthly revenue`, "clubDash.members": `Members`, "clubDash.nInCoachPlus": `{n} in Coaching +`,
+    "clubDash.fullestSlots": `Fullest slots`, "clubDash.nRegistered": `{n}/{cap} registered`,
+    "clubDash.included": `included`, "clubDash.planBreakdown": `Plan breakdown`,
+    "clubDash.coachPlusMarginNote": `The "Coaching +" mix is your margin: premium tracking billed at a higher rate.`,
+
+    "clubBill.memberRevenue": `Member revenue`, "clubBill.memberRevenueNote": `what the club collects (separate from the Sillance subscription above).`,
+    "clubBill.collectedThisMonth": `Collected this month`, "clubBill.pending": `Pending`, "clubBill.activeSubs": `Active subscriptions`,
+    "clubBill.stripeNote": `Monthly subscriptions + à la carte bookings. Collected via Stripe, directly to the club's account.`,
+    "clubBill.member": `Member`, "clubBill.reason": `Reason`, "clubBill.type": `Type`, "clubBill.paid": `paid`, "clubBill.waiting": `pending`,
   };
 
   var es = {
@@ -1279,6 +1357,45 @@
 
     "day.mon": `Lunes`, "day.tue": `Martes`, "day.wed": `Miércoles`, "day.thu": `Jueves`, "day.fri": `Viernes`, "day.sat": `Sábado`, "day.sun": `Domingo`,
     "day.monShort": `Lun`, "day.tueShort": `Mar`, "day.wedShort": `Mié`, "day.thuShort": `Jue`, "day.friShort": `Vie`, "day.satShort": `Sáb`, "day.sunShort": `Dom`,
+
+    "clubOffer.sub.name": `Suscripción club`, "clubOffer.sub.pitch": `Todas las sesiones colectivas incluidas.`,
+    "clubOffer.sub.inc1": `Franjas colectivas ilimitadas`, "clubOffer.sub.inc2": `Reserva prioritaria`, "clubOffer.sub.inc3": `Seguimiento de asistencia`,
+    "clubOffer.sub.who": `El corazón del club — el volumen.`,
+    "clubOffer.coach.name": `Coaching +`, "clubOffer.coach.pitch": `Suscripción + un coach que lee tus datos y adapta tus sesiones.`,
+    "clubOffer.coach.inc1": `Toda la suscripción club`, "clubOffer.coach.inc2": `Coach dedicado + plan personal`,
+    "clubOffer.coach.inc3": `Check-in matutino → sesión ajustada`, "clubOffer.coach.inc4": `Análisis del reloj (Garmin / Coros / .FIT)`,
+    "clubOffer.coach.who": `Atletas comprometidos, preparación de carrera o triatlón competición.`,
+
+    "coachOffer.name": `Seguimiento coaching`,
+
+    "coachTier.t1": `1 a 10 atletas`, "coachTier.t2": `11 a 30 atletas`, "coachTier.t3": `31+ atletas`,
+
+    "clubTier.club.name": `Club`, "clubTier.club.cap": `hasta 50 atletas`,
+    "clubTier.grand.name": `Club grande`, "clubTier.grand.cap": `hasta 150 atletas`,
+    "clubTier.illim.name": `Club ilimitado`, "clubTier.illim.cap": `atletas ilimitados`,
+
+    "tier.selected": `Seleccionado`,
+
+    "clubSub.subtitle": `Lo que el club paga por la plataforma — distinto de lo que facturas a tus socios más abajo.`,
+    "clubSub.founderRate": `Tarifa club fundador`, "clubSub.activatedAthletes": `atletas activados`, "clubSub.placedInGroup": `colocados en un grupo`,
+    "clubSub.yourPlan": `Tu plan`, "clubSub.perSeason": `temporada`,
+    "clubSub.terms": `Facturado por temporada (sept. → agosto), una factura en septiembre, por transferencia. Empiezas hoy — la factura solo se envía al inicio de temporada.`,
+    "clubSub.choosePlan": `Elegir el plan {name}`,
+    "clubSub.planChosenToast": `Plan {name} elegido — {p} €/temporada{founder}. Factura enviada en septiembre.`,
+    "clubSub.founderSuffix": ` (fundador)`,
+
+    "billing.coachPlusJune": `Coaching + — junio`, "billing.clubSubJune": `Suscripción club — junio`,
+
+    "clubDash.avgFill": `Ocupación media`, "clubDash.activeRegistrations": `Inscripciones activas`,
+    "clubDash.monthRevenue": `Facturación del mes`, "clubDash.members": `Socios`, "clubDash.nInCoachPlus": `{n} en Coaching +`,
+    "clubDash.fullestSlots": `Franjas más llenas`, "clubDash.nRegistered": `{n}/{cap} inscritos`,
+    "clubDash.included": `incluido`, "clubDash.planBreakdown": `Reparto por plan`,
+    "clubDash.coachPlusMarginNote": `La mezcla «Coaching +» es tu margen: seguimiento premium facturado más caro.`,
+
+    "clubBill.memberRevenue": `Ingresos de los socios`, "clubBill.memberRevenueNote": `lo que cobra el club (distinto de la suscripción Sillance de arriba).`,
+    "clubBill.collectedThisMonth": `Cobrado este mes`, "clubBill.pending": `Pendiente`, "clubBill.activeSubs": `Suscripciones activas`,
+    "clubBill.stripeNote": `Suscripciones mensuales + reservas a la carta. Cobrado por Stripe, directamente en la cuenta del club.`,
+    "clubBill.member": `Socio`, "clubBill.reason": `Motivo`, "clubBill.type": `Tipo`, "clubBill.paid": `pagado`, "clubBill.waiting": `pendiente`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
