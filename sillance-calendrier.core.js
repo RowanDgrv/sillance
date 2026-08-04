@@ -5427,7 +5427,7 @@ function updateBuilderSummary(){
   const {min,tss}=builderTotals();
   const nbBlocks=builderState.blocks.length;
   const nbLines=builderState.blocks.reduce((a,b)=>a+b.lines.length*b.series,0);
-  document.getElementById('bSummary').innerHTML=`<b>${fmtDur(min)}</b> total · <b>${tss}</b> TSS estimé · ${nbBlocks} bloc${nbBlocks>1?'s':''} · ${nbLines} intervalles`;
+  document.getElementById('bSummary').innerHTML=tr('builder.summary', {dur:fmtDur(min), tss, nbBlocks:tr(nbBlocks>1?'builder.nBlocksPlural':'builder.nBlocksSingular', {n:nbBlocks}), nLines:nbLines});
 }
 
 function builderToText(){
@@ -5465,7 +5465,7 @@ function builderToSession(){
   const post=document.getElementById('bNutriPost').value.trim();
   const s={
     disc: builderState.disc,
-    title: builderState.title || document.getElementById('bTitle').value || 'Séance personnalisée',
+    title: builderState.title || document.getElementById('bTitle').value || tr('builder.customSession'),
     dur: min, tss, zone: domZone,
     desc: builderToText(),
     objectif: builderState.objectif ? {type:builderState.objectif.split('|')[0], zone:builderState.objectif.split('|')[1]} : null,
@@ -5493,7 +5493,7 @@ function initBuilderNutrition(existing){
     const tmp={disc:builderState.disc, title:builderState.title, dur:builderTotals().min, zone:'Z3'};
     const n=nutritionForSession(tmp);
     pre.placeholder=n.pre; post.placeholder=n.post;
-    auto.textContent=`· suggestion auto : ${n.key}`;
+    auto.textContent=tr('builder.autoSuggestion', {key:n.key});
   };
   if(existing && existing.nutrition){ pre.value=existing.nutrition.pre||''; post.value=existing.nutrition.post||''; }
   else { pre.value=''; post.value=''; }
@@ -5677,12 +5677,12 @@ function computeImpact(s, data){
   }
   const heatSecPerKm = basePaceSec * heatPctPerKm;
   const heatTotal = heatSecPerKm * distKm;
-  items.push({key:'Chaleur', ico:'ic-thermometer', color:'var(--run)',
+  items.push({key:tr('impact.heat'), ico:'ic-thermometer', color:'var(--run)',
     cost: heatSecPerKm, total: heatTotal,
-    cond:`${c.temp}°C · ${c.humidity}% humidité`,
+    cond:tr('impact.heatCond', {temp:c.temp, hum:c.humidity}),
     detail: c.temp>15
-      ? `La chaleur t'a coûté ~${heatSecPerKm.toFixed(0)} s/km. Sans elle, tu aurais pu aller plus vite.`
-      : `Température idéale (${c.temp}°C) : aucun surcoût thermique.`});
+      ? tr('impact.heatDetailCost', {sec:heatSecPerKm.toFixed(0)})
+      : tr('impact.heatDetailIdeal', {temp:c.temp})});
 
   // — Vent —
   let windSecPerKm = 0;
@@ -5695,23 +5695,23 @@ function computeImpact(s, data){
     windSecPerKm = basePaceSec * windPct;
   }
   const windTotal = windSecPerKm * distKm;
-  items.push({key:'Vent', ico:'ic-wind', color:'var(--swim)',
+  items.push({key:tr('impact.wind'), ico:'ic-wind', color:'var(--swim)',
     cost: windSecPerKm, total: windTotal,
-    cond:`${c.wind} km/h · ${c.windHead?'de face':'favorable'}`,
+    cond:`${c.wind} km/h · ${c.windHead?tr('impact.headwind'):tr('impact.favorable')}`,
     detail: c.windHead
-      ? `Vent de face : ~${Math.abs(windSecPerKm).toFixed(0)} s/km perdues sur les sections exposées.`
-      : `Vent plutôt favorable : il t'a fait gagner ~${Math.abs(windSecPerKm).toFixed(0)} s/km.`});
+      ? tr('impact.windDetailHead', {sec:Math.abs(windSecPerKm).toFixed(0)})
+      : tr('impact.windDetailFavorable', {sec:Math.abs(windSecPerKm).toFixed(0)})});
 
   // — Dénivelé (D+) —
   // coût ~ 6 s par mètre de D+ en course (réparti sur la distance)
   const dplusSecTotal = isRun ? data.dplus*5.5 : data.dplus*3.2;
   const dplusSecPerKm = dplusSecTotal/distKm;
-  items.push({key:'Dénivelé', ico:'ic-mountain', color:'var(--bike)',
+  items.push({key:tr('impact.elevation'), ico:'ic-mountain', color:'var(--bike)',
     cost: dplusSecPerKm, total: dplusSecTotal,
     cond:`${data.dplus} m D+`,
     detail: data.dplus>20
-      ? `Le relief t'a coûté ~${fmtMMSS(dplusSecTotal)} sur l'ensemble (≈${dplusSecPerKm.toFixed(0)} s/km).`
-      : `Parcours quasi plat : impact du dénivelé négligeable.`});
+      ? tr('impact.elevDetailCost', {time:fmtMMSS(dplusSecTotal), sec:dplusSecPerKm.toFixed(0)})
+      : tr('impact.elevDetailFlat')});
 
   const totalLost = items.reduce((a,i)=>a+Math.max(0,i.total),0);
   const totalGain = items.reduce((a,i)=>a+Math.min(0,i.total),0);
@@ -5738,11 +5738,12 @@ function renderImpact(s, data){
   // synthèse : allure "corrigée" si conditions neutres
   const correctedPace = imp.basePaceSec - (imp.totalLost+imp.totalGain)/imp.distKm;
   const summary = `<div class="imp-summary">
-    <div class="is-h"><i class="ic ic-chart"></i> Allure corrigée des conditions</div>
-    <div class="is-txt">Dans des conditions neutres (15°C, sans vent, à plat), ton allure moyenne aurait été d'environ
-      <b>${paceFromSpeed(3600/correctedPace)}/km</b> au lieu de <b>${paceFromSpeed(data.avgSpeed)}/km</b>.
-      Au total, l'environnement t'a ${imp.totalLost+imp.totalGain>=0?'coûté':'fait gagner'}
-      <b>~${fmtMMSS(imp.totalLost+imp.totalGain)}</b> sur cette séance.</div>
+    <div class="is-h"><i class="ic ic-chart"></i> ${tr('impact.correctedPace')}</div>
+    <div class="is-txt">${tr('impact.summaryText', {
+      corrected:paceFromSpeed(3600/correctedPace), actual:paceFromSpeed(data.avgSpeed),
+      verb: imp.totalLost+imp.totalGain>=0?tr('impact.cost'):tr('impact.gained'),
+      time: fmtMMSS(imp.totalLost+imp.totalGain)
+    })}</div>
   </div>`;
   box.innerHTML = cards + summary;
 }
@@ -5762,7 +5763,7 @@ function openAnalysis(s){
   const isSwim=s.disc==='swim';
   // restaure les sections (au cas où une analyse Hyrox les a masquées)
   document.getElementById('anSpeedTitle').parentElement.parentElement.style.display='';
-  document.getElementById('anHr').parentElement.querySelector('h4').textContent='Fréquence cardiaque';
+  document.getElementById('anHr').parentElement.querySelector('h4').textContent=tr('analysis.heartRate');
   document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent='Détail par lap';
 
 

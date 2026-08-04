@@ -580,6 +580,26 @@
     "builder.chooseWorkZone": `Choisir la zone de travail`, "builder.calcReference": `Référence de calcul`,
     "builder.intensityPctAria": `Intensité en %`, "builder.switchTimeDist": `Basculer temps / distance`,
     "builder.zonePct": `Zone %`, "builder.exact": `Exact`, "builder.deleteLine": `Supprimer la ligne`,
+
+    "builder.summary": `<b>{dur}</b> total · <b>{tss}</b> TSS estimé · {nbBlocks} · {nLines} intervalles`,
+    "builder.nBlocksPlural": `{n} blocs`, "builder.nBlocksSingular": `{n} bloc`,
+    "builder.customSession": `Séance personnalisée`,
+    "builder.autoSuggestion": `· suggestion auto : {key}`,
+
+    "impact.heat": `Chaleur`, "impact.heatCond": `{temp}°C · {hum}% humidité`,
+    "impact.heatDetailCost": `La chaleur t'a coûté ~{sec} s/km. Sans elle, tu aurais pu aller plus vite.`,
+    "impact.heatDetailIdeal": `Température idéale ({temp}°C) : aucun surcoût thermique.`,
+    "impact.wind": `Vent`, "impact.headwind": `de face`, "impact.favorable": `favorable`,
+    "impact.windDetailHead": `Vent de face : ~{sec} s/km perdues sur les sections exposées.`,
+    "impact.windDetailFavorable": `Vent plutôt favorable : il t'a fait gagner ~{sec} s/km.`,
+    "impact.elevation": `Dénivelé`,
+    "impact.elevDetailCost": `Le relief t'a coûté ~{time} sur l'ensemble (≈{sec} s/km).`,
+    "impact.elevDetailFlat": `Parcours quasi plat : impact du dénivelé négligeable.`,
+    "impact.correctedPace": `Allure corrigée des conditions`,
+    "impact.summaryText": `Dans des conditions neutres (15°C, sans vent, à plat), ton allure moyenne aurait été d'environ <b>{corrected}/km</b> au lieu de <b>{actual}/km</b>. Au total, l'environnement t'a {verb} <b>~{time}</b> sur cette séance.`,
+    "impact.cost": `coûté`, "impact.gained": `fait gagner`,
+
+    "analysis.heartRate": `Fréquence cardiaque`,
   };
 
   var en = {
@@ -1159,6 +1179,26 @@
     "builder.chooseWorkZone": `Choose the work zone`, "builder.calcReference": `Calculation reference`,
     "builder.intensityPctAria": `Intensity in %`, "builder.switchTimeDist": `Switch time / distance`,
     "builder.zonePct": `Zone %`, "builder.exact": `Exact`, "builder.deleteLine": `Delete line`,
+
+    "builder.summary": `<b>{dur}</b> total · <b>{tss}</b> estimated TSS · {nbBlocks} · {nLines} intervals`,
+    "builder.nBlocksPlural": `{n} blocks`, "builder.nBlocksSingular": `{n} block`,
+    "builder.customSession": `Custom session`,
+    "builder.autoSuggestion": `· auto suggestion: {key}`,
+
+    "impact.heat": `Heat`, "impact.heatCond": `{temp}°C · {hum}% humidity`,
+    "impact.heatDetailCost": `The heat cost you ~{sec} s/km. Without it, you could have gone faster.`,
+    "impact.heatDetailIdeal": `Ideal temperature ({temp}°C): no thermal penalty.`,
+    "impact.wind": `Wind`, "impact.headwind": `headwind`, "impact.favorable": `favorable`,
+    "impact.windDetailHead": `Headwind: ~{sec} s/km lost on exposed sections.`,
+    "impact.windDetailFavorable": `Rather favorable wind: it gained you ~{sec} s/km.`,
+    "impact.elevation": `Elevation`,
+    "impact.elevDetailCost": `The terrain cost you ~{time} overall (≈{sec} s/km).`,
+    "impact.elevDetailFlat": `Nearly flat course: negligible elevation impact.`,
+    "impact.correctedPace": `Pace corrected for conditions`,
+    "impact.summaryText": `Under neutral conditions (15°C, no wind, flat), your average pace would have been about <b>{corrected}/km</b> instead of <b>{actual}/km</b>. Overall, the environment {verb} you <b>~{time}</b> on this session.`,
+    "impact.cost": `cost`, "impact.gained": `gained`,
+
+    "analysis.heartRate": `Heart rate`,
   };
 
   var es = {
@@ -1738,6 +1778,26 @@
     "builder.chooseWorkZone": `Elegir la zona de trabajo`, "builder.calcReference": `Referencia de cálculo`,
     "builder.intensityPctAria": `Intensidad en %`, "builder.switchTimeDist": `Alternar tiempo / distancia`,
     "builder.zonePct": `Zona %`, "builder.exact": `Exacto`, "builder.deleteLine": `Eliminar la línea`,
+
+    "builder.summary": `<b>{dur}</b> total · <b>{tss}</b> TSS estimado · {nbBlocks} · {nLines} intervalos`,
+    "builder.nBlocksPlural": `{n} bloques`, "builder.nBlocksSingular": `{n} bloque`,
+    "builder.customSession": `Sesión personalizada`,
+    "builder.autoSuggestion": `· sugerencia automática: {key}`,
+
+    "impact.heat": `Calor`, "impact.heatCond": `{temp}°C · {hum}% humedad`,
+    "impact.heatDetailCost": `El calor te costó ~{sec} s/km. Sin él, habrías podido ir más rápido.`,
+    "impact.heatDetailIdeal": `Temperatura ideal ({temp}°C): sin sobrecoste térmico.`,
+    "impact.wind": `Viento`, "impact.headwind": `de frente`, "impact.favorable": `favorable`,
+    "impact.windDetailHead": `Viento de frente: ~{sec} s/km perdidos en las secciones expuestas.`,
+    "impact.windDetailFavorable": `Viento más bien favorable: te hizo ganar ~{sec} s/km.`,
+    "impact.elevation": `Desnivel`,
+    "impact.elevDetailCost": `El desnivel te costó ~{time} en total (≈{sec} s/km).`,
+    "impact.elevDetailFlat": `Recorrido casi llano: impacto del desnivel insignificante.`,
+    "impact.correctedPace": `Ritmo corregido por las condiciones`,
+    "impact.summaryText": `En condiciones neutras (15°C, sin viento, llano), tu ritmo medio habría sido de aproximadamente <b>{corrected}/km</b> en lugar de <b>{actual}/km</b>. En total, el entorno te {verb} <b>~{time}</b> en esta sesión.`,
+    "impact.cost": `costó`, "impact.gained": `hizo ganar`,
+
+    "analysis.heartRate": `Frecuencia cardiaca`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
