@@ -373,42 +373,42 @@ function computeTarget(modelKey, pct){
 function paceStr(s){ return Math.floor(s/60)+"'"+String(Math.round(s%60)).padStart(2,'0')+'"'; }
 function paceFromKmh(kmh){ return paceStr(3600/kmh)+'/km'; }
 const TEMPLATES = [
-  {id:'t1', disc:'swim', title:'Technique + éducatifs', dur:60, tss:45, zone:'Z2',
-   desc:'400m échauffement · 8×50m éducatifs (rattrapé, poings fermés) · 6×100m allure régulière départ 2\'00 · 200m souple.'},
-  {id:'t2', disc:'swim', title:'Seuil 10×100m', dur:75, tss:70, zone:'Z4',
-   desc:'600m échauffement progressif · 10×100m allure seuil départ 1\'45 · 4×50m vite/souple · 200m récup.'},
-  {id:'t3', disc:'bike', title:'Endurance fondamentale', dur:150, tss:95, zone:'Z2',
-   desc:'2h30 vallonné en Z2 stricte. Cadence 90+. Nutrition course : 60g glucides/h. Rester assis dans les bosses.'},
-  {id:'t4', disc:'bike', title:'Intervalles 4×8\' FTP', dur:90, tss:88, zone:'Z4',
-   desc:'20\' échauffement · 4×8\' à 95–100% FTP, récup 4\' · retour au calme 15\'. Home trainer ou route plate.'},
-  {id:'t5', disc:'run', title:'Footing aérobie', dur:50, tss:42, zone:'Z2',
-   desc:'50\' en aisance respiratoire totale. FC < 75% FCmax. Terminer par 4 lignes droites en accélération progressive.'},
-  {id:'t6', disc:'run', title:'Fractionné 6×800m', dur:65, tss:75, zone:'Z5',
-   desc:'20\' échauffement + gammes · 6×800m allure 5km, récup 2\' trot · 10\' retour au calme.'},
-  {id:'t7', disc:'run', title:'Brick vélo→course', dur:80, tss:85, zone:'Z3',
-   desc:'45\' vélo Z3 puis enchaînement immédiat 30\' course allure triathlon. Travailler la transition T2.'},
-  {id:'t8', disc:'strength', title:'Renfo & gainage', dur:40, tss:25, zone:'—',
-   desc:'3 tours : squats ×15, fentes ×12/jambe, pompes ×12, planche 60s, gainage latéral 45s/côté, hip thrust ×15.'},
-  {id:'t9', disc:'swim', title:'Seuil 20×200 départ 3\'00', dur:95, tss:85, zone:'Z4',
-   desc:'1000m échauffement · 20×200m départ 3\'00 par blocs de 5 : nage complète, pull, nage complète, pull-plaquettes · 200m souple.'},
-  {id:'t10', disc:'swim', title:'Seuil 10×400 départ 6\'00', dur:90, tss:82, zone:'Z4',
-   desc:'1000m échauffement · 10×400m départ 6\'00, allure régulière au seuil · 400m récup.'},
-  {id:'t11', disc:'swim', title:'5×800 negative split', dur:85, tss:78, zone:'Z3',
-   desc:'1000m échauffement · 5×800m en negative split : chaque 800 plus rapide que le précédent · 200m souple.'},
-  {id:'t12', disc:'swim', title:'Progressif 5×800 de 1 à 5', dur:90, tss:80, zone:'Z3',
-   desc:'800m échauffement · 5×800m départ 11\'20, progressif du 1er (aisance) au 5e (fort) · récup libre.'},
-  {id:'t13', disc:'swim', title:'Pyramide aéro / appuyé', dur:80, tss:68, zone:'Z3',
-   desc:'1000m échauffement · 2× (800/400/200/100 en alternance aéro / appuyé) · 200m souple.'},
-  {id:'t14', disc:'swim', title:'Pull & plaquettes dégressif', dur:85, tss:75, zone:'Z3',
-   desc:'900m échauffement · nage complète : 1000/800/600/400 récup 50 · pull-plaquettes : 400 puis 2×200 puis 4×100, départs dégressifs · 200m souple.'},
-  {id:'t15', disc:'swim', title:'Allure course + transition', dur:80, tss:72, zone:'Z3',
-   desc:'2500m combiné : alternance Z2 / allure course, sortie d\'eau et remise à l\'effort · 16×50m pull-plaquettes départ 40\" · récup.'},
-  {id:'t16', disc:'swim', title:'Technique 4 nages + progressif', dur:95, tss:75, zone:'Z3',
-   desc:'1200m échauffement · 12×100m départ 1\'30 en alternance 4 nages / crawl · 15×200m progressif par 5, départs 2\'40 → 2\'35 → 2\'30 · 400m souple.'},
-  {id:'t17', disc:'swim', title:'Aérobie 8×500', dur:85, tss:60, zone:'Z2',
-   desc:'8×500m aérobie en continu, nage relâchée, respiration 3 temps · hydratation entre les blocs.'},
-  {id:'t18', disc:'swim', title:'Eau libre néoprène', dur:70, tss:50, zone:'Z2',
-   desc:'2400m et + en eau libre avec combinaison : aéro continu + blocs bras seuls, repérage et orientation.'}
+  {id:'t1', disc:'swim', get title(){return tr('tpl.t1.title')}, dur:60, tss:45, zone:'Z2',
+   get desc(){return tr('tpl.t1.desc')}},
+  {id:'t2', disc:'swim', get title(){return tr('tpl.t2.title')}, dur:75, tss:70, zone:'Z4',
+   get desc(){return tr('tpl.t2.desc')}},
+  {id:'t3', disc:'bike', get title(){return tr('tpl.t3.title')}, dur:150, tss:95, zone:'Z2',
+   get desc(){return tr('tpl.t3.desc')}},
+  {id:'t4', disc:'bike', get title(){return tr('tpl.t4.title')}, dur:90, tss:88, zone:'Z4',
+   get desc(){return tr('tpl.t4.desc')}},
+  {id:'t5', disc:'run', get title(){return tr('tpl.t5.title')}, dur:50, tss:42, zone:'Z2',
+   get desc(){return tr('tpl.t5.desc')}},
+  {id:'t6', disc:'run', get title(){return tr('tpl.t6.title')}, dur:65, tss:75, zone:'Z5',
+   get desc(){return tr('tpl.t6.desc')}},
+  {id:'t7', disc:'run', get title(){return tr('tpl.t7.title')}, dur:80, tss:85, zone:'Z3',
+   get desc(){return tr('tpl.t7.desc')}},
+  {id:'t8', disc:'strength', get title(){return tr('tpl.t8.title')}, dur:40, tss:25, zone:'—',
+   get desc(){return tr('tpl.t8.desc')}},
+  {id:'t9', disc:'swim', get title(){return tr('tpl.t9.title')}, dur:95, tss:85, zone:'Z4',
+   get desc(){return tr('tpl.t9.desc')}},
+  {id:'t10', disc:'swim', get title(){return tr('tpl.t10.title')}, dur:90, tss:82, zone:'Z4',
+   get desc(){return tr('tpl.t10.desc')}},
+  {id:'t11', disc:'swim', get title(){return tr('tpl.t11.title')}, dur:85, tss:78, zone:'Z3',
+   get desc(){return tr('tpl.t11.desc')}},
+  {id:'t12', disc:'swim', get title(){return tr('tpl.t12.title')}, dur:90, tss:80, zone:'Z3',
+   get desc(){return tr('tpl.t12.desc')}},
+  {id:'t13', disc:'swim', get title(){return tr('tpl.t13.title')}, dur:80, tss:68, zone:'Z3',
+   get desc(){return tr('tpl.t13.desc')}},
+  {id:'t14', disc:'swim', get title(){return tr('tpl.t14.title')}, dur:85, tss:75, zone:'Z3',
+   get desc(){return tr('tpl.t14.desc')}},
+  {id:'t15', disc:'swim', get title(){return tr('tpl.t15.title')}, dur:80, tss:72, zone:'Z3',
+   get desc(){return tr('tpl.t15.desc')}},
+  {id:'t16', disc:'swim', get title(){return tr('tpl.t16.title')}, dur:95, tss:75, zone:'Z3',
+   get desc(){return tr('tpl.t16.desc')}},
+  {id:'t17', disc:'swim', get title(){return tr('tpl.t17.title')}, dur:85, tss:60, zone:'Z2',
+   get desc(){return tr('tpl.t17.desc')}},
+  {id:'t18', disc:'swim', get title(){return tr('tpl.t18.title')}, dur:70, tss:50, zone:'Z2',
+   get desc(){return tr('tpl.t18.desc')}}
 ];
 
 /* ---- état (en mémoire — branchez votre backend ici) ---- */
@@ -438,7 +438,7 @@ const COACH_ROSTER = [
     {id:'g3', type:'shoe', name:'Asics Metaspeed Sky Paris', km:118, max:350, price:250, cat:'race', comm:320, notified:[]},
     {id:'g4', type:'bike', name:'Canyon Ultimate CF', km:4380, max:20000, price:3200, cat:null, comm:null, notified:[]},
   ]},
- {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',dispoNote:'Grosse semaine de boulot, jambes lourdes',hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*210).toISOString(),
+ {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',get dispoNote(){return tr('demoNote.a2')},hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*210).toISOString(),
   gear:[
     {id:'g5', type:'shoe', name:'Adidas Boston 12', km:723, max:700, price:150, cat:'tempo', comm:660, notified:[420,595,700]},
     {id:'g6', type:'shoe', name:'Adidas Ultraboost Light', km:214, max:850, price:180, cat:'daily', comm:800, notified:[]},
@@ -447,14 +447,14 @@ const COACH_ROSTER = [
   gear:[
     {id:'g7', type:'shoe', name:'Puma Deviate Nitro 3', km:405, max:700, price:160, cat:'tempo', comm:650, notified:[420]},
   ]},
- {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',dispoNote:'Douleur tibia droit depuis lundi, 4/10 en courant',hrv:60}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*104).toISOString(),
+ {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',get dispoNote(){return tr('demoNote.a4')},hrv:60}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*104).toISOString(),
   gear:[
     {id:'g8', type:'shoe', name:'Asics Novablast 5', km:648, max:750, price:150, cat:'tempo', comm:710, notified:[450,638]},
     {id:'g9', type:'bike', name:'BMC Roadmachine', km:2150, max:20000, price:2400, cat:null, comm:null, notified:[]},
   ]},
  {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9,cyclePhase:'menstrual',cycleDay:2}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,  refsUpdatedAt:new Date(Date.now()-1000*60*60*24*45).toISOString(),
   gear:[]},
- {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',dispoNote:'Rhume, gorge prise — nuit hachée',hrv:48}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35,
+ {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',get dispoNote(){return tr('demoNote.a6')},hrv:48}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35,
   gear:[]},
 ];
 let ROSTER = COACH_ROSTER;     // remplacé par le roster réel une fois connecté
@@ -3622,28 +3622,28 @@ const CLUB_ATHLETES = [
 /* groupes du club : le gestionnaire les crée et y affecte des athlètes.
    Sert à cibler les créneaux (ex. un créneau réservé au groupe Compétition). */
 let CLUB_GROUPS = [
-  {id:'g1', name:'Jeunes Loisir', color:'#2FD9FF', desc:'Découverte et plaisir, sans objectif de compétition'},
-  {id:'g2', name:'Jeunes Compétition', color:'#FF5470', desc:'Jeunes orientés performance et courses'},
-  {id:'g3', name:'Adultes Triathlon M', color:'#FFB13D', desc:'Format découverte / distance M (olympique)'},
-  {id:'g4', name:'Adultes Triathlon Half', color:'#9D7BFF', desc:'Préparation 70.3 / half-distance'},
-  {id:'g5', name:'Adultes Triathlon Ironman', color:'#39E6A3', desc:'Longue distance, format Ironman'},
-  {id:'g6', name:'Cyclisme Compétition', color:'#FF8A3D', desc:'Cyclisme sur route, groupe compétition'}
+  {id:'g1', get name(){return tr('grp.g1.name')}, color:'#2FD9FF', get desc(){return tr('grp.g1.desc')}},
+  {id:'g2', get name(){return tr('grp.g2.name')}, color:'#FF5470', get desc(){return tr('grp.g2.desc')}},
+  {id:'g3', get name(){return tr('grp.g3.name')}, color:'#FFB13D', get desc(){return tr('grp.g3.desc')}},
+  {id:'g4', get name(){return tr('grp.g4.name')}, color:'#9D7BFF', get desc(){return tr('grp.g4.desc')}},
+  {id:'g5', get name(){return tr('grp.g5.name')}, color:'#39E6A3', get desc(){return tr('grp.g5.desc')}},
+  {id:'g6', get name(){return tr('grp.g6.name')}, color:'#FF8A3D', get desc(){return tr('grp.g6.desc')}}
 ];
 function clubGroup(id){ return CLUB_GROUPS.find(g=>g.id===id); }
 const CLUB_DAYS = [tr('day.mon'),tr('day.tue'),tr('day.wed'),tr('day.thu'),tr('day.fri'),tr('day.sat'),tr('day.sun')];
 let CRENEAUX = [
-  {id:'c1', disc:'run', title:'Séance piste collective', day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7']},
-  {id:'c2', disc:'swim', title:'Technique natation', day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6']},
-  {id:'c3', disc:'bike', title:'Sortie vélo — groupe compétition', day:5, time:'19:00', dur:150, place:'Départ Vélodrome, Muret', cap:12, coach:'Karim', price:0, attendees:['a3','a5','a8']},
-  {id:'c4', disc:'bike', title:'Sortie longue groupe', day:6, time:'08:00', dur:180, place:'Départ Base de loisirs, Muret', cap:30, coach:'Éric', price:0, attendees:['a1','a4','a7']}
+  {id:'c1', disc:'run', get title(){return tr('cre.c1.title')}, day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7']},
+  {id:'c2', disc:'swim', get title(){return tr('cre.c2.title')}, day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6']},
+  {id:'c3', disc:'bike', get title(){return tr('cre.c3.title')}, day:5, time:'19:00', dur:150, place:'Départ Vélodrome, Muret', cap:12, coach:'Karim', price:0, attendees:['a3','a5','a8']},
+  {id:'c4', disc:'bike', get title(){return tr('cre.c4.title')}, day:6, time:'08:00', dur:180, place:'Départ Base de loisirs, Muret', cap:30, coach:'Éric', price:0, attendees:['a1','a4','a7']}
 ];
 const ME_CLUB_ID = 'a1'; // l'athlète "moi" (pour la démo d'inscription)
 let clubView = 'dash';
 
 /* demandes d'adhésion en attente (arrivées via le lien d'invitation) */
 let JOIN_REQUESTS = [
-  {id:'r1', name:'Hugo Mercier', disc:'tri', msg:'Triathlète, j\'aimerais préparer un half cette année'},
-  {id:'r2', name:'Camille Faure', disc:'bike', msg:'Débutante cyclisme sur route, motivée !'}
+  {id:'r1', name:'Hugo Mercier', disc:'tri', get msg(){return tr('joinReq.r1')}},
+  {id:'r2', name:'Camille Faure', disc:'bike', get msg(){return tr('joinReq.r2')}}
 ];
 /* noms fictifs pour simuler de nouvelles demandes (démo) */
 const DEMO_NAMES = ['Antoine Roche','Julie Vasseur','Nadia Lefort','Paul Chevalier','Emma Bonnet','Yanis Khelifi'];
