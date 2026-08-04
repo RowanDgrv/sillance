@@ -397,6 +397,36 @@
     "bilan.recordsImprovedPlural": `Records améliorés`, "bilan.recordsImprovedSingular": `Record amélioré`,
     "bilan.planAdherence": `Adhérence au plan`, "bilan.currentFitness": `Fitness (CTL) actuelle`,
     "bilan.recordsBeaten": `Records battus sur la période`,
+
+    "coachBand.wearPct": `{name} · {p}% d'usure`, "coachBand.raceInDays": `Course dans {days} j — pense à l'affûtage`,
+    "coachBand.lowCompletion": `Réalisé faible : {pct}% cette semaine`, "coachBand.cycle": `Cycle`,
+    "coachBand.refsNotRetested": `Références physio non retestées depuis {days} j`, "coachBand.nothingToReport": `Rien à signaler`,
+    "coachBand.exportBilanPdf": `Exporter le bilan de l'athlète en PDF`, "coachBand.bilanPdf": `Bilan PDF`,
+    "coachBand.caseStudyTitle": `Fiche de progression partageable (records, charge, adhérence)`, "coachBand.caseStudy": `Étude de cas`,
+    "coachBand.shareRaceLinkTitle": `Lien à partager avec les proches pour cette course`, "coachBand.shareRace": `Partager la course`,
+    "coachBand.customizeZonesTitle": `Personnaliser les zones de travail de l'athlète`, "coachBand.zones": `Zones`,
+    "coachBand.athleteProfileTitle": `VO2max, parcours, records, blessures, habitudes`, "coachBand.athleteProfile": `Fiche athlète`,
+    "coachBand.thisMorningCheckin": `Check-in de ce matin`, "coachBand.noCheckinYet": `Pas encore de check-in`,
+
+    "profile.eg10km": `Ex. 10 km`, "profile.eg3820": `Ex. 38:20`, "profile.egInjury": `Ex. Tendinite rotulienne genou droit`,
+    "profile.noRecordEntered": `Aucun record renseigné.`, "profile.noInjuryEntered": `Aucune blessure renseignée.`,
+    "profile.noDebriefFromAthlete": `Aucun débrief renseigné par l'athlète pour l'instant.`,
+    "profile.updatedFor": `Fiche mise à jour pour {name}`,
+
+    "spectator.noUpcomingRace": `Aucune course à venir enregistrée pour l'instant`,
+    "spectator.availableOnceConnected": `Disponible une fois connecté (démo non persistée).`,
+    "spectator.linkUnavailable": `Lien indisponible pour le moment.`,
+
+    "gear.titleCoach": `Matériel <span>de l'athlète</span>`, "gear.titleAthlete": `Mon <span>matériel</span>`,
+    "gear.subCoach": `Le matériel que l'athlète a renseigné dans son espace — surveille l'usure avant de planifier de l'intensité.`,
+    "gear.subAthlete": `Suis le kilométrage de tes chaussures et de tes vélos. Chaque modèle du catalogue a sa propre durée de vie estimée : tu es alerté avant que l'amorti ne se dégrade.`,
+
+    "theme.switchDark": `Passer en mode sombre`, "theme.switchLight": `Passer en mode clair`,
+
+    "club.athletes": `athlètes`, "club.slots": `créneaux`, "club.registrations": `inscriptions`, "club.aLaCarte": `à la carte`,
+
+    "day.mon": `Lundi`, "day.tue": `Mardi`, "day.wed": `Mercredi`, "day.thu": `Jeudi`, "day.fri": `Vendredi`, "day.sat": `Samedi`, "day.sun": `Dimanche`,
+    "day.monShort": `Lun`, "day.tueShort": `Mar`, "day.wedShort": `Mer`, "day.thuShort": `Jeu`, "day.friShort": `Ven`, "day.satShort": `Sam`, "day.sunShort": `Dim`,
   };
 
   var en = {
@@ -793,6 +823,36 @@
     "bilan.recordsImprovedPlural": `Records improved`, "bilan.recordsImprovedSingular": `Record improved`,
     "bilan.planAdherence": `Plan adherence`, "bilan.currentFitness": `Current fitness (CTL)`,
     "bilan.recordsBeaten": `Records beaten over the period`,
+
+    "coachBand.wearPct": `{name} · {p}% worn`, "coachBand.raceInDays": `Race in {days} days — think about tapering`,
+    "coachBand.lowCompletion": `Low completion: {pct}% this week`, "coachBand.cycle": `Cycle`,
+    "coachBand.refsNotRetested": `Physio references not retested for {days} days`, "coachBand.nothingToReport": `Nothing to report`,
+    "coachBand.exportBilanPdf": `Export the athlete's summary as PDF`, "coachBand.bilanPdf": `Summary PDF`,
+    "coachBand.caseStudyTitle": `Shareable progress report (records, load, adherence)`, "coachBand.caseStudy": `Case study`,
+    "coachBand.shareRaceLinkTitle": `Link to share with loved ones for this race`, "coachBand.shareRace": `Share the race`,
+    "coachBand.customizeZonesTitle": `Customize the athlete's work zones`, "coachBand.zones": `Zones`,
+    "coachBand.athleteProfileTitle": `VO2max, background, records, injuries, habits`, "coachBand.athleteProfile": `Athlete profile`,
+    "coachBand.thisMorningCheckin": `This morning's check-in`, "coachBand.noCheckinYet": `No check-in yet`,
+
+    "profile.eg10km": `E.g. 10 km`, "profile.eg3820": `E.g. 38:20`, "profile.egInjury": `E.g. Patellar tendinitis, right knee`,
+    "profile.noRecordEntered": `No record entered.`, "profile.noInjuryEntered": `No injury entered.`,
+    "profile.noDebriefFromAthlete": `No debrief from the athlete yet.`,
+    "profile.updatedFor": `Profile updated for {name}`,
+
+    "spectator.noUpcomingRace": `No upcoming race registered for now`,
+    "spectator.availableOnceConnected": `Available once connected (demo not persisted).`,
+    "spectator.linkUnavailable": `Link unavailable for now.`,
+
+    "gear.titleCoach": `Gear <span>of the athlete</span>`, "gear.titleAthlete": `My <span>gear</span>`,
+    "gear.subCoach": `The gear the athlete entered in their space — monitor wear before planning intensity.`,
+    "gear.subAthlete": `Track the mileage of your shoes and bikes. Each catalog model has its own estimated lifespan: you're alerted before the cushioning degrades.`,
+
+    "theme.switchDark": `Switch to dark mode`, "theme.switchLight": `Switch to light mode`,
+
+    "club.athletes": `athletes`, "club.slots": `slots`, "club.registrations": `registrations`, "club.aLaCarte": `à la carte`,
+
+    "day.mon": `Monday`, "day.tue": `Tuesday`, "day.wed": `Wednesday`, "day.thu": `Thursday`, "day.fri": `Friday`, "day.sat": `Saturday`, "day.sun": `Sunday`,
+    "day.monShort": `Mon`, "day.tueShort": `Tue`, "day.wedShort": `Wed`, "day.thuShort": `Thu`, "day.friShort": `Fri`, "day.satShort": `Sat`, "day.sunShort": `Sun`,
   };
 
   var es = {
@@ -1189,6 +1249,36 @@
     "bilan.recordsImprovedPlural": `Récords mejorados`, "bilan.recordsImprovedSingular": `Récord mejorado`,
     "bilan.planAdherence": `Cumplimiento del plan`, "bilan.currentFitness": `Fitness (CTL) actual`,
     "bilan.recordsBeaten": `Récords batidos en el período`,
+
+    "coachBand.wearPct": `{name} · {p}% de desgaste`, "coachBand.raceInDays": `Carrera en {days} días — piensa en el afinado`,
+    "coachBand.lowCompletion": `Realizado bajo: {pct}% esta semana`, "coachBand.cycle": `Ciclo`,
+    "coachBand.refsNotRetested": `Referencias fisiológicas sin retestear desde hace {days} días`, "coachBand.nothingToReport": `Nada que señalar`,
+    "coachBand.exportBilanPdf": `Exportar el balance del atleta en PDF`, "coachBand.bilanPdf": `Balance PDF`,
+    "coachBand.caseStudyTitle": `Ficha de progresión compartible (récords, carga, cumplimiento)`, "coachBand.caseStudy": `Estudio de caso`,
+    "coachBand.shareRaceLinkTitle": `Enlace para compartir con los allegados para esta carrera`, "coachBand.shareRace": `Compartir la carrera`,
+    "coachBand.customizeZonesTitle": `Personalizar las zonas de trabajo del atleta`, "coachBand.zones": `Zonas`,
+    "coachBand.athleteProfileTitle": `VO2max, trayectoria, récords, lesiones, hábitos`, "coachBand.athleteProfile": `Ficha del atleta`,
+    "coachBand.thisMorningCheckin": `Check-in de esta mañana`, "coachBand.noCheckinYet": `Aún sin check-in`,
+
+    "profile.eg10km": `Ej. 10 km`, "profile.eg3820": `Ej. 38:20`, "profile.egInjury": `Ej. Tendinitis rotuliana rodilla derecha`,
+    "profile.noRecordEntered": `Ningún récord indicado.`, "profile.noInjuryEntered": `Ninguna lesión indicada.`,
+    "profile.noDebriefFromAthlete": `Aún sin debrief por parte del atleta.`,
+    "profile.updatedFor": `Ficha actualizada para {name}`,
+
+    "spectator.noUpcomingRace": `Ninguna carrera próxima registrada por ahora`,
+    "spectator.availableOnceConnected": `Disponible una vez conectado (demo no persistida).`,
+    "spectator.linkUnavailable": `Enlace no disponible por ahora.`,
+
+    "gear.titleCoach": `Material <span>del atleta</span>`, "gear.titleAthlete": `Mi <span>material</span>`,
+    "gear.subCoach": `El material que el atleta ha indicado en su espacio — vigila el desgaste antes de planificar intensidad.`,
+    "gear.subAthlete": `Sigue el kilometraje de tus zapatillas y bicicletas. Cada modelo del catálogo tiene su propia vida útil estimada: se te avisa antes de que la amortiguación se degrade.`,
+
+    "theme.switchDark": `Pasar a modo oscuro`, "theme.switchLight": `Pasar a modo claro`,
+
+    "club.athletes": `atletas`, "club.slots": `franjas`, "club.registrations": `inscripciones`, "club.aLaCarte": `a la carta`,
+
+    "day.mon": `Lunes`, "day.tue": `Martes`, "day.wed": `Miércoles`, "day.thu": `Jueves`, "day.fri": `Viernes`, "day.sat": `Sábado`, "day.sun": `Domingo`,
+    "day.monShort": `Lun`, "day.tueShort": `Mar`, "day.wedShort": `Mié`, "day.thuShort": `Jue`, "day.friShort": `Vie`, "day.satShort": `Sáb`, "day.sunShort": `Dom`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

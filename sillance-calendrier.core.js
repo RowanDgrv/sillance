@@ -598,7 +598,7 @@ function mondayOf(offset){
 }
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
 function iso(d){return d.toISOString().slice(0,10)}
-const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const DAYS = [tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort'),tr('day.sunShort')];
 const fmt = new Intl.DateTimeFormat(localeStr(),{day:'numeric',month:'short'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
@@ -3302,9 +3302,9 @@ function renderCoachBand(){
   const compPct = tot ? Math.round(done/tot*100) : null;
   const flags = [];
   worn.slice(0,2).forEach(g=>{ const p=Math.round(g.km/g.max*100);
-    flags.push(`<span class="cb-flag ${p>=100?'danger':'warn'}"><i class="ic ic-shoe"></i>${g.name} · ${p}% d'usure</span>`); });
-  if(a.race && a.race.days<=14) flags.push(`<span class="cb-flag warn"><i class="ic ic-flag"></i>Course dans ${a.race.days} j — pense à l'affûtage</span>`);
-  if(compPct!=null && compPct<60) flags.push(`<span class="cb-flag danger"><i class="ic ic-alert-triangle"></i>Réalisé faible : ${compPct}% cette semaine</span>`);
+    flags.push(`<span class="cb-flag ${p>=100?'danger':'warn'}"><i class="ic ic-shoe"></i>${tr('coachBand.wearPct', {name:g.name, p})}</span>`); });
+  if(a.race && a.race.days<=14) flags.push(`<span class="cb-flag warn"><i class="ic ic-flag"></i>${tr('coachBand.raceInDays', {days:a.race.days})}</span>`);
+  if(compPct!=null && compPct<60) flags.push(`<span class="cb-flag danger"><i class="ic ic-alert-triangle"></i>${tr('coachBand.lowCompletion', {pct:compPct})}</span>`);
   const dk = athDispo(a);
   if(dk && dk!=='ok'){
     const d = DISPO_META[dk];
@@ -3317,27 +3317,27 @@ function renderCoachBand(){
   const cp = athCycle(a);
   if(cp && (cp==='menstrual' || cp==='luteal' || cp==='ovulation')){
     const cm = CYCLE_META[cp];
-    flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>Cycle · ${cm.l} — ${cm.tip}</span>`);
+    flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>${tr('coachBand.cycle')} · ${cm.l} — ${cm.tip}</span>`);
   }
   if(a.refsUpdatedAt){
     const refsAge = Math.floor((Date.now()-new Date(a.refsUpdatedAt).getTime())/86400000);
-    if(refsAge>=90) flags.push(`<span class="cb-flag warn"><i class="ic ic-target"></i>Références physio non retestées depuis ${refsAge} j</span>`);
+    if(refsAge>=90) flags.push(`<span class="cb-flag warn"><i class="ic ic-target"></i>${tr('coachBand.refsNotRetested', {days:refsAge})}</span>`);
   }
-  if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>Rien à signaler</span>`);
+  if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>${tr('coachBand.nothingToReport')}</span>`);
   const ck = a.checkin;
   band.style.setProperty('--cbc', a.color);
   band.innerHTML = `
     <div class="cb-id">
       <span class="cb-av">${a.ini}</span>
       <div>
-        <div class="cb-kicker">Athlète suivi</div>
+        <div class="cb-kicker">${tr('athPicker.trackedAthlete')}</div>
         <div class="cb-name">${a.name}</div>
         ${a.race?`<div class="cb-race"><i class="ic ic-flag"></i>${a.race.name} <b>J–${a.race.days}</b></div>`:''}
-        <button class="cb-bilan" id="bilanBtn" title="Exporter le bilan de l'athlète en PDF"><i class="ic ic-download"></i> Bilan PDF</button>
-        <button class="cb-bilan" id="caseStudyBtn" title="Fiche de progression partageable (records, charge, adhérence)"><i class="ic ic-sparkles"></i> Étude de cas</button>
-        ${a.race?`<button class="cb-bilan" id="shareSpecBtn" title="Lien à partager avec les proches pour cette course"><i class="ic ic-link"></i> Partager la course</button>`:''}
-        <button class="cb-bilan" id="zonesBtn" title="Personnaliser les zones de travail de l'athlète"><i class="ic ic-target"></i> Zones</button>
-        <button class="cb-bilan" id="profileBtn" title="VO2max, parcours, records, blessures, habitudes"><i class="ic ic-user"></i> Fiche athlète</button>
+        <button class="cb-bilan" id="bilanBtn" title="${tr('coachBand.exportBilanPdf')}"><i class="ic ic-download"></i> ${tr('coachBand.bilanPdf')}</button>
+        <button class="cb-bilan" id="caseStudyBtn" title="${tr('coachBand.caseStudyTitle')}"><i class="ic ic-sparkles"></i> ${tr('coachBand.caseStudy')}</button>
+        ${a.race?`<button class="cb-bilan" id="shareSpecBtn" title="${tr('coachBand.shareRaceLinkTitle')}"><i class="ic ic-link"></i> ${tr('coachBand.shareRace')}</button>`:''}
+        <button class="cb-bilan" id="zonesBtn" title="${tr('coachBand.customizeZonesTitle')}"><i class="ic ic-target"></i> ${tr('coachBand.zones')}</button>
+        <button class="cb-bilan" id="profileBtn" title="${tr('coachBand.athleteProfileTitle')}"><i class="ic ic-user"></i> ${tr('coachBand.athleteProfile')}</button>
       </div>
     </div>
     <div class="cb-forme">
@@ -3350,8 +3350,8 @@ function renderCoachBand(){
         <span class="pct" style="color:${fc}">${forme==null?'—':forme+'%'}</span>
       </div>
       <div class="cb-fdetail">
-        <div class="cb-kicker">Check-in de ce matin</div>
-        <div class="cb-note" style="color:${fc}">${forme==null?'Pas encore de check-in':athNote(forme)}</div>
+        <div class="cb-kicker">${tr('coachBand.thisMorningCheckin')}</div>
+        <div class="cb-note" style="color:${fc}">${forme==null?tr('coachBand.noCheckinYet'):athNote(forme)}</div>
         ${ck?`<div class="cb-checkin">
           <span><i class="ic ic-moon"></i>${ck.sommeil}/10</span>
           <span><i class="ic ic-battery"></i>${ck.fatigue}/10</span>
@@ -3374,15 +3374,15 @@ let profileAthId = null;
 function profRowHTML(kind, i, a, b){
   if(kind==='record'){
     return `<div class="prof-row" data-i="${i}">
-      <input type="text" placeholder="Ex. 10 km" data-f="d" value="${dispoSafe(a||'')}">
-      <input type="text" placeholder="Ex. 38:20" data-f="v" value="${dispoSafe(b||'')}">
-      <button class="prof-row-del" type="button" data-act="delrow" title="Supprimer"><i class="ic ic-x"></i></button>
+      <input type="text" placeholder="${tr('profile.eg10km')}" data-f="d" value="${dispoSafe(a||'')}">
+      <input type="text" placeholder="${tr('profile.eg3820')}" data-f="v" value="${dispoSafe(b||'')}">
+      <button class="prof-row-del" type="button" data-act="delrow" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
     </div>`;
   }
   return `<div class="prof-row" data-i="${i}">
     <input type="date" data-f="date" value="${a||''}" style="flex:0 0 150px">
-    <input type="text" placeholder="Ex. Tendinite rotulienne genou droit" data-f="desc" value="${dispoSafe(b||'')}">
-    <button class="prof-row-del" type="button" data-act="delrow" title="Supprimer"><i class="ic ic-x"></i></button>
+    <input type="text" placeholder="${tr('profile.egInjury')}" data-f="desc" value="${dispoSafe(b||'')}">
+    <button class="prof-row-del" type="button" data-act="delrow" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
   </div>`;
 }
 function wireProfRows(boxId, list, rerender){
@@ -3391,16 +3391,16 @@ function wireProfRows(boxId, list, rerender){
   });
 }
 function renderProfRecords(list){
-  document.getElementById('profRecords').innerHTML = list.map((r,i)=>profRowHTML('record',i,r.d,r.v)).join('') || '<p class="club-hint">Aucun record renseigné.</p>';
+  document.getElementById('profRecords').innerHTML = list.map((r,i)=>profRowHTML('record',i,r.d,r.v)).join('') || `<p class="club-hint">${tr('profile.noRecordEntered')}</p>`;
   wireProfRows('profRecords', list, renderProfRecords);
 }
 function renderProfInjuries(list){
-  document.getElementById('profInjuries').innerHTML = list.map((r,i)=>profRowHTML('injury',i,r.date,r.desc)).join('') || '<p class="club-hint">Aucune blessure renseignée.</p>';
+  document.getElementById('profInjuries').innerHTML = list.map((r,i)=>profRowHTML('injury',i,r.date,r.desc)).join('') || `<p class="club-hint">${tr('profile.noInjuryEntered')}</p>`;
   wireProfRows('profInjuries', list, renderProfInjuries);
 }
 function renderProfDebriefs(aid){
   const el = document.getElementById('profDebriefs'); if(!el) return;
-  el.innerHTML = debriefsBlockHTML(debriefsFor(aid), "Aucun débrief renseigné par l'athlète pour l'instant.");
+  el.innerHTML = debriefsBlockHTML(debriefsFor(aid), tr('profile.noDebriefFromAthlete'));
 }
 function renderProfCoTeam(aid){
   const el = document.getElementById('profCoTeam'); if(!el) return;
@@ -3473,7 +3473,7 @@ function saveDebrief(){
 let spectatorTargetAthleteId = null;
 function openSpectatorShare(athleteId){
   const race = currentRace();
-  if(!race){ toast("Aucune course à venir enregistrée pour l'instant"); return; }
+  if(!race){ toast(tr('spectator.noUpcomingRace')); return; }
   spectatorTargetAthleteId = athleteId;
   document.getElementById('specRaceName').textContent = race.name;
   document.getElementById('specNotes').value = '';
@@ -3485,7 +3485,7 @@ async function generateSpectatorLink(){
   const notes = document.getElementById('specNotes').value.trim();
   const resEl = document.getElementById('specLinkResult');
   if(!window.PF?.user){
-    resEl.innerHTML = `<p class="club-hint">Disponible une fois connecté (démo non persistée).</p>`;
+    resEl.innerHTML = `<p class="club-hint">${tr('spectator.availableOnceConnected')}</p>`;
     return;
   }
   try{
@@ -3493,10 +3493,10 @@ async function generateSpectatorLink(){
     const base = location.href.replace(/[^/]*$/, '');
     const url = `${base}spectateur.html?token=${row.token}`;
     resEl.innerHTML = `<input type="text" readonly value="${url}" id="specUrl" style="width:100%;box-sizing:border-box;margin-bottom:6px">
-      <button class="btn btn-secondary" id="specCopy" type="button" style="width:100%">Copier le lien</button>`;
+      <button class="btn btn-secondary" id="specCopy" type="button" style="width:100%">${tr('invite.copyLinkBtn')}</button>`;
     document.getElementById('specUrl').onclick = function(){ this.select(); };
     document.getElementById('specCopy').onclick = ()=>{ navigator.clipboard.writeText(url).then(()=> toast(tr('toast.lienCopie'))); };
-  }catch(e){ console.warn('[PF] getOrCreateSpectatorLink :', e); resEl.innerHTML = `<p class="club-hint">Lien indisponible pour le moment.</p>`; }
+  }catch(e){ console.warn('[PF] getOrCreateSpectatorLink :', e); resEl.innerHTML = `<p class="club-hint">${tr('spectator.linkUnavailable')}</p>`; }
 }
 (function initSpectator(){
   const ov=document.getElementById('spectatorOverlay'); if(!ov) return;
@@ -3522,7 +3522,7 @@ function saveAthleteProfile(){
     desc: row.querySelector('[data-f="desc"]').value.trim()
   })).filter(r=>r.date || r.desc);
   document.getElementById('profileOverlay').classList.remove('open');
-  toast(`Fiche mise à jour pour ${a?a.name:'l\'athlète'}`);
+  toast(tr('profile.updatedFor', {name:a?a.name:tr('bilan.thisAthlete')}));
 }
 (function initAthleteProfile(){
   const ov=document.getElementById('profileOverlay'); if(!ov) return;
@@ -3570,10 +3570,10 @@ function updateVideolibVisibility(){
   document.querySelectorAll('.ath-tab').forEach(b=> b.classList.toggle('active', b.dataset.tab===athView));
   // Matériel : côté coach, c'est celui que l'athlète a renseigné (lecture seule)
   const gt=document.getElementById('gearTitle'), gs=document.getElementById('gearSub');
-  if(gt) gt.innerHTML = mode==='coach' ? 'Matériel <span>de l\'athlète</span>' : 'Mon <span>matériel</span>';
+  if(gt) gt.innerHTML = mode==='coach' ? tr('gear.titleCoach') : tr('gear.titleAthlete');
   if(gs) gs.textContent = mode==='coach'
-    ? 'Le matériel que l\'athlète a renseigné dans son espace — surveille l\'usure avant de planifier de l\'intensité.'
-    : 'Suis le kilométrage de tes chaussures et de tes vélos. Chaque modèle du catalogue a sa propre durée de vie estimée : tu es alerté avant que l\'amorti ne se dégrade.';
+    ? tr('gear.subCoach')
+    : tr('gear.subAthlete');
 }
 // branchement des onglets
 document.querySelectorAll('.ath-tab').forEach(b=>{
@@ -3591,7 +3591,7 @@ document.querySelectorAll('.ath-tab').forEach(b=>{
   function apply(light){
     document.body.classList.toggle('light', light);
     if(icon) icon.innerHTML = light ? '<i class="ic ic-sun"></i>' : '<i class="ic ic-moon"></i>';
-    if(btn) btn.title = light ? 'Passer en mode sombre' : 'Passer en mode clair';
+    if(btn) btn.title = light ? tr('theme.switchDark') : tr('theme.switchLight');
     if(typeof rebuildCharts==='function') setTimeout(rebuildCharts, 0);
   }
   // Thème auto selon l'heure : mode jour (clair) de 7h00 à 18h59, mode nuit (sombre) de 19h00 à 6h59.
@@ -3630,7 +3630,7 @@ let CLUB_GROUPS = [
   {id:'g6', name:'Cyclisme Compétition', color:'#FF8A3D', desc:'Cyclisme sur route, groupe compétition'}
 ];
 function clubGroup(id){ return CLUB_GROUPS.find(g=>g.id===id); }
-const CLUB_DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const CLUB_DAYS = [tr('day.mon'),tr('day.tue'),tr('day.wed'),tr('day.thu'),tr('day.fri'),tr('day.sat'),tr('day.sun')];
 let CRENEAUX = [
   {id:'c1', disc:'run', title:'Séance piste collective', day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7']},
   {id:'c2', disc:'swim', title:'Technique natation', day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6']},
@@ -3657,10 +3657,10 @@ function renderClubStats(){
   const totalSpots = CRENEAUX.reduce((a,c)=>a+c.attendees.length,0);
   const paid = CRENEAUX.filter(c=>c.price>0).length;
   el.innerHTML = [
-    {v:CLUB_ATHLETES.length, k:'athlètes'},
-    {v:CRENEAUX.length, k:'créneaux'},
-    {v:totalSpots, k:'inscriptions'},
-    {v:paid, k:'à la carte'}
+    {v:CLUB_ATHLETES.length, k:tr('club.athletes')},
+    {v:CRENEAUX.length, k:tr('club.slots')},
+    {v:totalSpots, k:tr('club.registrations')},
+    {v:paid, k:tr('club.aLaCarte')}
   ].map(s=>`<div class="club-stat"><div class="v">${s.v}</div><div class="k">${s.k}</div></div>`).join('');
 }
 
