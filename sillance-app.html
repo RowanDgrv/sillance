@@ -2221,74 +2221,74 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="brand-mark" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 96 96" fill="none"><defs><linearGradient id="bmFuse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#46C2D8"/></linearGradient><linearGradient id="bmAir" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#FF9A3D" stop-opacity="0"/></linearGradient><linearGradient id="bmEau" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#46C2D8" stop-opacity="0"/></linearGradient></defs><path d="M72 48 C56 38 40 32 18 28" stroke="url(#bmAir)" stroke-width="6" stroke-linecap="round"/><path d="M72 48 C56 58 40 64 18 68" stroke="url(#bmEau)" stroke-width="6" stroke-linecap="round"/><circle cx="72" cy="48" r="9" fill="url(#bmFuse)"/><path d="M36.5 48 A5.5 5.5 0 0 1 47.5 48 Z" fill="#FF9A3D"/><path d="M47.5 48 A5.5 5.5 0 0 1 36.5 48 Z" fill="#46C2D8"/></svg></div>
       <div>
         <h1>Sill<span></span>ance</h1>
-        <small>Plan d'entraînement</small>
+        <small data-i18n="nav.trainingPlan">Plan d'entraînement</small>
       </div>
     </div>
-    <nav class="week-nav" aria-label="Navigation des semaines">
-      <button class="icon-btn" id="prevWeek" aria-label="Semaine précédente">‹</button>
+    <nav class="week-nav" aria-label="Navigation des semaines" data-i18n-attr="aria-label:nav.weeksNav">
+      <button class="icon-btn" id="prevWeek" aria-label="Semaine précédente" data-i18n-attr="aria-label:nav.prevWeek">‹</button>
       <span class="label" id="weekLabel"></span>
-      <button class="icon-btn" id="nextWeek" aria-label="Semaine suivante">›</button>
+      <button class="icon-btn" id="nextWeek" aria-label="Semaine suivante" data-i18n-attr="aria-label:nav.nextWeek">›</button>
     </nav>
-    <div class="mode" role="tablist" aria-label="Mode d'affichage">
-      <button id="modeCoach" class="active" role="tab" aria-selected="true"><i class="ic ic-target"></i>Coach</button>
-      <button id="modeAthlete" role="tab" aria-selected="false"><i class="ic ic-user"></i>Athlète</button>
-      <button id="modeClub" role="tab" aria-selected="false"><i class="ic ic-landmark"></i>Club</button>
+    <div class="mode" role="tablist" aria-label="Mode d'affichage" data-i18n-attr="aria-label:nav.displayMode">
+      <button id="modeCoach" class="active" role="tab" aria-selected="true"><i class="ic ic-target"></i><span data-i18n="mode.coach">Coach</span></button>
+      <button id="modeAthlete" role="tab" aria-selected="false"><i class="ic ic-user"></i><span data-i18n="mode.athlete">Athlète</span></button>
+      <button id="modeClub" role="tab" aria-selected="false"><i class="ic ic-landmark"></i><span data-i18n="mode.club">Club</span></button>
     </div>
     <div class="ath-picker" id="athPicker" hidden>
       <button class="ap-btn" id="apBtn" aria-haspopup="listbox" aria-expanded="false"></button>
       <div class="ap-menu" id="apMenu" role="listbox" hidden></div>
     </div>
-    <a class="icon-btn help-btn" href="./sillance-aide.html" target="_blank" rel="noopener" aria-label="Aide" title="Aide &amp; guide">
+    <a class="icon-btn help-btn" href="./sillance-aide.html" target="_blank" rel="noopener" aria-label="Aide" title="Aide &amp; guide" data-i18n-attr="aria-label:nav.help,title:nav.helpTitle">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M9.3 9.3a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.2" r="0.5" fill="currentColor" stroke="none"/></svg>
     </a>
-    <button class="icon-btn tuto-btn" id="tutoBtn" aria-label="Tutoriel guidé" title="Tutoriel guidé — créer une séance">
+    <button class="icon-btn tuto-btn" id="tutoBtn" aria-label="Tutoriel guidé" title="Tutoriel guidé — créer une séance" data-i18n-attr="aria-label:tour.guidedAria,title:tour.guidedTitle">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 7-6 2-2 6-6-15z"/></svg>
     </button>
-    <button class="icon-btn theme-btn" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre">
+    <button class="icon-btn theme-btn" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre" data-i18n-attr="aria-label:theme.changeAria,title:theme.changeTitle">
       <span id="themeIcon"><i class="ic ic-moon"></i></span>
     </button>
-    <button class="icon-btn settings-btn" id="settingsBtn" aria-label="Paramètres" title="Paramètres">
+    <button class="icon-btn settings-btn" id="settingsBtn" aria-label="Paramètres" title="Paramètres" data-i18n-attr="aria-label:settings.label,title:settings.label">
       <i class="ic ic-settings"></i>
     </button>
     <div class="bell-wrap" id="bellWrap">
-      <button class="icon-btn bell-btn" id="bellBtn" aria-label="Notifications" aria-haspopup="true" title="Alertes">
+      <button class="icon-btn bell-btn" id="bellBtn" aria-label="Notifications" aria-haspopup="true" title="Alertes" data-i18n-attr="aria-label:notif.aria,title:notif.title">
         <i class="ic ic-bell"></i><span class="bell-badge" id="bellBadge" hidden>0</span>
       </button>
-      <div class="bell-menu" id="bellMenu" role="menu" aria-label="Alertes athlètes">
-        <div class="bell-head">Alertes athlètes</div>
+      <div class="bell-menu" id="bellMenu" role="menu" aria-label="Alertes athlètes" data-i18n-attr="aria-label:notif.athleteAlerts">
+        <div class="bell-head" data-i18n="notif.athleteAlerts">Alertes athlètes</div>
         <div class="bell-list" id="bellList"></div>
       </div>
     </div>
-    <button class="icon-btn a11y-btn" id="a11yBtn" aria-label="Options d'affichage et de couleurs" aria-haspopup="true" title="Affichage & couleurs">
+    <button class="icon-btn a11y-btn" id="a11yBtn" aria-label="Options d'affichage et de couleurs" aria-haspopup="true" title="Affichage & couleurs" data-i18n-attr="aria-label:display.optionsAria,title:display.optionsTitle">
       <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
         <circle cx="9" cy="9" r="5.2" fill="var(--swim)" opacity="0.85"/>
         <circle cx="15" cy="9" r="5.2" fill="var(--bike)" opacity="0.85"/>
         <circle cx="12" cy="14.5" r="5.2" fill="var(--run)" opacity="0.85"/>
       </svg>
     </button>
-    <div class="a11y-menu" id="a11yMenu" role="menu" aria-label="Options d'accessibilité">
-      <div class="a11y-title">Vision des couleurs</div>
-      <button class="a11y-opt active" data-cvd="none" role="menuitemradio" aria-checked="true">Couleurs standard</button>
-      <button class="a11y-opt" data-cvd="deuter" role="menuitemradio" aria-checked="false">Deutéranopie <small>(rouge-vert)</small></button>
-      <button class="a11y-opt" data-cvd="protan" role="menuitemradio" aria-checked="false">Protanopie <small>(rouge-vert)</small></button>
-      <button class="a11y-opt" data-cvd="tritan" role="menuitemradio" aria-checked="false">Tritanopie <small>(bleu-jaune)</small></button>
-      <div class="a11y-title">Aides</div>
-      <button class="a11y-toggle" id="a11yPatterns" role="menuitemcheckbox" aria-checked="false"><span>Motifs sur les disciplines</span><span class="a11y-sw"></span></button>
-      <button class="a11y-toggle" id="a11yContrast" role="menuitemcheckbox" aria-checked="false"><span>Contraste renforcé</span><span class="a11y-sw"></span></button>
+    <div class="a11y-menu" id="a11yMenu" role="menu" aria-label="Options d'accessibilité" data-i18n-attr="aria-label:a11y.optionsAria">
+      <div class="a11y-title" data-i18n="a11y.colorVisionHeading">Vision des couleurs</div>
+      <button class="a11y-opt active" data-cvd="none" role="menuitemradio" aria-checked="true" data-i18n="a11y.stdColors">Couleurs standard</button>
+      <button class="a11y-opt" data-cvd="deuter" role="menuitemradio" aria-checked="false"><span data-i18n="a11y.deuteranopia">Deutéranopie</span> <small data-i18n="a11y.redGreen">(rouge-vert)</small></button>
+      <button class="a11y-opt" data-cvd="protan" role="menuitemradio" aria-checked="false"><span data-i18n="a11y.protanopia">Protanopie</span> <small data-i18n="a11y.redGreen">(rouge-vert)</small></button>
+      <button class="a11y-opt" data-cvd="tritan" role="menuitemradio" aria-checked="false"><span data-i18n="a11y.tritanopia">Tritanopie</span> <small data-i18n="a11y.blueYellow">(bleu-jaune)</small></button>
+      <div class="a11y-title" data-i18n="a11y.aidsHeading">Aides</div>
+      <button class="a11y-toggle" id="a11yPatterns" role="menuitemcheckbox" aria-checked="false"><span data-i18n="a11y.patternsOption">Motifs sur les disciplines</span><span class="a11y-sw"></span></button>
+      <button class="a11y-toggle" id="a11yContrast" role="menuitemcheckbox" aria-checked="false"><span data-i18n="a11y.highContrastOption">Contraste renforcé</span><span class="a11y-sw"></span></button>
     </div>
   </header>
 
   <!-- ===================== ONGLETS ATHLÈTE ===================== -->
-  <nav class="ath-tabs" id="athTabs" aria-label="Navigation athlète">
-    <button class="ath-tab active" data-tab="home"><i class="ic ic-home"></i>Accueil</button>
-    <button class="ath-tab" data-tab="stats"><i class="ic ic-chart"></i>Statistiques</button>
+  <nav class="ath-tabs" id="athTabs" aria-label="Navigation athlète" data-i18n-attr="aria-label:nav.athleteNav">
+    <button class="ath-tab active" data-tab="home"><i class="ic ic-home"></i><span data-i18n="nav.home">Accueil</span></button>
+    <button class="ath-tab" data-tab="stats"><i class="ic ic-chart"></i><span data-i18n="nav.stats">Statistiques</span></button>
   </nav>
 
   <!-- ===================== AUJOURD'HUI (guide quotidien) ===================== -->
-  <section class="today-panel" id="todayPanel" aria-label="Ton point du jour"></section>
+  <section class="today-panel" id="todayPanel" aria-label="Ton point du jour" data-i18n-attr="aria-label:today.pointAria"></section>
 
   <!-- ===================== BANDEAU STATS + ECG ===================== -->
-  <section class="pulse-strip" aria-label="Résumé de la semaine">
+  <section class="pulse-strip" aria-label="Résumé de la semaine" data-i18n-attr="aria-label:week.summaryAria">
     <svg class="ecg" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id="ecgGrad" x1="0" y1="0" x2="1" y2="0">
@@ -2298,42 +2298,42 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <path d="M0 30 H80 L95 30 L103 12 L112 42 L120 22 L128 30 H260 L275 30 L283 8 L292 44 L300 20 L308 30 H460 L475 30 L483 14 L492 40 L500 23 L508 30 H660 L675 30 L683 10 L692 43 L700 21 L708 30 H860 L875 30 L883 13 L892 41 L900 22 L908 30 H1060 L1075 30 L1083 9 L1092 42 L1100 20 L1108 30 H1200"/>
     </svg>
     <div class="stat">
-      <div class="k">Prochaine course</div>
+      <div class="k" data-i18n="dash.nextRace">Prochaine course</div>
       <div class="v" id="raceCountdown">J–22</div>
       <div class="trend flat" id="raceName">Gorillaman · Sprint</div>
     </div>
     <div class="stat stat-tech">
-      <div class="k">Charge semaine</div>
+      <div class="k" data-i18n="dash.weekLoad">Charge semaine</div>
       <div class="v" id="weekTss">0<em>TSS</em></div>
       <div class="trend up" id="weekTssTrend">▲ +12% vs S-1</div>
     </div>
     <div class="stat">
-      <div class="k">Volume planifié</div>
+      <div class="k" data-i18n="dash.plannedVolume">Volume planifié</div>
       <div class="v" id="weekHours">0<em>h</em></div>
       <div class="trend flat" id="weekCount">0 séances</div>
     </div>
     <div class="stat stat-tech">
       <div class="k">Forme (TSB)</div>
       <div class="v" style="color:var(--good)">+8</div>
-      <div class="trend up">Fraîcheur en hausse</div>
+      <div class="trend up" data-i18n="dash.freshnessRising">Fraîcheur en hausse</div>
     </div>
     <div class="stat">
-      <div class="k">Réalisé</div>
+      <div class="k" data-i18n="dash.completed">Réalisé</div>
       <div class="v" id="compliance">0<em>%</em></div>
       <div class="trend flat">cette semaine</div>
     </div>
   </section>
 
   <!-- ===================== BANDEAU COACH (athlète suivi) ===================== -->
-  <section class="coach-band" id="coachBand" aria-label="Athlète suivi"></section>
+  <section class="coach-band" id="coachBand" aria-label="Athlète suivi" data-i18n-attr="aria-label:athlete.trackedAria"></section>
 
   <!-- ===================== PLANNER ===================== -->
   <div class="planner">
-    <aside class="library" id="library" aria-label="Panneau latéral">
+    <aside class="library" id="library" aria-label="Panneau latéral" data-i18n-attr="aria-label:sidebar.panelAria">
       <div id="sidebarContent"></div>
     </aside>
 
-    <section class="calendar" aria-label="Calendrier d'entraînement">
+    <section class="calendar" aria-label="Calendrier d'entraînement" data-i18n-attr="aria-label:calendar.trainingAria">
       <div class="wk-int" id="weekIntensity" hidden></div>
       <div class="taper-hint" id="taperHint" hidden></div>
       <div class="taper-hint" id="weekRiskHint" hidden></div>
@@ -2346,15 +2346,15 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <!-- ===== ANALYSE (repliée, s'ouvre au clic sur une séance) ===== -->
   <div class="ath-panel-stats" id="athPanelStats">
   <div class="analysis-bar">
-    <span class="ab-t"><i class="ic ic-chart"></i>Analyse de la séance &amp; de la performance</span>
-    <button class="analysis-close" id="analysisClose"><i class="ic ic-x"></i>Replier</button>
+    <span class="ab-t"><i class="ic ic-chart"></i><span data-i18n="perf.analysisBannerTitle">Analyse de la séance &amp; de la performance</span></span>
+    <button class="analysis-close" id="analysisClose"><i class="ic ic-x"></i><span data-i18n="perf.collapse">Replier</span></button>
   </div>
   <!-- ===================== IA · ÉTAT DE FORME ===================== -->
-  <section class="readyhub" id="readyhub" aria-label="Analyse de l'état de forme">
+  <section class="readyhub" id="readyhub" aria-label="Analyse de l'état de forme" data-i18n-attr="aria-label:fitness.analysisAria">
     <div class="readyhub-head">
       <div>
-        <div class="ai-badge"><span class="ai-dot"></span>Analyse assistée</div>
-        <h2>État de forme <span>&amp; risque</span></h2>
+        <div class="ai-badge"><span class="ai-dot"></span><span data-i18n="perf.aiAssisted">Analyse assistée</span></div>
+        <h2><span data-i18n="fitness.stateHeading">État de forme</span> <span data-i18n="fitness.riskSuffix">&amp; risque</span></h2>
         <p class="rh-sub">Un moteur d'analyse croise la charge d'entraînement, le ressenti et la récupération pour t'aider à décider : <b>poursuivre</b> ou <b>relâcher</b>. Recommandation indicative — c'est toujours le coach qui tranche.</p>
       </div>
     </div>
@@ -2380,7 +2380,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 
       <!-- Facteurs -->
       <div class="rh-card">
-        <h3>Ce que regarde l'analyse</h3>
+        <h3 data-i18n="fitness.whatAnalysisLooksAt">Ce que regarde l'analyse</h3>
         <div class="rh-factors" id="rhFactors"></div>
       </div>
     </div>
@@ -2391,26 +2391,26 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <!-- ===================== ANALYTICS ===================== -->
   <section class="analytics" id="analytics">
     <div class="analytics-head">
-      <h2>Analyse <span>performance</span></h2>
+      <h2><span data-i18n="perf.analysisHeading">Analyse</span> <span data-i18n="perf.performanceSuffix">performance</span></h2>
       <span class="src">données <b>STRAVA</b> · sync auto</span>
     </div>
     <p class="sub">Vitesse, fréquence cardiaque, volume et charge d'entraînement de l'athlète — mis à jour à chaque activité synchronisée.</p>
 
     <label class="ath-stats-toggle" id="athStatsToggleWrap">
       <input type="checkbox" id="athStatsToggle" checked>
-      <span>Afficher mes statistiques détaillées</span>
+      <span data-i18n="stats.showDetailed">Afficher mes statistiques détaillées</span>
       <small>Décoche si ça fait trop d'informations — tu peux revenir dessus à tout moment.</small>
     </label>
 
-    <div class="chart-filter" id="chartFilter" aria-label="Choisir les graphiques à afficher"></div>
+    <div class="chart-filter" id="chartFilter" aria-label="Choisir les graphiques à afficher" data-i18n-attr="aria-label:charts.chooseAria"></div>
 
     <div class="charts stats-group" data-group="charge">
       <div class="chart-card c12">
-        <h3>Charge cumulée &amp; signaux <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— sur toute l'année du calendrier</span></h3>
+        <h3><span data-i18n="chart.cumulLoadHeading">Charge cumulée &amp; signaux</span> <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0" data-i18n="chart.cumulLoadSub">— sur toute l'année du calendrier</span></h3>
         <div class="sub">charge empilée par discipline · défile sur l'année · coche les signaux à afficher · survole une période pour le détail</div>
         <div class="ls-period" id="loadStackPeriodTog"></div>
         <div class="ls-toggles" id="loadStackToggles"></div>
-        <div class="ls-scroll" id="loadStackScroll"><svg id="loadStackChart" role="img" aria-label="Charge cumulée par discipline, fatigue, risque de blessure et forme"></svg></div>
+        <div class="ls-scroll" id="loadStackScroll"><svg id="loadStackChart" role="img" aria-label="Charge cumulée par discipline, fatigue, risque de blessure et forme" data-i18n-attr="aria-label:chart.loadAria"></svg></div>
         <div class="legend" style="margin-top:10px">
           <span><i style="background:#46C2D8"></i>Natation</span>
           <span><i style="background:#D9962F"></i>Vélo</span>
@@ -2420,13 +2420,13 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       </div>
 
       <div class="chart-card c12">
-        <h3>Charge & forme <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— curseur synchronisé avec FTP &amp; distance</span></h3>
+        <h3><span data-i18n="chart.loadFitnessHeading">Charge &amp; forme</span> <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0" data-i18n="chart.loadFitnessSub">— curseur synchronisé avec FTP &amp; distance</span></h3>
         <div class="sub">Fitness (CTL) · Fatigue (ATL) · 8 semaines</div>
-        <svg id="loadChart" viewBox="0 0 640 240" role="img" aria-label="Évolution de la charge et de la forme"></svg>
+        <svg id="loadChart" viewBox="0 0 640 240" role="img" aria-label="Évolution de la charge et de la forme" data-i18n-attr="aria-label:chart.loadFitnessAria"></svg>
         <div class="legend">
           <span><i style="background:var(--swim)"></i>Fitness</span>
           <span><i style="background:var(--run)"></i>Fatigue</span>
-          <span><i style="background:var(--good)"></i>Zone de forme optimale</span>
+          <span><i style="background:var(--good)"></i><span data-i18n="chart.optimalFormZone">Zone de forme optimale</span></span>
         </div>
       </div>
 
@@ -2434,7 +2434,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
         <h3>FTP & PMA estimées — vélo</h3>
         <div class="sub">8 dernières semaines · watts</div>
         <div class="big" style="color:var(--bike)" id="ftpNow"></div>
-        <svg id="ftpChart" viewBox="0 0 460 220" role="img" aria-label="Évolution FTP et PMA"></svg>
+        <svg id="ftpChart" viewBox="0 0 460 220" role="img" aria-label="Évolution FTP et PMA" data-i18n-attr="aria-label:chart.ftpPmaAria"></svg>
         <div class="legend">
           <span><i style="background:var(--bike)"></i>FTP (1h)</span>
           <span><i style="background:var(--strength)"></i>PMA (5min)</span>
@@ -2442,9 +2442,9 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       </div>
 
       <div class="chart-card c6">
-        <h3>Distance hebdomadaire</h3>
+        <h3 data-i18n="chart.weeklyDistHeading">Distance hebdomadaire</h3>
         <div class="sub">par discipline · km</div>
-        <svg id="distChart" viewBox="0 0 460 240" role="img" aria-label="Distance hebdomadaire par discipline"></svg>
+        <svg id="distChart" viewBox="0 0 460 240" role="img" aria-label="Distance hebdomadaire par discipline" data-i18n-attr="aria-label:chart.weeklyDistAria"></svg>
         <div class="legend">
           <span><i style="background:var(--swim)"></i>Natation ×10</span>
           <span><i style="background:var(--bike)"></i>Vélo</span>
@@ -2458,9 +2458,9 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="chart-card c12">
         <h3>Courbe lactate — vélo</h3>
         <div class="sub">test terrain · lactate (mmol/L) vs puissance</div>
-        <svg id="lactateBike" viewBox="0 0 460 250" role="img" aria-label="Courbe lactate vélo"></svg>
+        <svg id="lactateBike" viewBox="0 0 460 250" role="img" aria-label="Courbe lactate vélo" data-i18n-attr="aria-label:chart.lactateAria"></svg>
         <div class="lactate-legend">
-          <span><i style="background:var(--bike)"></i>Lactate</span>
+          <span><i style="background:var(--bike)"></i><span data-i18n="chart.lactateLabel">Lactate</span></span>
           <span><i class="dot" style="background:var(--good)"></i>SV1</span>
           <span><i class="dot" style="background:var(--run)"></i>SV2</span>
         </div>
@@ -2470,15 +2470,15 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="chart-card c12">
         <h3>Courbe puissance–durée</h3>
         <div class="sub">records de puissance · 1 s → 8 h · survole un point pour le détail</div>
-        <svg id="mmpChart" viewBox="0 0 940 300" role="img" aria-label="Courbe puissance-durée"></svg>
+        <svg id="mmpChart" viewBox="0 0 940 300" role="img" aria-label="Courbe puissance-durée" data-i18n-attr="aria-label:chart.powerDurationAria"></svg>
       </div>
 
       <div class="chart-card c12">
-        <h3>Durabilité <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— puissance sous fatigue</span></h3>
+        <h3><span data-i18n="chart.durabilityHeading">Durabilité</span> <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0" data-i18n="chart.durabilitySub">— puissance sous fatigue</span></h3>
         <div class="sub">records à froid vs après un volume d'effort donné · choisis les paliers kJ à afficher</div>
         <div class="big" id="durabNow" style="color:var(--good)"></div>
         <div class="durab-levels" id="durabLevels"></div>
-        <svg id="durabChart" viewBox="0 0 940 300" role="img" aria-label="Courbe de durabilité"></svg>
+        <svg id="durabChart" viewBox="0 0 940 300" role="img" aria-label="Courbe de durabilité" data-i18n-attr="aria-label:chart.durabilityAria"></svg>
         <div class="legend" id="durabLegend"></div>
       </div>
     </div>
@@ -2486,14 +2486,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <!-- ===== Onglet : Biomécanique ===== -->
     <div class="charts stats-group" data-group="biomeca">
       <div class="chart-card c7">
-        <h3>Dynamiques de course <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— zones</span></h3>
+        <h3><span data-i18n="chart.raceDynamicsHeading">Dynamiques de course</span> <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0" data-i18n="chart.raceDynamicsSub">— zones</span></h3>
         <div class="sub">cadence · oscillation verticale · ratio vertical · contact au sol — repère par rapport aux zones de référence</div>
         <div class="rd-note">Nécessite un capteur de dynamique de course (montre Garmin compatible, Stryd, RunScribe…). Valeurs de démonstration.</div>
         <div id="runDynBody"></div>
       </div>
 
       <div class="chart-card c5">
-        <h3>Foulée &amp; puissance</h3>
+        <h3 data-i18n="chart.strideOutputHeading">Foulée &amp; puissance</h3>
         <div class="sub">longueur de foulée · puissance (W) si le capteur la fournit</div>
         <div class="rd-tiles" id="runTilesBody"></div>
       </div>
@@ -2505,9 +2505,9 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       </div>
 
       <div class="chart-card c6">
-        <h3>Tendance cadence &amp; contact au sol</h3>
+        <h3 data-i18n="chart.cadenceGctHeading">Tendance cadence &amp; contact au sol</h3>
         <div class="sub">8 dernières semaines · cadence ↑ et GCT ↓ = foulée plus efficace</div>
-        <svg id="runTrendChart" viewBox="0 0 460 220" role="img" aria-label="Tendance cadence et temps de contact au sol"></svg>
+        <svg id="runTrendChart" viewBox="0 0 460 220" role="img" aria-label="Tendance cadence et temps de contact au sol" data-i18n-attr="aria-label:chart.cadenceGctAria"></svg>
         <div class="legend">
           <span><i style="background:#2FD9FF"></i>Cadence (pas/min)</span>
           <span><i style="background:#DD5C72"></i>Contact au sol (ms)</span>
@@ -2520,11 +2520,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="chart-card c6">
         <h3>Zones de fréquence cardiaque</h3>
         <div class="sub">répartition du temps · 4 dernières semaines</div>
-        <svg id="hrChart" viewBox="0 0 460 230" role="img" aria-label="Répartition des zones cardiaques"></svg>
+        <svg id="hrChart" viewBox="0 0 460 230" role="img" aria-label="Répartition des zones cardiaques" data-i18n-attr="aria-label:chart.hrZonesAria"></svg>
       </div>
 
       <div class="chart-card c6">
-        <h3>Charge d'entraînement <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— méthode</span></h3>
+        <h3><span data-i18n="chart.trainingLoadHeading">Charge d'entraînement</span> <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0" data-i18n="chart.trainingLoadSub">— méthode</span></h3>
         <div class="sub">comment la charge de chaque séance est calculée (estimé)</div>
         <div id="loadMixBody"></div>
       </div>
@@ -2563,39 +2563,39 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <!-- ===================== RECORDS (en bas de page) ===================== -->
   <section class="records" id="records">
     <div class="analytics-head">
-      <h2>Records <span>personnels</span></h2>
+      <h2><span data-i18n="records.heading">Records</span> <span data-i18n="records.personalSuffix">personnels</span></h2>
       <span class="src">meilleures performances · tous temps</span>
     </div>
     <p class="sub">Tes meilleures performances par durée et par distance, détectées automatiquement à partir de tes activités.</p>
 
     <div class="rec-tabs" id="recTabs">
       <button class="rec-tab active" data-rt="bike"><i class="ic ic-bike"></i>Vélo</button>
-      <button class="rec-tab" data-rt="run"><i class="ic ic-run"></i>Allure course</button>
+      <button class="rec-tab" data-rt="run"><i class="ic ic-run"></i><span data-i18n="records.runPaceTab">Allure course</span></button>
     </div>
     <div class="rec-grid" id="recGrid"></div>
   </section>
   </div><!-- /ath-panel-stats -->
 
   <!-- ===================== BIBLIOTHÈQUE VIDÉO ===================== -->
-  <section class="videolib" id="videolib" aria-label="Bibliothèque vidéo">
+  <section class="videolib" id="videolib" aria-label="Bibliothèque vidéo" data-i18n-attr="aria-label:video.libraryAria">
     <div class="vl-head">
       <div>
-        <div class="vl-eyebrow"><span class="vl-dot"></span>Technique</div>
-        <h2>Bibliothèque <span>vidéo</span></h2>
+        <div class="vl-eyebrow"><span class="vl-dot"></span><span data-i18n="video.eyebrow">Technique</span></div>
+        <h2><span data-i18n="video.libraryHeading">Bibliothèque</span> <span data-i18n="video.librarySuffix">vidéo</span></h2>
         <p class="vl-sub">Éducatifs, gammes et gestes techniques, filtrés par sport. Les vidéos liées à tes séances apparaissent au survol dans ton programme.</p>
-        <div class="vl-count"><b id="vlCount">0</b> vidéos · <span id="vlCountDisc">Natation</span> · <span class="cc-soon">Contenu en cours d'ajout</span></div>
+        <div class="vl-count"><b id="vlCount">0</b> vidéos · <span id="vlCountDisc">Natation</span> · <span class="cc-soon" data-i18n="video.contentComingSoon">Contenu en cours d'ajout</span></div>
       </div>
       <div class="vl-search">
-        <input type="search" id="vlSearch" placeholder="Rechercher (rattrapé, gammes, squat…)" aria-label="Rechercher une vidéo">
+        <input type="search" id="vlSearch" placeholder="Rechercher (rattrapé, gammes, squat…)" aria-label="Rechercher une vidéo" data-i18n-attr="placeholder:video.searchPh,aria-label:video.searchAria">
       </div>
-      <button class="vl-grid-toggle" id="vlGridToggle" aria-pressed="false" title="Afficher la grille modulaire (Müller-Brockmann)"><span class="gt-dot"></span>Grille</button>
+      <button class="vl-grid-toggle" id="vlGridToggle" aria-pressed="false" title="Afficher la grille modulaire (Müller-Brockmann)" data-i18n-attr="title:video.gridTitle"><span class="gt-dot"></span>Grille</button>
     </div>
-    <div class="vl-filters" id="vlFilters" role="tablist" aria-label="Filtrer par sport">
-      <button class="vl-filter active" data-f="swim" role="tab" aria-selected="true"><i class="ic ic-waves"></i>Natation</button>
+    <div class="vl-filters" id="vlFilters" role="tablist" aria-label="Filtrer par sport" data-i18n-attr="aria-label:video.filterSportAria">
+      <button class="vl-filter active" data-f="swim" role="tab" aria-selected="true"><i class="ic ic-waves"></i><span data-i18n="disc.swim">Natation</span></button>
       <button class="vl-filter" data-f="bike" role="tab"><i class="ic ic-bike"></i>Vélo</button>
-      <button class="vl-filter" data-f="run" role="tab"><i class="ic ic-run"></i>Course</button>
-      <button class="vl-filter" data-f="strength" role="tab"><i class="ic ic-dumbbell"></i>Renfo</button>
-      <button class="vl-filter" data-f="hyrox" role="tab"><i class="ic ic-dumbbell"></i>Hyrox</button>
+      <button class="vl-filter" data-f="run" role="tab"><i class="ic ic-run"></i><span data-i18n="disc.run">Course</span></button>
+      <button class="vl-filter" data-f="strength" role="tab"><i class="ic ic-dumbbell"></i><span data-i18n="disc.strength">Renfo</span></button>
+      <button class="vl-filter" data-f="hyrox" role="tab"><i class="ic ic-dumbbell"></i><span data-i18n="disc.hyrox">Hyrox</span></button>
     </div>
     <div class="vl-grid" id="vlGrid"></div>
     <div class="vl-guides" aria-hidden="true"><div class="vg-cols" id="vlCols"></div><div class="vg-rows"></div></div>
@@ -2606,10 +2606,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
        placeholder (VOTRE-LIEN-ERIC) jamais rempli, renvoyait 404 en prod.
        Réactiver dès que le vrai lien Calendly est disponible : décommenter
        cette section + repointer PREPA_MENTALE[0].calendly plus bas.
-  <section class="mental" aria-label="Préparation mentale">
+  <section class="mental" aria-label="Préparation mentale" data-i18n-attr="aria-label:mental.prepAria">
     <div class="mental-glow" aria-hidden="true"></div>
     <div class="mental-txt">
-      <span class="mental-tag">Inclus dans ta formule coaching</span>
+      <span class="mental-tag" data-i18n="mental.includedTag">Inclus dans ta formule coaching</span>
       <h2>Le mental, ta 4<sup>e</sup> discipline</h2>
       <p>Gestion du stress de course, visualisation, routines pré-compétition — une séance individuelle avec <b>Éric</b>, notre préparateur mental, directement dans son agenda.</p>
     </div>
@@ -2618,14 +2618,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   -->
 
   <!-- ===================== RÉSERVATION TEST LACTATE (accueil) ===================== -->
-  <section class="lactest" aria-label="Réserver un test lactate">
+  <section class="lactest" aria-label="Réserver un test lactate" data-i18n-attr="aria-label:lactate.bookAria">
     <div class="lactest-glow" aria-hidden="true"></div>
     <div class="lactest-txt">
-      <span class="lactest-tag">Connais tes vrais seuils</span>
-      <h2>Réserve ton test lactate</h2>
+      <span class="lactest-tag" data-i18n="lactate.knowThresholdsTag">Connais tes vrais seuils</span>
+      <h2 data-i18n="lactate.bookHeading">Réserve ton test lactate</h2>
       <p>Un test à l'effort avec prélèvements sanguins détermine précisément tes seuils SV1 et SV2 — la base la plus fiable pour calibrer tes zones d'entraînement. Course à pied ou vélo, sur le terrain ou en labo.</p>
     </div>
-    <button class="btn lactest-btn" id="lactestBtn"><i class="ic ic-flask"></i>Réserver mon test</button>
+    <button class="btn lactest-btn" id="lactestBtn"><i class="ic ic-flask"></i><span data-i18n="lactate.bookMyTest">Réserver mon test</span></button>
   </section>
 
   <!-- ===================== PANNEAU STATISTIQUES (onglet) ===================== -->
@@ -2633,20 +2633,20 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <div class="club-panel" id="clubPanel">
     <div class="club-head">
       <div>
-        <div class="club-eyebrow"><span class="club-dot"></span>Espace club</div>
+        <div class="club-eyebrow"><span class="club-dot"></span><span data-i18n="club.eyebrow">Espace club</span></div>
         <h2 id="clubName">Muret Goat Squad</h2>
         <p class="club-sub">Gère tes créneaux collectifs, les inscriptions et les présences. Idéal pour les clubs de triathlon, course à pied, natation et cyclisme.</p>
       </div>
     </div>
 
     <div class="club-tabs" id="clubTabs">
-      <button class="club-tab active" data-ct="dash"><i class="ic ic-landmark"></i>Tableau de bord</button>
-      <button class="club-tab" data-ct="creneaux"><i class="ic ic-calendar"></i>Créneaux</button>
-      <button class="club-tab" data-ct="presence"><i class="ic ic-check"></i>Présences</button>
-      <button class="club-tab" data-ct="bill"><i class="ic ic-coin"></i>Facturation</button>
-      <button class="club-tab" data-ct="athletes"><i class="ic ic-users"></i>Adhérents</button>
-      <button class="club-tab" data-ct="groupes"><i class="ic ic-shirt"></i>Groupes</button>
-      <button class="club-tab" data-ct="offres"><i class="ic ic-ticket"></i>Offres</button>
+      <button class="club-tab active" data-ct="dash"><i class="ic ic-landmark"></i><span data-i18n="club.tabDash">Tableau de bord</span></button>
+      <button class="club-tab" data-ct="creneaux"><i class="ic ic-calendar"></i><span data-i18n="club.tabSlots">Créneaux</span></button>
+      <button class="club-tab" data-ct="presence"><i class="ic ic-check"></i><span data-i18n="club.tabAttendance">Présences</span></button>
+      <button class="club-tab" data-ct="bill"><i class="ic ic-coin"></i><span data-i18n="club.tabBilling">Facturation</span></button>
+      <button class="club-tab" data-ct="athletes"><i class="ic ic-users"></i><span data-i18n="club.tabMembers">Adhérents</span></button>
+      <button class="club-tab" data-ct="groupes"><i class="ic ic-shirt"></i><span data-i18n="club.tabGroups">Groupes</span></button>
+      <button class="club-tab" data-ct="offres"><i class="ic ic-ticket"></i><span data-i18n="club.tabOffers">Offres</span></button>
     </div>
 
     <!-- Onglet créneaux -->
@@ -2674,11 +2674,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="invite-card">
         <div class="invite-icon"><i class="ic ic-link"></i></div>
         <div class="invite-body">
-          <div class="invite-title">Lien d'invitation du club</div>
+          <div class="invite-title" data-i18n="club.inviteLinkTitle">Lien d'invitation du club</div>
           <div class="invite-sub">Partage ce lien à tes athlètes : ils demandent à rejoindre le club, puis tu les affectes au bon groupe.</div>
           <div class="invite-linkrow">
-            <input type="text" id="inviteLink" readonly aria-label="Lien d'invitation à partager" value="https://sillance.app/rejoindre/muret-goat-squad">
-            <button class="btn invite-copy btn-secondary" id="inviteCopy"><i class="ic ic-clipboard"></i>Copier</button>
+            <input type="text" id="inviteLink" readonly aria-label="Lien d'invitation à partager" data-i18n-attr="aria-label:invite.linkAria" value="https://sillance.app/rejoindre/muret-goat-squad">
+            <button class="btn invite-copy btn-secondary" id="inviteCopy"><i class="ic ic-clipboard"></i><span data-i18n="common.copy">Copier</span></button>
           </div>
           <div class="invite-share">
             <button class="invite-wa" id="inviteWhatsapp">Partager sur WhatsApp</button>
@@ -2692,7 +2692,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div id="licenceAlert"></div>
 
       <div class="club-actions">
-        <input type="search" id="clubAthleteSearch" class="club-search" aria-label="Rechercher un athlète" placeholder="Rechercher un athlète…">
+        <input type="search" id="clubAthleteSearch" class="club-search" aria-label="Rechercher un athlète" placeholder="Rechercher un athlète…" data-i18n-attr="aria-label:athlete.searchAria,placeholder:athlete.searchPh">
       </div>
       <div class="club-athletes" id="clubAthletesList"></div>
     </div>
@@ -2714,13 +2714,13 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 
 <!-- Modal création de créneau club -->
-<div class="overlay" id="creneauOverlay" role="dialog" aria-modal="true" aria-label="Créer un créneau">
+<div class="overlay" id="creneauOverlay" role="dialog" aria-modal="true" aria-label="Créer un créneau" data-i18n-attr="aria-label:slot.createAria">
   <div class="modal creneau-modal">
-    <button class="close" id="creneauClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <span class="badge">Nouveau créneau</span>
-    <h3>Créneau collectif</h3>
+    <button class="close" id="creneauClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
+    <span class="badge" data-i18n="slot.newBadge">Nouveau créneau</span>
+    <h3 data-i18n="slot.groupHeading">Créneau collectif</h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="crDisc">Discipline</label>
+      <div class="b-fld"><label for="crDisc" data-i18n="slot.disciplineLabel">Discipline</label>
         <select id="crDisc">
           <option value="swim">Natation</option>
           <option value="bike">Vélo</option>
@@ -2728,23 +2728,23 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <option value="strength">Renfo</option>
         </select>
       </div>
-      <div class="b-fld"><label for="crTitle">Intitulé</label><input type="text" id="crTitle" placeholder="Ex. Séance piste collective"></div>
+      <div class="b-fld"><label for="crTitle" data-i18n="slot.titleLabel">Intitulé</label><input type="text" id="crTitle" placeholder="Ex. Séance piste collective" data-i18n-attr="placeholder:slot.titlePh"></div>
       <div class="cr-row">
-        <div class="b-fld"><label for="crDay">Jour</label><select id="crDay"></select></div>
-        <div class="b-fld"><label for="crTime">Heure</label><input type="time" id="crTime" value="18:30"></div>
-        <div class="b-fld"><label for="crDur">Durée (min)</label><input type="number" id="crDur" value="90" min="15" max="240"></div>
+        <div class="b-fld"><label for="crDay" data-i18n="slot.dayLabel">Jour</label><select id="crDay"></select></div>
+        <div class="b-fld"><label for="crTime" data-i18n="slot.timeLabel">Heure</label><input type="time" id="crTime" value="18:30"></div>
+        <div class="b-fld"><label for="crDur" data-i18n="slot.durationLabel">Durée (min)</label><input type="number" id="crDur" value="90" min="15" max="240"></div>
       </div>
       <div class="cr-row">
-        <div class="b-fld"><label for="crPlace">Lieu</label><input type="text" id="crPlace" placeholder="Ex. Stade / Salle Hyrox"></div>
-        <div class="b-fld"><label for="crCap">Places max</label><input type="number" id="crCap" value="20" min="1" max="200"></div>
+        <div class="b-fld"><label for="crPlace" data-i18n="slot.placeLabel">Lieu</label><input type="text" id="crPlace" placeholder="Ex. Stade / Salle Hyrox" data-i18n-attr="placeholder:slot.placePh"></div>
+        <div class="b-fld"><label for="crCap" data-i18n="slot.capacityLabel">Places max</label><input type="number" id="crCap" value="20" min="1" max="200"></div>
       </div>
       <div class="cr-row">
-        <div class="b-fld"><label for="crCoach">Coach</label><input type="text" id="crCoach" placeholder="Nom du coach"></div>
+        <div class="b-fld"><label for="crCoach" data-i18n="mode.coach">Coach</label><input type="text" id="crCoach" placeholder="Nom du coach" data-i18n-attr="placeholder:slot.coachNamePh"></div>
         <div class="b-fld"><label for="crPrice">Tarif séance (€)</label><input type="number" id="crPrice" value="0" min="0" step="0.5"></div>
       </div>
-      <div class="b-fld"><label for="crDesc">Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage — visible par les inscrits"></textarea></div>
+      <div class="b-fld"><label for="crDesc" data-i18n="slot.contentLabel">Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage — visible par les inscrits" data-i18n-attr="placeholder:slot.descPh"></textarea></div>
       <div class="cr-row">
-        <div class="b-fld"><label for="crGroup">Groupe (contenu réservé)</label><select id="crGroup"><option value="">Tout le club</option></select></div>
+        <div class="b-fld"><label for="crGroup" data-i18n="slot.groupRestrictedLabel">Groupe (contenu réservé)</label><select id="crGroup"><option value="" data-i18n="slot.wholeClubOption">Tout le club</option></select></div>
         <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> Inviter tout le groupe</label></div>
       </div>
       <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres — ils n'ont qu'à confirmer leur présence.</p>
@@ -2755,35 +2755,35 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 
 <!-- ===== Fiche créneau : description / participants / paramètres ===== -->
-<div class="overlay" id="crDetailOverlay" role="dialog" aria-modal="true" aria-label="Fiche du créneau">
+<div class="overlay" id="crDetailOverlay" role="dialog" aria-modal="true" aria-label="Fiche du créneau" data-i18n-attr="aria-label:slot.sheetAria">
   <div class="modal crd-modal">
-    <button class="close" id="crdClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <span class="badge" id="crdBadge">Créneau</span>
+    <button class="close" id="crdClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
+    <span class="badge" id="crdBadge" data-i18n="slot.badge">Créneau</span>
     <h3 id="crdTitle"></h3>
     <div class="crd-meta" id="crdMeta"></div>
     <nav class="crd-tabs" id="crdTabs">
-      <button class="crd-tab active" data-t="desc">Description</button>
-      <button class="crd-tab" data-t="participants">Participants</button>
-      <button class="crd-tab" data-t="params">Paramètres</button>
+      <button class="crd-tab active" data-t="desc" data-i18n="slot.descTab">Description</button>
+      <button class="crd-tab" data-t="participants" data-i18n="slot.participantsTab">Participants</button>
+      <button class="crd-tab" data-t="params" data-i18n="settings.label">Paramètres</button>
     </nav>
     <div class="crd-body" id="crdBody"></div>
   </div>
 </div>
 
 <!-- Modal création / édition de groupe -->
-<div class="overlay" id="groupOverlay" role="dialog" aria-modal="true" aria-label="Créer un groupe">
+<div class="overlay" id="groupOverlay" role="dialog" aria-modal="true" aria-label="Créer un groupe" data-i18n-attr="aria-label:group.createAria">
   <div class="modal group-modal">
-    <button class="close" id="groupClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="groupClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--strength)"><i class="ic ic-shirt"></i> Groupe</span>
-    <h3 id="groupModalTitle">Nouveau groupe</h3>
+    <h3 id="groupModalTitle" data-i18n="group.newBadge">Nouveau groupe</h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="grpName">Nom du groupe</label><input type="text" id="grpName" placeholder="Ex. Adultes Triathlon Ironman"></div>
-      <div class="b-fld"><label for="grpDesc">Description (optionnel)</label><input type="text" id="grpDesc" placeholder="Ex. Longue distance, format Ironman"></div>
-      <div class="b-fld"><label>Couleur</label>
+      <div class="b-fld"><label for="grpName" data-i18n="group.nameLabel">Nom du groupe</label><input type="text" id="grpName" placeholder="Ex. Adultes Triathlon Ironman" data-i18n-attr="placeholder:group.namePh"></div>
+      <div class="b-fld"><label for="grpDesc" data-i18n="group.descLabel">Description (optionnel)</label><input type="text" id="grpDesc" placeholder="Ex. Longue distance, format Ironman" data-i18n-attr="placeholder:group.descPh"></div>
+      <div class="b-fld"><label data-i18n="group.colorLabel">Couleur</label>
         <div class="grp-colors" id="grpColors"></div>
       </div>
-      <div class="b-fld"><label for="grpMemberSearch">Athlètes du groupe</label>
-        <input type="search" id="grpMemberSearch" class="club-search grp-search" placeholder="Rechercher un athlète…">
+      <div class="b-fld"><label for="grpMemberSearch" data-i18n="group.membersLabel">Athlètes du groupe</label>
+        <input type="search" id="grpMemberSearch" class="club-search grp-search" placeholder="Rechercher un athlète…" data-i18n-attr="placeholder:athlete.searchPh">
         <div class="grp-members" id="grpMembers"></div>
       </div>
     </div>
@@ -2792,17 +2792,17 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 
 <!-- Modal consentement parental (membre mineur) -->
-<div class="overlay" id="consentOverlay" role="dialog" aria-modal="true" aria-label="Consentement parental">
+<div class="overlay" id="consentOverlay" role="dialog" aria-modal="true" aria-label="Consentement parental" data-i18n-attr="aria-label:parental.consentAria">
   <div class="modal group-modal">
-    <button class="close" id="consentClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="consentClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--run)"><i class="ic ic-shield"></i> Protection des mineurs</span>
     <h3>Consentement parental — <span id="consentAthName"></span></h3>
     <div class="cr-form">
-      <label class="consent-check"><input type="checkbox" id="consentIsMinor"> <span>Cet athlète est <b>mineur</b> (moins de 18 ans)</span></label>
+      <label class="consent-check"><input type="checkbox" id="consentIsMinor"> <span><span data-i18n="parental.athleteIsPrefix">Cet athlète est</span> <b data-i18n="parental.minorWord">mineur</b> <span data-i18n="parental.under18">(moins de 18 ans)</span></span></label>
       <div id="consentFields" hidden>
         <p class="consent-note">En France, le traitement des données d'un mineur suppose l'autorisation de son représentant légal (données de santé incluses). Renseigne son contact et atteste avoir recueilli son autorisation.</p>
-        <div class="b-fld"><label for="consentGuardianName">Nom du représentant légal</label><input type="text" id="consentGuardianName" placeholder="Ex. Claire Rousseau"></div>
-        <div class="b-fld"><label for="consentGuardianEmail">E-mail du représentant légal</label><input type="email" id="consentGuardianEmail" placeholder="parent@exemple.fr"></div>
+        <div class="b-fld"><label for="consentGuardianName" data-i18n="parental.guardianNameLabel">Nom du représentant légal</label><input type="text" id="consentGuardianName" placeholder="Ex. Claire Rousseau" data-i18n-attr="placeholder:athlete.namePh"></div>
+        <div class="b-fld"><label for="consentGuardianEmail">E-mail du représentant légal</label><input type="email" id="consentGuardianEmail" placeholder="parent@exemple.fr" data-i18n-attr="placeholder:parental.emailPh"></div>
         <label class="consent-check"><input type="checkbox" id="consentAttest"> <span>J'atteste avoir recueilli l'autorisation écrite du représentant légal pour le traitement des données personnelles (dont données de santé) de ce mineur, conformément à la <a href="./legal.html#confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</span></label>
       </div>
     </div>
@@ -2811,21 +2811,21 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 
 <!-- Modal licence & certificat médical -->
-<div class="overlay" id="licenceOverlay" role="dialog" aria-modal="true" aria-label="Licence et certificat médical">
+<div class="overlay" id="licenceOverlay" role="dialog" aria-modal="true" aria-label="Licence et certificat médical" data-i18n-attr="aria-label:license.medicalAria">
   <div class="modal group-modal">
-    <button class="close" id="licenceClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="licenceClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--bike)"><i class="ic ic-shield"></i> Licence sportive</span>
     <h3>Licence — <span id="licenceAthName"></span></h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="licFed">Fédération</label>
+      <div class="b-fld"><label for="licFed" data-i18n="license.federationLabel">Fédération</label>
         <select id="licFed">
           <option value="FFTri">FFTri — Fédération Française de Triathlon</option>
           <option value="FFC">FFC — Fédération Française de Cyclisme</option>
           <option value="Autre">Autre / aucune</option>
         </select>
       </div>
-      <div class="b-fld"><label for="licNum">Numéro de licence</label><input type="text" id="licNum" placeholder="Ex. 1234567"></div>
-      <div class="b-fld"><label for="licCert">Certificat médical valable jusqu'au</label><input type="date" id="licCert"></div>
+      <div class="b-fld"><label for="licNum">Numéro de licence</label><input type="text" id="licNum" placeholder="Ex. 1234567" data-i18n-attr="placeholder:license.numberPh"></div>
+      <div class="b-fld"><label for="licCert" data-i18n="license.validUntilLabel">Certificat médical valable jusqu'au</label><input type="date" id="licCert"></div>
       <p class="consent-note">Le certificat médical (ou le questionnaire de santé qui en tient lieu selon les règles de ta fédération) est une donnée de santé, traitée selon la <a href="./legal.html#confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
     </div>
     <button class="btn" id="licSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
@@ -2833,56 +2833,56 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 
 <!-- Modal fiche athlète (coach) : VO2max, parcours, records, blessures, habitudes -->
-<div class="overlay" id="profileOverlay" role="dialog" aria-modal="true" aria-label="Fiche athlète">
+<div class="overlay" id="profileOverlay" role="dialog" aria-modal="true" aria-label="Fiche athlète" data-i18n-attr="aria-label:athlete.sheetAria">
   <div class="modal group-modal">
-    <button class="close" id="profileClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="profileClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--strength)"><i class="ic ic-user"></i> Fiche athlète</span>
     <h3>Fiche — <span id="profileAthName"></span></h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="profVo2max">VO2max (ml/kg/min, optionnel)</label><input type="number" step="0.1" min="0" max="99" id="profVo2max" placeholder="Ex. 58"></div>
-      <div class="b-fld"><label for="profBackground">Parcours sportif</label><textarea id="profBackground" rows="3" placeholder="Depuis quand il/elle pratique, expérience, contexte…"></textarea></div>
+      <div class="b-fld"><label for="profVo2max">VO2max (ml/kg/min, optionnel)</label><input type="number" step="0.1" min="0" max="99" id="profVo2max" placeholder="Ex. 58" data-i18n-attr="placeholder:athlete.weightPh"></div>
+      <div class="b-fld"><label for="profBackground" data-i18n="athlete.backgroundLabel">Parcours sportif</label><textarea id="profBackground" rows="3" placeholder="Depuis quand il/elle pratique, expérience, contexte…" data-i18n-attr="placeholder:athlete.experiencePh"></textarea></div>
 
-      <div class="b-fld"><label>Records personnels</label>
+      <div class="b-fld"><label data-i18n="records.personalLabel">Records personnels</label>
         <div class="prof-list" id="profRecords"></div>
         <button class="group-edit" id="profAddRecord" type="button" style="margin-top:6px">+ Ajouter un record</button>
       </div>
 
-      <div class="b-fld"><label>Historique de blessures</label>
+      <div class="b-fld"><label data-i18n="athlete.injuryHistoryLabel">Historique de blessures</label>
         <div class="prof-list" id="profInjuries"></div>
         <button class="group-edit" id="profAddInjury" type="button" style="margin-top:6px">+ Ajouter une blessure</button>
       </div>
 
-      <div class="b-fld"><label for="profDiet">Habitudes alimentaires</label><textarea id="profDiet" rows="2" placeholder="Allergies, régime, préférences…"></textarea></div>
-      <div class="b-fld"><label for="profWork">Habitudes de vie / travail</label><textarea id="profWork" rows="2" placeholder="Horaires, métier physique ou sédentaire, contraintes…"></textarea></div>
-      <div class="b-fld"><label>Débriefs de course (remplis par l'athlète)</label><div id="profDebriefs"></div></div>
-      <div class="b-fld"><label>Équipe de coachs</label><div id="profCoTeam"></div></div>
+      <div class="b-fld"><label for="profDiet" data-i18n="athlete.dietLabel">Habitudes alimentaires</label><textarea id="profDiet" rows="2" placeholder="Allergies, régime, préférences…" data-i18n-attr="placeholder:athlete.allergiesPh"></textarea></div>
+      <div class="b-fld"><label for="profWork">Habitudes de vie / travail</label><textarea id="profWork" rows="2" placeholder="Horaires, métier physique ou sédentaire, contraintes…" data-i18n-attr="placeholder:athlete.schedulePh"></textarea></div>
+      <div class="b-fld"><label data-i18n="race.debriefsLabel">Débriefs de course (remplis par l'athlète)</label><div id="profDebriefs"></div></div>
+      <div class="b-fld"><label data-i18n="coach.teamLabel">Équipe de coachs</label><div id="profCoTeam"></div></div>
     </div>
     <button class="btn" id="profileSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer la fiche</button>
   </div>
 </div>
 
-<div class="overlay" id="coCoachOverlay" role="dialog" aria-modal="true" aria-label="Ajouter un coach">
+<div class="overlay" id="coCoachOverlay" role="dialog" aria-modal="true" aria-label="Ajouter un coach" data-i18n-attr="aria-label:coach.addAria">
   <div class="modal group-modal">
-    <button class="close" id="coCoachClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <span class="badge" style="background:var(--swim)"><i class="ic ic-users"></i> Ajouter un coach</span>
-    <h3>Proposer un coach supplémentaire</h3>
+    <button class="close" id="coCoachClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--swim)"><i class="ic ic-users"></i> <span data-i18n="coach.addAria">Ajouter un coach</span></span>
+    <h3 data-i18n="coach.proposeAdditional">Proposer un coach supplémentaire</h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="ccEmail">Email du coach</label><input type="email" id="ccEmail" placeholder="prenom@exemple.com"></div>
-      <div class="b-fld"><label for="ccRole">Rôle (optionnel)</label><input type="text" id="ccRole" placeholder="Ex. Vélo, Course, Nutrition, Data…"></div>
+      <div class="b-fld"><label for="ccEmail">Email du coach</label><input type="email" id="ccEmail" placeholder="prenom@exemple.com" data-i18n-attr="placeholder:coach.emailPh"></div>
+      <div class="b-fld"><label for="ccRole" data-i18n="coach.roleOptionalLabel">Rôle (optionnel)</label><input type="text" id="ccRole" placeholder="Ex. Vélo, Course, Nutrition, Data…" data-i18n-attr="placeholder:coach.rolePh"></div>
       <p class="club-hint" id="ccHint"></p>
     </div>
     <button class="btn" id="coCoachSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Envoyer la demande</button>
   </div>
 </div>
 
-<div class="overlay" id="spectatorOverlay" role="dialog" aria-modal="true" aria-label="Partager avec les proches">
+<div class="overlay" id="spectatorOverlay" role="dialog" aria-modal="true" aria-label="Partager avec les proches" data-i18n-attr="aria-label:share.relativesAria">
   <div class="modal group-modal">
-    <button class="close" id="spectatorClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="spectatorClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--bike)"><i class="ic ic-link"></i> Partager la course</span>
     <h3>Lien pour les proches — <span id="specRaceName"></span></h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="specNotes">Repères pour tes proches (optionnel)</label>
-        <textarea id="specNotes" rows="3" placeholder="Ex. À 30 km, ralentis si FC > 170. Ravito prévu au km 15."></textarea></div>
+      <div class="b-fld"><label for="specNotes" data-i18n="share.spectatorNoteLabel">Repères pour tes proches (optionnel)</label>
+        <textarea id="specNotes" rows="3" placeholder="Ex. À 30 km, ralentis si FC > 170. Ravito prévu au km 15." data-i18n-attr="placeholder:race.instructionsPh"></textarea></div>
       <p class="club-hint">Aucun tracking GPS en direct — juste ces repères, et le résultat dès qu'il est disponible.</p>
     </div>
     <button class="btn" id="specGenerate" style="width:100%;margin-top:8px"><i class="ic ic-link"></i> Générer le lien</button>
@@ -2890,35 +2890,35 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   </div>
 </div>
 
-<div class="overlay" id="debriefOverlay" role="dialog" aria-modal="true" aria-label="Débrief de course">
+<div class="overlay" id="debriefOverlay" role="dialog" aria-modal="true" aria-label="Débrief de course" data-i18n-attr="aria-label:race.debriefAria">
   <div class="modal group-modal">
-    <button class="close" id="debriefClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="debriefClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--run)"><i class="ic ic-flag"></i> Débrief de course</span>
-    <h3>Comment s'est passée ta course&nbsp;?</h3>
+    <h3 data-i18n="race.debriefHeading">Comment s'est passée ta course&nbsp;?</h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="dbRace">Course</label><input type="text" id="dbRace" placeholder="Ex. Gorillaman Sprint"></div>
-      <div class="b-fld"><label for="dbDate">Date</label><input type="date" id="dbDate"></div>
-      <div class="b-fld"><label for="dbResult">Résultat / temps</label><input type="text" id="dbResult" placeholder="Ex. 1h12, ou position au général"></div>
-      <div class="b-fld"><label for="dbFelt">Ressenti général</label><textarea id="dbFelt" rows="2" placeholder="Comment tu t'es senti pendant la course…"></textarea></div>
-      <div class="b-fld"><label for="dbNutrition">Nutrition suivie comme prévu&nbsp;?</label>
-        <select id="dbNutrition"><option value="oui">Oui</option><option value="partiel">Partiellement</option><option value="non">Non</option></select>
+      <div class="b-fld"><label for="dbRace" data-i18n="race.nameLabel">Course</label><input type="text" id="dbRace" placeholder="Ex. Gorillaman Sprint" data-i18n-attr="placeholder:race.namePh"></div>
+      <div class="b-fld"><label for="dbDate" data-i18n="common.date">Date</label><input type="date" id="dbDate"></div>
+      <div class="b-fld"><label for="dbResult">Résultat / temps</label><input type="text" id="dbResult" placeholder="Ex. 1h12, ou position au général" data-i18n-attr="placeholder:race.resultPh"></div>
+      <div class="b-fld"><label for="dbFelt" data-i18n="race.resultLabel">Ressenti général</label><textarea id="dbFelt" rows="2" placeholder="Comment tu t'es senti pendant la course…" data-i18n-attr="placeholder:race.feltPh"></textarea></div>
+      <div class="b-fld"><label for="dbNutrition" data-i18n="race.nutritionFollowedLabel">Nutrition suivie comme prévu&nbsp;?</label>
+        <select id="dbNutrition"><option value="oui" data-i18n="common.yes">Oui</option><option value="partiel" data-i18n="common.partially">Partiellement</option><option value="non" data-i18n="common.no">Non</option></select>
       </div>
-      <div class="b-fld"><label for="dbWeather">Météo</label><input type="text" id="dbWeather" placeholder="Ex. chaud, pluie, vent…"></div>
-      <div class="b-fld"><label for="dbGood">Ce qui a bien marché</label><textarea id="dbGood" rows="2"></textarea></div>
-      <div class="b-fld"><label for="dbBad">Ce qui a coincé</label><textarea id="dbBad" rows="2"></textarea></div>
+      <div class="b-fld"><label for="dbWeather" data-i18n="race.weatherLabel">Météo</label><input type="text" id="dbWeather" placeholder="Ex. chaud, pluie, vent…" data-i18n-attr="placeholder:race.weatherPh"></div>
+      <div class="b-fld"><label for="dbGood" data-i18n="race.whatWentWellLabel">Ce qui a bien marché</label><textarea id="dbGood" rows="2"></textarea></div>
+      <div class="b-fld"><label for="dbBad" data-i18n="race.whatDidntLabel">Ce qui a coincé</label><textarea id="dbBad" rows="2"></textarea></div>
     </div>
     <button class="btn" id="debriefSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer mon débrief</button>
   </div>
 </div>
 
 <!-- Modal acceptation d'une demande d'adhésion (affecter à un groupe) -->
-<div class="overlay" id="acceptOverlay" role="dialog" aria-modal="true" aria-label="Accepter une demande">
+<div class="overlay" id="acceptOverlay" role="dialog" aria-modal="true" aria-label="Accepter une demande" data-i18n-attr="aria-label:request.acceptAria">
   <div class="modal accept-modal">
-    <button class="close" id="acceptClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="acceptClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--good);color:#062a1d"><i class="ic ic-check"></i> Nouvelle adhésion</span>
-    <h3 id="acceptName">Accepter l'athlète</h3>
+    <h3 id="acceptName" data-i18n="request.acceptAthleteHeading">Accepter l'athlète</h3>
     <p class="desc">Choisis le groupe qui correspond le mieux à cet athlète. Tu pourras le changer plus tard.</p>
-    <div class="b-fld"><label>Affecter au groupe</label>
+    <div class="b-fld"><label data-i18n="request.assignGroupLabel">Affecter au groupe</label>
       <div class="accept-groups" id="acceptGroups"></div>
     </div>
     <button class="btn" id="acceptSave" style="width:100%;margin-top:12px"><i class="ic ic-check"></i> Ajouter au club</button>
@@ -2930,28 +2930,28 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 
 <!-- Modal ajout d'équipement -->
-<div class="overlay" id="gearOverlay" role="dialog" aria-modal="true" aria-label="Ajouter un équipement">
+<div class="overlay" id="gearOverlay" role="dialog" aria-modal="true" aria-label="Ajouter un équipement" data-i18n-attr="aria-label:gear.addAria">
   <div class="modal gear-modal">
-    <button class="close" id="gearClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="gearClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge"><i class="ic ic-shoe"></i> Équipement</span>
-    <h3>Nouvel équipement</h3>
+    <h3 data-i18n="gear.newHeading">Nouvel équipement</h3>
     <div class="cr-form">
-      <div class="b-fld"><label for="gearType">Type</label>
+      <div class="b-fld"><label for="gearType" data-i18n="gear.typeLabel">Type</label>
         <select id="gearType">
-          <option value="shoe">Chaussures de course</option>
+          <option value="shoe" data-i18n="gear.runningShoesOption">Chaussures de course</option>
           <option value="bike">Vélo</option>
         </select>
       </div>
-      <div class="b-fld" id="shoeSearchFld"><label for="gearSearch">Cherche ton modèle</label>
-        <input type="text" id="gearSearch" placeholder="Ex. Pegasus, Novablast, Vaporfly…" autocomplete="off">
+      <div class="b-fld" id="shoeSearchFld"><label for="gearSearch" data-i18n="gear.searchModelLabel">Cherche ton modèle</label>
+        <input type="text" id="gearSearch" placeholder="Ex. Pegasus, Novablast, Vaporfly…" data-i18n-attr="placeholder:gear.modelPh" autocomplete="off">
         <div class="shoe-results" id="shoeResults"></div>
         <div class="shoe-brands" id="shoeBrands"></div>
       </div>
-      <div class="b-fld"><label for="gearName">Nom / modèle</label><input type="text" id="gearName" placeholder="Ou saisis-le librement s'il n'est pas dans le catalogue"></div>
+      <div class="b-fld"><label for="gearName">Nom / modèle</label><input type="text" id="gearName" placeholder="Ou saisis-le librement s'il n'est pas dans le catalogue" data-i18n-attr="placeholder:gear.freeTextPh"></div>
       <div class="shoe-picked" id="shoePicked" hidden></div>
       <div class="cr-row">
-        <div class="b-fld"><label for="gearKm">Km déjà parcourus</label><input type="number" id="gearKm" value="0" min="0"></div>
-        <div class="b-fld"><label for="gearMax">Durée de vie (km)</label><input type="number" id="gearMax" value="900" min="100"></div>
+        <div class="b-fld"><label for="gearKm" data-i18n="gear.kmDoneLabel">Km déjà parcourus</label><input type="number" id="gearKm" value="0" min="0"></div>
+        <div class="b-fld"><label for="gearMax" data-i18n="gear.lifespanLabel">Durée de vie (km)</label><input type="number" id="gearMax" value="900" min="100"></div>
         <div class="b-fld"><label for="gearPrice">Prix d'achat (€)</label><input type="number" id="gearPrice" value="" min="0" placeholder="160"></div>
       </div>
       <p class="cr-note">La durée de vie se remplit automatiquement selon le modèle choisi : une chaussure carbone de compétition s'use vers 350 km, une paire d'entraînement tient 900 km et plus. Le prix permet de suivre ton coût au kilomètre.</p>
@@ -2960,91 +2960,91 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   </div>
 </div>
 
-<div class="overlay" id="mentalOverlay" role="dialog" aria-modal="true" aria-label="Prise de rendez-vous prépa mentale">
+<div class="overlay" id="mentalOverlay" role="dialog" aria-modal="true" aria-label="Prise de rendez-vous prépa mentale" data-i18n-attr="aria-label:mental.bookingAria">
   <div class="modal mental-modal">
-    <button class="close" id="mentalClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="mentalClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--strength)"><i class="ic ic-brain"></i> Prépa mentale</span>
     <h3 id="mentalTitle">Réserve ta séance de préparation mentale</h3>
-    <p class="desc" id="mentalDesc" style="border-color:var(--strength)">Choisis ton préparateur, puis ton créneau.</p>
+    <p class="desc" id="mentalDesc" style="border-color:var(--strength)" data-i18n="mental.chooseCoachThenSlot">Choisis ton préparateur, puis ton créneau.</p>
     <a href="#" class="pm-back" id="mentalBack" hidden>← Choisir un autre préparateur</a>
-    <div class="pm-picker" id="mentalPicker" aria-label="Préparateurs mentaux disponibles"></div>
+    <div class="pm-picker" id="mentalPicker" aria-label="Préparateurs mentaux disponibles" data-i18n-attr="aria-label:mental.availableAria"></div>
     <div class="calendly-wrap" id="calendlyWrap" hidden>
-      <iframe id="calendlyFrame" title="Agenda de réservation — préparation mentale"
+      <iframe id="calendlyFrame" title="Agenda de réservation — préparation mentale" data-i18n-attr="title:mental.calendlyTitle"
               loading="lazy" allow="camera; microphone"></iframe>
     </div>
     <p class="mental-fallback" id="mentalFallback" hidden>L'agenda ne s'affiche pas ? <a id="calendlyLink" href="#" target="_blank" rel="noopener">Ouvrir l'agenda dans un nouvel onglet ↗</a></p>
   </div>
 </div>
 
-<div class="overlay" id="lactestOverlay" role="dialog" aria-modal="true" aria-label="Réserver un test lactate">
+<div class="overlay" id="lactestOverlay" role="dialog" aria-modal="true" aria-label="Réserver un test lactate" data-i18n-attr="aria-label:lactate.bookAria">
   <div class="modal lactest-modal">
-    <button class="close" id="lactestClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="lactestClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--good)"><i class="ic ic-flask"></i> Test lactate</span>
-    <h3>Réserve ton test lactate</h3>
+    <h3 data-i18n="lactate.bookHeading">Réserve ton test lactate</h3>
     <p class="desc" style="border-color:var(--good)">Remplis ce formulaire : nous te recontactons sous 48 h pour fixer une date selon tes disponibilités.</p>
     <div class="lf-grid">
-      <div class="lf-field"><label for="lf-name">Nom complet</label><input id="lf-name" type="text" autocomplete="name"></div>
-      <div class="lf-field"><label for="lf-email">Email</label><input id="lf-email" type="email" autocomplete="email"></div>
-      <div class="lf-field"><label for="lf-type">Type de test</label>
+      <div class="lf-field"><label for="lf-name" data-i18n="common.fullName">Nom complet</label><input id="lf-name" type="text" autocomplete="name"></div>
+      <div class="lf-field"><label for="lf-email" data-i18n="common.email">Email</label><input id="lf-email" type="email" autocomplete="email"></div>
+      <div class="lf-field"><label for="lf-type" data-i18n="lactate.testTypeLabel">Type de test</label>
         <select id="lf-type">
-          <option>Course à pied</option>
+          <option data-i18n="disc.run">Course à pied</option>
           <option>Vélo</option>
-          <option>Les deux</option>
+          <option data-i18n="common.both">Les deux</option>
         </select>
       </div>
-      <div class="lf-field"><label for="lf-period">Période souhaitée</label><input id="lf-period" type="text" placeholder="ex. semaine du 23 juin"></div>
-      <div class="lf-field full"><label for="lf-msg">Message (objectif, course visée…)</label><textarea id="lf-msg" placeholder="Optionnel"></textarea></div>
+      <div class="lf-field"><label for="lf-period" data-i18n="lactate.periodLabel">Période souhaitée</label><input id="lf-period" type="text" placeholder="ex. semaine du 23 juin" data-i18n-attr="placeholder:cycle.weekPh"></div>
+      <div class="lf-field full"><label for="lf-msg">Message (objectif, course visée…)</label><textarea id="lf-msg" placeholder="Optionnel" data-i18n-attr="placeholder:cycle.optionalPh"></textarea></div>
     </div>
-    <button class="btn" id="lactestSend" style="width:100%">Envoyer ma demande</button>
+    <button class="btn" id="lactestSend" style="width:100%" data-i18n="common.sendRequest">Envoyer ma demande</button>
     <p class="mental-fallback" id="lactestFallback" style="display:none"></p>
   </div>
 </div>
 
 <!-- ===================== ÉDITEUR DE SÉANCE ===================== -->
 <!-- ===================== ANALYSE DÉTAILLÉE SÉANCE ===================== -->
-<div class="overlay" id="analysisOverlay" role="dialog" aria-modal="true" aria-label="Analyse de la séance">
+<div class="overlay" id="analysisOverlay" role="dialog" aria-modal="true" aria-label="Analyse de la séance" data-i18n-attr="aria-label:session.analysisAria">
   <div class="modal analysis-modal">
-    <button class="close" id="analysisClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="analysisClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" id="anBadge"></span>
     <h3 id="anTitle"></h3>
     <div class="an-kpis" id="anKpis"></div>
     <div class="an-section" id="anImpactWrap">
-      <div class="an-sec-head"><h4>Impact des conditions <span class="an-hint">ce que l'environnement t'a coûté</span></h4></div>
+      <div class="an-sec-head"><h4><span data-i18n="perf.conditionsImpactHeading">Impact des conditions</span> <span class="an-hint" data-i18n="perf.conditionsImpactHint">ce que l'environnement t'a coûté</span></h4></div>
       <div class="an-impact" id="anImpact"></div>
     </div>
     <div class="an-section">
-      <div class="an-sec-head"><h4 id="anSpeedTitle">Vitesse</h4></div>
-      <svg id="anSpeed" viewBox="0 0 720 180" role="img" aria-label="Courbe de vitesse"></svg>
+      <div class="an-sec-head"><h4 id="anSpeedTitle" data-i18n="chart.speedHeading">Vitesse</h4></div>
+      <svg id="anSpeed" viewBox="0 0 720 180" role="img" aria-label="Courbe de vitesse" data-i18n-attr="aria-label:chart.speedAria"></svg>
     </div>
     <div class="an-section" id="anPowerWrap">
       <div class="an-sec-head"><h4>Puissance (W)</h4></div>
-      <svg id="anPower" viewBox="0 0 720 180" role="img" aria-label="Courbe de puissance"></svg>
+      <svg id="anPower" viewBox="0 0 720 180" role="img" aria-label="Courbe de puissance" data-i18n-attr="aria-label:chart.powerAria"></svg>
     </div>
     <div class="an-section">
-      <div class="an-sec-head"><h4>Fréquence cardiaque</h4></div>
-      <svg id="anHr" viewBox="0 0 720 180" role="img" aria-label="Courbe de fréquence cardiaque"></svg>
+      <div class="an-sec-head"><h4 data-i18n="chart.hrHeading">Fréquence cardiaque</h4></div>
+      <svg id="anHr" viewBox="0 0 720 180" role="img" aria-label="Courbe de fréquence cardiaque" data-i18n-attr="aria-label:chart.hrCurveAria"></svg>
     </div>
     <div class="an-section" id="anElevWrap">
       <div class="an-sec-head"><h4>Profil d'altitude · D+</h4></div>
-      <svg id="anElev" viewBox="0 0 720 150" role="img" aria-label="Profil d'altitude"></svg>
+      <svg id="anElev" viewBox="0 0 720 150" role="img" aria-label="Profil d'altitude" data-i18n-attr="aria-label:chart.altitudeAria"></svg>
     </div>
     <div class="an-section" id="anBiomechWrap">
-      <div class="an-sec-head"><h4>Biomécanique <span class="an-hint">dynamiques de course, si la montre les fournit</span></h4></div>
+      <div class="an-sec-head"><h4><span data-i18n="perf.biomechanicsHeading">Biomécanique</span> <span class="an-hint" data-i18n="perf.biomechanicsHint">dynamiques de course, si la montre les fournit</span></h4></div>
       <div class="an-sub-sec">
-        <h5 class="an-sub-h">Fréquence de foulée</h5>
-        <svg id="anCadence" viewBox="0 0 720 150" role="img" aria-label="Fréquence de foulée" style="display:none"></svg>
+        <h5 class="an-sub-h" data-i18n="chart.cadenceHeading">Fréquence de foulée</h5>
+        <svg id="anCadence" viewBox="0 0 720 150" role="img" aria-label="Fréquence de foulée" data-i18n-attr="aria-label:chart.cadenceAria" style="display:none"></svg>
         <p class="hint" id="anCadenceNA">Pas de données de cadence disponibles sur cette activité.</p>
       </div>
       <div class="an-sub-sec" style="margin-top:18px">
-        <h5 class="an-sub-h">Longueur de foulée</h5>
-        <svg id="anStepLen" viewBox="0 0 720 150" role="img" aria-label="Longueur de foulée" style="display:none"></svg>
+        <h5 class="an-sub-h" data-i18n="chart.strideLenHeading">Longueur de foulée</h5>
+        <svg id="anStepLen" viewBox="0 0 720 150" role="img" aria-label="Longueur de foulée" data-i18n-attr="aria-label:chart.strideAria" style="display:none"></svg>
         <p class="hint" id="anStepLenNA">Pas de données de longueur de foulée disponibles sur cette activité (nécessite une montre avec capteur de dynamiques de course — Coros, Garmin… — via import .FIT).</p>
       </div>
     </div>
     <div class="an-section" id="anDecoupleWrap">
-      <div class="an-sec-head"><h4>Découplage <span class="an-hint" id="anDecoupleHint">efficacité cardiaque sur la durée</span></h4></div>
+      <div class="an-sec-head"><h4><span data-i18n="chart.decouplingHeading">Découplage</span> <span class="an-hint" id="anDecoupleHint" data-i18n="chart.decouplingHint">efficacité cardiaque sur la durée</span></h4></div>
       <div class="an-dc-kpi" id="anDecoupleKpi"></div>
-      <svg id="anDecouple" viewBox="0 0 720 170" role="img" aria-label="Courbe de découplage"></svg>
+      <svg id="anDecouple" viewBox="0 0 720 170" role="img" aria-label="Courbe de découplage" data-i18n-attr="aria-label:chart.decouplingAria"></svg>
       <div class="an-dc-trend" id="anDecoupleTrend"></div>
     </div>
     <div class="an-section" id="anAiWrap">
@@ -3056,20 +3056,20 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="lap-chart" id="anLapChart"></div>
     </div>
     <div class="an-section">
-      <div class="an-sec-head"><h4>Détail par lap</h4><span class="an-hint" id="anLapHint"></span></div>
+      <div class="an-sec-head"><h4 data-i18n="perf.lapDetailHeading">Détail par lap</h4><span class="an-hint" id="anLapHint"></span></div>
       <div class="an-laps" id="anLaps"></div>
     </div>
     <div class="an-section" id="anSimilarWrap">
-      <div class="an-sec-head"><h4>Séances similaires</h4><span class="an-hint">comparaison automatique</span></div>
+      <div class="an-sec-head"><h4 data-i18n="perf.similarSessionsHeading">Séances similaires</h4><span class="an-hint" data-i18n="perf.autoComparison">comparaison automatique</span></div>
       <div id="anSimilar"></div>
     </div>
   </div>
 </div>
 
 <!-- ===== Paramètres (abonnements & compte) ===== -->
-<div class="overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-label="Paramètres">
+<div class="overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-label="Paramètres" data-i18n-attr="aria-label:settings.label">
   <div class="modal settings-modal">
-    <button class="close" id="settingsClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="settingsClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge">Paramètres</span>
     <div class="set-layout">
       <nav class="set-nav" id="setNav">
@@ -3082,13 +3082,13 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 
 <!-- ===== Éditeur de cycle (programme complet multi-semaines) ===== -->
-<div class="overlay" id="cycleOverlay" role="dialog" aria-modal="true" aria-label="Création de cycle">
+<div class="overlay" id="cycleOverlay" role="dialog" aria-modal="true" aria-label="Création de cycle" data-i18n-attr="aria-label:cycle.createAria">
   <div class="modal cycle-modal">
-    <button class="close" id="cycleClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <span class="badge" id="cycleBadge">Nouveau cycle</span>
+    <button class="close" id="cycleClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
+    <span class="badge" id="cycleBadge" data-i18n="cycle.newBadge">Nouveau cycle</span>
     <div class="cy-meta">
-      <input type="text" id="cyName" class="b-title-input" aria-label="Nom du cycle" placeholder="Nom du cycle (ex. Endurance hiver, Affûtage course A…)">
-      <select id="cyWeeks" class="b-disc-select" aria-label="Durée du cycle">
+      <input type="text" id="cyName" class="b-title-input" aria-label="Nom du cycle" placeholder="Nom du cycle (ex. Endurance hiver, Affûtage course A…)" data-i18n-attr="aria-label:cycle.nameAria,placeholder:cycle.namePh">
+      <select id="cyWeeks" class="b-disc-select" aria-label="Durée du cycle" data-i18n-attr="aria-label:cycle.durationAria">
         <option value="3">3 semaines</option>
         <option value="4" selected>4 semaines</option>
         <option value="5">5 semaines</option>
@@ -3098,7 +3098,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <p class="cy-hint"><i class="ic ic-lightbulb"></i> Clique sur le + d'un jour pour y ajouter des séances de ta bibliothèque (clique sur une séance pour la retirer). Les allures seront recalculées avec les références de l'athlète.</p>
     <div id="cyGrid"></div>
     <div class="cy-foot">
-      <label class="cy-start">Semaine de départ : <input type="date" id="cyStart"></label>
+      <label class="cy-start"><span data-i18n="cycle.startWeekLabel">Semaine de départ :</span> <input type="date" id="cyStart"></label>
       <div class="cy-actions">
         <button class="btn cy-ghost" id="cySave"><i class="ic ic-check"></i> Enregistrer le cycle</button>
         <button class="btn" id="cyApply"><i class="ic ic-calendar"></i> Ajouter à l'athlète</button>
@@ -3108,22 +3108,22 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 </div>
 <div id="cyPicker" hidden></div>
 
-<div class="overlay" id="builderOverlay" role="dialog" aria-modal="true" aria-label="Création de séance">
+<div class="overlay" id="builderOverlay" role="dialog" aria-modal="true" aria-label="Création de séance" data-i18n-attr="aria-label:session.createAria">
   <div class="modal builder-modal">
-    <button class="close" id="builderClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="builderClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <div class="builder-head">
-      <span class="badge" id="builderBadge">Nouvelle séance</span>
+      <span class="badge" id="builderBadge" data-i18n="session.newBadge">Nouvelle séance</span>
       <div class="builder-meta-row">
-        <input type="text" id="bTitle" class="b-title-input" aria-label="Titre de la séance" placeholder="Titre de la séance (ex. Seuil 4×8' FTP)">
-        <select id="bDiscPick" class="b-disc-select" aria-label="Sport">
+        <input type="text" id="bTitle" class="b-title-input" aria-label="Titre de la séance" placeholder="Titre de la séance (ex. Seuil 4×8' FTP)" data-i18n-attr="aria-label:session.titleAria,placeholder:session.titlePh">
+        <select id="bDiscPick" class="b-disc-select" aria-label="Sport" data-i18n-attr="aria-label:session.sportAria">
           <option value="swim">Natation</option>
           <option value="bike">Vélo</option>
           <option value="run">Course</option>
           <option value="strength">Renfo</option>
           <option value="hyrox">Hyrox</option>
         </select>
-        <select id="bObjectif" title="Objectif de la séance — sert à l'analyse IA" aria-label="Objectif de la séance" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:var(--radius-sm);padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
-          <option value="">Objectif : auto</option>
+        <select id="bObjectif" title="Objectif de la séance — sert à l'analyse IA" aria-label="Objectif de la séance" data-i18n-attr="title:session.goalTitle,aria-label:session.goalAria" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:var(--radius-sm);padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
+          <option value="" data-i18n="session.goalAutoOption">Objectif : auto</option>
           <option value="endurance|Z2">Endurance fondamentale (Z2)</option>
           <option value="seuil|Z3">Seuil aérobie · LT1 (Z3)</option>
           <option value="seuil|Z4">Seuil · LT2 (Z4)</option>
@@ -3132,7 +3132,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
         </select>
       </div>
       <div class="b-refs-row">
-        <span class="b-refs-lbl">Références affichées :</span>
+        <span class="b-refs-lbl" data-i18n="session.refsShownLabel">Références affichées :</span>
         <div class="b-refs" id="bRefs"></div>
       </div>
     </div>
@@ -3144,8 +3144,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="b-nutri">
         <div class="b-nutri-head"><i class="ic ic-utensils"></i> Consignes nutrition <span id="bNutriAuto" class="b-nutri-auto"></span></div>
         <div class="b-nutri-grid">
-          <div class="b-fld"><label for="bNutriPre">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type — ou écris ta consigne"></textarea></div>
-          <div class="b-fld"><label for="bNutriPost">Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides"></textarea></div>
+          <div class="b-fld"><label for="bNutriPre" data-i18n="session.beforeSessionLabel">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type — ou écris ta consigne" data-i18n-attr="placeholder:session.notePh"></textarea></div>
+          <div class="b-fld"><label for="bNutriPost" data-i18n="session.afterSessionLabel">Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides" data-i18n-attr="placeholder:session.nutritionPh"></textarea></div>
         </div>
         <button class="b-nutri-reset" id="bNutriReset" type="button">↺ Regénérer automatiquement</button>
       </div>
@@ -3161,9 +3161,9 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   </div>
 </div>
 
-<div class="overlay" id="videoOverlay" role="dialog" aria-modal="true" aria-label="Lecteur vidéo">
+<div class="overlay" id="videoOverlay" role="dialog" aria-modal="true" aria-label="Lecteur vidéo" data-i18n-attr="aria-label:video.playerAria">
   <div class="modal video-modal">
-    <button class="close" id="videoClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" id="videoClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" id="videoBadge"></span>
     <h3 id="videoTitle"></h3>
     <div class="video-frame" id="videoFrame"></div>
@@ -3174,14 +3174,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 
 <div class="vid-popover" id="vidPopover" aria-hidden="true">
   <div class="vp-thumb" id="vpThumb"></div>
-  <div class="vp-meta"><b id="vpTitle"></b><span id="vpHint">Clic pour ouvrir en grand</span></div>
+  <div class="vp-meta"><b id="vpTitle"></b><span id="vpHint" data-i18n="common.clickToEnlarge">Clic pour ouvrir en grand</span></div>
 </div>
 
 <!-- ===================== MESSAGERIE ===================== -->
-<button class="chat-fab" id="chatFab" aria-label="Messagerie">
+<button class="chat-fab" id="chatFab" aria-label="Messagerie" data-i18n-attr="aria-label:messaging.aria">
   <i class="ic ic-message-circle"></i><span class="chat-fab-badge" id="chatFabBadge" hidden></span>
 </button>
-<div class="chat-panel" id="chatPanel" role="dialog" aria-label="Messagerie">
+<div class="chat-panel" id="chatPanel" role="dialog" aria-label="Messagerie" data-i18n-attr="aria-label:messaging.aria">
   <div class="chat-head">
     <div class="chat-head-id">
       <div class="chat-avatar" id="chatAvatar">RD</div>
@@ -3191,17 +3191,17 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       </div>
     </div>
     <div class="chat-head-actions">
-      <button class="chat-wa" id="chatWhatsapp" title="Ouvrir dans WhatsApp">
+      <button class="chat-wa" id="chatWhatsapp" title="Ouvrir dans WhatsApp" data-i18n-attr="title:whatsapp.openTitle">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.738-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>
       </button>
-      <button class="chat-close" id="chatClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+      <button class="chat-close" id="chatClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     </div>
   </div>
   <div class="chat-quick" id="chatQuick"></div>
   <div class="chat-body" id="chatBody"></div>
   <div class="chat-input">
-    <input type="text" id="chatText" aria-label="Message" placeholder="Écris un message…" autocomplete="off">
-    <button id="chatSend" aria-label="Envoyer"><i class="ic ic-send"></i></button>
+    <input type="text" id="chatText" aria-label="Message" placeholder="Écris un message…" data-i18n-attr="aria-label:message.aria,placeholder:message.ph" autocomplete="off">
+    <button id="chatSend" aria-label="Envoyer" data-i18n-attr="aria-label:message.sendAria"><i class="ic ic-send"></i></button>
   </div>
 </div>
 
