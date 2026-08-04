@@ -16,6 +16,8 @@
 import { PF } from "./sillance-client.js";
 window.PF = PF;
 
+function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
+
 const A = () => window.__pf_app;   // raccourci vers le hook de l'app
 const TRIAL_DAYS = 14;             // durée de l'essai gratuit coach (jours)
 
@@ -146,7 +148,7 @@ async function hydrate() {
     } catch (e) { console.warn("[PF] rosterRefs :", e); }
     const list = rows.map((r) => ({
       id: r.athlete_id,
-      name: esc(r.profiles?.full_name || r.profiles?.email) || "Athlète",
+      name: esc(r.profiles?.full_name || r.profiles?.email) || tr("mode.athlete"),
       checkin: ckByAth[r.athlete_id] || null,
       refsUpdatedAt: refsByAth[r.athlete_id] || null,
     }));
@@ -234,7 +236,7 @@ async function hydrate() {
         app.replaceArray(app.data.CLUB_GROUPS, []);
         app.replaceArray(app.data.CRENEAUX, []);
         const el = document.getElementById("clubName");
-        if (el) el.textContent = "Mon club";
+        if (el) el.textContent = tr("club.myClubFallback");
         return;
       }
       const club = clubs[0];
@@ -387,12 +389,12 @@ function setCloudBadge(connected) {
     b.id = "pf-cloud-badge";
     document.body.appendChild(b);
     b.addEventListener("click", () => {
-      if (PF.user) { if (confirm("Se déconnecter ?")) PF.signOut().then(() => location.reload()); }
+      if (PF.user) { if (confirm(tr("auth.confirmLogOut"))) PF.signOut().then(() => location.reload()); }
       else openAuth();
     });
   }
   b.classList.toggle("on", !!connected);
-  b.textContent = connected ? `☁︎ ${PF.profile?.full_name || "Connecté"}` : "☁︎ Se connecter";
+  b.textContent = connected ? `☁︎ ${PF.profile?.full_name || tr("auth.connected")}` : `☁︎ ${tr("auth.logIn")}`;
 }
 
 let authMode = gateMode ? "signup" : "signin";
@@ -429,23 +431,23 @@ function renderAuth() {
   const isUp = authMode === "signup";
   card.innerHTML = `
     <h2>Sillance</h2>
-    <p class="sub">${isUp ? "Crée ton compte" : "Connecte-toi à ton espace"}</p>
+    <p class="sub">${isUp ? tr("auth.createAccount") : tr("auth.logInToSpace")}</p>
     ${isUp ? `
-      <label>Nom complet</label><input id="pf-name" placeholder="Prénom Nom">
-      <label>Je suis…</label>
+      <label>${tr("auth.fullName")}</label><input id="pf-name" placeholder="${tr("auth.fullNamePh")}">
+      <label>${tr("auth.iAm")}</label>
       <div class="row-roles">
-        <div class="role" data-role="coach">Coach</div>
-        ${hardGate ? `` : `<div class="role" data-role="athlete">Athlète</div>`}
-        <div class="role" data-role="club_admin">Club</div>
+        <div class="role" data-role="coach">${tr("mode.coach")}</div>
+        ${hardGate ? `` : `<div class="role" data-role="athlete">${tr("mode.athlete")}</div>`}
+        <div class="role" data-role="club_admin">${tr("mode.club")}</div>
       </div>` : ``}
-    <label>Email</label><input id="pf-email" type="email" placeholder="toi@mail.com">
-    <label>Mot de passe</label><input id="pf-pass" type="password" placeholder="••••••••">
+    <label>${tr("common.email")}</label><input id="pf-email" type="email" placeholder="${tr("auth.emailPh")}">
+    <label>${tr("auth.password")}</label><input id="pf-pass" type="password" placeholder="••••••••">
     <div class="err" id="pf-err"></div>
-    ${isUp ? `<label class="pf-consent"><input type="checkbox" id="pf-consent"><span>J'accepte que Sillance traite mes données d'entraînement, y compris mes données de santé (check-ins, fréquence cardiaque), pour fournir le service. Voir la <a href="./legal.html#confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</span></label>` : ``}
-    <button class="primary" id="pf-go">${isUp ? "Créer mon compte" : "Se connecter"}</button>
+    ${isUp ? `<label class="pf-consent"><input type="checkbox" id="pf-consent"><span>${tr("auth.consentText")} <a href="./legal.html#confidentialite" target="_blank" rel="noopener">${tr("auth.privacyPolicyLink")}</a>.</span></label>` : ``}
+    <button class="primary" id="pf-go">${isUp ? tr("auth.createMyAccount") : tr("auth.logIn")}</button>
     <div class="switch">${isUp
-      ? `Déjà un compte ? <a id="pf-switch">Se connecter</a>`
-      : `Pas encore de compte ? <a id="pf-switch">S'inscrire</a>`}</div>`;
+      ? `${tr("auth.alreadyAccount")} <a id="pf-switch">${tr("auth.logIn")}</a>`
+      : `${tr("auth.noAccountYet")} <a id="pf-switch">${tr("auth.signUp")}</a>`}</div>`;
 
   card.querySelectorAll(".role").forEach((r) => {
     r.classList.toggle("active", r.dataset.role === pickedRole);
@@ -463,19 +465,19 @@ async function submitAuth() {
   try {
     if (authMode === "signup") {
       const consent = document.getElementById("pf-consent");
-      if (consent && !consent.checked) { err.textContent = "Merci d'accepter le traitement de tes données pour créer ton compte."; return; }
+      if (consent && !consent.checked) { err.textContent = tr("auth.pleaseAcceptConsent"); return; }
       const fullName = document.getElementById("pf-name").value.trim();
       await PF.signUp({ email, password, fullName, role: pickedRole });
       // Selon la config Supabase, une confirmation email peut être requise.
       await PF.signIn({ email, password }).catch(() => {});
-      if (!PF.user) { err.textContent = "Compte créé. Vérifie ton email puis connecte-toi."; authMode = "signin"; renderAuth(); return; }
+      if (!PF.user) { err.textContent = tr("auth.accountCreatedCheckEmail"); authMode = "signin"; renderAuth(); return; }
     } else {
       await PF.signIn({ email, password });
     }
     closeAuth(true);
     await onLoggedIn();
   } catch (e) {
-    err.textContent = e?.message || "Erreur de connexion.";
+    err.textContent = e?.message || tr("auth.connectionError");
   }
 }
 
@@ -534,11 +536,11 @@ function renderCoachGate({ subscribed, role, trialDaysLeft, locked }) {
     o.id = "pf-lock-overlay";
     o.innerHTML = `
       <div class="card">
-        <h2>Ton essai gratuit est terminé</h2>
-        <p>Abonne-toi à Sillance pour continuer à coacher tes athlètes, planifier et analyser.</p>
-        <div class="price">29 €<small> /mois</small></div>
-        <button class="go" id="pf-lock-go">S'abonner à Sillance</button>
-        <button class="out" id="pf-lock-out">Se déconnecter</button>
+        <h2>${tr("gate.trialOverHeading")}</h2>
+        <p>${tr("gate.trialOverText")}</p>
+        <div class="price">29 €<small> ${tr("gate.perMonth")}</small></div>
+        <button class="go" id="pf-lock-go">${tr("gate.subscribeToSillance")}</button>
+        <button class="out" id="pf-lock-out">${tr("auth.logOut")}</button>
       </div>`;
     document.body.appendChild(o);
     o.querySelector("#pf-lock-go").onclick = () =>
@@ -552,9 +554,9 @@ function renderCoachGate({ subscribed, role, trialDaysLeft, locked }) {
   if (trialDaysLeft != null) {
     const b = document.createElement("div");
     b.id = "pf-trial-banner";
-    const j = trialDaysLeft <= 1 ? "dernier jour" : `${trialDaysLeft} jours restants`;
-    b.innerHTML = `🎁 Essai gratuit — <b>${j}</b>
-      <button id="pf-trial-go">S'abonner (29 €/mois)</button>`;
+    const j = trialDaysLeft <= 1 ? tr("gate.lastDay") : tr("gate.daysLeft", { n: trialDaysLeft });
+    b.innerHTML = `🎁 ${tr("gate.freeTrial")} — <b>${j}</b>
+      <button id="pf-trial-go">${tr("gate.subscribePrice")}</button>`;
     document.body.appendChild(b);
     document.body.style.paddingTop = b.offsetHeight + "px";
     b.querySelector("#pf-trial-go").onclick = () =>
@@ -575,8 +577,8 @@ function renderVideoGate({ role, videosOk }) {
     if (!teaser) {
       teaser = document.createElement("div");
       teaser.id = "pf-video-teaser";
-      teaser.innerHTML = `<div class="t">🔒 Vidéos d'exercices réservées</div>
-        <div class="s">Ton coach peut débloquer les vidéos de démonstration pour toi.<br>Demande-lui d'activer l'option dans son espace.</div>`;
+      teaser.innerHTML = `<div class="t">🔒 ${tr("gate.videosLockedTitle")}</div>
+        <div class="s">${tr("gate.videosLockedText1")}<br>${tr("gate.videosLockedText2")}</div>`;
       lib.appendChild(teaser);
     }
   } else if (teaser) {
