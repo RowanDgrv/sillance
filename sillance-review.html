@@ -453,7 +453,12 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
   border:1px solid var(--line);border-radius:var(--radius);
   background:var(--panel);overflow:hidden;
 }
-.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+/* min-height (audit Lighthouse CLS 04/08/2026) : #calGrid/#vlGrid/#coachBand sont
+   remplis en JS par le script principal (8700+ lignes) — sous réseau lent, le
+   navigateur peut peindre le squelette HTML vide avant l'exécution du script,
+   puis tout saute d'un coup une fois le contenu injecté (CLS mesuré 0.66,
+   quasi entièrement ce seul saut). Réserver l'espace élimine le saut. */
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));min-height:480px}
 @media (max-width:980px){.cal-grid{grid-template-columns:1fr}}
 /* overlay grille du calendrier (7 colonnes = jours), révélé par body.grid-on */
 .cal-guides{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .26s ease;z-index:5}
@@ -776,6 +781,7 @@ body:not([data-athview]):not([data-clubview]) .gear-card .gear-del{display:none}
   display:grid;grid-template-columns:auto 1fr auto;gap:26px;align-items:center;
   border:1px solid var(--line);border-radius:16px;padding:20px var(--space-5);margin-bottom:26px;
   background:linear-gradient(135deg, var(--panel-2), var(--panel));position:relative;overflow:hidden;
+  min-height:100px; /* réserve d'espace CLS, voir commentaire sur .cal-grid */
 }
 .coach-band::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(600px 220px at 85% 0%, color-mix(in srgb, var(--cbc,#46C2D8) 10%, transparent), transparent 70%)}
@@ -1040,7 +1046,7 @@ body[data-athview="home"] .today-panel{display:block}
 .vl-filter.active{background:linear-gradient(120deg,rgba(47,217,255,.16),rgba(157,123,255,.16));color:var(--text);border-color:transparent}
 /* grille MODULAIRE : 12 colonnes, gouttière = 24px, interligne = 24px ; les cartes
    occupent des modules entiers et tombent sur les MÊMES lignes que l'overlay. */
-.vl-grid{display:grid;grid-template-columns:repeat(var(--v-cols),minmax(0,1fr));column-gap:var(--v-gutter);row-gap:var(--lh);position:relative;z-index:1}
+.vl-grid{display:grid;grid-template-columns:repeat(var(--v-cols),minmax(0,1fr));column-gap:var(--v-gutter);row-gap:var(--lh);position:relative;z-index:1;min-height:500px} /* réserve d'espace CLS, voir commentaire sur .cal-grid */
 .vl-grid .vcard{grid-column:span 3}
 @media (max-width:1040px){.vl-grid .vcard{grid-column:span 4}}
 @media (max-width:760px){.vl-grid .vcard{grid-column:span 6}}

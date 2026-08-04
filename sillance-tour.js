@@ -163,11 +163,21 @@
   function isRendered(el){ return !!el && el.getClientRects().length > 0; }
 
   function updatePosition(){
+    rafId = null;
     if(!active || !currentStep) return;
     if(!isCoachMode()){ finishTour(false); return; }
     var el = qs(currentStep.target);
     if(currentStep.target && !isRendered(el)){ finishTour(false); return; }
     positionFor(currentStep, el);
+  }
+  // Repositionne au resize/scroll plutôt qu'en boucle sur chaque frame (perf
+  // 04/08/2026) : l'ancienne version se rappelait via requestAnimationFrame
+  // indéfiniment tant qu'une étape attendait un clic — coûteux en reflow forcé
+  // (getBoundingClientRect + écritures de style à chaque frame), mesuré comme
+  // la première cause du TBT/LCP tardifs en audit Lighthouse.
+  function scheduleReposition(){
+    if(!active) return;
+    if(rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(updatePosition);
   }
 
@@ -178,8 +188,6 @@
     if(step.target && !isRendered(el)){ finishTour(false); return; }
     if(el && el.scrollIntoView) el.scrollIntoView({block:'center', inline:'nearest'});
     positionFor(step, el);
-    if(rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(updatePosition);
   }
 
   function advance(){
@@ -243,6 +251,8 @@
     document.addEventListener('click', onDomEvent, true);
     document.addEventListener('change', onDomEvent, true);
     document.addEventListener('input', onDomEvent, true);
+    window.addEventListener('resize', scheduleReposition);
+    window.addEventListener('scroll', scheduleReposition, true);
     var btn = document.getElementById('tutoBtn');
     if(btn) btn.addEventListener('click', start);
     maybeAutoLaunch();
