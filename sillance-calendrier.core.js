@@ -1155,6 +1155,11 @@ function refreshAlertBadge(){
   if(unseen>0){ badge.hidden=false; badge.textContent=unseen; bell.classList.add('has-alert');
     badge.style.background = hasUrgent ? '#FF5470' : '#FF8A4D'; }
   else { badge.hidden=true; bell.classList.remove('has-alert'); }
+  // le badge numérique est un texte VISIBLE dans le bouton (ex. "1") : le nom
+  // accessible doit l'inclure (WCAG 2.5.3 Label in Name, audit a11y 04/08/2026)
+  // sinon la commande vocale/lecteur d'écran annonce juste "Notifications" et
+  // n'a rien à faire correspondre au chiffre affiché.
+  bell.setAttribute('aria-label', unseen>0 ? tr('notif.ariaWithCount', {n:unseen}) : tr('notif.aria'));
 }
 function timeAgo(d){
   const m=Math.round((Date.now()-d.getTime())/60000);

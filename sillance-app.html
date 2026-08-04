@@ -49,7 +49,7 @@
   --line:rgba(150,165,200,.12);
   --line-strong:rgba(150,165,200,.24);
   --text:#EAEEF7;
-  --muted:#8B95AD;
+  --muted:#949DB4; /* était #8B95AD — audit a11y 04/08 : trop juste sous n'importe quel opacity<1 (4.46-4.47:1 mesuré dans 2 contextes distincts, .session.done et .coach-connect) ; ce ton passe large partout, y compris à pleine opacité */
   --soft:#C2CAD9;
   /* Une seule couleur de marque (teal raffiné), disciplines désaturées = code data, pas déco */
   --accent:#46C2D8;
@@ -517,13 +517,6 @@ body.grid-on .cal-guides{opacity:1}
 .session .t{font-weight:600;font-size:13.5px;line-height:1.3;display:flex;gap:6px;align-items:flex-start;padding-right:var(--space-4)}
 .session .t::before{content:'';width:7px;height:7px;margin-top:var(--space-1);flex:none;border-radius:2px;background:var(--c,var(--muted))}
 .session .m{font-family:var(--font-data);font-size:var(--fs-sm);color:var(--muted);margin-top:var(--space-1);display:flex;gap:var(--space-2);flex-wrap:wrap}
-/* thème sombre (audit a11y 04/08/2026) : --muted à travers l'opacity:.85 de
-   .session.done retombe à 4.47:1 sur son fond effectif (sous 4.5 requis) —
-   le titre passait large avec la même opacity (--text quasi blanc), mais le
-   texte secondaire gris était déjà proche du seuil À PLEINE opacité. Léger
-   éclaircissement ciblé, 4.91:1 une fois repassé par l'opacity du parent.
-   Thème clair déjà à 4.64:1 avec les mêmes valeurs, pas retouché. */
-body:not(.light) .session.done .m{color:#949DB4}
 
 /* Profil visuel de la séance (barres d'intensité dans le temps, façon TrainingPeaks) */
 .sess-profile{
@@ -555,14 +548,18 @@ body:not(.light) .session.done .m{color:#949DB4}
 .wk-alert.hard{color:#FFC69A;background:rgba(255,138,61,.1);border:1px solid rgba(255,138,61,.35)}
 .wk-alert.easy{color:#A9EFD2;background:rgba(57,230,163,.08);border:1px solid rgba(57,230,163,.3)}
 @media(max-width:980px){.wk-tot{min-width:0}}
+/* cibles tactiles élargies à 24×24 (audit a11y 04/08/2026, WCAG 2.5.8 Target
+   Size) : 18×18 avec 2px d'écart entre les deux boutons ne passait ni la
+   taille minimale ni l'exception d'espacement. Zone cliquable agrandie,
+   icônes visuellement inchangées (juste plus de marge autour). */
 .session .del{
-  position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:6px;
+  position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:7px;
   border:none;background:transparent;color:var(--muted);font-size:var(--fs-sm);line-height:1;
-  opacity:0;transition:.15s;
+  opacity:0;transition:.15s;display:flex;align-items:center;justify-content:center;
 }
 .session:hover .del{opacity:1}
 .session .del:hover{color:var(--run);background:rgba(255,84,112,.12)}
-.session .note-btn{position:absolute;top:6px;right:26px;width:18px;height:18px;border-radius:6px;
+.session .note-btn{position:absolute;top:3px;right:29px;width:24px;height:24px;border-radius:7px;
   border:none;background:transparent;color:var(--muted);opacity:0;transition:.15s;
   display:flex;align-items:center;justify-content:center}
 .session .note-btn .ic{width:11px;height:11px}
@@ -2276,7 +2273,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <i class="ic ic-settings"></i>
     </button>
     <div class="bell-wrap" id="bellWrap">
-      <button class="icon-btn bell-btn" id="bellBtn" aria-label="Notifications" aria-haspopup="true" title="Alertes" data-i18n-attr="aria-label:notif.aria,title:notif.title">
+      <!-- aria-label PAS dans data-i18n-attr : refreshAlertBadge() le pilote en JS
+           (avec le compteur inclus, WCAG 2.5.3) — sinon applyTranslations() au
+           chargement l'écrase avec la version statique sans le compteur. -->
+      <button class="icon-btn bell-btn" id="bellBtn" aria-label="Notifications" aria-haspopup="true" title="Alertes" data-i18n-attr="title:notif.title">
         <i class="ic ic-bell"></i><span class="bell-badge" id="bellBadge" hidden>0</span>
       </button>
       <div class="bell-menu" id="bellMenu" role="menu" aria-label="Alertes athlètes" data-i18n-attr="aria-label:notif.athleteAlerts">
