@@ -5476,11 +5476,15 @@ function builderToSession(){
   }));
   const domZone = zMax ? 'Z'+zMax : 'Z2';
   // nutrition : valeurs saisies par le coach (ou auto si laissé vide)
-  const pre=document.getElementById('bNutriPre').value.trim();
-  const post=document.getElementById('bNutriPost').value.trim();
+  // Échappés à la saisie (audit sécurité 04/08/2026, même raison que les
+  // groupes club) : titre + consignes nutrition s'affichent ensuite via
+  // innerHTML sans ré-échapper, et la nutrition est explicitement montrée à
+  // l'ATHLÈTE (fiche séance) — pas juste le coach qui l'a tapée.
+  const pre=dispoSafe(document.getElementById('bNutriPre').value.trim());
+  const post=dispoSafe(document.getElementById('bNutriPost').value.trim());
   const s={
     disc: builderState.disc,
-    title: builderState.title || document.getElementById('bTitle').value || tr('builder.customSession'),
+    title: dispoSafe(builderState.title || document.getElementById('bTitle').value || tr('builder.customSession')),
     dur: min, tss, zone: domZone,
     desc: builderToText(),
     objectif: builderState.objectif ? {type:builderState.objectif.split('|')[0], zone:builderState.objectif.split('|')[1]} : null,
