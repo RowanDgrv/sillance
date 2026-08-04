@@ -767,15 +767,15 @@ function coachGuideHTML(){
   if(localStorage.getItem('sil_coach_guide')==='off') return '';
   return `
       <div class="startguide" id="startGuide">
-        <div class="sg-head"><b><i class="ic ic-lightbulb"></i> Par où commencer</b><button class="sg-x" id="sgClose" title="Masquer"><i class="ic ic-x"></i></button></div>
-        <p class="sg-sub">4 étapes pour lancer ton coaching.</p>
+        <div class="sg-head"><b><i class="ic ic-lightbulb"></i> ${tr('guide.whereToStart')}</b><button class="sg-x" id="sgClose" title="${tr('common.hide')}"><i class="ic ic-x"></i></button></div>
+        <p class="sg-sub">${tr('guide.subtitle')}</p>
         <ol class="sg-steps">
-          <li><b>Crée tes séances</b> : ta bibliothèque, ou un cycle complet d'un coup.</li>
-          <li><b>Ajoute un athlète</b> : invite-le par e-mail, il voit son plan.</li>
-          <li><b>Connecte sa montre</b> : Garmin, Coros ou .FIT, ses séances remontent analysées.</li>
-          <li><b>Planifie sa semaine</b> : glisse tes séances sur le calendrier.</li>
+          <li><b>${tr('guide.step1Title')}</b> : ${tr('guide.step1Text')}</li>
+          <li><b>${tr('guide.step2Title')}</b> : ${tr('guide.step2Text')}</li>
+          <li><b>${tr('guide.step3Title')}</b> : ${tr('guide.step3Text')}</li>
+          <li><b>${tr('guide.step4Title')}</b> : ${tr('guide.step4Text')}</li>
         </ol>
-        <button class="sg-cta" id="sgCta">Créer ma première séance</button>
+        <button class="sg-cta" id="sgCta">${tr('guide.cta')}</button>
       </div>`;
 }
 /* ============================================================
@@ -790,18 +790,18 @@ function coachGuideHTML(){
 function athNeedScore(a){
   let score=0; const reasons=[];
   const dk = athDispo(a);
-  if(dk==='blesse'){ score+=100; reasons.push('Blessé'); }
-  else if(dk==='malade'){ score+=70; reasons.push('Malade'); }
-  else if(dk==='fatigue'){ score+=40; reasons.push('Fatigué'); }
+  if(dk==='blesse'){ score+=100; reasons.push(tr('need.injured')); }
+  else if(dk==='malade'){ score+=70; reasons.push(tr('need.sick')); }
+  else if(dk==='fatigue'){ score+=40; reasons.push(tr('need.tired')); }
   const forme = athForme(a);
-  if(forme!=null && forme<55){ score+=30; reasons.push(`Forme basse (${forme}%)`); }
+  if(forme!=null && forme<55){ score+=30; reasons.push(tr('need.lowForm', {pct:forme})); }
   const hs = a.checkin && hrvStatus(a.checkin.hrv, ATHLETE_REF.hrvBase);
-  if(hs && hs.level==='low'){ score+=35; reasons.push('HRV basse'); }
+  if(hs && hs.level==='low'){ score+=35; reasons.push(tr('need.lowHrv')); }
   if(a.refsUpdatedAt){
     const days = Math.floor((Date.now()-new Date(a.refsUpdatedAt).getTime())/86400000);
-    if(days>=90){ score+=15; reasons.push(`Zones à retester (${days} j)`); }
+    if(days>=90){ score+=15; reasons.push(tr('need.zonesToRetest', {days})); }
   }
-  if(!a.checkin){ score+=8; reasons.push("Pas de check-in aujourd'hui"); }
+  if(!a.checkin){ score+=8; reasons.push(tr('need.noCheckinToday')); }
   return {score, reasons};
 }
 function needRadarHTML(){
@@ -3022,7 +3022,7 @@ function openInviteAthlete(){
     <h3>${tr('sidebar.inviteAthlete')}</h3>
     <p class="adh-sub">${tr('invite.subtitle')}</p>
     <div class="invite-linkrow">
-      <input type="email" id="invAthEmail" placeholder="email@athlete.fr" autocomplete="email">
+      <input type="email" id="invAthEmail" placeholder="${tr('invite.emailPh')}" autocomplete="email">
       <button class="cc-btn" id="invAthSend">${tr('invite.send')}</button>
     </div>
     <div id="invAthResult"></div>
