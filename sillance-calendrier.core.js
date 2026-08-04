@@ -6443,8 +6443,8 @@ function showAnTip(evt, i){
   if(sp) html+=`<div style="color:var(--swim);font-weight:700">${sp.label(p)}</div>`;
   if(pw) html+=`<div style="color:var(--bike);font-weight:700">${pw.label(p)}</div>`;
   if(hr) html+=`<div style="color:var(--run);font-weight:700">${hr.label(p)}</div>`;
-  if(el) html+=`<div style="color:var(--bike)">${Math.round(p.alt)} m · pente ${p.grade>0?'+':''}${p.grade.toFixed(1)}%</div>`;
-  const dcc=AN_CHARTS.decouple; if(dcc&&p._dr) html+=`<div style="color:var(--accent)">éff. ${dcc.label(p)}</div>`;
+  if(el) html+=`<div style="color:var(--bike)">${Math.round(p.alt)} m · ${tr('analysis.grade')} ${p.grade>0?'+':''}${p.grade.toFixed(1)}%</div>`;
+  const dcc=AN_CHARTS.decouple; if(dcc&&p._dr) html+=`<div style="color:var(--accent)">${tr('analysis.effAbbr')} ${dcc.label(p)}</div>`;
   const cad=AN_CHARTS.cadence; if(cad&&p._cadReal) html+=`<div style="color:var(--accent)">${cad.label(p)}</div>`;
   const stl=AN_CHARTS.steplen; if(stl&&p.stepLen) html+=`<div style="color:var(--strength)">${stl.label(p)}</div>`;
   tip.innerHTML=html;
@@ -6472,7 +6472,7 @@ function drawElevation(data){
   svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="var(--bike)" opacity="0.14"/>`);
   svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--bike)" stroke-width="1.8"/>`);
   [aMin,aMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-6}" y="${y(v)+3}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${Math.round(v)}m</text>`); });
-  svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="${H-6}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">D+ total ${data.dplus} m</text>`);
+  svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="${H-6}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${tr('analysis.totalDplus', {m:data.dplus})}</text>`);
   AN_CHARTS.elev = {svg, pts, W, H, P, xs, y:(p)=>y(p.alt), color:'var(--bike)', label:(p)=>`${Math.round(p.alt)} m`};
   attachCursor('elev');
 }
@@ -6486,7 +6486,7 @@ function drawCadence(data){
   const pts=data.pts;
   if(!pts.some(p=>p.cad>0)){ svg.style.display='none'; na.style.display=''; delete AN_CHARTS.cadence; return; }
   na.style.display='none'; svg.style.display=''; svg.innerHTML='';
-  const unit = data.disc==='run' ? 'pas/min' : 'rpm';
+  const unit = data.disc==='run' ? tr('analysis.stepsPerMin') : 'rpm';
   pts.forEach(p=>{ p._cadReal = data.disc==='run' ? (p.cad||0)*2 : (p.cad||0); });
   const W=720,H=150,P={l:44,r:14,t:10,b:20};
   const xs=i=>P.l+i/(pts.length-1)*(W-P.l-P.r);
@@ -6520,7 +6520,7 @@ function drawStepLen(data){
   svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--strength)" stroke-width="1.8"/>`);
   [vMin,vMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-6}" y="${y(v)+3}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${v.toFixed(2)}m</text>`); });
   svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">m</text>`);
-  AN_CHARTS.steplen = {svg, pts, W, H, P, xs, y:(p)=>y(p.stepLen||vMin), color:'var(--strength)', label:(p)=>`${p.stepLen?.toFixed(2)} m foulée`};
+  AN_CHARTS.steplen = {svg, pts, W, H, P, xs, y:(p)=>y(p.stepLen||vMin), color:'var(--strength)', label:(p)=>tr('analysis.strideLen', {m:p.stepLen?.toFixed(2)})};
   attachCursor('steplen');
 }
 
@@ -6538,21 +6538,21 @@ function lapZone(power){
 }
 function colApplies(app,disc){ if(app==='all')return true; if(app[0]==='!')return disc!==app.slice(1); return app===disc; }
 const LAP_COLS = [
-  {key:'time', label:'Temps', def:1, app:'all', v:l=>fmtLapTime(l.durMin)},
-  {key:'dist', label:'Distance', def:1, app:'all', v:l=>l.dist.toFixed(2)+'<small> km</small>'},
-  {key:'speed',label:d=>d==='bike'?'Vitesse':'Allure', def:1, app:'all', v:(l,_,d)=>d==='bike'?l.avgSpeed.toFixed(1)+'<small> km/h</small>':(d==='run'?paceFromSpeed(l.avgSpeed)+'<small>/km</small>':paceFromSpeed2(l.avgSpeed)+'<small>/100m</small>')},
+  {key:'time', get label(){return tr('modal.duration')}, def:1, app:'all', v:l=>fmtLapTime(l.durMin)},
+  {key:'dist', get label(){return tr('simMetric.dist2')}, def:1, app:'all', v:l=>l.dist.toFixed(2)+'<small> km</small>'},
+  {key:'speed',label:d=>d==='bike'?tr('lapCol.speed'):tr('lapCol.pace'), def:1, app:'all', v:(l,_,d)=>d==='bike'?l.avgSpeed.toFixed(1)+'<small> km/h</small>':(d==='run'?paceFromSpeed(l.avgSpeed)+'<small>/km</small>':paceFromSpeed2(l.avgSpeed)+'<small>/100m</small>')},
   {key:'hr',   label:'FC', def:1, app:'all', v:l=>`<b style="color:var(--run)">${l.avgHr}</b><small> bpm</small>`},
   {key:'pw',   label:'Watts', def:1, app:'bike', v:l=>`<b style="color:var(--bike)">${l.avgPower}</b><small> W</small>`},
   {key:'np',   label:'NP', def:1, app:'bike', v:l=>`<b>${l.np}</b><small> W</small>`},
-  {key:'zone', label:'Zone', def:1, app:'bike', v:l=>{const z=lapZone(l.np);return `<span class="zbadge" style="background:${z.c}22;color:${z.c};border-color:${z.c}66">${z.z}</span>`;}},
+  {key:'zone', get label(){return tr('lapCol.zone')}, def:1, app:'bike', v:l=>{const z=lapZone(l.np);return `<span class="zbadge" style="background:${z.c}22;color:${z.c};border-color:${z.c}66">${z.z}</span>`;}},
   {key:'if',   label:'IF', def:0, app:'bike', v:l=>l.if.toFixed(2)},
   {key:'wkg',  label:'W/kg', def:0, app:'bike', v:l=>(l.avgPower/lapWeightVal()).toFixed(1)},
-  {key:'cad',  label:'Cadence', def:0, app:'bike', v:l=>`${l.cad}<small> rpm</small>`},
+  {key:'cad',  get label(){return tr('lapCol.cadence')}, def:0, app:'bike', v:l=>`${l.cad}<small> rpm</small>`},
   {key:'kj',   label:'kJ', def:0, app:'bike', v:l=>l.kj},
-  {key:'hrmax',label:'FC max', def:0, app:'all', v:l=>`${l.maxHr}<small> bpm</small>`},
+  {key:'hrmax',get label(){return tr('refs.maxHr')}, def:0, app:'all', v:l=>`${l.maxHr}<small> bpm</small>`},
   {key:'vap',  label:'VAP', def:0, app:'!bike', v:(l,_,d)=>d==='swim'?paceFromSpeed2(l.avgGap)+'<small>/100m</small>':paceFromSpeed(l.avgGap)+'<small>/km</small>'},
   {key:'dplus',label:'D+', def:0, app:'!swim', v:l=>`${l.dplus}<small> m</small>`},
-  {key:'temp', label:'Temp.', def:0, app:'all', v:(l,data)=>`${data.cond.temp}<small>°C</small>`},
+  {key:'temp', get label(){return tr('lapCol.temp')}, def:0, app:'all', v:(l,data)=>`${data.cond.temp}<small>°C</small>`},
 ];
 function injectLapCss(){
   if(document.getElementById('pf-lap-css')) return;
@@ -6603,7 +6603,7 @@ function renderLapChart(data){
   const box=document.getElementById('anLapChart'); if(!box) return;
   injectLapChartCss();
   const laps=data.laps, disc=data.disc;
-  if(!laps || !laps.length){ box.innerHTML='<p class="hint">Pas assez de laps pour un visuel.</p>'; return; }
+  if(!laps || !laps.length){ box.innerHTML=`<p class="hint">${tr('lapCol.notEnoughLaps')}</p>`; return; }
   const speedLbl=l=> disc==='bike' ? l.avgSpeed.toFixed(1)+' km/h' : (disc==='swim' ? paceFromSpeed2(l.avgSpeed)+'/100m' : paceFromSpeed(l.avgSpeed)+'/km');
   const maxSpeed=Math.max(...laps.map(l=>l.avgSpeed), 0.001);
   const maxHr=Math.max(...laps.map(l=>l.avgHr||0), 1);
@@ -6612,8 +6612,8 @@ function renderLapChart(data){
     const hrH=l.avgHr ? Math.max(6, Math.round((l.avgHr/maxHr)*100)) : 4;
     return `<div class="lch-col">
       <div class="lch-bars">
-        <div class="lch-bar sp ${l.hard?'hard':''}" style="height:${spH}%" title="Allure/vitesse — lap ${l.n}"></div>
-        <div class="lch-bar hr" style="height:${hrH}%" title="FC moyenne — lap ${l.n}"></div>
+        <div class="lch-bar sp ${l.hard?'hard':''}" style="height:${spH}%" title="${tr('lapCol.paceSpeedLap', {n:l.n})}"></div>
+        <div class="lch-bar hr" style="height:${hrH}%" title="${tr('lapCol.avgHrLap', {n:l.n})}"></div>
       </div>
       <div class="lch-vals">
         <span class="lch-sp">${speedLbl(l)}</span>
@@ -6625,7 +6625,7 @@ function renderLapChart(data){
 }
 function renderLaps(data, isSwim){
   const box=document.getElementById('anLaps'); const disc=data.disc; injectLapCss();
-  document.getElementById('anLapHint').textContent = (isSwim?'par série':'splits automatiques')+' · colonnes au choix';
+  document.getElementById('anLapHint').textContent = (isSwim?tr('lapCol.perSet'):tr('lapCol.autoSplits'))+' · '+tr('lapCol.chooseColumns');
   const cols=LAP_COLS.filter(c=>colApplies(c.app,disc));
   const sel=lapColSet(disc);
   const lbl=c=>typeof c.label==='function'?c.label(disc):c.label;

@@ -662,6 +662,14 @@
     "ai.footReal": `Rédigé par Claude à partir du bilan chiffré de la séance (zones FC, découplage, pics) — aucune donnée inventée.`,
     "ai.demoBadge": `démo`,
     "ai.analyzingInProgress": `Analyse de la séance en cours…`,
+
+    "analysis.grade": `pente`, "analysis.effAbbr": `éff.`, "analysis.totalDplus": `D+ total {m} m`,
+    "analysis.stepsPerMin": `pas/min`, "analysis.strideLen": `{m} m foulée`,
+
+    "lapCol.speed": `Vitesse`, "lapCol.pace": `Allure`, "lapCol.zone": `Zone`, "lapCol.cadence": `Cadence`, "lapCol.temp": `Temp.`,
+    "lapCol.notEnoughLaps": `Pas assez de laps pour un visuel.`,
+    "lapCol.paceSpeedLap": `Allure/vitesse — lap {n}`, "lapCol.avgHrLap": `FC moyenne — lap {n}`,
+    "lapCol.perSet": `par série`, "lapCol.autoSplits": `splits automatiques`, "lapCol.chooseColumns": `colonnes au choix`,
   };
 
   var en = {
@@ -1323,6 +1331,14 @@
     "ai.footReal": `Written by Claude from the session's numeric summary (HR zones, decoupling, peaks) — no invented data.`,
     "ai.demoBadge": `demo`,
     "ai.analyzingInProgress": `Analyzing the session…`,
+
+    "analysis.grade": `grade`, "analysis.effAbbr": `eff.`, "analysis.totalDplus": `Total D+ {m} m`,
+    "analysis.stepsPerMin": `steps/min`, "analysis.strideLen": `{m} m stride`,
+
+    "lapCol.speed": `Speed`, "lapCol.pace": `Pace`, "lapCol.zone": `Zone`, "lapCol.cadence": `Cadence`, "lapCol.temp": `Temp.`,
+    "lapCol.notEnoughLaps": `Not enough laps for a visual.`,
+    "lapCol.paceSpeedLap": `Pace/speed — lap {n}`, "lapCol.avgHrLap": `Average HR — lap {n}`,
+    "lapCol.perSet": `per set`, "lapCol.autoSplits": `automatic splits`, "lapCol.chooseColumns": `choose columns`,
   };
 
   var es = {
@@ -1984,6 +2000,14 @@
     "ai.footReal": `Redactado por Claude a partir del balance numérico de la sesión (zonas FC, desacoplamiento, picos) — ningún dato inventado.`,
     "ai.demoBadge": `demo`,
     "ai.analyzingInProgress": `Analizando la sesión…`,
+
+    "analysis.grade": `pendiente`, "analysis.effAbbr": `efic.`, "analysis.totalDplus": `D+ total {m} m`,
+    "analysis.stepsPerMin": `pasos/min`, "analysis.strideLen": `{m} m zancada`,
+
+    "lapCol.speed": `Velocidad`, "lapCol.pace": `Ritmo`, "lapCol.zone": `Zona`, "lapCol.cadence": `Cadencia`, "lapCol.temp": `Temp.`,
+    "lapCol.notEnoughLaps": `No hay suficientes laps para un visual.`,
+    "lapCol.paceSpeedLap": `Ritmo/velocidad — lap {n}`, "lapCol.avgHrLap": `FC media — lap {n}`,
+    "lapCol.perSet": `por serie`, "lapCol.autoSplits": `splits automáticos`, "lapCol.chooseColumns": `columnas a elegir`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
