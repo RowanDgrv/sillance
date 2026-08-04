@@ -5764,12 +5764,12 @@ function openAnalysis(s){
   // restaure les sections (au cas où une analyse Hyrox les a masquées)
   document.getElementById('anSpeedTitle').parentElement.parentElement.style.display='';
   document.getElementById('anHr').parentElement.querySelector('h4').textContent=tr('analysis.heartRate');
-  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent='Détail par lap';
+  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent=tr('analysis.lapDetail');
 
 
 
   // titre vitesse selon le sport
-  const spTitle = s.disc==='bike'?'Vitesse (km/h)' : s.disc==='run'?'Allure (min/km)' : 'Allure (/100m)';
+  const spTitle = s.disc==='bike'?tr('analysis.speedKmh') : s.disc==='run'?tr('analysis.paceMinKm') : tr('analysis.pace100m');
   document.getElementById('anSpeedTitle').textContent = spTitle;
   // réinitialise le registre des graphes (curseur)
   AN_CHARTS.speed=AN_CHARTS.hr=AN_CHARTS.elev=AN_CHARTS.power=AN_CHARTS.decouple=null;
@@ -5841,23 +5841,23 @@ function openHyroxAnalysis(s){
   const maxHr = hrs.length?Math.max(...hrs):0;
   const totalDist = log.filter(st=>st.unit==='m').reduce((a,st)=>a+(+st.done||0),0);
   document.getElementById('anKpis').innerHTML=[
-    {k:'Temps total', v:totalSec?fmtClock(totalSec/60):'—', u:''},
-    {k:'Distance cumulée', v:totalDist, u:'m'},
-    {k:'FC moy', v:avgHr||'—', u:'bpm'},
-    {k:'FC max', v:maxHr||'—', u:'bpm'},
-    {k:'Stations', v:log.length, u:''}
+    {k:tr('analysis.totalTime'), v:totalSec?fmtClock(totalSec/60):'—', u:''},
+    {k:tr('analysis.totalDistance'), v:totalDist, u:'m'},
+    {k:tr('analysis.avgHr'), v:avgHr||'—', u:'bpm'},
+    {k:tr('refs.maxHr'), v:maxHr||'—', u:'bpm'},
+    {k:tr('analysis.stations'), v:log.length, u:''}
   ].map(x=>`<div class="an-kpi"><div class="k">${x.k}</div><div class="v">${x.v}</div><div class="u">${x.u}</div></div>`).join('');
 
   // on masque les graphes vitesse/altitude, on garde la FC en barres par station
   document.getElementById('anSpeedTitle').parentElement.parentElement.style.display='none';
   document.getElementById('anElevWrap').style.display='none';
   document.getElementById('anPowerWrap').style.display='none';
-  document.getElementById('anHr').parentElement.querySelector('h4').textContent='Fréquence cardiaque par station';
+  document.getElementById('anHr').parentElement.querySelector('h4').textContent=tr('analysis.hrByStation');
   drawHyroxHr(log);
 
   // tableau éditable des stations
-  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent='Détail par station';
-  document.getElementById('anLapHint').textContent='saisis tes valeurs réalisées';
+  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent=tr('analysis.detailByStation');
+  document.getElementById('anLapHint').textContent=tr('analysis.enterActualValues');
   renderHyroxStations(s);
   // comparateur Hyrox (vs simulations passées)
   const wb=log.find(st=>/wall/i.test(st.name));
@@ -5887,7 +5887,7 @@ function renderHyroxStations(s){
   const log=s._hyroxLog;
   const box=document.getElementById('anLaps');
   box.innerHTML = `<div class="hx-an-head">
-      <span>Station</span><span>Réalisé</span><span>Poids</span><span>Temps</span><span>FC moy</span>
+      <span>${tr('analysis.station')}</span><span>${tr('analysis.achieved')}</span><span>${tr('analysis.weight')}</span><span>${tr('modal.duration')}</span><span>${tr('analysis.avgHr')}</span>
     </div>` + log.map((st,i)=>`
     <div class="hx-an-row" data-i="${i}">
       <div class="hx-an-name">${st.name}</div>
@@ -6037,11 +6037,11 @@ function renderSimilar(disc, type, cur){
   if(disc==='swim'||!cur){ wrap.style.display='none'; return; }
   wrap.style.display=''; injectSimCss();
   const box=document.getElementById('anSimilar');
-  const TYPELBL={seuil:'Seuil',vo2:'VO2max / intervalles',endurance:'Endurance',hyrox:'Hyrox'};
+  const TYPELBL={seuil:tr('simType.threshold'),vo2:tr('simType.vo2'),endurance:tr('simType.endurance'),hyrox:'Hyrox'};
   const matches=SESSION_HISTORY.filter(h=>h.disc===disc&&h.type===type).slice(0,2);
-  if(!matches.length){ box.innerHTML=`<p class="an-sim-empty">Aucune séance « ${TYPELBL[type]||type} » comparable dans l'historique récent.</p>`; return; }
+  if(!matches.length){ box.innerHTML=`<p class="an-sim-empty">${tr('simType.noComparable', {type:TYPELBL[type]||type})}</p>`; return; }
   const M=SIM_METRICS[disc]||[];
-  const head=`<div class="sim-row sim-head"><span>${TYPELBL[type]||type}</span><span class="sim-cur">Cette séance</span>${matches.map(m=>`<span>${m.date}</span>`).join('')}</div>`;
+  const head=`<div class="sim-row sim-head"><span>${TYPELBL[type]||type}</span><span class="sim-cur">${tr('simType.thisSession')}</span>${matches.map(m=>`<span>${m.date}</span>`).join('')}</div>`;
   const rows=M.map(met=>{
     const cv=cur[met.k], hasCur=cv!=null&&cv!==0;
     const cells=matches.map(m=>{ const pv=m[met.k]; if(pv==null) return '<span>—</span>';
@@ -6084,20 +6084,20 @@ function computeDecouple(data, disc){
   return {pct:(r1-r2)/r1*100, r1, r2, warm, mid};
 }
 function decoupleVerdict(pct){
-  if(pct<5)  return {c:'var(--good)', lbl:'Aérobie solide'};
-  if(pct<=10) return {c:'var(--bike)', lbl:'Dérive modérée'};
-  return {c:'var(--run)', lbl:'Forte dérive'};
+  if(pct<5)  return {c:'var(--good)', lbl:tr('decouple.solidAerobic')};
+  if(pct<=10) return {c:'var(--bike)', lbl:tr('decouple.moderateDrift')};
+  return {c:'var(--run)', lbl:tr('decouple.strongDrift')};
 }
 function decoupleInterp(type, pct, disc){
   if(type==='endurance'){
-    if(pct<5)  return "Allure bien tenue en zone aérobie : le cœur ne dérive pas, l'endurance fondamentale est au rendez-vous.";
-    if(pct<=10) return "Légère dérive cardiaque : l'allure était un peu haute pour du Z2 (ou fatigue/chaleur). À surveiller.";
-    return "Forte dérive : ce footing n'est pas resté aérobie. Ralentir l'allure pour rester en Z2.";
+    if(pct<5)  return tr('decouple.endLow');
+    if(pct<=10) return tr('decouple.endMid');
+    return tr('decouple.endHigh');
   }
   // seuil / LT1
-  if(pct<5)  return "Effort soutenable : tu es resté sous le seuil, c'est la bonne zone de travail.";
-  if(pct<=10) return "Dérive modérée : tu étais à la limite haute du seuil.";
-  return "Dérive trop forte : l'intensité dépassait le seuil aérobie. Recaler la zone un cran plus bas.";
+  if(pct<5)  return tr('decouple.thrLow');
+  if(pct<=10) return tr('decouple.thrMid');
+  return tr('decouple.thrHigh');
 }
 function injectDecoupleCss(){
   if(document.getElementById('pf-dc-css')) return;
@@ -6131,7 +6131,7 @@ function drawDecouple(data, disc, dc){
   // bande d'échauffement grisée
   const warmI=pts.findIndex(p=>p.t>=dc.warm);
   const warmX=xs(warmI<1?0:warmI);
-  if(warmI>0){ svg.insertAdjacentHTML('beforeend',`<rect x="${P.l}" y="${P.t}" width="${warmX-P.l}" height="${H-P.t-P.b}" fill="rgba(148,163,196,.06)"/><text x="${(P.l+warmX)/2}" y="${P.t+11}" fill="var(--muted)" font-size="8" text-anchor="middle" font-family="var(--font-data)">échauf.</text>`); }
+  if(warmI>0){ svg.insertAdjacentHTML('beforeend',`<rect x="${P.l}" y="${P.t}" width="${warmX-P.l}" height="${H-P.t-P.b}" fill="rgba(148,163,196,.06)"/><text x="${(P.l+warmX)/2}" y="${P.t+11}" fill="var(--muted)" font-size="8" text-anchor="middle" font-family="var(--font-data)">${tr('decouple.warmupAbbr')}</text>`); }
   // ligne de séparation des 2 moitiés
   let midI=pts.findIndex(p=>p.t>=dc.mid); if(midI<0) midI=Math.floor(pts.length/2);
   const mx=xs(midI), endX=xs(pts.length-1);

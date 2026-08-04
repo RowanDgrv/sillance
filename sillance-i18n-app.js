@@ -600,6 +600,25 @@
     "impact.cost": `coûté`, "impact.gained": `fait gagner`,
 
     "analysis.heartRate": `Fréquence cardiaque`,
+    "analysis.lapDetail": `Détail par lap`, "analysis.speedKmh": `Vitesse (km/h)`,
+    "analysis.paceMinKm": `Allure (min/km)`, "analysis.pace100m": `Allure (/100m)`,
+    "analysis.totalTime": `Temps total`, "analysis.totalDistance": `Distance cumulée`,
+    "analysis.avgHr": `FC moy`, "analysis.stations": `Stations`, "analysis.hrByStation": `Fréquence cardiaque par station`,
+    "analysis.detailByStation": `Détail par station`, "analysis.enterActualValues": `saisis tes valeurs réalisées`,
+    "analysis.station": `Station`, "analysis.achieved": `Réalisé`, "analysis.weight": `Poids`,
+
+    "simType.threshold": `Seuil`, "simType.vo2": `VO2max / intervalles`, "simType.endurance": `Endurance`,
+    "simType.noComparable": `Aucune séance « {type} » comparable dans l'historique récent.`,
+    "simType.thisSession": `Cette séance`,
+
+    "decouple.solidAerobic": `Aérobie solide`, "decouple.moderateDrift": `Dérive modérée`, "decouple.strongDrift": `Forte dérive`,
+    "decouple.endLow": `Allure bien tenue en zone aérobie : le cœur ne dérive pas, l'endurance fondamentale est au rendez-vous.`,
+    "decouple.endMid": `Légère dérive cardiaque : l'allure était un peu haute pour du Z2 (ou fatigue/chaleur). À surveiller.`,
+    "decouple.endHigh": `Forte dérive : ce footing n'est pas resté aérobie. Ralentir l'allure pour rester en Z2.`,
+    "decouple.thrLow": `Effort soutenable : tu es resté sous le seuil, c'est la bonne zone de travail.`,
+    "decouple.thrMid": `Dérive modérée : tu étais à la limite haute du seuil.`,
+    "decouple.thrHigh": `Dérive trop forte : l'intensité dépassait le seuil aérobie. Recaler la zone un cran plus bas.`,
+    "decouple.warmupAbbr": `échauf.`,
   };
 
   var en = {
@@ -1199,6 +1218,25 @@
     "impact.cost": `cost`, "impact.gained": `gained`,
 
     "analysis.heartRate": `Heart rate`,
+    "analysis.lapDetail": `Lap detail`, "analysis.speedKmh": `Speed (km/h)`,
+    "analysis.paceMinKm": `Pace (min/km)`, "analysis.pace100m": `Pace (/100m)`,
+    "analysis.totalTime": `Total time`, "analysis.totalDistance": `Total distance`,
+    "analysis.avgHr": `Avg HR`, "analysis.stations": `Stations`, "analysis.hrByStation": `Heart rate by station`,
+    "analysis.detailByStation": `Detail by station`, "analysis.enterActualValues": `enter your actual values`,
+    "analysis.station": `Station`, "analysis.achieved": `Achieved`, "analysis.weight": `Weight`,
+
+    "simType.threshold": `Threshold`, "simType.vo2": `VO2max / intervals`, "simType.endurance": `Endurance`,
+    "simType.noComparable": `No comparable "{type}" session in recent history.`,
+    "simType.thisSession": `This session`,
+
+    "decouple.solidAerobic": `Solid aerobic`, "decouple.moderateDrift": `Moderate drift`, "decouple.strongDrift": `Strong drift`,
+    "decouple.endLow": `Pace held well in the aerobic zone: heart doesn't drift, base endurance is there.`,
+    "decouple.endMid": `Slight cardiac drift: pace was a bit high for Z2 (or fatigue/heat). Worth watching.`,
+    "decouple.endHigh": `Strong drift: this run didn't stay aerobic. Slow the pace to stay in Z2.`,
+    "decouple.thrLow": `Sustainable effort: you stayed below threshold, that's the right zone to work in.`,
+    "decouple.thrMid": `Moderate drift: you were at the upper edge of threshold.`,
+    "decouple.thrHigh": `Drift too strong: intensity exceeded the aerobic threshold. Dial the zone back a notch.`,
+    "decouple.warmupAbbr": `warm-up`,
   };
 
   var es = {
@@ -1798,6 +1836,25 @@
     "impact.cost": `costó`, "impact.gained": `hizo ganar`,
 
     "analysis.heartRate": `Frecuencia cardiaca`,
+    "analysis.lapDetail": `Detalle por lap`, "analysis.speedKmh": `Velocidad (km/h)`,
+    "analysis.paceMinKm": `Ritmo (min/km)`, "analysis.pace100m": `Ritmo (/100m)`,
+    "analysis.totalTime": `Tiempo total`, "analysis.totalDistance": `Distancia acumulada`,
+    "analysis.avgHr": `FC media`, "analysis.stations": `Estaciones`, "analysis.hrByStation": `Frecuencia cardiaca por estación`,
+    "analysis.detailByStation": `Detalle por estación`, "analysis.enterActualValues": `introduce tus valores reales`,
+    "analysis.station": `Estación`, "analysis.achieved": `Realizado`, "analysis.weight": `Peso`,
+
+    "simType.threshold": `Umbral`, "simType.vo2": `VO2max / intervalos`, "simType.endurance": `Resistencia`,
+    "simType.noComparable": `Ninguna sesión «{type}» comparable en el historial reciente.`,
+    "simType.thisSession": `Esta sesión`,
+
+    "decouple.solidAerobic": `Aeróbico sólido`, "decouple.moderateDrift": `Deriva moderada`, "decouple.strongDrift": `Deriva fuerte`,
+    "decouple.endLow": `Ritmo bien mantenido en zona aeróbica: el corazón no deriva, la resistencia de base está presente.`,
+    "decouple.endMid": `Ligera deriva cardiaca: el ritmo era algo alto para Z2 (o fatiga/calor). A vigilar.`,
+    "decouple.endHigh": `Deriva fuerte: este rodaje no se mantuvo aeróbico. Reduce el ritmo para quedarte en Z2.`,
+    "decouple.thrLow": `Esfuerzo sostenible: te mantuviste por debajo del umbral, es la zona de trabajo correcta.`,
+    "decouple.thrMid": `Deriva moderada: estabas en el límite superior del umbral.`,
+    "decouple.thrHigh": `Deriva demasiado fuerte: la intensidad superaba el umbral aeróbico. Reajusta la zona un punto más abajo.`,
+    "decouple.warmupAbbr": `calent.`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
