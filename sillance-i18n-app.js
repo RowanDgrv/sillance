@@ -696,6 +696,27 @@
     "hyrox.aerobicLoad": `Charge aérobie`, "hyrox.muscularLoad": `Charge musculaire`,
     "hyrox.paceDegradation": `Dégradation d'allure sur les 8 runs`, "hyrox.hoverBar": `survole une barre`,
     "hyrox.compromisedRunning": `Course sous fatigue (« compromised running ») : à froid <b>{fresh}/km</b> → après station <b style="color:var(--bike)">{fatigue}/km</b> <span style="color:var(--bike)">(+{pct}%)</span>`,
+
+    "records.totalTime": `{time} au total`,
+
+    "today.riskHigh": `Élevé`, "today.riskHighHint": `Charge récente bien au-dessus de ton habitude`,
+    "today.riskModerate": `Modéré`, "today.riskModerateHint": `Surveille les sensations, évite d'en rajouter`,
+    "today.riskUnderload": `Sous-charge`, "today.riskUnderloadHint": `Tu peux te permettre un peu plus de volume`,
+    "today.riskLow": `Faible`, "today.riskLowHint": `Charge bien équilibrée, continue`,
+    "today.restDay": `Repos`, "today.noSessionPlanned": `Journée sans séance prévue`,
+    "today.validated": `Validée`, "today.toDo": `À faire`,
+    "today.nutLongHint": `Sortie longue : ravitaille-toi régulièrement`,
+    "today.nutHardHint": `Séance intense : glucides + protéines en récup`,
+    "today.nutEasyHint": `Séance courte : hydratation suffit souvent`,
+    "today.nutRestHint": `Repos : alimentation équilibrée habituelle`,
+    "today.yourDailyPoint": `Ton point du jour`, "today.exportBilanTitle": `Exporter ton bilan en PDF`,
+    "today.myBilanPdf": `Mon bilan PDF`,
+    "today.freshnessState": `État de fraîcheur`,
+    "today.freshnessGoodHint": `En forme, prêt à performer`, "today.freshnessOkHint": `Correct, gère l'intensité`,
+    "today.freshnessBadHint": `Fatigue marquée, allège`,
+    "today.injuryRisk": `Risque de blessure`, "today.todaySession": `Séance du jour`,
+    "today.recommendedNutrition": `Nutrition recommandée`, "today.idealBedtime": `Heure idéale de coucher`,
+    "today.sleepTargetHint": `~{h} h de sommeil visées`,
   };
 
   var en = {
@@ -1391,6 +1412,27 @@
     "hyrox.aerobicLoad": `Aerobic load`, "hyrox.muscularLoad": `Muscular load`,
     "hyrox.paceDegradation": `Pace degradation over the 8 runs`, "hyrox.hoverBar": `hover a bar`,
     "hyrox.compromisedRunning": `Running under fatigue ("compromised running"): fresh <b>{fresh}/km</b> → after station <b style="color:var(--bike)">{fatigue}/km</b> <span style="color:var(--bike)">(+{pct}%)</span>`,
+
+    "records.totalTime": `{time} total`,
+
+    "today.riskHigh": `High`, "today.riskHighHint": `Recent load well above your usual`,
+    "today.riskModerate": `Moderate`, "today.riskModerateHint": `Watch how you feel, avoid adding more`,
+    "today.riskUnderload": `Underload`, "today.riskUnderloadHint": `You can afford a bit more volume`,
+    "today.riskLow": `Low`, "today.riskLowHint": `Load well balanced, keep going`,
+    "today.restDay": `Rest`, "today.noSessionPlanned": `No session planned today`,
+    "today.validated": `Done`, "today.toDo": `To do`,
+    "today.nutLongHint": `Long ride/run: fuel up regularly`,
+    "today.nutHardHint": `Intense session: carbs + protein for recovery`,
+    "today.nutEasyHint": `Short session: hydration is often enough`,
+    "today.nutRestHint": `Rest: your usual balanced diet`,
+    "today.yourDailyPoint": `Your daily brief`, "today.exportBilanTitle": `Export your summary as PDF`,
+    "today.myBilanPdf": `My summary PDF`,
+    "today.freshnessState": `Freshness level`,
+    "today.freshnessGoodHint": `In good form, ready to perform`, "today.freshnessOkHint": `OK, manage the intensity`,
+    "today.freshnessBadHint": `Marked fatigue, ease off`,
+    "today.injuryRisk": `Injury risk`, "today.todaySession": `Today's session`,
+    "today.recommendedNutrition": `Recommended nutrition`, "today.idealBedtime": `Ideal bedtime`,
+    "today.sleepTargetHint": `~{h} h of sleep targeted`,
   };
 
   var es = {
@@ -2086,6 +2128,27 @@
     "hyrox.aerobicLoad": `Carga aeróbica`, "hyrox.muscularLoad": `Carga muscular`,
     "hyrox.paceDegradation": `Degradación del ritmo en los 8 runs`, "hyrox.hoverBar": `pasa el cursor sobre una barra`,
     "hyrox.compromisedRunning": `Carrera bajo fatiga («compromised running»): en frío <b>{fresh}/km</b> → tras estación <b style="color:var(--bike)">{fatigue}/km</b> <span style="color:var(--bike)">(+{pct}%)</span>`,
+
+    "records.totalTime": `{time} en total`,
+
+    "today.riskHigh": `Alto`, "today.riskHighHint": `Carga reciente muy por encima de tu habitual`,
+    "today.riskModerate": `Moderado`, "today.riskModerateHint": `Vigila las sensaciones, evita añadir más`,
+    "today.riskUnderload": `Carga baja`, "today.riskUnderloadHint": `Puedes permitirte algo más de volumen`,
+    "today.riskLow": `Bajo`, "today.riskLowHint": `Carga bien equilibrada, continúa así`,
+    "today.restDay": `Descanso`, "today.noSessionPlanned": `Día sin sesión prevista`,
+    "today.validated": `Validada`, "today.toDo": `Por hacer`,
+    "today.nutLongHint": `Salida larga: reabastécete regularmente`,
+    "today.nutHardHint": `Sesión intensa: carbohidratos + proteínas en la recuperación`,
+    "today.nutEasyHint": `Sesión corta: la hidratación suele bastar`,
+    "today.nutRestHint": `Descanso: tu alimentación equilibrada habitual`,
+    "today.yourDailyPoint": `Tu punto del día`, "today.exportBilanTitle": `Exportar tu balance en PDF`,
+    "today.myBilanPdf": `Mi balance PDF`,
+    "today.freshnessState": `Estado de frescura`,
+    "today.freshnessGoodHint": `En forma, listo para rendir`, "today.freshnessOkHint": `Correcto, gestiona la intensidad`,
+    "today.freshnessBadHint": `Fatiga marcada, aligera`,
+    "today.injuryRisk": `Riesgo de lesión`, "today.todaySession": `Sesión del día`,
+    "today.recommendedNutrition": `Nutrición recomendada`, "today.idealBedtime": `Hora ideal para acostarse`,
+    "today.sleepTargetHint": `~{h} h de sueño objetivo`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

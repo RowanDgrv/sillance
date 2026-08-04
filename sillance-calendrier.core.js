@@ -7536,14 +7536,14 @@ function renderRecords(){
     html = REC_BIKE_DIST.map((d,i)=>{
       const kmh=bikeSpeedForDistance(d.km);
       const totalMin=d.km/kmh*60;
-      return recCard(d.k, kmh.toFixed(1), 'km/h', recDate(i), 'var(--bike)', fmtClock(totalMin)+' au total');
+      return recCard(d.k, kmh.toFixed(1), 'km/h', recDate(i), 'var(--bike)', tr('records.totalTime', {time:fmtClock(totalMin)}));
     }).join('');
   } else {
     grid.style.setProperty('--rc','var(--run)');
     html = REC_RUN_DIST.map((d,i)=>{
       const sPerKm=runPaceForDistance(d.m);
       const totalSec=sPerKm*d.m/1000;
-      return recCard(d.k, fmtPace(sPerKm), '/km', recDate(i), 'var(--run)', fmtClock(totalSec/60)+' au total');
+      return recCard(d.k, fmtPace(sPerKm), '/km', recDate(i), 'var(--run)', tr('records.totalTime', {time:fmtClock(totalSec/60)}));
     }).join('');
   }
   grid.innerHTML=html;
@@ -7690,27 +7690,27 @@ function renderToday(){
   const frClass = fraicheur>=70?'ti-good':fraicheur>=50?'ti-warn':'ti-bad';
 
   // 2. Risque de blessure depuis l'ACWR (sweet spot 0.8–1.3)
-  let risque, rqClass, rqHint;
-  if(acwr>1.5){ risque='Élevé'; rqClass='ti-bad'; rqHint='Charge récente bien au-dessus de ton habitude'; }
-  else if(acwr>1.3){ risque='Modéré'; rqClass='ti-warn'; rqHint='Surveille les sensations, évite d\'en rajouter'; }
-  else if(acwr<0.8){ risque='Sous-charge'; rqClass='ti-info'; rqHint='Tu peux te permettre un peu plus de volume'; }
-  else { risque='Faible'; rqClass='ti-good'; rqHint='Charge bien équilibrée, continue'; }
+  let risque, risqueLbl, rqClass, rqHint;
+  if(acwr>1.5){ risque='Élevé'; risqueLbl=tr('today.riskHigh'); rqClass='ti-bad'; rqHint=tr('today.riskHighHint'); }
+  else if(acwr>1.3){ risque='Modéré'; risqueLbl=tr('today.riskModerate'); rqClass='ti-warn'; rqHint=tr('today.riskModerateHint'); }
+  else if(acwr<0.8){ risque='Sous-charge'; risqueLbl=tr('today.riskUnderload'); rqClass='ti-info'; rqHint=tr('today.riskUnderloadHint'); }
+  else { risque='Faible'; risqueLbl=tr('today.riskLow'); rqClass='ti-good'; rqHint=tr('today.riskLowHint'); }
 
   // 3. Séance du jour
   const s = todaySession();
   let seance, scClass, scHint;
-  if(!s){ seance='Repos'; scClass='ti-info'; scHint='Journée sans séance prévue'; }
-  else if(s.done){ seance='Validée <i class="ic ic-check"></i>'; scClass='ti-good'; scHint=s.title; }
-  else { seance='À faire'; scClass='ti-warn'; scHint=s.title; }
+  if(!s){ seance=tr('today.restDay'); scClass='ti-info'; scHint=tr('today.noSessionPlanned'); }
+  else if(s.done){ seance=tr('today.validated')+' <i class="ic ic-check"></i>'; scClass='ti-good'; scHint=s.title; }
+  else { seance=tr('today.toDo'); scClass='ti-warn'; scHint=s.title; }
 
   // 4. Nutrition recommandée (g glucides/h) selon durée & intensité de la séance
   let carbs, nutHint;
   if(s){
     const long = (s.dur||0)>=120, hard=['Z4','Z5'].includes(s.zone)||/vma|seuil|vo2/i.test(s.title||'');
-    if(long){ carbs='80–90 g/h'; nutHint='Sortie longue : ravitaille-toi régulièrement'; }
-    else if(hard){ carbs='60 g/h'; nutHint='Séance intense : glucides + protéines en récup'; }
-    else { carbs='30 g/h'; nutHint='Séance courte : hydratation suffit souvent'; }
-  } else { carbs='—'; nutHint='Repos : alimentation équilibrée habituelle'; }
+    if(long){ carbs='80–90 g/h'; nutHint=tr('today.nutLongHint'); }
+    else if(hard){ carbs='60 g/h'; nutHint=tr('today.nutHardHint'); }
+    else { carbs='30 g/h'; nutHint=tr('today.nutEasyHint'); }
+  } else { carbs='—'; nutHint=tr('today.nutRestHint'); }
 
   // 5. Heure idéale de coucher : réveil habituel - besoin de sommeil (ajusté si grosse séance demain)
   const wake = 6.5;                       // réveil ~6h30 (démo)
@@ -7728,42 +7728,42 @@ function renderToday(){
 
   box.innerHTML = `<div class="today-card">
     <div class="today-head">
-      <div class="today-title"><i class="ic ic-sun"></i> Ton point du jour</div>
+      <div class="today-title"><i class="ic ic-sun"></i> ${tr('today.yourDailyPoint')}</div>
       <div class="today-head-r">
-        <button class="cb-bilan" id="cbBilanBtn" title="Exporter ton bilan en PDF"><i class="ic ic-download"></i> Mon bilan PDF</button>
+        <button class="cb-bilan" id="cbBilanBtn" title="${tr('today.exportBilanTitle')}"><i class="ic ic-download"></i> ${tr('today.myBilanPdf')}</button>
         <div class="today-date">${dateStr}</div>
       </div>
     </div>
     <div class="today-grid">
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-battery"></i></div>
-        <div class="ti-label">État de fraîcheur</div>
+        <div class="ti-label">${tr('today.freshnessState')}</div>
         <div class="ti-value ${frClass}">${fraicheur} %</div>
-        <div class="ti-hint">${fraicheur>=70?'En forme, prêt à performer':fraicheur>=50?'Correct, gère l\'intensité':'Fatigue marquée, allège'}</div>
+        <div class="ti-hint">${fraicheur>=70?tr('today.freshnessGoodHint'):fraicheur>=50?tr('today.freshnessOkHint'):tr('today.freshnessBadHint')}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-shield"></i></div>
-        <div class="ti-label">Risque de blessure</div>
-        <div class="ti-value ${rqClass}">${risque}</div>
+        <div class="ti-label">${tr('today.injuryRisk')}</div>
+        <div class="ti-value ${rqClass}">${risqueLbl}</div>
         <div class="ti-hint">${rqHint}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-target"></i></div>
-        <div class="ti-label">Séance du jour</div>
+        <div class="ti-label">${tr('today.todaySession')}</div>
         <div class="ti-value ${scClass}">${seance}</div>
         <div class="ti-hint">${scHint}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-cup"></i></div>
-        <div class="ti-label">Nutrition recommandée</div>
+        <div class="ti-label">${tr('today.recommendedNutrition')}</div>
         <div class="ti-value ti-info">${carbs}</div>
         <div class="ti-hint">${nutHint}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-moon"></i></div>
-        <div class="ti-label">Heure idéale de coucher</div>
+        <div class="ti-label">${tr('today.idealBedtime')}</div>
         <div class="ti-value ti-info">${bedStr}</div>
-        <div class="ti-hint">~${need.toFixed(1).replace('.0','')} h de sommeil visées</div>
+        <div class="ti-hint">${tr('today.sleepTargetHint', {h:need.toFixed(1).replace('.0','')})}</div>
       </div>
     </div>
     <div class="today-foot"><i class="ic ic-lightbulb"></i> ${todayAdvice(fraicheur, risque, s)}</div>
