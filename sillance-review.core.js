@@ -1373,33 +1373,33 @@ let stravaActivities = [];     // activités importées (démo)
    changer pour choisir le rendu préféré. */
 const STRAVA_DEMO_SETS = {
   triathlete: [
-    {disc:'bike', name:'Sortie longue vallonnée',     dur:210, dist:72.4, date:'auj.',      src:'strava'},
-    {disc:'swim', name:'Nat. seuil 8×100m',           dur:60,  dist:3.2,  date:'auj.',      src:'garmin'},
-    {disc:'run',  name:'Brick run post-vélo',         dur:25,  dist:5.3,  date:'hier',      src:'strava'},
-    {disc:'run',  name:'Footing récup',               dur:42,  dist:8.1,  date:'hier',      src:'coros'},
-    {disc:'bike', name:'Home-trainer Z2',             dur:75,  dist:34.0, date:'il y a 2 j',src:'garmin'},
-    {disc:'swim', name:'Technique + pull-buoy',       dur:50,  dist:2.4,  date:'il y a 3 j',src:'coros'}
+    {disc:'bike', get name(){return tr('demoAct.tri1')},     dur:210, dist:72.4, get date(){return tr('date.today')},      src:'strava'},
+    {disc:'swim', get name(){return tr('demoAct.tri2')},           dur:60,  dist:3.2,  get date(){return tr('date.today')},      src:'garmin'},
+    {disc:'run',  get name(){return tr('demoAct.tri3')},         dur:25,  dist:5.3,  get date(){return tr('date.yesterday')},      src:'strava'},
+    {disc:'run',  get name(){return tr('demoAct.tri4')},               dur:42,  dist:8.1,  get date(){return tr('date.yesterday')},      src:'coros'},
+    {disc:'bike', get name(){return tr('demoAct.tri5')},             dur:75,  dist:34.0, get date(){return tr('date.daysAgo',{days:2})},src:'garmin'},
+    {disc:'swim', get name(){return tr('demoAct.tri6')},       dur:50,  dist:2.4,  get date(){return tr('date.daysAgo',{days:3})},src:'coros'}
   ],
   course: [
-    {disc:'run',      name:'VO2max 10×400m piste',    dur:58,  dist:11.2, date:'auj.',      src:'garmin'},
-    {disc:'run',      name:'Sortie longue 1h45',      dur:105, dist:21.6, date:'hier',      src:'garmin'},
-    {disc:'run',      name:'Footing matinal',         dur:45,  dist:9.0,  date:'hier',      src:'strava'},
-    {disc:'strength', name:'PPG + gainage',           dur:35,  dist:0,    date:'il y a 2 j',src:'coros'},
-    {disc:'run',      name:'Seuil 3×3000m',           dur:52,  dist:12.4, date:'il y a 3 j',src:'garmin'}
+    {disc:'run',      get name(){return tr('demoAct.run1')},    dur:58,  dist:11.2, get date(){return tr('date.today')},      src:'garmin'},
+    {disc:'run',      get name(){return tr('demoAct.run2')},      dur:105, dist:21.6, get date(){return tr('date.yesterday')},      src:'garmin'},
+    {disc:'run',      get name(){return tr('demoAct.run3')},         dur:45,  dist:9.0,  get date(){return tr('date.yesterday')},      src:'strava'},
+    {disc:'strength', get name(){return tr('demoAct.run4')},           dur:35,  dist:0,    get date(){return tr('date.daysAgo',{days:2})},src:'coros'},
+    {disc:'run',      get name(){return tr('demoAct.run5')},      dur:52,  dist:12.4, get date(){return tr('date.daysAgo',{days:3})},src:'garmin'}
   ],
   hyrox: [
-    {disc:'hyrox',    name:'Simu Hyrox 4 stations',   dur:48,  dist:6.0,  date:'auj.',      src:'coros'},
-    {disc:'strength', name:'Force max bas du corps',  dur:55,  dist:0,    date:'auj.',      src:'strava'},
-    {disc:'run',      name:'Compromised running',     dur:32,  dist:6.5,  date:'hier',      src:'coros'},
-    {disc:'strength', name:'Sled push/pull + wall balls', dur:40, dist:0, date:'il y a 2 j',src:'strava'},
-    {disc:'run',      name:'Intervalles 8×1min',      dur:38,  dist:7.8,  date:'il y a 3 j',src:'garmin'}
+    {disc:'hyrox',    get name(){return tr('demoAct.hx1')},   dur:48,  dist:6.0,  get date(){return tr('date.today')},      src:'coros'},
+    {disc:'strength', get name(){return tr('demoAct.hx2')},  dur:55,  dist:0,    get date(){return tr('date.today')},      src:'strava'},
+    {disc:'run',      get name(){return tr('demoAct.hx3')},     dur:32,  dist:6.5,  get date(){return tr('date.yesterday')},      src:'coros'},
+    {disc:'strength', get name(){return tr('demoAct.hx4')}, dur:40, dist:0, get date(){return tr('date.daysAgo',{days:2})},src:'strava'},
+    {disc:'run',      get name(){return tr('demoAct.hx5')},      dur:38,  dist:7.8,  get date(){return tr('date.daysAgo',{days:3})},src:'garmin'}
   ],
   velo: [
-    {disc:'bike', name:'Cols — 1800m D+',             dur:240, dist:88.0, date:'auj.',      src:'strava'},
-    {disc:'bike', name:'Seuil 3×12min',               dur:90,  dist:42.5, date:'hier',      src:'garmin'},
-    {disc:'bike', name:'Récup café-ride',             dur:60,  dist:24.0, date:'hier',      src:'strava'},
-    {disc:'run',  name:'Footing croisé',              dur:35,  dist:6.8,  date:'il y a 2 j',src:'coros'},
-    {disc:'bike', name:'Home-trainer sweet spot',     dur:75,  dist:36.0, date:'il y a 3 j',src:'garmin'}
+    {disc:'bike', get name(){return tr('demoAct.vel1')},             dur:240, dist:88.0, get date(){return tr('date.today')},      src:'strava'},
+    {disc:'bike', get name(){return tr('demoAct.vel2')},               dur:90,  dist:42.5, get date(){return tr('date.yesterday')},      src:'garmin'},
+    {disc:'bike', get name(){return tr('demoAct.vel3')},             dur:60,  dist:24.0, get date(){return tr('date.yesterday')},      src:'strava'},
+    {disc:'run',  get name(){return tr('demoAct.vel4')},              dur:35,  dist:6.8,  get date(){return tr('date.daysAgo',{days:2})},src:'coros'},
+    {disc:'bike', get name(){return tr('demoAct.vel5')},   dur:75,  dist:36.0, get date(){return tr('date.daysAgo',{days:3})},src:'garmin'}
   ]
 };
 const DEMO_SET_LABELS = { get triathlete(){return tr('demoSet.triathlete')}, get course(){return tr('demoSet.course')}, get hyrox(){return tr('demoSet.hyrox')}, get velo(){return tr('demoSet.velo')} };
@@ -5979,16 +5979,16 @@ function drawPower(data){
 
 /* ===== Comparateur de séances similaires (vélo · course · Hyrox) ===== */
 const SESSION_HISTORY = [
-  {disc:'bike', type:'seuil', date:'12 mai', np:262, ifv:0.95, avgHr:166, dist:38.5, dec:6.4},
-  {disc:'bike', type:'seuil', date:'28 avr', np:255, ifv:0.92, avgHr:163, dist:41.2, dec:7.3},
-  {disc:'bike', type:'vo2',   date:'5 mai',  np:288, ifv:1.06, avgHr:174, dist:33.0},
-  {disc:'bike', type:'endurance', date:'9 mai', np:198, ifv:0.72, avgHr:142, dist:92.0, dec:3.1},
-  {disc:'run',  type:'seuil', date:'10 mai', pace:228, avgHr:168, dist:12.4, dec:5.6},
-  {disc:'run',  type:'seuil', date:'26 avr', pace:233, avgHr:166, dist:11.0, dec:6.8},
-  {disc:'run',  type:'vo2',   date:'3 mai',  pace:198, avgHr:176, dist:9.5},
-  {disc:'run',  type:'endurance', date:'7 mai', pace:300, avgHr:148, dist:21.0, dec:2.7},
-  {disc:'hyrox',type:'hyrox', date:'15 mai', total:4020, wbtime:218, avgHr:165},
-  {disc:'hyrox',type:'hyrox', date:'1 mai',  total:4185, wbtime:245, avgHr:162},
+  {disc:'bike', type:'seuil', get date(){return `12 ${tr('month.may')}`}, np:262, ifv:0.95, avgHr:166, dist:38.5, dec:6.4},
+  {disc:'bike', type:'seuil', get date(){return `28 ${tr('month.apr')}`}, np:255, ifv:0.92, avgHr:163, dist:41.2, dec:7.3},
+  {disc:'bike', type:'vo2',   get date(){return `5 ${tr('month.may')}`},  np:288, ifv:1.06, avgHr:174, dist:33.0},
+  {disc:'bike', type:'endurance', get date(){return `9 ${tr('month.may')}`}, np:198, ifv:0.72, avgHr:142, dist:92.0, dec:3.1},
+  {disc:'run',  type:'seuil', get date(){return `10 ${tr('month.may')}`}, pace:228, avgHr:168, dist:12.4, dec:5.6},
+  {disc:'run',  type:'seuil', get date(){return `26 ${tr('month.apr')}`}, pace:233, avgHr:166, dist:11.0, dec:6.8},
+  {disc:'run',  type:'vo2',   get date(){return `3 ${tr('month.may')}`},  pace:198, avgHr:176, dist:9.5},
+  {disc:'run',  type:'endurance', get date(){return `7 ${tr('month.may')}`}, pace:300, avgHr:148, dist:21.0, dec:2.7},
+  {disc:'hyrox',type:'hyrox', get date(){return `15 ${tr('month.may')}`}, total:4020, wbtime:218, avgHr:165},
+  {disc:'hyrox',type:'hyrox', get date(){return `1 ${tr('month.may')}`},  total:4185, wbtime:245, avgHr:162},
 ];
 function sessionType(s){
   if(s.disc==='hyrox') return 'hyrox';
@@ -6686,18 +6686,18 @@ const STRAVA_DEMO = {
   pma:       [395, 399, 403, 406, 409, 411, 413, 415],          // watts → 415 réel
   weightKg:  70,
   physio: [
-    {k:'VO2max estimé', v:'71.0', u:'ml/kg/min', t:'▲ +1.6 / 8 sem.', up:true, c:'var(--run)'},
-    {k:'FTP / poids',   v:'4.43', u:'W/kg',      t:'▲ +0.26',         up:true, c:'var(--bike)'},
-    {k:'PMA / poids',   v:'5.93', u:'W/kg',      t:'▲ +0.29',         up:true, c:'var(--strength)'},
-    {k:'Seuil course',  v:"3'30\"", u:'/km LT2',  t:'▲ -8"/km',        up:true, c:'var(--run)'},
-    {k:'VMA estimée',   v:'20.3', u:'km/h',      t:'▲ +0.4',          up:true, c:'var(--run)'},
-    {k:'Efficacité (EF)', v:'2.18', u:'W/bpm',   t:'▲ +0.09',         up:true, c:'var(--good)'}
+    {get k(){return tr('physio.vo2max')}, v:'71.0', u:'ml/kg/min', t:'▲ +1.6 / 8 sem.', up:true, c:'var(--run)'},
+    {get k(){return tr('physio.ftpWeight')},   v:'4.43', u:'W/kg',      t:'▲ +0.26',         up:true, c:'var(--bike)'},
+    {get k(){return tr('physio.pmaWeight')},   v:'5.93', u:'W/kg',      t:'▲ +0.29',         up:true, c:'var(--strength)'},
+    {get k(){return tr('physio.runThreshold')},  v:'3\'30"', u:'/km LT2',  t:'▲ -8"/km',        up:true, c:'var(--run)'},
+    {get k(){return tr('physio.vmaEst')},   v:'20.3', u:'km/h',      t:'▲ +0.4',          up:true, c:'var(--run)'},
+    {get k(){return tr('physio.efficiency')}, v:'2.18', u:'W/bpm',   t:'▲ +0.09',         up:true, c:'var(--good)'}
   ],
-  hrZones:   [{z:'Z1 Récup', pct:16, c:'#39E6A3'},
-              {z:'Z2 Endurance', pct:52, c:'#2FD9FF'},
-              {z:'Z3 Tempo', pct:14, c:'#9D7BFF'},
-              {z:'Z4 Seuil', pct:11, c:'#FFB13D'},
-              {z:'Z5 VO2max', pct:7, c:'#FF5470'}],
+  hrZones:   [{get z(){return 'Z1 '+tr('physio.zRecup')}, pct:16, c:'#39E6A3'},
+              {get z(){return 'Z2 '+tr('zoneCat.endurance')}, pct:52, c:'#2FD9FF'},
+              {get z(){return 'Z3 '+tr('zoneCat.tempo')}, pct:14, c:'#9D7BFF'},
+              {get z(){return 'Z4 '+tr('zoneCat.threshold')}, pct:11, c:'#FFB13D'},
+              {get z(){return 'Z5 '+tr('zoneCat.vo2max')}, pct:7, c:'#FF5470'}],
 
   /* ============================================================
      TESTS LACTATE — REMPLACE PAR TES VRAIS RÉSULTATS DE TEST
@@ -7501,8 +7501,8 @@ const REC_RUN_DIST = [
   {k:'10 km',m:10000},{k:'21 km',m:21097},{k:'42 km',m:42195}
 ];
 // dates fictives pour donner vie aux records (démo)
-const REC_DATES = ['12 juin','3 mai','21 avr.','8 mars','17 fév.','29 janv.','5 janv.','14 déc.'];
-function recDate(i){ return REC_DATES[i % REC_DATES.length]; }
+function recDates(){ return [`12 ${tr('month.jun')}`,`3 ${tr('month.may')}`,`21 ${tr('month.apr')}`,`8 ${tr('month.mar')}`,`17 ${tr('month.feb')}`,`29 ${tr('month.jan')}`,`5 ${tr('month.jan')}`,`14 ${tr('month.dec')}`]; }
+function recDate(i){ const d=recDates(); return d[i % d.length]; }
 
 /* — Vélo : vitesse moyenne (km/h) soutenable selon la distance — décroît avec la distance — */
 function bikeSpeedForDistance(km){
