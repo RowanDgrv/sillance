@@ -102,6 +102,7 @@
     "footer.mentions": `Mentions légales`,
     "footer.cgu": `CGU / CGV`,
     "footer.confidentialite": `Politique de confidentialité`,
+    "nav.legalLinksAria": `Informations légales`,
   };
 
   var en = {
@@ -206,6 +207,7 @@
     "footer.mentions": `Legal notice`,
     "footer.cgu": `Terms of use`,
     "footer.confidentialite": `Privacy policy`,
+    "nav.legalLinksAria": `Legal information`,
   };
 
   var es = {
@@ -310,6 +312,7 @@
     "footer.mentions": `Aviso legal`,
     "footer.cgu": `Términos de uso`,
     "footer.confidentialite": `Política de privacidad`,
+    "nav.legalLinksAria": `Información legal`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
