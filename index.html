@@ -101,13 +101,20 @@ main,.nav,footer{position:relative;z-index:1}
   border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:.15s;line-height:1}
 .lang-switch button:hover{color:var(--soft)}
 .lang-switch button.active{background:var(--accent);color:#062028}
-@media(max-width:760px){.nav-links{display:none}}
+@media(max-width:930px){.nav-links{display:none}}
 @media(max-width:520px){
   .nav-right .btn.ghost{display:none}
   .beta-badge{display:none}
   .nav .wrap{gap:10px}
   .btn.primary{padding:12px 16px;font-size:13px}
   .lang-switch button{padding:6px 7px;font-size:10px}
+}
+@media(max-width:360px){
+  .nav .wrap{padding:0 12px;gap:6px}
+  .brand{font-size:18px}
+  .btn.primary{padding:10px 12px;font-size:12px}
+  .lang-switch{gap:1px;padding:1px}
+  .lang-switch button{padding:5px 6px}
 }
 
 /* ---------- type ---------- */

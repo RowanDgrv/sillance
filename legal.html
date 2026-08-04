@@ -36,7 +36,8 @@
   .todo{color:var(--muted);font-style:italic}
   .provisional{background:var(--panel);border:1px solid var(--line-strong);border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin:18px 0 32px;font-size:13.5px;color:var(--soft)}
   .provisional b{color:var(--ink)}
-  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
+  table{width:100%;border-collapse:collapse;margin:0;font-size:14px}
   th,td{text-align:left;padding:9px 12px;border:1px solid var(--line);vertical-align:top}
   th{color:var(--ink);font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:12.5px;background:var(--panel)}
   .box{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;padding:14px 18px;margin:16px 0}
@@ -102,14 +103,14 @@ qu'athlète ou membre de club avec l'accord de son représentant légal ; le con
 dans l'application pour les membres mineurs des clubs.</p>
 
 <h3 data-i18n="legal.cgu.t3">2.3 Offres et tarifs</h3>
-<table>
+<div class="table-wrap"><table>
   <tr><th data-i18n="legal.cgu.th1">Offre</th><th data-i18n="legal.cgu.th2">Prix</th><th data-i18n="legal.cgu.th3">Modalités</th></tr>
   <tr><td data-i18n="legal.cgu.row1.a">Abonnement Coach</td><td data-i18n="legal.cgu.row1.b">19 €/mois (1 à 10 athlètes coachés) · 29 €/mois (11 à 30) · 49 €/mois (31 et plus)</td><td data-i18n="legal.cgu.row1.c">Essai gratuit de 14 jours, puis abonnement mensuel. Obligatoire pour utiliser le mode coach. Le palier est déclaré par le coach selon son nombre d'athlètes coachés et peut être changé à tout moment.</td></tr>
   <tr><td data-i18n="legal.cgu.row2.a">Add-on Assistant IA (coach)</td><td data-i18n="legal.cgu.row2.b">12 €/mois</td><td data-i18n="legal.cgu.row2.c">Essai gratuit de 14 jours avec moyen de paiement enregistré ; débit automatique à l'issue de l'essai sauf résiliation.</td></tr>
   <tr><td data-i18n="legal.cgu.row3.a">Option Vidéos (coach)</td><td data-i18n="legal.cgu.row3.b">3 €/mois par athlète activé</td><td data-i18n="legal.cgu.row3.c">Le coach choisit les athlètes bénéficiaires ; facturation au nombre de sièges actifs.</td></tr>
   <tr><td data-i18n="legal.cgu.row4.a">Frais de service et de facturation (suivi coach-athlète)</td><td data-i18n="legal.cgu.row4.b">2 % du montant de l'abonnement</td><td data-i18n="legal.cgu.row4.c">Lorsqu'un athlète règle son suivi de coaching directement à son coach via le Service (paiement récurrent facilité par Sillance), une commission de 2 % est prélevée sur ce montant pour couvrir le service de facturation et de gestion des paiements. Le solde est reversé au coach.</td></tr>
   <tr><td data-i18n="legal.cgu.row5.a">Offre Club</td><td data-i18n="legal.cgu.row5.b">600 €/saison (≤ 50 athlètes activés) · 1 350 €/saison (≤ 150) · 1 800 €/saison (illimité)</td><td data-i18n-html="legal.cgu.row5.c">Facturation annuelle par saison sportive (1<sup>er</sup> septembre – 31 août), payable par virement ou carte. Au-delà d'un palier : +12 €/athlète et par saison, avec bascule automatique au palier supérieur dès qu'il est plus avantageux. L'effectif « activé » (athlètes placés dans un groupe d'entraînement) est constaté à la date de facturation. Des remises commerciales (notamment « clubs fondateurs ») peuvent s'appliquer ; le tarif remisé figure sur la facture.</td></tr>
-</table>
+</table></div>
 <p data-i18n="legal.cgu.p3">Les prix sont exprimés en euros. Sillance se réserve le droit de
 modifier ses tarifs ; toute modification est notifiée au moins 30 jours avant son application et ne s'applique
 pas à la période déjà payée.</p>
@@ -183,14 +184,14 @@ avant toute action judiciaire ; les consommateurs peuvent recourir gratuitement 
 contact : <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.</p>
 
 <h3 data-i18n="legal.priv.t1">3.1 Données collectées et finalités</h3>
-<table>
+<div class="table-wrap"><table>
   <tr><th data-i18n="legal.priv.th1">Données</th><th data-i18n="legal.priv.th2">Finalité</th><th data-i18n="legal.priv.th3">Base légale</th></tr>
   <tr><td data-i18n="legal.priv.d1.a">Compte : e-mail, nom, rôle (coach/athlète/club)</td><td data-i18n="legal.priv.d1.b">Création et gestion du compte, authentification</td><td data-i18n="legal.priv.d1.c">Exécution du contrat</td></tr>
   <tr><td data-i18n="legal.priv.d2.a">Données d'entraînement : séances planifiées et réalisées, activités importées (GPS, puissance, allure), références physiologiques (FTP, VMA, FC max…), matériel</td><td data-i18n="legal.priv.d2.b">Fourniture du Service : planification, analyse, suivi coach-athlète</td><td data-i18n="legal.priv.d2.c">Exécution du contrat</td></tr>
   <tr><td data-i18n-html="legal.priv.d3.a"><strong>Données relatives à la santé</strong> : fréquence cardiaque, sommeil, fatigue, ressenti (check-ins)</td><td data-i18n="legal.priv.d3.b">Analyse de la charge d'entraînement et de la récupération</td><td data-i18n-html="legal.priv.d3.c"><strong>Consentement explicite</strong> (art. 9.2.a RGPD), retirable à tout moment</td></tr>
   <tr><td data-i18n="legal.priv.d4.a">Facturation : identité, historique de paiement (via Stripe)</td><td data-i18n="legal.priv.d4.b">Gestion des abonnements, obligations comptables</td><td data-i18n="legal.priv.d4.c">Exécution du contrat / obligation légale</td></tr>
   <tr><td data-i18n="legal.priv.d5.a">Données techniques : jeton de session, préférences d'affichage (stockage local du navigateur)</td><td data-i18n="legal.priv.d5.b">Fonctionnement du Service</td><td data-i18n="legal.priv.d5.c">Intérêt légitime (strictement nécessaires)</td></tr>
-</table>
+</table></div>
 
 <h3 data-i18n="legal.priv.t2">3.2 Qui accède à vos données</h3>
 <p data-i18n-html="legal.priv.p2">Vos données d'entraînement sont visibles par <strong>votre coach</strong> (si vous avez accepté son invitation) ou par
@@ -199,7 +200,7 @@ tout moment. Les clubs voient les informations de gestion (adhésions, présence
 l'analyse individuelle, réservée aux entraîneurs.</p>
 
 <h3 data-i18n="legal.priv.t3">3.3 Sous-traitants</h3>
-<table>
+<div class="table-wrap"><table>
   <tr><th data-i18n="legal.priv.th4">Prestataire</th><th data-i18n="legal.priv.th5">Rôle</th><th data-i18n="legal.priv.th6">Localisation</th></tr>
   <tr><td>Supabase</td><td data-i18n="legal.priv.sub1.b">Base de données, authentification, hébergement applicatif</td><td data-i18n="legal.priv.eu">Union européenne</td></tr>
   <tr><td>Stripe Payments Europe</td><td data-i18n="legal.priv.sub2.b">Paiements et abonnements</td><td data-i18n="legal.priv.sub2.c">UE / transferts encadrés (clauses contractuelles types)</td></tr>
@@ -207,7 +208,7 @@ l'analyse individuelle, réservée aux entraîneurs.</p>
   <tr><td>GitHub Pages</td><td data-i18n="legal.priv.sub4.b">Hébergement du site statique (aucune donnée personnelle)</td><td data-i18n="legal.priv.us">États-Unis</td></tr>
   <tr><td>Garmin / Coros / Strava</td><td data-i18n="legal.priv.sub5.b">Import de vos activités, uniquement si vous connectez votre compte (révocable)</td><td data-i18n="legal.priv.sub5.c">Selon prestataire</td></tr>
   <tr><td>Resend</td><td data-i18n="legal.priv.sub6.b">Envoi d'e-mails transactionnels (invitations, rappels)</td><td data-i18n="legal.priv.sub3.c">États-Unis (clauses contractuelles types)</td></tr>
-</table>
+</table></div>
 
 <h3 data-i18n="legal.priv.t4">3.4 Durées de conservation</h3>
 <ul>

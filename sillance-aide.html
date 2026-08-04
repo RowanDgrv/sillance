@@ -36,6 +36,12 @@
   .lang-switch button.active{background:var(--accent);color:#062028}
   .wrap{max-width:1080px;margin:0 auto;padding:42px 22px 90px;display:grid;grid-template-columns:210px 1fr;gap:44px}
   @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:24px}.toc{position:static!important;display:none}}
+  @media(max-width:360px){
+    .top .in{padding:12px 12px;gap:8px}
+    .wm{font-size:17px}
+    .top .cta{padding:8px 10px;font-size:12px}
+    .lang-switch button{padding:5px 6px}
+  }
   /* sommaire */
   .toc{position:sticky;top:96px;align-self:start;font-size:13.5px}
   .toc .lbl{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
