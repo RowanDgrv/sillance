@@ -826,6 +826,40 @@
     "physio.zRecup": `Récup`,
 
     "month.jun": `juin`, "month.mar": `mars`, "month.feb": `fév.`, "month.jan": `janv.`, "month.dec": `déc.`,
+
+    "seed.footing": `Footing`, "seed.natationClub": `Natation club`, "seed.enduranceFond": `Endurance fondamentale`,
+    "seed.footingLD": `Footing + LD`, "seed.vmaCourt": `VMA court`, "seed.lt2IntCourts": `LT2 intervalles courts`,
+    "seed.footingFacile": `Footing facile`, "seed.sv2IntCourts": `SV2 intervalles courts`,
+    "seed.sortieLongueD3": `Sortie longue D3`, "seed.enduranceD3": `Endurance D3`, "seed.footingD3": `Footing D3`,
+    "seed.vo2maxHT": `VO2max HT`, "seed.vo2maxPiste": `VO2max piste`, "seed.actif": `Actif`,
+    "seed.enduranceLT1": `Endurance + LT1`, "seed.sv2": `SV2`,
+    "seed.noteGoodSensations": `Sensations correctes, bonne séance.`,
+    "seed.noteHardLastReps": `Très dur sur les dernières répétitions.`,
+    "seed.debriefFelt": `Très bon négatif split sur la course à pied, jambes fraîches jusqu'au bout.`,
+    "seed.debriefWeather": `Chaud, 27°C, peu de vent`,
+    "seed.debriefGood": `Transition vélo → course fluide, pas de point de côté.`,
+    "seed.debriefBad": `Crampe au mollet gauche dans les 2 derniers km.`,
+
+    "nutriFull.longPre": `Repas riche en glucides 3 h avant. Petite collation glucidique 30 min avant (banane, barre).`,
+    "nutriFull.longDuring": `Sortie longue : 30–60 g de glucides par heure (gels, boisson énergétique, fruits secs).`,
+    "nutriFull.longPost": `Recharge glucidique + protéines dans les 30 min (boisson de récup, repas complet).`,
+    "nutriFull.hardPre": `Collation légère 1–2 h avant, plutôt glucidique, peu de fibres et de gras.`,
+    "nutriFull.hardDuring": `Hydratation régulière. Sur séance courte, pas de ravitaillement nécessaire.`,
+    "nutriFull.hardPost": `Apport en protéines dans les 30 min pour la reconstruction musculaire (~20–25 g) + glucides.`,
+    "nutriFull.easyPre": `Pas besoin de manger juste avant si séance le matin à jeun léger possible. Sinon collation légère.`,
+    "nutriFull.easyDuring": `Hydratation à la sensation.`,
+    "nutriFull.easyPost": `Repas équilibré habituel. Hydrate-toi bien.`,
+    "nutriFull.swimDuring": `Hydrate-toi entre les séries (gourde au bord du bassin).`,
+
+    "coRole.principal": `Principal`, "coRole.nutrition": `Nutrition`, "coRole.velo": `Vélo`,
+    "demoCoach.you": `Toi (coach démo)`,
+    "toast.coachAjouteEquipe": `Coach ajouté à l'équipe`,
+    "notif.urgent": `URGENT`, "notif.alert": `Alerte`, "notif.freshness": `fraîcheur`,
+    "notif.checkinBody": `Sommeil {sommeil}/10 · Fatigue {fatigue}/10 · Motiv. {motiv}/10`,
+
+    "loadLog.threshold2x20": `Sortie seuil 2×20`, "loadLog.tempo8k": `Tempo 8 km`,
+    "loadLog.lowerBodyStrength": `Renfo bas du corps`, "loadLog.techniqueThreshold": `Technique + seuil`,
+    "loadLog.hyroxSim": `Hyrox — simulation`, "loadLog.recoveryJog": `Footing récup`,
   };
 
   var en = {
@@ -1651,6 +1685,40 @@
     "physio.zRecup": `Recovery`,
 
     "month.jun": `Jun`, "month.mar": `Mar`, "month.feb": `Feb`, "month.jan": `Jan`, "month.dec": `Dec`,
+
+    "seed.footing": `Easy run`, "seed.natationClub": `Swim club`, "seed.enduranceFond": `Base endurance`,
+    "seed.footingLD": `Easy run + LD`, "seed.vmaCourt": `Short VMA`, "seed.lt2IntCourts": `LT2 short intervals`,
+    "seed.footingFacile": `Easy run`, "seed.sv2IntCourts": `SV2 short intervals`,
+    "seed.sortieLongueD3": `D3 long ride`, "seed.enduranceD3": `D3 endurance`, "seed.footingD3": `D3 easy run`,
+    "seed.vo2maxHT": `VO2max HT`, "seed.vo2maxPiste": `VO2max track`, "seed.actif": `Active recovery`,
+    "seed.enduranceLT1": `Endurance + LT1`, "seed.sv2": `SV2`,
+    "seed.noteGoodSensations": `Good sensations, solid session.`,
+    "seed.noteHardLastReps": `Very tough on the last reps.`,
+    "seed.debriefFelt": `Great negative split on the run, legs stayed fresh until the end.`,
+    "seed.debriefWeather": `Hot, 27°C, little wind`,
+    "seed.debriefGood": `Smooth bike-to-run transition, no side stitch.`,
+    "seed.debriefBad": `Cramp in the left calf during the last 2 km.`,
+
+    "nutriFull.longPre": `Carb-rich meal 3 h before. Small carb snack 30 min before (banana, bar).`,
+    "nutriFull.longDuring": `Long session: 30–60 g of carbs per hour (gels, sports drink, dried fruit).`,
+    "nutriFull.longPost": `Carb + protein refuel within 30 min (recovery drink, full meal).`,
+    "nutriFull.hardPre": `Light snack 1–2 h before, mostly carbs, low fiber and fat.`,
+    "nutriFull.hardDuring": `Regular hydration. No fueling needed for a short session.`,
+    "nutriFull.hardPost": `Protein intake within 30 min for muscle repair (~20–25 g) + carbs.`,
+    "nutriFull.easyPre": `No need to eat right before if a light-fasted morning session works for you. Otherwise a light snack.`,
+    "nutriFull.easyDuring": `Hydrate to thirst.`,
+    "nutriFull.easyPost": `Your usual balanced meal. Stay well hydrated.`,
+    "nutriFull.swimDuring": `Hydrate between sets (bottle at the poolside).`,
+
+    "coRole.principal": `Primary`, "coRole.nutrition": `Nutrition`, "coRole.velo": `Cycling`,
+    "demoCoach.you": `You (demo coach)`,
+    "toast.coachAjouteEquipe": `Coach added to the team`,
+    "notif.urgent": `URGENT`, "notif.alert": `Alert`, "notif.freshness": `freshness`,
+    "notif.checkinBody": `Sleep {sommeil}/10 · Fatigue {fatigue}/10 · Motiv. {motiv}/10`,
+
+    "loadLog.threshold2x20": `Threshold ride 2×20`, "loadLog.tempo8k": `5 mi tempo`,
+    "loadLog.lowerBodyStrength": `Lower body strength`, "loadLog.techniqueThreshold": `Technique + threshold`,
+    "loadLog.hyroxSim": `Hyrox — simulation`, "loadLog.recoveryJog": `Recovery jog`,
   };
 
   var es = {
@@ -2476,6 +2544,40 @@
     "physio.zRecup": `Recup.`,
 
     "month.jun": `jun.`, "month.mar": `mar.`, "month.feb": `feb.`, "month.jan": `ene.`, "month.dec": `dic.`,
+
+    "seed.footing": `Rodaje`, "seed.natationClub": `Natación club`, "seed.enduranceFond": `Resistencia de base`,
+    "seed.footingLD": `Rodaje + LD`, "seed.vmaCourt": `VAM corto`, "seed.lt2IntCourts": `Intervalos cortos LT2`,
+    "seed.footingFacile": `Rodaje suave`, "seed.sv2IntCourts": `Intervalos cortos SV2`,
+    "seed.sortieLongueD3": `Salida larga D3`, "seed.enduranceD3": `Resistencia D3`, "seed.footingD3": `Rodaje D3`,
+    "seed.vo2maxHT": `VO2max HT`, "seed.vo2maxPiste": `VO2max pista`, "seed.actif": `Activo`,
+    "seed.enduranceLT1": `Resistencia + LT1`, "seed.sv2": `SV2`,
+    "seed.noteGoodSensations": `Buenas sensaciones, sesión sólida.`,
+    "seed.noteHardLastReps": `Muy duro en las últimas repeticiones.`,
+    "seed.debriefFelt": `Muy buen split negativo en la carrera a pie, piernas frescas hasta el final.`,
+    "seed.debriefWeather": `Caluroso, 27°C, poco viento`,
+    "seed.debriefGood": `Transición ciclismo → carrera fluida, sin flato.`,
+    "seed.debriefBad": `Calambre en la pantorrilla izquierda en los últimos 2 km.`,
+
+    "nutriFull.longPre": `Comida rica en carbohidratos 3 h antes. Pequeño tentempié de carbohidratos 30 min antes (plátano, barrita).`,
+    "nutriFull.longDuring": `Salida larga: 30–60 g de carbohidratos por hora (geles, bebida energética, frutos secos).`,
+    "nutriFull.longPost": `Recarga de carbohidratos + proteínas en los primeros 30 min (bebida de recuperación, comida completa).`,
+    "nutriFull.hardPre": `Tentempié ligero 1–2 h antes, sobre todo carbohidratos, poca fibra y grasa.`,
+    "nutriFull.hardDuring": `Hidratación regular. En sesión corta, no hace falta avituallamiento.`,
+    "nutriFull.hardPost": `Aporte de proteínas en los primeros 30 min para la recuperación muscular (~20–25 g) + carbohidratos.`,
+    "nutriFull.easyPre": `No hace falta comer justo antes si es posible una sesión matutina en ayunas ligera. Si no, tentempié ligero.`,
+    "nutriFull.easyDuring": `Hidrátate según la sensación.`,
+    "nutriFull.easyPost": `Tu comida equilibrada habitual. Mantente bien hidratado.`,
+    "nutriFull.swimDuring": `Hidrátate entre series (botella al borde de la piscina).`,
+
+    "coRole.principal": `Principal`, "coRole.nutrition": `Nutrición`, "coRole.velo": `Ciclismo`,
+    "demoCoach.you": `Tú (entrenador demo)`,
+    "toast.coachAjouteEquipe": `Entrenador añadido al equipo`,
+    "notif.urgent": `URGENTE`, "notif.alert": `Alerta`, "notif.freshness": `frescura`,
+    "notif.checkinBody": `Sueño {sommeil}/10 · Fatiga {fatigue}/10 · Motiv. {motiv}/10`,
+
+    "loadLog.threshold2x20": `Salida al umbral 2×20`, "loadLog.tempo8k": `Tempo 8 km`,
+    "loadLog.lowerBodyStrength": `Fuerza tren inferior`, "loadLog.techniqueThreshold": `Técnica + umbral`,
+    "loadLog.hyroxSim": `Hyrox — simulación`, "loadLog.recoveryJog": `Rodaje de recuperación`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

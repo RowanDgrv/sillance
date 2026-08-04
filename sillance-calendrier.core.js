@@ -130,22 +130,22 @@ function nutritionForSession(s){
   const long = dur>=120;
   let pre, during='', post, key;
   if(long){
-    pre='Repas riche en glucides 3 h avant. Petite collation glucidique 30 min avant (banane, barre).';
-    during='Sortie longue : 30–60 g de glucides par heure (gels, boisson énergétique, fruits secs).';
-    post='Recharge glucidique + protéines dans les 30 min (boisson de récup, repas complet).';
+    pre=tr('nutriFull.longPre');
+    during=tr('nutriFull.longDuring');
+    post=tr('nutriFull.longPost');
     key='glucides';
   } else if(hard){
-    pre='Collation légère 1–2 h avant, plutôt glucidique, peu de fibres et de gras.';
-    during='Hydratation régulière. Sur séance courte, pas de ravitaillement nécessaire.';
-    post='Apport en protéines dans les 30 min pour la reconstruction musculaire (~20–25 g) + glucides.';
+    pre=tr('nutriFull.hardPre');
+    during=tr('nutriFull.hardDuring');
+    post=tr('nutriFull.hardPost');
     key='protéines';
   } else {
-    pre='Pas besoin de manger juste avant si séance le matin à jeun léger possible. Sinon collation légère.';
-    during='Hydratation à la sensation.';
-    post='Repas équilibré habituel. Hydrate-toi bien.';
+    pre=tr('nutriFull.easyPre');
+    during=tr('nutriFull.easyDuring');
+    post=tr('nutriFull.easyPost');
     key='hydratation';
   }
-  if(s.disc==='swim'){ during='Hydrate-toi entre les séries (gourde au bord du bassin).'; }
+  if(s.disc==='swim'){ during=tr('nutriFull.swimDuring'); }
   return {pre, during, post, key, auto:true};
 }
 /* phrase courte pour la notification "pense à prendre : X" */
@@ -546,46 +546,46 @@ function setActivityState(hasActivity){
 
   /* ---------- S22 (offset -2) — TSS ≈ 388 ---------- */
   // Lun-Mar : repos
-  add(-2,2, D('run','Footing',45,8.5,42,'Z2',1,4));
-  add(-2,2, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(-2,3, D('bike','Endurance fondamentale',90,33,70,'Z2',1,6));
-  add(-2,4, D('bike','Endurance fondamentale',150,88,110,'Z2',1,6));
-  add(-2,4, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(-2,5, D('run','Footing + LD',58,12.3,56,'Z2',1,6));
+  add(-2,2, D('run',tr('seed.footing'),45,8.5,42,'Z2',1,4));
+  add(-2,2, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(-2,3, D('bike',tr('seed.enduranceFond'),90,33,70,'Z2',1,6));
+  add(-2,4, D('bike',tr('seed.enduranceFond'),150,88,110,'Z2',1,6));
+  add(-2,4, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(-2,5, D('run',tr('seed.footingLD'),58,12.3,56,'Z2',1,6));
 
   /* ---------- S23 (offset -1) — TSS ≈ 879 ---------- */
-  add(-1,0, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(-1,0, D('run','VMA court',55,12.1,80,'Z5',1,8)); // 30/45
-  add(-1,1, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(-1,1, D('run','LT2 intervalles courts',84,10.7,92,'Z4',1,8));
-  add(-1,2, D('bike','Endurance fondamentale',150,55,108,'Z2',1,6));
-  add(-1,2, D('run','Footing facile',70,15.6,62,'Z2',1,5));
-  add(-1,3, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(-1,3, D('run','SV2 intervalles courts',68,11,85,'Z4',1,8,'Sensations correctes, bonne séance.'));
-  add(-1,4, D('bike','Endurance fondamentale',90,33,70,'Z2',1,6));
-  add(-1,4, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(-1,4, D('run','Footing facile',45,9.3,42,'Z2',1,4));
-  add(-1,5, D('bike','Sortie longue D3',120,39.4,95,'Z2',1,6)); // weekend D3
-  add(-1,6, D('bike','Endurance D3',75,21.8,68,'Z2',1,7));
-  add(-1,6, D('run','Footing D3',60,13.7,55,'Z2',1,6));
+  add(-1,0, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(-1,0, D('run',tr('seed.vmaCourt'),55,12.1,80,'Z5',1,8)); // 30/45
+  add(-1,1, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(-1,1, D('run',tr('seed.lt2IntCourts'),84,10.7,92,'Z4',1,8));
+  add(-1,2, D('bike',tr('seed.enduranceFond'),150,55,108,'Z2',1,6));
+  add(-1,2, D('run',tr('seed.footingFacile'),70,15.6,62,'Z2',1,5));
+  add(-1,3, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(-1,3, D('run',tr('seed.sv2IntCourts'),68,11,85,'Z4',1,8,tr('seed.noteGoodSensations')));
+  add(-1,4, D('bike',tr('seed.enduranceFond'),90,33,70,'Z2',1,6));
+  add(-1,4, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(-1,4, D('run',tr('seed.footingFacile'),45,9.3,42,'Z2',1,4));
+  add(-1,5, D('bike',tr('seed.sortieLongueD3'),120,39.4,95,'Z2',1,6)); // weekend D3
+  add(-1,6, D('bike',tr('seed.enduranceD3'),75,21.8,68,'Z2',1,7));
+  add(-1,6, D('run',tr('seed.footingD3'),60,13.7,55,'Z2',1,6));
 
   /* ---------- S24 (offset 0, EN COURS) — TSS ≈ 1867 ---------- */
-  add(0,0, D('bike','Endurance fondamentale',90,33,75,'Z2',1,6));
-  add(0,0, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(0,0, D('run','Footing facile',50,9.7,46,'Z2',1,5));
-  add(0,1, D('bike','VO2max HT',78,39.5,105,'Z5',1,9,'Très dur sur les dernières répétitions.')); // 30/30
-  add(0,1, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(0,1, D('run','VO2max piste',65,11.9,95,'Z5',1,9)); // 10×300m r1
-  add(0,2, D('bike','Endurance fondamentale',180,53.1,135,'Z2',1,7));
-  add(0,2, D('run','Footing facile',45,8.5,42,'Z2',1,5));
-  add(0,3, D('swim','Natation club',75,0,55,'Z2',1,5));
-  add(0,3, D('run','Actif',76,18.8,72,'Z3',1,6));
-  add(0,4, D('bike','Endurance fondamentale',120,86.3,130,'Z2',0)); // aujourd'hui, à faire
-  add(0,4, D('swim','Natation club',75,0,55,'Z2',0));
-  add(0,5, D('bike','Endurance + LT1',220,0,175,'Z3',0)); // samedi à venir
-  add(0,5, D('run','Footing facile',60,0,55,'Z2',0));
-  add(0,6, D('bike','Endurance fondamentale',90,0,75,'Z2',0)); // dimanche à venir
-  add(0,6, D('run','SV2',72,0,90,'Z4',0));
+  add(0,0, D('bike',tr('seed.enduranceFond'),90,33,75,'Z2',1,6));
+  add(0,0, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(0,0, D('run',tr('seed.footingFacile'),50,9.7,46,'Z2',1,5));
+  add(0,1, D('bike',tr('seed.vo2maxHT'),78,39.5,105,'Z5',1,9,tr('seed.noteHardLastReps'))); // 30/30
+  add(0,1, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(0,1, D('run',tr('seed.vo2maxPiste'),65,11.9,95,'Z5',1,9)); // 10×300m r1
+  add(0,2, D('bike',tr('seed.enduranceFond'),180,53.1,135,'Z2',1,7));
+  add(0,2, D('run',tr('seed.footingFacile'),45,8.5,42,'Z2',1,5));
+  add(0,3, D('swim',tr('seed.natationClub'),75,0,55,'Z2',1,5));
+  add(0,3, D('run',tr('seed.actif'),76,18.8,72,'Z3',1,6));
+  add(0,4, D('bike',tr('seed.enduranceFond'),120,86.3,130,'Z2',0)); // aujourd'hui, à faire
+  add(0,4, D('swim',tr('seed.natationClub'),75,0,55,'Z2',0));
+  add(0,5, D('bike',tr('seed.enduranceLT1'),220,0,175,'Z3',0)); // samedi à venir
+  add(0,5, D('run',tr('seed.footingFacile'),60,0,55,'Z2',0));
+  add(0,6, D('bike',tr('seed.enduranceFond'),90,0,75,'Z2',0)); // dimanche à venir
+  add(0,6, D('run',tr('seed.sv2'),72,0,90,'Z4',0));
 })();
 
 
@@ -629,10 +629,10 @@ function athleteProfile(aid){
    ============================================================ */
 let RACE_DEBRIEFS = { a1: [
   { race:"Gorillaman · Sprint 2025", date:'2025-06-14', result:"1h12'30",
-    felt:"Très bon négatif split sur la course à pied, jambes fraîches jusqu'au bout.",
-    nutrition:'oui', weather:'Chaud, 27°C, peu de vent',
-    good:'Transition vélo → course fluide, pas de point de côté.',
-    bad:'Crampe au mollet gauche dans les 2 derniers km.' }
+    get felt(){return tr('seed.debriefFelt')},
+    nutrition:'oui', get weather(){return tr('seed.debriefWeather')},
+    get good(){return tr('seed.debriefGood')},
+    get bad(){return tr('seed.debriefBad')} }
 ]};
 function debriefsFor(aid){ return RACE_DEBRIEFS[aid] || (RACE_DEBRIEFS[aid]=[]); }
 /* clé de "mes" débriefs en vue Athlète : mon id réel une fois connecté,
@@ -660,16 +660,16 @@ function debriefsBlockHTML(list, emptyTxt){
    un compte Sillance (pas d'onboarding coach par email en v1).
    ============================================================ */
 let CO_TEAM = { a1: [
-  {id:'ct1', coachId:'demo-principal', roleLabel:'Principal', coach:{full_name:'Toi (coach démo)'}},
-  {id:'ct2', coachId:'demo-nutri', roleLabel:'Nutrition', coach:{full_name:'Camille Aubert'}},
+  {id:'ct1', coachId:'demo-principal', get roleLabel(){return tr('coRole.principal')}, coach:{get full_name(){return tr('demoCoach.you')}}},
+  {id:'ct2', coachId:'demo-nutri', get roleLabel(){return tr('coRole.nutrition')}, coach:{full_name:'Camille Aubert'}},
 ]};
 let CO_PENDING = { a1: [
-  {id:'ccr1', coachEmail:'julien.velo@example.com', roleLabel:'Vélo', requestedByRole:'coach'},
+  {id:'ccr1', coachEmail:'julien.velo@example.com', get roleLabel(){return tr('coRole.velo')}, requestedByRole:'coach'},
 ]};
 function coTeamFor(aid){ return CO_TEAM[aid] || (CO_TEAM[aid]=[]); }
 function coPendingFor(aid){ return CO_PENDING[aid] || (CO_PENDING[aid]=[]); }
 function coTeamItemHTML(t){
-  return `<div class="sn-item"><div class="sn-when">${dispoSafe(t.roleLabel||'Coach')}</div><div class="sn-txt">${dispoSafe((t.coach&&(t.coach.full_name||t.coach.email))||'Coach')}</div></div>`;
+  return `<div class="sn-item"><div class="sn-when">${dispoSafe(t.roleLabel||tr('crd.coach'))}</div><div class="sn-txt">${dispoSafe((t.coach&&(t.coach.full_name||t.coach.email))||tr('crd.coach'))}</div></div>`;
 }
 /* canDecide = le viewer courant n'est pas à l'origine de la demande donc
    c'est à lui de valider/refuser ; sinon lecture seule "en attente". */
@@ -741,7 +741,7 @@ function decideCoCoach(id, aid, decision){
   if(window.PF?.user){
     PF.approveCoCoach(id, decision).catch(e=> console.warn('[PF] approveCoCoach', e));
   }
-  toast(decision==='approve' ? 'Coach ajouté à l\'équipe' : 'Demande refusée');
+  toast(decision==='approve' ? tr('toast.coachAjouteEquipe') : tr('toast.demandeRefusee'));
   if(document.getElementById('profileOverlay')?.classList.contains('open')) renderProfCoTeam(aid);
   if(mode==='athlete') renderSidebar();
 }
@@ -1140,11 +1140,11 @@ async function submitCheckin(){
 
 function notifyCoach(a){
   // démo : notification navigateur (le vrai envoi se fait côté serveur)
-  const pre = a.level==='urgent' ? 'URGENT' : 'Alerte';
+  const pre = a.level==='urgent' ? tr('notif.urgent') : tr('notif.alert');
   if('Notification' in window){
     if(Notification.permission==='granted'){
-      new Notification(`${pre} ${a.athlete} — fraîcheur ${a.score}%`,
-        {body:`Sommeil ${a.checkin.sommeil}/10 · Fatigue ${a.checkin.fatigue}/10 · Motiv. ${a.checkin.motivation}/10`});
+      new Notification(`${pre} ${a.athlete} — ${tr('notif.freshness')} ${a.score}%`,
+        {body:tr('notif.checkinBody', {sommeil:a.checkin.sommeil, fatigue:a.checkin.fatigue, motiv:a.checkin.motivation})});
     } else if(Notification.permission!=='denied'){
       Notification.requestPermission();
     }
@@ -7387,12 +7387,12 @@ function durabChart(){
    "compromised running" (cf. Frontiers in Physiology 2025).
    ============================================================ */
 const LOAD_LOG = [
-  {disc:'bike', name:'Sortie seuil 2×20', dur:75, if:0.88, metric:'TSS'},
-  {disc:'run',  name:'Tempo 8 km', dur:42, if:0.92, metric:'rTSS'},
-  {disc:'strength', name:'Renfo bas du corps', dur:55, rpe:7, metric:'sRPE'},
-  {disc:'swim', name:'Technique + seuil', dur:60, if:0.80, metric:'sTSS'},
-  {disc:'hyrox', name:'Hyrox — simulation', dur:64, rpe:9, metric:'sRPE'},
-  {disc:'run',  name:'Footing récup', dur:40, if:0.66, metric:'hrTSS'},
+  {disc:'bike', get name(){return tr('loadLog.threshold2x20')}, dur:75, if:0.88, metric:'TSS'},
+  {disc:'run',  get name(){return tr('loadLog.tempo8k')}, dur:42, if:0.92, metric:'rTSS'},
+  {disc:'strength', get name(){return tr('loadLog.lowerBodyStrength')}, dur:55, rpe:7, metric:'sRPE'},
+  {disc:'swim', get name(){return tr('loadLog.techniqueThreshold')}, dur:60, if:0.80, metric:'sTSS'},
+  {disc:'hyrox', get name(){return tr('loadLog.hyroxSim')}, dur:64, rpe:9, metric:'sRPE'},
+  {disc:'run',  get name(){return tr('loadLog.recoveryJog')}, dur:40, if:0.66, metric:'hrTSS'},
 ];
 function sessionLoad(s){
   if(s.if!=null) return Math.round(s.dur*60*s.if*s.if/36); // famille TSS
