@@ -65,6 +65,8 @@ if(!Array.prototype.at){
    données (ex. noms de zones dans INTENSITY_MODELS, laissés en français
    volontairement : les toucher demanderait de séparer affichage/logique). */
 function tr(key, vars){ return window.SilI18n ? SilI18n.t(key, vars) : key; }
+const DATE_LOCALE = {fr:'fr-FR', en:'en-US', es:'es-ES'};
+function localeStr(){ return DATE_LOCALE[window.SilI18n ? SilI18n.getLang() : 'fr'] || 'fr-FR'; }
 const DISC = {
   swim:     {get label(){return tr('disc.swim')}, ico:'ic-waves',    color:'var(--swim)', get gear(){return [tr('gear.swim1'),tr('gear.swim2'),tr('gear.swim3')]}},
   bike:     {get label(){return tr('disc.bike')}, ico:'ic-bike',     color:'var(--bike)', get gear(){return [tr('gear.bike1'),tr('gear.bike2'),tr('gear.bike3'),tr('gear.bike4')]}},
@@ -597,7 +599,7 @@ function mondayOf(offset){
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
 function iso(d){return d.toISOString().slice(0,10)}
 const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-const fmt = new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short'});
+const fmt = new Intl.DateTimeFormat(localeStr(),{day:'numeric',month:'short'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
 const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null, cyclePhase:null, cycleDay:null };
@@ -1168,24 +1170,24 @@ function renderAlerts(){
   const list=document.getElementById('bellList');
   // tri : urgent d'abord, puis par score croissant
   COACH_ALERTS.sort((a,b)=> (a.level==='urgent'?0:1)-(b.level==='urgent'?0:1) || a.score-b.score);
-  if(!COACH_ALERTS.length){ list.innerHTML=`<div class="bell-empty">Aucune alerte. Tes athlètes sont en forme.</div>`; return; }
+  if(!COACH_ALERTS.length){ list.innerHTML=`<div class="bell-empty">${tr('alerts.empty')}</div>`; return; }
   list.innerHTML=COACH_ALERTS.map(a=>{
     const urgent = a.level==='urgent';
     const col = urgent?'#FF5470':'#FF8A4D';
     const dk = a.checkin && a.checkin.dispo && a.checkin.dispo!=='ok' ? a.checkin.dispo : null;
     const dm = dk ? DISPO_META[dk] : null;
-    const flag = dm ? `● ${dm.l.toLowerCase()}` : urgent?'● fraîcheur critique':'● fraîcheur basse';
+    const flag = dm ? `● ${dm.l.toLowerCase()}` : urgent?`● ${tr('alerts.freshnessCritical')}`:`● ${tr('alerts.freshnessLow')}`;
     return `<div class="alert-item ${a.seen?'':'unseen'}">
       <div class="alert-ring" style="--ac:${col};--p:${a.score}"><span>${a.score}</span></div>
       <div class="alert-body">
         <div class="an">${a.athlete} <span class="flag" style="color:${col}">${flag}</span></div>
-        <div class="ad"><i class="ic ic-moon"></i> ${a.checkin.sommeil}/10 · <i class="ic ic-battery"></i> fatigue ${a.checkin.fatigue}/10 · <i class="ic ic-zap"></i> ${a.checkin.motivation}/10</div>
+        <div class="ad"><i class="ic ic-moon"></i> ${a.checkin.sommeil}/10 · <i class="ic ic-battery"></i> ${tr('alerts.fatigue')} ${a.checkin.fatigue}/10 · <i class="ic ic-zap"></i> ${a.checkin.motivation}/10</div>
         ${dm&&a.checkin.dispoNote?`<div class="ad" style="color:${dm.c}"><i class="ic ${dm.ic}"></i> ${dispoSafe(a.checkin.dispoNote)}</div>`:''}
         <div class="at">${timeAgo(a.time)}</div>
         <div class="alert-cta">
-          <button data-act="adapt">Adapter la séance</button>
-          <button data-act="message"><i class="ic ic-message-circle"></i> Message</button>
-          <button data-act="dismiss">Vu</button>
+          <button data-act="adapt">${tr('alerts.adaptSession')}</button>
+          <button data-act="message"><i class="ic ic-message-circle"></i> ${tr('alerts.message')}</button>
+          <button data-act="dismiss">${tr('alerts.seen')}</button>
         </div>
       </div>
     </div>`;
@@ -1206,7 +1208,7 @@ function renderAlerts(){
     b.addEventListener('click', ()=>{
       const a=COACH_ALERTS[i];
       document.getElementById('bellMenu').classList.remove('open');
-      openChat(`Salut ! Vu ton check-in (fraîcheur ${a?a.score:''}%), je te conseille du repos ou une séance très allégée aujourd'hui. Comment tu te sens ?`);
+      openChat(tr('alerts.chatPrefill', {score:a?a.score:''}));
     });
   });
 }
@@ -1229,13 +1231,13 @@ document.addEventListener('click', e=>{ if(!bellMenu.contains(e.target)&&e.targe
 /* ---- Message matinal : récap séances + matériel agrégé ---- */
 function buildMorningMessage(dateKey){
   const sessions = (planning[dateKey]||[]);
-  if(!sessions.length) return {empty:true, title:'Repos aujourd\'hui', body:'Pas de séance prévue. Profites-en pour récupérer.'};
+  if(!sessions.length) return {empty:true, title:tr('morning.restToday'), body:tr('morning.restBody')};
   const discs = [...new Set(sessions.map(s=>DISC[s.disc].label))];
   const gear = [...new Set(sessions.flatMap(gearForSession))];
   const lines = sessions.map(s=>`${discIcon(DISC[s.disc])} ${s.title} · ${fmtDur(s.dur)}`);
   return {
     empty:false,
-    title:`Entraînement du jour : ${discs.join(' + ')}`,
+    title:tr('morning.todayTraining', {discs:discs.join(' + ')}),
     sessions:lines,
     gear
   };
@@ -1257,9 +1259,9 @@ function urlB64ToUint8(s){
 }
 async function enableMorningPush(){
   if(!('serviceWorker' in navigator) || !('Notification' in window))
-    throw new Error("Navigateur sans notifications — choisis le canal Email");
+    throw new Error(tr('morning.errNoNotif'));
   if(Notification.permission === 'denied')
-    throw new Error('Notifications bloquées pour ce site — clique sur l\'icône à gauche de l\'adresse (ou Réglages du site) → Notifications → Autoriser, puis réessaie');
+    throw new Error(tr('morning.errBlocked'));
   if(Notification.permission !== 'granted')
     toast(tr('toast.chromeDemandePermissionCliqueAutoriser'));
   // certains navigateurs n'affichent qu'une icône discrète et la promesse reste
@@ -1268,11 +1270,11 @@ async function enableMorningPush(){
     Notification.requestPermission(),
     new Promise(res=> setTimeout(()=>res('timeout'), 25000)),
   ]);
-  if(perm === 'timeout') throw new Error('Pas de réponse — cherche la petite cloche barrée dans la barre d\'adresse de Chrome, clique-la et choisis « Autoriser »');
-  if(perm !== 'granted') throw new Error('Notifications refusées — autorise-les dans les réglages du site puis réessaie');
+  if(perm === 'timeout') throw new Error(tr('morning.errTimeout'));
+  if(perm !== 'granted') throw new Error(tr('morning.errDenied'));
   const reg = await navigator.serviceWorker.register('./sillance-sw.js');
   await navigator.serviceWorker.ready;
-  if(!reg.pushManager) throw new Error("Push indisponible — sur iPhone, ajoute d'abord le site à l'écran d'accueil (voir le tuto)");
+  if(!reg.pushManager) throw new Error(tr('morning.errNoPush'));
   const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8(VAPID_PUBLIC_KEY) });
   if(window.PF?.user && PF.savePushSubscription) await PF.savePushSubscription(sub.toJSON());
   return reg;
@@ -1293,9 +1295,9 @@ function buildMorningPreview(){
   box.innerHTML = `
     <div class="mp-title">${m.title}</div>
     <ul class="mp-sessions">${m.sessions.map(l=>`<li>${l}</li>`).join('')}</ul>
-    <div class="mp-gear-lbl"><i class="ic ic-backpack"></i> À prévoir</div>
+    <div class="mp-gear-lbl"><i class="ic ic-backpack"></i> ${tr('morning.toBring')}</div>
     <div class="mp-gear">${m.gear.map(g=>`<span>${g}</span>`).join('')}</div>
-    <button class="mp-sync" id="syncActivityBtn"><i class="ic ic-refresh"></i> J'ai fini — synchroniser mon activité</button>`;
+    <button class="mp-sync" id="syncActivityBtn"><i class="ic ic-refresh"></i> ${tr('morning.syncActivity')}</button>`;
 
   const btn = document.getElementById('morningBtn');
   if(btn && !btn._wired){
@@ -1309,24 +1311,24 @@ function buildMorningPreview(){
         if(channel !== 'email'){
           const reg = await enableMorningPush();
           // notification de test immédiate pour valider le canal
-          reg.showNotification('Sillance — '+m.title, {body:'À prévoir : '+m.gear.join(', '), icon:'./icon-192.png', tag:'sillance-test'});
+          reg.showNotification('Sillance — '+m.title, {body:tr('morning.toBring')+' : '+m.gear.join(', '), icon:'./icon-192.png', tag:'sillance-test'});
         }
         if(window.PF?.user && PF.saveNotifPrefs){
           await PF.saveNotifPrefs({ hour:hh, minute:mm - (mm % 15),
             tz: Intl.DateTimeFormat().resolvedOptions().timeZone, channel });
         }
-        btn.innerHTML = `<i class="ic ic-check"></i> Rappel activé à ${h}`;
+        btn.innerHTML = `<i class="ic ic-check"></i> ${tr('morning.activatedAt', {h})}`;
         btn.classList.add('on');
         if(!window.PF?.user){
           toast(tr('toast.testEnvoyeDemoConnecteToi'));
         } else {
-          toast(channel==='email' ? 'Rappel email activé à '+h
-               : channel==='both' ? 'Notification + email activés à '+h
-               : 'Notifications activées à '+h+' — test envoyé');
+          toast(channel==='email' ? tr('morning.emailActivatedAt', {h})
+               : channel==='both' ? tr('morning.bothActivatedAt', {h})
+               : tr('morning.pushActivatedAt', {h}));
         }
       }catch(e){
         console.warn('[notif]', e);
-        toast(e && e.message ? e.message : 'Activation impossible sur ce navigateur', 'error');
+        toast(e && e.message ? e.message : tr('morning.errNoActivate'), 'error');
       }finally{ btn.disabled = false; }
     });
   }
@@ -1338,16 +1340,16 @@ function buildMorningPreview(){
       // on prend la séance la plus "marquante" du jour (longue ou intense)
       const s = todaySessions.slice().sort((a,b)=> (b.dur||0)-(a.dur||0))[0];
       if(!s) return;
-      sync.textContent='Activité synchronisée';
+      sync.textContent=tr('morning.activitySynced');
       sync.classList.add('done');
       const reminder = nutritionReminder(s);
       const n = nutritionForSession(s);
-      toast(`Activité reçue — pense à prendre : ${reminder}`);
+      toast(tr('morning.activityReceived', {reminder}));
       if('Notification' in window){
         if(Notification.permission==='granted'){
-          new Notification('Sillance — Récupération', {body:`Pense à prendre : ${reminder}. ${n.post}`});
+          new Notification(tr('morning.notifRecoveryTitle'), {body:tr('morning.notifRecoveryBody', {reminder})+' '+n.post});
         } else if(Notification.permission!=='denied'){
-          Notification.requestPermission().then(p=>{ if(p==='granted') new Notification('Sillance — Récupération', {body:`Pense à prendre : ${reminder}`}); });
+          Notification.requestPermission().then(p=>{ if(p==='granted') new Notification(tr('morning.notifRecoveryTitle'), {body:tr('morning.notifRecoveryBody', {reminder})}); });
         }
       }
     });
@@ -1411,16 +1413,16 @@ function renderStravaCard(){
   const providers = window.__pf_providers || [];
   if(!stravaConnected){
     box.innerHTML=`
-      <h2>Synchronisation</h2>
-      <p class="hint" style="margin-bottom:10px">Connecte ta montre pour importer tes activités automatiquement.</p>
-      <button class="strava-connect" id="stravaConnectBtn">${stravaLogo} Se connecter avec Strava</button>
+      <h2>${tr('sync.title')}</h2>
+      <p class="hint" style="margin-bottom:10px">${tr('sync.connectWatch')}</p>
+      <button class="strava-connect" id="stravaConnectBtn">${stravaLogo} ${tr('sync.connectStrava')}</button>
       <div class="dev-more">
         <button class="dev-mini" data-p="garmin">⌚ Garmin</button>
         <button class="dev-mini" data-p="coros">⌚ Coros</button>
-        <button class="dev-mini" id="importFitBtn" title="Importer un fichier .FIT/.TCX/.GPX exporté de ta montre"><i class="ic ic-upload"></i> Importer un fichier</button>
+        <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle')}"><i class="ic ic-upload"></i> ${tr('sync.importFile')}</button>
       </div>
-      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ Tes données <b>Strava</b> restent personnelles (conditions Strava). Pour les partager avec ton coach : <b>Garmin/Coros</b> ou <b>import de fichier</b>.</p>
-      <div class="strava-powered">Strava · Garmin · Coros — données en lecture seule</div>`;
+      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy')}</p>
+      <div class="strava-powered">${tr('sync.readOnly')}</div>`;
     document.getElementById('stravaConnectBtn').onclick=connectStrava;
     box.querySelectorAll('.dev-mini').forEach(b=> b.onclick=()=> connectProvider(b.dataset.p));
   } else {
@@ -1429,22 +1431,22 @@ function renderStravaCard(){
       const D=DISC[a.disc]||DISC.run;
       const src = a.src? ` · ${escAct(SRC[a.src]||a.src)}` : '';
       const clickable = a.id && a.src==='strava';
-      return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="Voir l'analyse détaillée"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${escAct(a.name)}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${escAct(a.date)}${src}</div></div></div>`;
-    }).join('')}</div>` : `<p class="hint" style="margin-top:9px">Aucune activité encore importée.</p>`;
+      return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="${tr('sync.seeDetailedAnalysis')}"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${escAct(a.name)}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${escAct(a.date)}${src}</div></div></div>`;
+    }).join('')}</div>` : `<p class="hint" style="margin-top:9px">${tr('sync.noActivity')}</p>`;
     const linked = providers.length? providers.map(p=>SRC[p]||p).join(' · ') : 'Strava';
     box.innerHTML=`
-      <h2>Activités synchronisées</h2>
+      <h2>${tr('sync.syncedActivities')}</h2>
       <div class="strava-state">
-        <div class="sline"><span class="sdot"></span>Comptes liés : ${linked}</div>
-        <div class="smeta">Dernière synchro : ${stravaActivities.length?'à l\'instant':'jamais'}</div>
-        <button class="strava-sync" id="stravaSyncBtn">${stravaLogo} Synchroniser mes dernières activités</button>
-        <button class="strava-disconnect" id="stravaDisconnectBtn">Déconnecter</button>
-        <button class="dev-mini" id="importFitBtn" title="Importer un fichier .FIT/.TCX/.GPX"><i class="ic ic-upload"></i> Importer un fichier (.FIT/.TCX/.GPX)</button>
+        <div class="sline"><span class="sdot"></span>${tr('sync.linkedAccounts')} : ${linked}</div>
+        <div class="smeta">${tr('sync.lastSync')} : ${stravaActivities.length?tr('sync.justNow'):tr('sync.never')}</div>
+        <button class="strava-sync" id="stravaSyncBtn">${stravaLogo} ${tr('sync.syncLatest')}</button>
+        <button class="strava-disconnect" id="stravaDisconnectBtn">${tr('sync.disconnect')}</button>
+        <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle2')}"><i class="ic ic-upload"></i> ${tr('sync.importFile2')}</button>
       </div>
-      ${(!window.PF?.user)?`<div class="demo-pick"><span class="dp-lbl">Profil démo</span>${Object.keys(STRAVA_DEMO_SETS).map(k=>`<button class="dp-chip${k===stravaDemoSet?' on':''}" data-set="${k}">${DEMO_SET_LABELS[k]}</button>`).join('')}</div>`:''}
+      ${(!window.PF?.user)?`<div class="demo-pick"><span class="dp-lbl">${tr('sync.demoProfile')}</span>${Object.keys(STRAVA_DEMO_SETS).map(k=>`<button class="dp-chip${k===stravaDemoSet?' on':''}" data-set="${k}">${DEMO_SET_LABELS[k]}</button>`).join('')}</div>`:''}
       ${actsHtml}
-      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ Les activités <b>Strava</b> restent personnelles à l'athlète (conditions Strava) et ne sont pas partagées au coach. Canaux partageables : <b>Garmin/Coros</b> ou <b>import .FIT/.TCX/.GPX</b>.</p>
-      <div class="strava-powered">Powered by Strava · Garmin · Coros</div>`;
+      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy2')}</p>
+      <div class="strava-powered">${tr('sync.poweredBy')}</div>`;
     document.getElementById('stravaSyncBtn').onclick=syncStrava;
     box.querySelectorAll('.strava-act.clickable').forEach(el=> el.onclick=()=>openStravaAnalysis(stravaActivities[+el.dataset.idx]));
     box.querySelectorAll('.dp-chip').forEach(b=> b.onclick=()=>{ stravaDemoSet=b.dataset.set; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); });
@@ -1472,10 +1474,10 @@ function importActivityFile(file){
   const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
   toast(tr('toast.lectureFichier'));
   PFFit.parseFile(file, {ftp}).then(res=>{
-    if(!res.ok){ toast('Import : '+res.error); return; }
+    if(!res.ok){ toast(tr('sync.importPrefix')+res.error); return; }
     const s=res.summary;
     stravaConnected=true;
-    stravaActivities.unshift({disc:s.disc, name:s.title, dur:s.durMin, dist:+(+s.dist).toFixed(1), date:'importé', src:'upload'});
+    stravaActivities.unshift({disc:s.disc, name:s.title, dur:s.durMin, dist:+(+s.dist).toFixed(1), date:tr('sync.imported'), src:'upload'});
     renderStravaCard();
     openAnalysis({id:'imp'+Date.now(), disc:s.disc, title:s.title, dur:s.durMin, zone:'Z2', _realData:res.data});
     toast(tr('toast.activiteImportee'));
@@ -1496,7 +1498,7 @@ function openStravaAnalysis(act){
     if(!points || !points.length){ toast(tr('toast.pasDetailSecondeParSeconde')); return; }
     const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
     const res = PFFit.buildFromRaw(points, act.disc, [], {ftp});
-    if(!res.ok){ toast(res.error||'Analyse impossible', 'error'); return; }
+    if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
     openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
   }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(tr('toast.recuperationDetailStravaImpossible'), 'error'); });
 }
@@ -1505,27 +1507,27 @@ function connectStrava(){
   // RÉEL (connecté à Sillance cloud) → OAuth Strava ; sinon démo.
   if(window.PF?.user){
     const btn=document.getElementById('stravaConnectBtn');
-    if(btn){ btn.textContent='Redirection vers Strava…'; btn.disabled=true; }
+    if(btn){ btn.textContent=tr('sync.redirectingStrava'); btn.disabled=true; }
     PF.connectDevice('strava').then(r=>{
-      if(r&&r.pending){ if(btn) btn.disabled=false; renderStravaCard(); toast(r.message||'Intégration bientôt disponible'); }
+      if(r&&r.pending){ if(btn) btn.disabled=false; renderStravaCard(); toast(r.message||tr('sync.integrationSoon')); }
       // sinon : redirection en cours vers Strava.
     }).catch(e=>{ console.warn('[PF] connectDevice:',e); if(btn) btn.disabled=false; renderStravaCard(); toast(tr('toast.connexionStravaImpossible'), 'error'); });
     return;
   }
   // DÉMO : simule le retour de l'autorisation OAuth.
   const btn=document.getElementById('stravaConnectBtn');
-  if(btn){ btn.textContent='Connexion à Strava…'; btn.disabled=true; }
+  if(btn){ btn.textContent=tr('sync.connectingStrava'); btn.disabled=true; }
   setTimeout(()=>{ stravaConnected=true; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); toast(tr('toast.stravaConnecte')); }, 800);
 }
 
 function syncStrava(){
   const btn=document.getElementById('stravaSyncBtn');
-  if(btn){ btn.classList.add('syncing'); btn.textContent='Synchronisation…'; }
+  if(btn){ btn.classList.add('syncing'); btn.textContent=tr('sync.syncing'); }
   // RÉEL : l'edge function appelle l'API Strava avec le token stocké.
   if(window.PF?.user){
     PF.syncDevice('strava')
       .then(()=> refreshDeviceState())
-      .then(()=> toast(`${stravaActivities.length} activités synchronisées`))
+      .then(()=> toast(tr('sync.nActivitiesSynced', {n:stravaActivities.length})))
       .catch(e=>{ console.warn('[PF] syncDevice:',e); renderStravaCard(); toast(tr('toast.synchroStravaImpossible'), 'error'); });
     return;
   }
@@ -1533,7 +1535,7 @@ function syncStrava(){
   setTimeout(()=>{
     stravaActivities = STRAVA_DEMO_SETS[stravaDemoSet].slice();
     renderStravaCard();
-    toast(`${stravaActivities.length} activités importées`);
+    toast(tr('sync.nActivitiesImported', {n:stravaActivities.length}));
   }, 1000);
 }
 
@@ -1550,7 +1552,7 @@ async function refreshDeviceState(){
       stravaActivities = acts.map(a=>({
         id: a.id,
         disc: a.disc || 'run',
-        name: a.name || 'Activité',
+        name: a.name || tr('sync.activity'),
         dur: a.duration_s ? Math.round(a.duration_s/60) : 0,
         dist: a.distance_m ? +(a.distance_m/1000).toFixed(1) : 0,
         date: fmtActDate(a.start_time),
@@ -1564,7 +1566,7 @@ async function refreshDeviceState(){
 // Connexion d'une plateforme autre que Strava (Garmin/Coros).
 function connectProvider(p){
   if(!window.PF?.user){ toast(tr('toast.connecteToiCloudPuisReessaie')); return; }
-  PF.connectDevice(p).then(r=>{ if(r&&r.pending) toast(r.message||'Intégration bientôt disponible'); })
+  PF.connectDevice(p).then(r=>{ if(r&&r.pending) toast(r.message||tr('sync.integrationSoon')); })
     .catch(e=>{ console.warn('[PF] connectDevice:',e); toast(tr('toast.connexionImpossible'), 'error'); });
 }
 
@@ -1572,10 +1574,10 @@ function fmtActDate(iso){
   if(!iso) return '';
   const d=new Date(iso);
   const days=Math.floor((new Date().setHours(0,0,0,0)-new Date(iso).setHours(0,0,0,0))/86400000);
-  if(days<=0) return 'auj.';
-  if(days===1) return 'hier';
-  if(days<7) return `il y a ${days} j`;
-  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+  if(days<=0) return tr('date.today');
+  if(days===1) return tr('date.yesterday');
+  if(days<7) return tr('date.daysAgo', {days});
+  return d.toLocaleDateString(localeStr(),{day:'2-digit',month:'2-digit'});
 }
 
 /* ============================================================
@@ -1599,8 +1601,8 @@ function tplZoneCat(t){
   return best? 'Z'+best : '—';
 }
 const ZONE_CATS=[
-  ['Z5','Z5 · VO2max / VMA'], ['Z4','Z4 · Seuil'], ['Z3','Z3 · Tempo'],
-  ['Z2','Z2 · Endurance'], ['Z1','Z1 · Récupération'], ['—','Renfo / autre']
+  ['Z5','Z5 · '+tr('zoneCat.vo2max')], ['Z4','Z4 · '+tr('zoneCat.threshold')], ['Z3','Z3 · '+tr('zoneCat.tempo')],
+  ['Z2','Z2 · '+tr('zoneCat.endurance')], ['Z1','Z1 · '+tr('zoneCat.recovery')], ['—',tr('zoneCat.strengthOther')]
 ];
 const ZONE_COLORS={Z1:'#2FD9FF',Z2:'#39E6A3',Z3:'#FFD43D',Z4:'#FFB13D',Z5:'#FF5470','—':'#8B93A7'};
 let libSport='all', libZone='all';
@@ -1609,12 +1611,12 @@ function buildTemplates(container){
   container.innerHTML='';
   const filt=document.createElement('div'); filt.className='lib-filters';
   filt.innerHTML=`
-    <select id="libSport" aria-label="Filtrer par sport">
-      <option value="all">Tous les sports</option>
+    <select id="libSport" aria-label="${tr('lib.filterBySport')}">
+      <option value="all">${tr('lib.allSports')}</option>
       ${Object.entries(DISC).map(([k,d])=>`<option value="${k}"${libSport===k?' selected':''}>${d.label}</option>`).join('')}
     </select>
-    <select id="libZone" aria-label="Filtrer par type de séance">
-      <option value="all">Tous les types de séance</option>
+    <select id="libZone" aria-label="${tr('lib.filterByType')}">
+      <option value="all">${tr('lib.allTypes')}</option>
       ${ZONE_CATS.map(([v,l])=>`<option value="${v}"${libZone===v?' selected':''}>${l}</option>`).join('')}
     </select>`;
   container.appendChild(filt);
@@ -1625,7 +1627,7 @@ function buildTemplates(container){
     .map(t=>({t, z:tplZoneCat(t)}))
     .filter(x=> (libSport==='all'||x.t.disc===libSport) && (libZone==='all'||x.z===libZone));
   if(!list.length){
-    container.insertAdjacentHTML('beforeend','<div class="lib-empty">Aucune séance — modifie les filtres ou crée-en une.</div>');
+    container.insertAdjacentHTML('beforeend',`<div class="lib-empty">${tr('lib.empty')}</div>`);
     return;
   }
   // filtres actifs → groupes ouverts ; sinon tout replié pour rester compact
@@ -1649,7 +1651,7 @@ function tplCard(t, z){
   el.style.setProperty('--c', D.color);
   el.innerHTML = `<div class="t">${t.title}<span class="zb" style="color:${ZONE_COLORS[z]}">${z}</span></div>
                   <div class="m">${t.dur}min · ${t.tss} TSS</div>
-                  <button class="tpl-assign" title="Attribuer à plusieurs athlètes" aria-label="Attribuer cette séance à plusieurs athlètes"><i class="ic ic-users"></i></button>`;
+                  <button class="tpl-assign" title="${tr('lib.assignToMultiple')}" aria-label="${tr('lib.assignToMultipleAria')}"><i class="ic ic-users"></i></button>`;
   el.addEventListener('dragstart', e=>{
     e.dataTransfer.setData('text/plain', JSON.stringify({type:'tpl', id:t.id}));
   });
@@ -1679,16 +1681,16 @@ function nextMonday(){ return addDays(mondayOf(0),7); }
 
 function buildCycles(container){
   container.innerHTML='';
-  if(!CYCLES.length){ container.innerHTML='<div class="lib-empty">Aucun cycle — crée ton premier programme.</div>'; return; }
+  if(!CYCLES.length){ container.innerHTML=`<div class="lib-empty">${tr('cycles.empty')}</div>`; return; }
   CYCLES.forEach(c=>{
     const el=document.createElement('div');
     el.className='tpl cycle-card';
     el.style.setProperty('--c','var(--accent)');
     el.innerHTML=`<div class="t">${c.name}</div>
-      <div class="m">${c.weeks} semaines · ${cycleCount(c)} séances</div>
-      <button class="cy-apply"><i class="ic ic-calendar"></i> Ajouter à l'athlète</button>
-      <button class="cy-multi"><i class="ic ic-users"></i> Attribuer à plusieurs</button>
-      <button class="cy-del" aria-label="Supprimer le cycle"><i class="ic ic-x"></i></button>`;
+      <div class="m">${c.weeks} ${tr('cycles.weeks')} · ${cycleCount(c)} ${tr('cycles.sessions')}</div>
+      <button class="cy-apply"><i class="ic ic-calendar"></i> ${tr('cycles.addToAthlete')}</button>
+      <button class="cy-multi"><i class="ic ic-users"></i> ${tr('cycles.assignMultiple')}</button>
+      <button class="cy-del" aria-label="${tr('cycles.deleteAria')}"><i class="ic ic-x"></i></button>`;
     el.querySelector('.cy-apply').addEventListener('click', e=>{ e.stopPropagation(); applyCycle(c, null); });
     el.querySelector('.cy-multi').addEventListener('click', e=>{ e.stopPropagation(); openAssign('cycle', c); });
     el.querySelector('.cy-del').addEventListener('click', e=>{
@@ -1731,7 +1733,7 @@ function applyCycle(c, startIso){
   });
   weekOffset = Math.round((mon - mondayOf(0))/(7*864e5));
   render();
-  toast(`Cycle « ${c.name} » posé : ${out.length} séances sur ${c.weeks} semaines`);
+  toast(tr('cycles.appliedToast', {name:c.name, n:out.length, weeks:c.weeks}));
 }
 
 /* ============================================================
@@ -1773,8 +1775,8 @@ function doAssign(kind, obj, dateIso, targets){
   render();
   const nA = targets.length;
   toast(kind==='cycle'
-    ? `Cycle « ${obj.name} » posé pour ${nA} athlète${nA>1?'s':''} : ${entries.length} séances chacun`
-    : `Séance « ${obj.title} » attribuée à ${nA} athlète${nA>1?'s':''}`);
+    ? tr(nA>1?'assign.cyclePosedPlural':'assign.cyclePosedSingular', {name:obj.name, n:nA, entries:entries.length})
+    : tr(nA>1?'assign.sessionAssignedPlural':'assign.sessionAssignedSingular', {title:obj.title, n:nA}));
 }
 
 function openAssign(kind, obj){
@@ -1788,20 +1790,20 @@ function openAssign(kind, obj){
       ${g?`<span class="asg-grp" style="color:${g.color}">${g.name}</span>`:''}</label>`;
   }).join('');
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=`<div class="adh-modal asg-modal" role="dialog" aria-label="Attribuer à plusieurs athlètes">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Attribuer « ${isCycle?obj.name:obj.title} »</h3>
+  el.innerHTML=`<div class="adh-modal asg-modal" role="dialog" aria-label="${tr('assign.dialogAria')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('assign.title', {name:isCycle?obj.name:obj.title})}</h3>
     <p class="adh-sub">${isCycle
-      ? `Pose ce cycle (${obj.weeks} semaines, ${cycleCount(obj)} séances) sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`
-      : `Pose cette séance sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`}</p>
-    <div class="asg-date"><span>${isCycle?'Semaine du':'Le'}</span><input type="date" id="asgDate" value="${defDate}"></div>
+      ? tr('assign.subCycle', {weeks:obj.weeks, n:cycleCount(obj)})
+      : tr('assign.subSession')}</p>
+    <div class="asg-date"><span>${isCycle?tr('assign.weekOf'):tr('assign.onDate')}</span><input type="date" id="asgDate" value="${defDate}"></div>
     ${groups.length?`<div class="asg-groups">${groups.map(g=>{
       const n=ROSTER.filter(a=>a.group===g.id).length;
       return `<button class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name} · ${n}</button>`;
     }).join('')}</div>`:''}
-    <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">Aucun athlète lié — invite ton premier athlète pour lui attribuer des séances.</div>`}</div>
-    ${rows?`<label class="asg-all"><input type="checkbox" id="asgAll"> Tout sélectionner</label>
-    <button class="btn asg-go" id="asgGo" disabled>Attribuer</button>`:''}
+    <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">${tr('assign.noAthlete')}</div>`}</div>
+    ${rows?`<label class="asg-all"><input type="checkbox" id="asgAll"> ${tr('assign.selectAll')}</label>
+    <button class="btn asg-go" id="asgGo" disabled>${tr('assign.assign')}</button>`:''}
   </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('open'));
@@ -1815,7 +1817,7 @@ function openAssign(kind, obj){
   const sync=()=>{
     const n=boxes.filter(b=>b.checked).length;
     go.disabled=!n;
-    go.textContent = n ? `Attribuer à ${n} athlète${n>1?'s':''}` : 'Attribuer';
+    go.textContent = n ? tr(n>1?'assign.assignToNPlural':'assign.assignToNSingular', {n}) : tr('assign.assign');
     all.checked = n===boxes.length;
     el.querySelectorAll('.asg-chip').forEach(ch=>{
       const m=boxes.filter(b=>b.dataset.grp===ch.dataset.g);
@@ -1935,7 +1937,7 @@ document.getElementById('cyApply').addEventListener('click', ()=>{
    Démo : valeurs d'exemple ; connecté : les boutons pointent vers
    le vrai checkout / portail Stripe.
    ============================================================ */
-function fmtDateFr(d){ return d.toLocaleDateString('fr-FR'); }
+function fmtDateFr(d){ return d.toLocaleDateString(localeStr()); }
 function aiTrialDaysLeft(){
   if(window.__pf_aiDemo && window.__pf_aiDemoStart)
     return Math.max(0, 14 - Math.floor((Date.now()-window.__pf_aiDemoStart)/86400000));
@@ -2967,7 +2969,7 @@ function openAdherence(){
    app) ; démo = 3 lignes fictives pour montrer le rendu. */
 function openCoachInvoices(){
   const renderRows=(invoices)=> invoices.length ? invoices.map(inv=>`<tr>
-      <td>${new Date(inv.created).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td>${new Date(inv.created).toLocaleDateString(localeStr(),{day:'2-digit',month:'short',year:'numeric'})}</td>
       <td>${inv.athlete_name}</td>
       <td>${inv.offer_name}</td>
       <td>${inv.amount_paid.toFixed(2)} €</td>
@@ -3169,8 +3171,8 @@ function exportBilan(name){
     let race=null; try{ race=UPCOMING_RACES&&UPCOMING_RACES[0]; }catch(e){}
     const REFL={ftp:['FTP','W'],pma:['PMA','W'],cpBike:['CP vélo','W'],vma:['VMA','km/h'],cv:['VC','km/h'],seuilRun:['Seuil','s/km'],css:['CSS','s/100m'],fcMax:['FC max','bpm'],fcRepos:['FC repos','bpm']};
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    const dfmt=d=>{ try{ return new Date(d).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } };
-    const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+    const dfmt=d=>{ try{ return new Date(d).toLocaleDateString(localeStr(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } };
+    const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const tsbCls = tsb==null?'':tsb>=5?'good':tsb>-15?'warn':'bad';
     const compCls = comp==null?'':comp>=85?'good':comp>=60?'warn':'bad';
     const refRows = Object.keys(REFL).filter(k=>ref[k]!=null&&ref[k]!=='').map(k=>`<div class="row"><span class="l">${REFL[k][0]}</span><span class="v">${esc(ref[k])} <em>${REFL[k][1]}</em></span></div>`).join('');
@@ -3243,7 +3245,7 @@ function exportCaseStudy(name){
     const adherence = tot ? Math.round(done/tot*100) : null;
     const quote = (prompt("Un mot sur ce cycle avec "+name+" (optionnel, apparaît sur la fiche) :", "") || '').trim();
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+    const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const recRows = newRecs.length ? newRecs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v acc">${esc(r.v)}</span></div>`).join('') : '';
     const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Progression — ${esc(name)}</title><style>
 @page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -3963,7 +3965,7 @@ function renderCreneaux(){
         <span class="cr-price ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':'inclus'}</span>
       </div>
       <div class="cr-meta">
-        <span><b>${c.recur==='once'&&c.date?new Date(c.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):CLUB_DAYS[c.day]}</b> ${c.time}</span>
+        <span><b>${c.recur==='once'&&c.date?new Date(c.date+'T00:00:00').toLocaleDateString(localeStr(),{day:'numeric',month:'short'}):CLUB_DAYS[c.day]}</b> ${c.time}</span>
         ${c.recur==='once'?'<span title="Séance ponctuelle">ponctuel</span>':'<span title="Se répète chaque semaine"><i class="ic ic-refresh"></i> hebdo</span>'}
         <span>${fmtDur(c.dur)}</span>
         <span><i class="ic ic-pin"></i> ${c.place}</span>
@@ -4461,7 +4463,7 @@ function openCreneauDetail(c, tab){
 }
 function crdWhen(c){
   return c.recur==='once' && c.date
-    ? `${new Date(c.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} ${c.time}`
+    ? `${new Date(c.date+'T00:00:00').toLocaleDateString(localeStr(),{weekday:'long',day:'numeric',month:'long'})} ${c.time}`
     : `${CLUB_DAYS[c.day]} ${c.time} · chaque semaine`;
 }
 function renderCreneauDetail(){
@@ -7069,7 +7071,7 @@ function buildLoadPeriods(period){
     const key = period==='month' ? (d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')) : String(d.getFullYear());
     if(!groups[key]){
       groups[key]={ wk:key, mon:d,
-        label: period==='month' ? d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'}) : String(d.getFullYear()),
+        label: period==='month' ? d.toLocaleDateString(localeStr(),{month:'short',year:'2-digit'}) : String(d.getFullYear()),
         load:{swim:0,bike:0,run:0,strength:0}, hours:0, total:0, _atl:0,_tsb:0,_acwr:0,_n:0 };
       order.push(key);
     }
@@ -7166,7 +7168,7 @@ function drawLoadStack(){
       const risk=w.acwr>1.5?'<span style="color:#FF5470">élevé</span>':w.acwr<0.8?'<span style="color:#FFB13D">sous-charge</span>':'<span style="color:#39E6A3">maîtrisé</span>';
       const dd=w.mon;
       const periodLbl = loadStackPeriod==='week' ? `Sem. ${dd.getDate()}/${dd.getMonth()+1}`
-        : loadStackPeriod==='month' ? `Mois de ${dd.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}`
+        : loadStackPeriod==='month' ? `Mois de ${dd.toLocaleDateString(localeStr(),{month:'long',year:'numeric'})}`
         : `Année ${dd.getFullYear()}`;
       tipShow(e,`<b>${periodLbl}</b> · charge <b>${w.total}</b> · <b>${w.hours.toFixed(1)} h</b><br>Nat ${w.load.swim} · Vélo ${w.load.bike} · Course ${w.load.run} · Renfo ${w.load.strength}<br>Fatigue ${w.atl} · Risque ACWR <b>${w.acwr.toFixed(2)}</b> (${risk}) · Forme ${w.tsb>=0?'+':''}${w.tsb}`);
     });
@@ -7721,7 +7723,7 @@ function renderToday(){
   const bedStr = `${String(bh).padStart(2,'0')} h ${String(bm).padStart(2,'0')}`;
 
   const today = new Date();
-  const dateStr = today.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+  const dateStr = today.toLocaleDateString(localeStr(), {weekday:'long', day:'numeric', month:'long'});
 
   box.innerHTML = `<div class="today-card">
     <div class="today-head">
@@ -7990,7 +7992,7 @@ function renderGear(){
         </div>
         <button class="gear-del" data-act="del">Retirer</button>
       </div>
-      <div class="gear-km">${g.km.toLocaleString('fr-FR')}<small> / ${g.max.toLocaleString('fr-FR')} km</small> ${costKm}</div>
+      <div class="gear-km">${g.km.toLocaleString(localeStr())}<small> / ${g.max.toLocaleString(localeStr())} km</small> ${costKm}</div>
       <div class="gear-sub">${Math.round(pct)}% de la durée de vie du modèle</div>
       <div class="gear-bar">${marks}<i style="width:${pct}%;background:${barColor}"></i></div>
       ${milestones}
