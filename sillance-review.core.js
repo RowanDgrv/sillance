@@ -58,12 +58,21 @@ if(!Array.prototype.at){
    plus aucun onclick= en dur dans le HTML, tout est attaché en JS.
    ============================================================ */
 (function(){
+/* i18n (03/08/2026) : raccourci vers SilI18n.t — nommé "tr" (pas "t") car
+   "t" est déjà utilisé partout dans ce fichier comme paramètre local pour
+   "template" (tplCard(t,z), t.disc, t.title…). Ne traduit que le texte pur
+   affiché à l'écran — jamais les valeurs qui servent aussi de clé de
+   données (ex. noms de zones dans INTENSITY_MODELS, laissés en français
+   volontairement : les toucher demanderait de séparer affichage/logique). */
+function tr(key, vars){ return window.SilI18n ? SilI18n.t(key, vars) : key; }
+const DATE_LOCALE = {fr:'fr-FR', en:'en-US', es:'es-ES'};
+function localeStr(){ return DATE_LOCALE[window.SilI18n ? SilI18n.getLang() : 'fr'] || 'fr-FR'; }
 const DISC = {
-  swim:     {label:'Natation', ico:'ic-waves',    color:'var(--swim)', gear:['maillot de bain','bonnet','lunettes']},
-  bike:     {label:'Vélo',     ico:'ic-bike',     color:'var(--bike)', gear:['vélo','casque','tenue vélo','bidon']},
-  run:      {label:'Course',   ico:'ic-run',      color:'var(--run)', gear:['chaussures de course','tenue running']},
-  strength: {label:'Renfo',    ico:'ic-dumbbell', color:'var(--strength)', gear:['tapis','tenue confortable']},
-  hyrox:    {label:'Hyrox',    ico:'ic-zap',      color:'#FF8A3D', gear:['chaussures','gants','tenue','eau']}
+  swim:     {get label(){return tr('disc.swim')}, ico:'ic-waves',    color:'var(--swim)', get gear(){return [tr('gear.swim1'),tr('gear.swim2'),tr('gear.swim3')]}},
+  bike:     {get label(){return tr('disc.bike')}, ico:'ic-bike',     color:'var(--bike)', get gear(){return [tr('gear.bike1'),tr('gear.bike2'),tr('gear.bike3'),tr('gear.bike4')]}},
+  run:      {get label(){return tr('disc.run')},  ico:'ic-run',      color:'var(--run)', get gear(){return [tr('gear.run1'),tr('gear.run2')]}},
+  strength: {get label(){return tr('disc.strength')}, ico:'ic-dumbbell', color:'var(--strength)', get gear(){return [tr('gear.strength1'),tr('gear.strength2')]}},
+  hyrox:    {get label(){return tr('disc.hyrox')}, ico:'ic-zap',      color:'#FF8A3D', get gear(){return [tr('gear.hyrox1'),tr('gear.hyrox2'),tr('gear.hyrox3'),tr('gear.hyrox4')]}}
 };
 /* Icône HTML d'une discipline (usage innerHTML uniquement — pas dans <option>/textContent/SVG). */
 function discIcon(d){ return d && d.ico ? `<i class="ic ${d.ico}"></i>` : ''; }
@@ -142,9 +151,9 @@ function nutritionForSession(s){
 /* phrase courte pour la notification "pense à prendre : X" */
 function nutritionReminder(s){
   const n=nutritionForSession(s);
-  if(n.key==='glucides') return 'des glucides (gels, barres, boisson énergétique) pour cette sortie longue';
-  if(n.key==='protéines') return 'des protéines pour la récup (séance intense) + glucides';
-  return 'de quoi bien t\'hydrater';
+  if(n.key==='glucides') return tr('nutriReminder.carbs');
+  if(n.key==='protéines') return tr('nutriReminder.protein');
+  return tr('nutriReminder.hydrate');
 }
 
 /* ============================================================
@@ -165,58 +174,58 @@ function nutritionReminder(s){
    ============================================================ */
 const VIDEOS = [
   // --- Natation ---
-  {id:'v1', disc:'swim', title:'Crawl — rattrapé', dur:'1:24', level:'Inter',
-   desc:'Une main attend l\'autre devant : améliore le timing et l\'allonge.', tags:['rattrapé','rattrape'], src:''},
-  {id:'v2', disc:'swim', title:'Crawl — poings fermés', dur:'0:58', level:'Inter',
-   desc:'Nager poings fermés pour sentir l\'appui de l\'avant-bras.', tags:['poings fermés','poings'], src:''},
-  {id:'v3', disc:'swim', title:'Crawl — battements planche', dur:'1:10', level:'Débutant',
-   desc:'Renforce le battement et le gainage, planche devant.', tags:['battement','planche'], src:''},
-  {id:'v4', disc:'swim', title:'Respiration 3 temps', dur:'1:05', level:'Débutant',
-   desc:'Alterner le côté de respiration pour équilibrer le crawl.', tags:['respiration','3 temps'], src:''},
-  {id:'v5', disc:'swim', title:'Virage culbute', dur:'1:32', level:'Avancé',
-   desc:'Technique de virage rapide en bassin.', tags:['virage','culbute'], src:''},
-  {id:'v6', disc:'swim', title:'Pull-buoy & plaquettes', dur:'1:18', level:'Inter',
-   desc:'Travail de force et de trajet moteur avec matériel.', tags:['plaquette','pull-buoy','pull'], src:''},
+  {id:'v1', disc:'swim', get title(){return tr('video.v1.title')}, dur:'1:24', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v1.desc')}, tags:['rattrapé','rattrape'], src:''},
+  {id:'v2', disc:'swim', get title(){return tr('video.v2.title')}, dur:'0:58', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v2.desc')}, tags:['poings fermés','poings'], src:''},
+  {id:'v3', disc:'swim', get title(){return tr('video.v3.title')}, dur:'1:10', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v3.desc')}, tags:['battement','planche'], src:''},
+  {id:'v4', disc:'swim', get title(){return tr('video.v4.title')}, dur:'1:05', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v4.desc')}, tags:['respiration','3 temps'], src:''},
+  {id:'v5', disc:'swim', get title(){return tr('video.v5.title')}, dur:'1:32', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.v5.desc')}, tags:['virage','culbute'], src:''},
+  {id:'v6', disc:'swim', get title(){return tr('video.v6.title')}, dur:'1:18', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v6.desc')}, tags:['plaquette','pull-buoy','pull'], src:''},
   // --- Course ---
-  {id:'v7', disc:'run', title:'Gammes — montées de genoux', dur:'0:48', level:'Débutant',
-   desc:'Éducatif de foulée, fréquence et posture.', tags:['gammes','montées de genoux','genoux'], src:''},
-  {id:'v8', disc:'run', title:'Gammes — talons-fesses', dur:'0:44', level:'Débutant',
-   desc:'Active les ischios et le cycle arrière.', tags:['talons-fesses','gammes'], src:''},
-  {id:'v9', disc:'run', title:'Foulées bondissantes', dur:'1:02', level:'Avancé',
-   desc:'Travail de puissance et d\'élasticité.', tags:['bondissantes','foulées','foulee'], src:''},
-  {id:'v10', disc:'run', title:'Lignes droites (strides)', dur:'0:55', level:'Inter',
-   desc:'Accélérations progressives pour la vitesse et la relâche.', tags:['lignes droites','strides','ligne'], src:''},
+  {id:'v7', disc:'run', get title(){return tr('video.v7.title')}, dur:'0:48', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v7.desc')}, tags:['gammes','montées de genoux','genoux'], src:''},
+  {id:'v8', disc:'run', get title(){return tr('video.v8.title')}, dur:'0:44', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v8.desc')}, tags:['talons-fesses','gammes'], src:''},
+  {id:'v9', disc:'run', get title(){return tr('video.v9.title')}, dur:'1:02', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.v9.desc')}, tags:['bondissantes','foulées','foulee'], src:''},
+  {id:'v10', disc:'run', get title(){return tr('video.v10.title')}, dur:'0:55', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v10.desc')}, tags:['lignes droites','strides','ligne'], src:''},
   // --- Vélo ---
-  {id:'v11', disc:'bike', title:'Pédalage — vélocité', dur:'1:15', level:'Inter',
-   desc:'Travail de cadence élevée et de fluidité du coup de pédale.', tags:['vélocité','cadence'], src:''},
-  {id:'v12', disc:'bike', title:'Position aéro & posture', dur:'1:40', level:'Inter',
-   desc:'Optimiser sa position pour l\'aérodynamisme et le confort.', tags:['aéro','position','posture'], src:''},
-  {id:'v13', disc:'bike', title:'Montée en danseuse', dur:'1:08', level:'Avancé',
-   desc:'Technique de relance et de grimpe debout.', tags:['danseuse','montée','grimpe'], src:''},
+  {id:'v11', disc:'bike', get title(){return tr('video.v11.title')}, dur:'1:15', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v11.desc')}, tags:['vélocité','cadence'], src:''},
+  {id:'v12', disc:'bike', get title(){return tr('video.v12.title')}, dur:'1:40', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v12.desc')}, tags:['aéro','position','posture'], src:''},
+  {id:'v13', disc:'bike', get title(){return tr('video.v13.title')}, dur:'1:08', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.v13.desc')}, tags:['danseuse','montée','grimpe'], src:''},
   // --- Renfo ---
-  {id:'v14', disc:'strength', title:'Gainage — la planche', dur:'1:00', level:'Débutant',
-   desc:'Placement correct du gainage ventral.', tags:['gainage','planche'], src:''},
-  {id:'v15', disc:'strength', title:'Squat — technique', dur:'1:22', level:'Inter',
-   desc:'Exécution propre du squat, genoux et dos.', tags:['squat'], src:''},
-  {id:'v16', disc:'strength', title:'Fentes avant', dur:'0:52', level:'Inter',
-   desc:'Renforcement unilatéral des quadriceps et fessiers.', tags:['fente','fentes'], src:''},
+  {id:'v14', disc:'strength', get title(){return tr('video.v14.title')}, dur:'1:00', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.v14.desc')}, tags:['gainage','planche'], src:''},
+  {id:'v15', disc:'strength', get title(){return tr('video.v15.title')}, dur:'1:22', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v15.desc')}, tags:['squat'], src:''},
+  {id:'v16', disc:'strength', get title(){return tr('video.v16.title')}, dur:'0:52', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.v16.desc')}, tags:['fente','fentes'], src:''},
   // --- Hyrox (les 8 stations) ---
-  {id:'h1', disc:'hyrox', title:'SkiErg — technique', dur:'1:20', level:'Inter',
-   desc:'Engagement du tronc et des dorsaux, mouvement complet du SkiErg.', tags:['ski','skierg'], src:''},
-  {id:'h2', disc:'hyrox', title:'Sled Push — posture', dur:'1:05', level:'Inter',
-   desc:'Position basse, bras tendus, poussée par les jambes.', tags:['sled push','sledpush','traîneau'], src:''},
-  {id:'h3', disc:'hyrox', title:'Sled Pull — technique', dur:'1:12', level:'Inter',
-   desc:'Tirage du traîneau à la corde, jeu de hanches et de bras.', tags:['sled pull','sledpull','tirage'], src:''},
-  {id:'h4', disc:'hyrox', title:'Burpee Broad Jump', dur:'0:58', level:'Avancé',
-   desc:'Burpee suivi d\'un saut en longueur, efficacité et économie.', tags:['burpee','broad jump'], src:''},
-  {id:'h5', disc:'hyrox', title:'Rowing — technique', dur:'1:15', level:'Débutant',
-   desc:'Séquence jambes-tronc-bras au rameur, rythme et puissance.', tags:['row','rowing','rameur'], src:''},
-  {id:'h6', disc:'hyrox', title:'Farmers Carry', dur:'0:50', level:'Débutant',
-   desc:'Port de charges lourdes, gainage et grip sous fatigue.', tags:['farmer','farmers carry','port'], src:''},
-  {id:'h7', disc:'hyrox', title:'Sandbag Lunges', dur:'1:08', level:'Avancé',
-   desc:'Fentes marchées avec sac lesté sur les épaules.', tags:['lunges','sandbag','fentes lestées'], src:''},
-  {id:'h8', disc:'hyrox', title:'Wall Balls — technique', dur:'1:00', level:'Inter',
-   desc:'Squat puis lancer cible, coordination et cadence.', tags:['wallball','wall balls','wall ball'], src:''}
+  {id:'h1', disc:'hyrox', get title(){return tr('video.h1.title')}, dur:'1:20', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h1.desc')}, tags:['ski','skierg'], src:''},
+  {id:'h2', disc:'hyrox', get title(){return tr('video.h2.title')}, dur:'1:05', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h2.desc')}, tags:['sled push','sledpush','traîneau'], src:''},
+  {id:'h3', disc:'hyrox', get title(){return tr('video.h3.title')}, dur:'1:12', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h3.desc')}, tags:['sled pull','sledpull','tirage'], src:''},
+  {id:'h4', disc:'hyrox', get title(){return tr('video.h4.title')}, dur:'0:58', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.h4.desc')}, tags:['burpee','broad jump'], src:''},
+  {id:'h5', disc:'hyrox', get title(){return tr('video.h5.title')}, dur:'1:15', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.h5.desc')}, tags:['row','rowing','rameur'], src:''},
+  {id:'h6', disc:'hyrox', get title(){return tr('video.h6.title')}, dur:'0:50', get level(){return tr('videoLevel.beginner')},
+   get desc(){return tr('video.h6.desc')}, tags:['farmer','farmers carry','port'], src:''},
+  {id:'h7', disc:'hyrox', get title(){return tr('video.h7.title')}, dur:'1:08', get level(){return tr('videoLevel.advanced')},
+   get desc(){return tr('video.h7.desc')}, tags:['lunges','sandbag','fentes lestées'], src:''},
+  {id:'h8', disc:'hyrox', get title(){return tr('video.h8.title')}, dur:'1:00', get level(){return tr('videoLevel.inter')},
+   get desc(){return tr('video.h8.desc')}, tags:['wallball','wall balls','wall ball'], src:''}
 ];
 /* trouve la vidéo liée à une séance d'après son titre/description */
 function videoForSession(s){
@@ -273,10 +282,10 @@ function hrvStatus(hrv, base){
   base = base || (typeof ATHLETE_REF!=='undefined' ? ATHLETE_REF.hrvBase : null);
   if(!hrv || !base) return null;
   const r = hrv/base;
-  if(r < 0.85) return {level:'low',  c:'var(--run)',  txt:'HRV basse', pct:Math.round((r-1)*100)};
-  if(r < 0.92) return {level:'warn', c:'var(--bike)', txt:'HRV sous la base', pct:Math.round((r-1)*100)};
-  if(r > 1.08) return {level:'high', c:'var(--good)', txt:'HRV au-dessus', pct:Math.round((r-1)*100)};
-  return {level:'ok', c:'var(--good)', txt:'HRV normale', pct:Math.round((r-1)*100)};
+  if(r < 0.85) return {level:'low',  c:'var(--run)',  txt:tr('hrv.low'), pct:Math.round((r-1)*100)};
+  if(r < 0.92) return {level:'warn', c:'var(--bike)', txt:tr('hrv.warn'), pct:Math.round((r-1)*100)};
+  if(r > 1.08) return {level:'high', c:'var(--good)', txt:tr('hrv.high'), pct:Math.round((r-1)*100)};
+  return {level:'ok', c:'var(--good)', txt:tr('hrv.ok'), pct:Math.round((r-1)*100)};
 }
 
 /* Définition des "modèles de zones" sélectionnables par bloc.
@@ -458,10 +467,10 @@ function athFormeColor(s){ return s==null ? 'var(--muted)' : s>=75 ? 'var(--good
 /* Journal dispo/blessure : l'athlète signale sa disponibilité au check-in,
    le coach la voit (bandeau, sélecteur, table de suivi). */
 const DISPO_META = {
-  ok:     {l:'OK',      c:'var(--good)', ic:'ic-check'},
-  fatigue:{l:'Fatigué', c:'var(--bike)', ic:'ic-battery'},
-  malade: {l:'Malade',  c:'#FF8A4D',     ic:'ic-thermometer'},
-  blesse: {l:'Blessé',  c:'var(--run)',  ic:'ic-alert-triangle'}
+  ok:     {get l(){return tr('dispo.ok')},      c:'var(--good)', ic:'ic-check'},
+  fatigue:{get l(){return tr('dispo.fatigue')}, c:'var(--bike)', ic:'ic-battery'},
+  malade: {get l(){return tr('dispo.malade')},  c:'#FF8A4D',     ic:'ic-thermometer'},
+  blesse: {get l(){return tr('dispo.blesse')},  c:'var(--run)',  ic:'ic-alert-triangle'}
 };
 function athDispo(a){ const d=a&&a.checkin&&a.checkin.dispo; return (d&&DISPO_META[d])?d:null; }
 function dispoSafe(t){ return String(t||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
@@ -475,14 +484,14 @@ function dispoSafe(t){ return String(t||'').replace(/[<>&"]/g, c=>({'<':'&lt;','
    avec le ressenti — la réponse est très individuelle).
    ============================================================ */
 const CYCLE_META = {
-  menstrual: {l:'Règles',      short:'J1–5',   c:'#DD5C72', ic:'ic-waves',
-    tip:"Symptômes possibles (fatigue, crampes) : intensité selon les sensations, rien d'imposé."},
-  follicular:{l:'Folliculaire', short:'J6–13',  c:'#35C58C', ic:'ic-zap',
-    tip:"Fenêtre souvent favorable : bon moment pour le travail intense (VMA, seuil, force) et les gros volumes."},
-  ovulation: {l:'Ovulation',    short:'~J14',   c:'#46C2D8', ic:'ic-target',
-    tip:"Force au plus haut, mais laxité ligamentaire accrue → échauffement soigné, vigilance blessure (genou/cheville)."},
-  luteal:    {l:'Lutéale',      short:'J15–28', c:'#D9962F', ic:'ic-thermometer',
-    tip:"Effort perçu et température plus élevés en fin de phase : récup allongée, hydratation/chaleur surveillées, plutôt endurance/technique."}
+  menstrual: {get l(){return tr('cycle.menstrual.l')},  short:'J1–5',   c:'#DD5C72', ic:'ic-waves',
+    get tip(){return tr('cycle.menstrual.tip')}},
+  follicular:{get l(){return tr('cycle.follicular.l')}, short:'J6–13',  c:'#35C58C', ic:'ic-zap',
+    get tip(){return tr('cycle.follicular.tip')}},
+  ovulation: {get l(){return tr('cycle.ovulation.l')},  short:'~J14',   c:'#46C2D8', ic:'ic-target',
+    get tip(){return tr('cycle.ovulation.tip')}},
+  luteal:    {get l(){return tr('cycle.luteal.l')},     short:'J15–28', c:'#D9962F', ic:'ic-thermometer',
+    get tip(){return tr('cycle.luteal.tip')}}
 };
 /* phase auto-déduite du jour de cycle (repère 28 j, ajusté au ressenti) */
 function cyclePhaseFromDay(d){
@@ -493,7 +502,7 @@ function cyclePhaseFromDay(d){
   return 'luteal';
 }
 function athCycle(a){ const p=a&&a.checkin&&a.checkin.cyclePhase; return (p&&CYCLE_META[p])?p:null; }
-function athNote(s){ return s==null ? '' : s>=75 ? 'Prêt pour la qualité' : s>=55 ? 'À surveiller' : 'Allègement conseillé'; }
+function athNote(s){ return s==null ? '' : s>=75 ? tr('athNote.ready') : s>=55 ? tr('athNote.watch') : tr('athNote.lighten'); }
 
 function setCoachAthletes(list, defaultId){
   // Appelé uniquement au login réel : on remplace TOUJOURS le roster de démo,
@@ -589,8 +598,8 @@ function mondayOf(offset){
 }
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
 function iso(d){return d.toISOString().slice(0,10)}
-const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-const fmt = new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short'});
+const DAYS = [tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort'),tr('day.sunShort')];
+const fmt = new Intl.DateTimeFormat(localeStr(),{day:'numeric',month:'short'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
 const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null, cyclePhase:null, cycleDay:null };
@@ -708,14 +717,14 @@ function openCoCoachInvite(athleteId, viewerRole){
 function saveCoCoachInvite(){
   const email = document.getElementById('ccEmail').value.trim();
   const role = document.getElementById('ccRole').value.trim();
-  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Renseigne un email valide'); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast(tr('toast.renseigneEmailValide')); return; }
   const aid = coCoachTargetAthleteId;
   coPendingFor(aid).unshift({id:'ccr'+Date.now(), coachEmail:email, roleLabel:role||null, requestedByRole:coCoachViewerRole});
   if(window.PF?.user){
     PF.requestCoCoach(aid, email, role||null).catch(e=>{ console.warn('[PF] requestCoCoach', e); toast("Demande indisponible pour l'instant", 'error'); });
   }
   document.getElementById('coCoachOverlay').classList.remove('open');
-  toast('Demande envoyée — en attente de validation');
+  toast(tr('toast.demandeEnvoyeeEnAttenteValidation'));
   if(document.getElementById('profileOverlay')?.classList.contains('open')) renderProfCoTeam(aid);
   if(mode==='athlete') renderSidebar();
 }
@@ -806,40 +815,40 @@ function needRadarHTML(){
 function renderSidebar(){
   if(mode==='coach'){
     sidebarContent.innerHTML = coachGuideHTML() + needRadarHTML() + `
-      <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> Suivi de mes athlètes</button>
-      <button class="btn adh-open-btn" id="inviteAthOpen" style="margin-top:8px"><i class="ic ic-user-plus"></i> Inviter un athlète</button>
-      <h2>Bibliothèque</h2>
-      <p class="hint">Glissez une séance sur un jour →</p>
-      <button class="create-btn" id="createSessionBtn">+ Créer une séance</button>
+      <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> ${tr('sidebar.myAthletesTracking')}</button>
+      <button class="btn adh-open-btn" id="inviteAthOpen" style="margin-top:8px"><i class="ic ic-user-plus"></i> ${tr('sidebar.inviteAthlete')}</button>
+      <h2>${tr('sidebar.library')}</h2>
+      <p class="hint">${tr('sidebar.libraryHint')}</p>
+      <button class="create-btn" id="createSessionBtn">+ ${tr('sidebar.createSession')}</button>
       <div id="tplList" style="margin-top:12px"></div>
-      <h2 style="margin-top:20px">Cycles</h2>
-      <p class="hint">Un programme complet posé en un clic</p>
-      <button class="create-btn" id="createCycleBtn">+ Créer un cycle</button>
+      <h2 style="margin-top:20px">${tr('sidebar.cycles')}</h2>
+      <p class="hint">${tr('sidebar.cyclesHint')}</p>
+      <button class="create-btn" id="createCycleBtn">+ ${tr('sidebar.createCycle')}</button>
       <div id="cycleList" style="margin-top:12px"></div>
-      <div class="lib-note"><i class="ic ic-lightbulb"></i> <b>Astuce coach</b> — déplacez aussi les séances d'un jour à l'autre directement dans le calendrier.</div>
+      <div class="lib-note"><i class="ic ic-lightbulb"></i> <b>${tr('sidebar.coachTip')}</b> ${tr('sidebar.coachTipText')}</div>
       <div class="readiness" style="margin-top:14px">
-        <div class="lbl">Fraîcheur athlète (check-in du jour)</div>
+        <div class="lbl">${tr('sidebar.athleteFreshness')}</div>
         <div class="score" style="color:${readinessAdvice(readinessScore()).c}">${readinessScore()}%</div>
       </div>
       <div class="coach-connect" style="margin-top:14px">
-        <div class="cc-t"><b>⭐ Abonnement Sillance</b></div>
+        <div class="cc-t"><b>⭐ ${tr('sidebar.sillanceSub')}</b></div>
         ${window.__pf_subscribed
-          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> Ton abonnement Sillance est actif. Merci !</div>
-             <button class="cc-btn" id="coachManageBtn">Gérer mon abonnement</button>`
-          : `<div class="cc-s">Débloque ton espace coach complet — choisis le palier selon ton nombre d'athlètes.</div>
+          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> ${tr('sidebar.subActive')}</div>
+             <button class="cc-btn" id="coachManageBtn">${tr('sidebar.manageSub')}</button>`
+          : `<div class="cc-s">${tr('sidebar.unlockCoach')}</div>
              ${coachTiersHTML()}
-             <button class="cc-btn" id="coachSubscribeBtn" style="margin-top:10px">S'abonner — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/mois</button>`}
+             <button class="cc-btn" id="coachSubscribeBtn" style="margin-top:10px">${tr('sidebar.subscribe')} — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/${tr('sidebar.perMonth')}</button>`}
       </div>
       <div class="coach-connect" style="margin-top:14px;opacity:.7">
-        <div class="cc-t"><b><i class="ic ic-brain"></i> Assistant IA coach</b> <span class="cc-soon">Bientôt disponible</span></div>
-        <div class="cc-s">Vérifiera automatiquement que chaque séance réalisée respecte ce qui était prévu : zones cibles, dérive cardiaque, découplage FC. En finalisation, disponible très prochainement.</div>
+        <div class="cc-t"><b><i class="ic ic-brain"></i> ${tr('sidebar.aiAssistant')}</b> <span class="cc-soon">${tr('sidebar.comingSoon')}</span></div>
+        <div class="cc-s">${tr('sidebar.aiAssistantText')}</div>
       </div>
       <div class="coach-connect" style="margin-top:14px">
-        <div class="cc-t"><b><i class="ic ic-credit-card"></i> Fais-toi payer</b></div>
-        <div class="cc-s">Relie ton compte Stripe pour facturer tes athlètes.</div>
-        <div class="cc-price">Tarif du suivi : <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/mois</small> · <a href="#" id="coachPriceEdit">modifier</a></div>
-        <button class="cc-btn" id="coachConnectBtn">Relier Stripe</button>
-        <button class="cc-btn" id="coachInvoicesBtn" style="margin-top:8px">Voir mes factures</button>
+        <div class="cc-t"><b><i class="ic ic-credit-card"></i> ${tr('sidebar.getPaid')}</b></div>
+        <div class="cc-s">${tr('sidebar.getPaidText')}</div>
+        <div class="cc-price">${tr('sidebar.trackingRate')} <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/${tr('sidebar.perMonth')}</small> · <a href="#" id="coachPriceEdit">${tr('sidebar.edit')}</a></div>
+        <button class="cc-btn" id="coachConnectBtn">${tr('sidebar.connectStripe')}</button>
+        <button class="cc-btn" id="coachInvoicesBtn" style="margin-top:8px">${tr('sidebar.seeInvoices')}</button>
       </div>`;
     buildTemplates(document.getElementById('tplList'));
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
@@ -856,137 +865,137 @@ function renderSidebar(){
     /* Assistant IA — essai 14 jours (checkout Stripe connecté, déverrouillage en démo) */
     const aiT=document.getElementById('aiTrialBtn');
     if(aiT) aiT.onclick=()=>{
-      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>{console.warn('[PF] ai-addon:',e); toast('Stripe indisponible', 'error');}); return; }
-      window.__pf_aiDemo=true; window.__pf_aiDemoStart=Date.now(); renderSidebar(); toast('Assistant IA activé — essai 14 jours (démo)');
+      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>{console.warn('[PF] ai-addon:',e); toast(tr('toast.stripeIndisponible'), 'error');}); return; }
+      window.__pf_aiDemo=true; window.__pf_aiDemoStart=Date.now(); renderSidebar(); toast(tr('toast.assistantIaActiveEssai14'));
     };
     const aiM=document.getElementById('aiManageBtn');
     if(aiM) aiM.onclick=()=> openSettings('coach');
     const ccb=document.getElementById('coachConnectBtn');
     if(ccb) ccb.onclick=()=>{
-      if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast('Stripe indisponible', 'error');});
-      else toast('Connecte ton espace coach pour relier Stripe');
+      if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast(tr('toast.stripeIndisponible'), 'error');});
+      else toast(tr('toast.connecteEspaceCoachPourRelier'));
     };
     const cib=document.getElementById('coachInvoicesBtn');
     if(cib) cib.onclick=()=> openCoachInvoices();
     wireCoachTiers(sidebarContent);
     const csb=document.getElementById('coachSubscribeBtn');
     if(csb) csb.onclick=()=>{
-      if(window.PF?.user){ toast('Redirection vers le paiement…'); PF.startCheckout('coach', selectedCoachTier).catch(e=>{console.warn(e);toast('Paiement indisponible', 'error');}); }
-      else toast('Connecte ton espace coach pour t\'abonner');
+      if(window.PF?.user){ toast(tr('toast.redirectionVersPaiement')); PF.startCheckout('coach', selectedCoachTier).catch(e=>{console.warn(e);toast(tr('toast.paiementIndisponible'), 'error');}); }
+      else toast(tr('toast.connecteEspaceCoachPourT'));
     };
     const cmb=document.getElementById('coachManageBtn');
     if(cmb) cmb.onclick=()=> openSettings('structure');
     const cpe=document.getElementById('coachPriceEdit');
     if(cpe) cpe.onclick=(ev)=>{
       ev.preventDefault();
-      const v=prompt('Tarif de ton suivi coaching (€/mois) :', COACH_OFFER.price);
+      const v=prompt(tr('sidebar.pricePrompt'), COACH_OFFER.price);
       if(v!==null && !isNaN(+v) && v!==''){
         COACH_OFFER.price=+v;
         const pv=document.getElementById('coachPriceVal'); if(pv) pv.textContent=COACH_OFFER.price+' €';
-        toast('Tarif coaching mis à jour');
+        toast(tr('toast.tarifCoachingMisAJour'));
         if(window.PF?.user) PF.saveCoachOffer({name:COACH_OFFER.name, price:COACH_OFFER.price}).catch(er=>console.warn('saveCoachOffer',er));
       }
     };
   } else {
     const s = readinessScore(), adv = readinessAdvice(s);
     sidebarContent.innerHTML = `
-      <h2>Check-in du jour</h2>
-      <p class="hint">30 secondes chaque matin — ton coach adapte le plan.</p>
+      <h2>${tr('checkin.title')}</h2>
+      <p class="hint">${tr('checkin.hint')}</p>
       <div class="checkin">
-        ${[['sommeil','Sommeil','ic-moon'],['fatigue','Fatigue jambes','ic-battery'],['motivation','Motivation','ic-zap']].map(([k,l,ic])=>`
+        ${[['sommeil',tr('checkin.sleep'),'ic-moon'],['fatigue',tr('checkin.legFatigue'),'ic-battery'],['motivation',tr('checkin.motivation'),'ic-zap']].map(([k,l,ic])=>`
         <div class="row">
           <label><i class="ic ${ic}"></i> ${l}<span class="val" id="val-${k}">${checkin[k]}/10</span></label>
           <input type="range" min="1" max="10" value="${checkin[k]}" data-k="${k}" aria-label="${l}">
         </div>`).join('')}
         <div class="row ck-weight">
-          <label>Poids<span class="val" id="val-poids">${checkin.poids} kg</span></label>
+          <label>${tr('checkin.weight')}<span class="val" id="val-poids">${checkin.poids} kg</span></label>
           <div class="ck-wrow">
-            <input type="number" min="30" max="150" step="0.1" value="${checkin.poids}" id="ckPoids" aria-label="Poids en kilogrammes">
+            <input type="number" min="30" max="150" step="0.1" value="${checkin.poids}" id="ckPoids" aria-label="${tr('checkin.weightAria')}">
             <span class="ck-wkg" id="ckWkg">${ATHLETE_REF.ftp?(ATHLETE_REF.ftp/checkin.poids).toFixed(2)+' W/kg':''}</span>
           </div>
         </div>
         <div class="row ck-hrv">
-          <label><i class="ic ic-refresh"></i> HRV du matin <span class="ck-hrv-opt">montre / bracelet · facultatif</span></label>
+          <label><i class="ic ic-refresh"></i> ${tr('checkin.hrvMorning')} <span class="ck-hrv-opt">${tr('checkin.hrvOptional')}</span></label>
           <div class="ck-wrow">
-            <input type="number" min="10" max="200" step="1" value="${checkin.hrv||''}" id="ckHrv" placeholder="rMSSD (ms)" aria-label="HRV du matin en millisecondes">
+            <input type="number" min="10" max="200" step="1" value="${checkin.hrv||''}" id="ckHrv" placeholder="rMSSD (ms)" aria-label="${tr('checkin.hrvAria')}">
             <span class="ck-hrv-stat" id="ckHrvStat"></span>
           </div>
         </div>
         <div class="row ck-dispo">
-          <label><i class="ic ic-clipboard"></i> Disponibilité</label>
-          <div class="ck-dispo-seg" id="ckDispoSeg" role="group" aria-label="Disponibilité du jour">
+          <label><i class="ic ic-clipboard"></i> ${tr('checkin.availability')}</label>
+          <div class="ck-dispo-seg" id="ckDispoSeg" role="group" aria-label="${tr('checkin.availabilityAria')}">
             ${Object.entries(DISPO_META).map(([k,d])=>`<button type="button" data-dispo="${k}" class="${(checkin.dispo||'ok')===k?'sel':''}" style="--dc:${d.c}"><i class="ic ${d.ic}"></i>${d.l}</button>`).join('')}
           </div>
-          <textarea id="ckDispoNote" rows="2" placeholder="Précise pour ton coach (ex. douleur mollet droit depuis mardi)…" ${(checkin.dispo||'ok')==='ok'?'hidden':''}>${dispoSafe(checkin.dispoNote)}</textarea>
+          <textarea id="ckDispoNote" rows="2" placeholder="${tr('checkin.notePlaceholder')}" ${(checkin.dispo||'ok')==='ok'?'hidden':''}>${dispoSafe(checkin.dispoNote)}</textarea>
         </div>
         ${(()=>{ const on = localStorage.getItem('sil_track_cycle')==='1' || checkin.cyclePhase; return `
         <div class="row ck-cycle">
           ${on ? `
-          <label><i class="ic ic-waves"></i> Cycle menstruel <button type="button" class="ck-cycle-off" id="ckCycleOff" title="Ne plus suivre">masquer</button></label>
+          <label><i class="ic ic-waves"></i> ${tr('checkin.cycleTitle')} <button type="button" class="ck-cycle-off" id="ckCycleOff" title="${tr('checkin.cycleStopTracking')}">${tr('checkin.hide')}</button></label>
           <div class="ck-cycle-day">
-            <span>Jour du cycle</span>
-            <input type="number" min="1" max="40" value="${checkin.cycleDay||''}" id="ckCycleDay" placeholder="J—" aria-label="Jour du cycle">
-            <span class="ck-cycle-hint">ou choisis la phase :</span>
+            <span>${tr('checkin.cycleDay')}</span>
+            <input type="number" min="1" max="40" value="${checkin.cycleDay||''}" id="ckCycleDay" placeholder="J—" aria-label="${tr('checkin.cycleDayAria')}">
+            <span class="ck-cycle-hint">${tr('checkin.cycleOrChoose')}</span>
           </div>
-          <div class="ck-cycle-seg" id="ckCycleSeg" role="group" aria-label="Phase du cycle">
+          <div class="ck-cycle-seg" id="ckCycleSeg" role="group" aria-label="${tr('checkin.cyclePhaseAria')}">
             ${Object.entries(CYCLE_META).map(([k,d])=>`<button type="button" data-cyc="${k}" class="${checkin.cyclePhase===k?'sel':''}" style="--cc:${d.c}"><i class="ic ${d.ic}"></i>${d.l}<small>${d.short}</small></button>`).join('')}
           </div>
           <div class="ck-cycle-tip" id="ckCycleTip">${checkin.cyclePhase?CYCLE_META[checkin.cyclePhase].tip:''}</div>
-          ` : `<button type="button" class="ck-cycle-optin" id="ckCycleOptin"><i class="ic ic-waves"></i> Suivre mon cycle menstruel</button>
-               <div class="ck-cycle-note">Facultatif et privé — aide ton coach à adapter les séances au bon moment du cycle.</div>`}
+          ` : `<button type="button" class="ck-cycle-optin" id="ckCycleOptin"><i class="ic ic-waves"></i> ${tr('checkin.cycleOptin')}</button>
+               <div class="ck-cycle-note">${tr('checkin.cycleNote')}</div>`}
         </div>`; })()}
         <div class="readiness">
-          <div class="lbl">Fraîcheur</div>
+          <div class="lbl">${tr('checkin.freshness')}</div>
           <div class="score" id="readyScore" style="color:${adv.c}">${s}%</div>
           <div class="advice" id="readyAdvice" style="color:${adv.c}">${adv.t}</div>
         </div>
-        <button class="btn checkin-validate" id="checkinValidate" style="width:100%;margin-top:10px">Valider mon check-in</button>
+        <button class="btn checkin-validate" id="checkinValidate" style="width:100%;margin-top:10px">${tr('checkin.validate')}</button>
       </div>
       <div class="records">
-        <h2>Records personnels</h2>
-        ${RECORDS.length ? RECORDS.map(r=>`<div class="pb"><span class="d">${r.d}</span>${r.isNew?'<span class="new">NEW</span>':''}<span class="v">${r.v}</span></div>`).join('') : `<p class="club-hint">Aucun record pour l'instant — importe ou synchronise une première activité.</p>`}
+        <h2>${tr('records.title')}</h2>
+        ${RECORDS.length ? RECORDS.map(r=>`<div class="pb"><span class="d">${r.d}</span>${r.isNew?'<span class="new">NEW</span>':''}<span class="v">${r.v}</span></div>`).join('') : `<p class="club-hint">${tr('records.empty')}</p>`}
       </div>
       <div class="records" id="refsBlock">
-        <h2>Mes références physio</h2>
-        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return "Jamais renseignées."; const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return `Dernière mise à jour&nbsp;: il y a ${days}&nbsp;j${days>=90?' — pense à retester tes zones':''}`; })()}</p>
+        <h2>${tr('refs.title')}</h2>
+        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return tr('refs.never'); const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return tr('refs.lastUpdate', {days}) + (days>=90?' — '+tr('refs.retest'):''); })()}</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-          ${[['ftp','FTP','W'],['pma','PMA','W'],['cpBike','CP vélo','W'],['vma','VMA','km/h'],['cv','VC','km/h'],['seuilRun','Seuil','s/km'],['css','CSS','s/100m'],['fcMax','FC max','bpm'],['fcRepos','FC repos','bpm']].map(([k,l,u])=>`
+          ${[['ftp','FTP','W'],['pma',tr('refs.map'),'W'],['cpBike',tr('refs.bikeCp'),'W'],['vma',tr('refs.vVo2max'),'km/h'],['cv','CV','km/h'],['seuilRun',tr('refs.threshold'),'s/km'],['css','CSS','s/100m'],['fcMax',tr('refs.maxHr'),'bpm'],['fcRepos',tr('refs.restHr'),'bpm']].map(([k,l,u])=>`
           <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)"><span>${l} <em style="font-style:normal;opacity:.65">${u}</em></span>
             <input type="number" step="any" data-ref="${k}" value="${ATHLETE_REF[k]??''}" style="width:100%;box-sizing:border-box"></label>`).join('')}
         </div>
-        <button class="btn" id="refsSave" style="width:100%;margin-top:10px">Enregistrer mes références</button>
+        <button class="btn" id="refsSave" style="width:100%;margin-top:10px">${tr('refs.save')}</button>
       </div>
       <div class="records" id="debriefCard">
-        ${debriefsBlockHTML(debriefsFor(myDebriefKey()), "Pas encore de débrief — remplis-en un après ta prochaine course.")}
-        <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> Ajouter un débrief de course</button>
+        ${debriefsBlockHTML(debriefsFor(myDebriefKey()), tr('debrief.empty'))}
+        <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> ${tr('debrief.add')}</button>
       </div>
       <div class="records" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}</div>
-      ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn"><i class="ic ic-link"></i> Partager ma course avec mes proches</button>` : ''}
+      ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
       <div class="strava-card" id="stravaCard"></div>
       <div class="coach-sub" id="coachSubCard">
-        <h2>Mon coaching</h2>
-        <p class="hint" style="margin-bottom:10px">Suivi personnalisé : ton coach lit tes données et adapte tes séances selon ta forme.</p>
-        <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/mois</small></span></div>
-        <button class="btn coach-sub-btn" id="coachSubBtn">S'abonner au suivi</button>
+        <h2>${tr('coachSub.title')}</h2>
+        <p class="hint" style="margin-bottom:10px">${tr('coachSub.text')}</p>
+        <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/${tr('sidebar.perMonth')}</small></span></div>
+        <button class="btn coach-sub-btn" id="coachSubBtn">${tr('coachSub.subscribe')}</button>
       </div>
       <div class="morning-card">
-        <h2>Rappel du matin</h2>
-        <p class="hint" style="margin-bottom:10px">Reçois chaque jour ton récap + le matériel.</p>
+        <h2>${tr('morning.title')}</h2>
+        <p class="hint" style="margin-bottom:10px">${tr('morning.text')}</p>
         <div class="morning-pre" id="morningPre"></div>
         <div class="morning-time">
-          <label for="morningHour">Heure d'envoi</label>
+          <label for="morningHour">${tr('morning.sendTime')}</label>
           <input type="time" id="morningHour" value="07:00" step="900">
         </div>
         <div class="morning-time">
-          <label for="morningChannel">Je veux recevoir</label>
+          <label for="morningChannel">${tr('morning.wantToReceive')}</label>
           <select id="morningChannel">
-            <option value="push">Notification (téléphone / PC)</option>
-            <option value="email">Email</option>
-            <option value="both">Les deux</option>
+            <option value="push">${tr('morning.push')}</option>
+            <option value="email">${tr('morning.email')}</option>
+            <option value="both">${tr('morning.both')}</option>
           </select>
         </div>
-        <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> Activer le rappel</button>
-        <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">Comment recevoir ma notification&nbsp;?</a>
+        <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> ${tr('morning.activate')}</button>
+        <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">${tr('morning.howTo')}</a>
       </div>`;
     sidebarContent.querySelectorAll('input[type=range]').forEach(inp=>{
       inp.addEventListener('input', ()=>{
@@ -1036,8 +1045,8 @@ function renderSidebar(){
     renderStravaCard();
     const csb=document.getElementById('coachSubBtn');
     if(csb) csb.onclick=()=>{
-      if(window.PF?.user) PF.subscribeToCoach().catch(e=>{console.warn('subscribeToCoach',e);toast('Suivi indisponible (démo)', 'error');});
-      else toast('Suivi coaching — disponible une fois connecté à ton coach (démo)');
+      if(window.PF?.user) PF.subscribeToCoach().catch(e=>{console.warn('subscribeToCoach',e);toast(tr('toast.suiviIndisponibleDemo'), 'error');});
+      else toast(tr('toast.suiviCoachingDisponibleFoisConnecte'));
     };
     const cv = document.getElementById('checkinValidate');
     if(cv) cv.addEventListener('click', ()=> submitCheckin());
@@ -1067,7 +1076,7 @@ function saveMyRefs(){
       .catch(e=> console.warn('[PF] saveAthleteRefs échoué :', e));
   }
   render();
-  toast('Références mises à jour');
+  toast(tr('toast.referencesMisesAJour'));
 }
 
 /* ============================================================
@@ -1161,24 +1170,24 @@ function renderAlerts(){
   const list=document.getElementById('bellList');
   // tri : urgent d'abord, puis par score croissant
   COACH_ALERTS.sort((a,b)=> (a.level==='urgent'?0:1)-(b.level==='urgent'?0:1) || a.score-b.score);
-  if(!COACH_ALERTS.length){ list.innerHTML=`<div class="bell-empty">Aucune alerte. Tes athlètes sont en forme.</div>`; return; }
+  if(!COACH_ALERTS.length){ list.innerHTML=`<div class="bell-empty">${tr('alerts.empty')}</div>`; return; }
   list.innerHTML=COACH_ALERTS.map(a=>{
     const urgent = a.level==='urgent';
     const col = urgent?'#FF5470':'#FF8A4D';
     const dk = a.checkin && a.checkin.dispo && a.checkin.dispo!=='ok' ? a.checkin.dispo : null;
     const dm = dk ? DISPO_META[dk] : null;
-    const flag = dm ? `● ${dm.l.toLowerCase()}` : urgent?'● fraîcheur critique':'● fraîcheur basse';
+    const flag = dm ? `● ${dm.l.toLowerCase()}` : urgent?`● ${tr('alerts.freshnessCritical')}`:`● ${tr('alerts.freshnessLow')}`;
     return `<div class="alert-item ${a.seen?'':'unseen'}">
       <div class="alert-ring" style="--ac:${col};--p:${a.score}"><span>${a.score}</span></div>
       <div class="alert-body">
         <div class="an">${a.athlete} <span class="flag" style="color:${col}">${flag}</span></div>
-        <div class="ad"><i class="ic ic-moon"></i> ${a.checkin.sommeil}/10 · <i class="ic ic-battery"></i> fatigue ${a.checkin.fatigue}/10 · <i class="ic ic-zap"></i> ${a.checkin.motivation}/10</div>
+        <div class="ad"><i class="ic ic-moon"></i> ${a.checkin.sommeil}/10 · <i class="ic ic-battery"></i> ${tr('alerts.fatigue')} ${a.checkin.fatigue}/10 · <i class="ic ic-zap"></i> ${a.checkin.motivation}/10</div>
         ${dm&&a.checkin.dispoNote?`<div class="ad" style="color:${dm.c}"><i class="ic ${dm.ic}"></i> ${dispoSafe(a.checkin.dispoNote)}</div>`:''}
         <div class="at">${timeAgo(a.time)}</div>
         <div class="alert-cta">
-          <button data-act="adapt">Adapter la séance</button>
-          <button data-act="message"><i class="ic ic-message-circle"></i> Message</button>
-          <button data-act="dismiss">Vu</button>
+          <button data-act="adapt">${tr('alerts.adaptSession')}</button>
+          <button data-act="message"><i class="ic ic-message-circle"></i> ${tr('alerts.message')}</button>
+          <button data-act="dismiss">${tr('alerts.seen')}</button>
         </div>
       </div>
     </div>`;
@@ -1192,14 +1201,14 @@ function renderAlerts(){
       document.getElementById('bellMenu').classList.remove('open');
       if(mode!=='coach'){ document.getElementById('modeCoach').click(); }
       document.getElementById('readyhub')?.scrollIntoView({behavior:'smooth'});
-      toast('Vue coach — pense à alléger la séance du jour');
+      toast(tr('toast.vueCoachPenseAAlleger'));
     });
   });
   list.querySelectorAll('[data-act="message"]').forEach((b,i)=>{
     b.addEventListener('click', ()=>{
       const a=COACH_ALERTS[i];
       document.getElementById('bellMenu').classList.remove('open');
-      openChat(`Salut ! Vu ton check-in (fraîcheur ${a?a.score:''}%), je te conseille du repos ou une séance très allégée aujourd'hui. Comment tu te sens ?`);
+      openChat(tr('alerts.chatPrefill', {score:a?a.score:''}));
     });
   });
 }
@@ -1222,13 +1231,13 @@ document.addEventListener('click', e=>{ if(!bellMenu.contains(e.target)&&e.targe
 /* ---- Message matinal : récap séances + matériel agrégé ---- */
 function buildMorningMessage(dateKey){
   const sessions = (planning[dateKey]||[]);
-  if(!sessions.length) return {empty:true, title:'Repos aujourd\'hui', body:'Pas de séance prévue. Profites-en pour récupérer.'};
+  if(!sessions.length) return {empty:true, title:tr('morning.restToday'), body:tr('morning.restBody')};
   const discs = [...new Set(sessions.map(s=>DISC[s.disc].label))];
   const gear = [...new Set(sessions.flatMap(gearForSession))];
   const lines = sessions.map(s=>`${discIcon(DISC[s.disc])} ${s.title} · ${fmtDur(s.dur)}`);
   return {
     empty:false,
-    title:`Entraînement du jour : ${discs.join(' + ')}`,
+    title:tr('morning.todayTraining', {discs:discs.join(' + ')}),
     sessions:lines,
     gear
   };
@@ -1250,22 +1259,22 @@ function urlB64ToUint8(s){
 }
 async function enableMorningPush(){
   if(!('serviceWorker' in navigator) || !('Notification' in window))
-    throw new Error("Navigateur sans notifications — choisis le canal Email");
+    throw new Error(tr('morning.errNoNotif'));
   if(Notification.permission === 'denied')
-    throw new Error('Notifications bloquées pour ce site — clique sur l\'icône à gauche de l\'adresse (ou Réglages du site) → Notifications → Autoriser, puis réessaie');
+    throw new Error(tr('morning.errBlocked'));
   if(Notification.permission !== 'granted')
-    toast('Chrome demande la permission : clique « Autoriser » (parfois juste une petite cloche dans la barre d\'adresse)');
+    toast(tr('toast.chromeDemandePermissionCliqueAutoriser'));
   // certains navigateurs n'affichent qu'une icône discrète et la promesse reste
   // en attente : on borne à 25 s pour ne jamais laisser le bouton muet
   const perm = await Promise.race([
     Notification.requestPermission(),
     new Promise(res=> setTimeout(()=>res('timeout'), 25000)),
   ]);
-  if(perm === 'timeout') throw new Error('Pas de réponse — cherche la petite cloche barrée dans la barre d\'adresse de Chrome, clique-la et choisis « Autoriser »');
-  if(perm !== 'granted') throw new Error('Notifications refusées — autorise-les dans les réglages du site puis réessaie');
+  if(perm === 'timeout') throw new Error(tr('morning.errTimeout'));
+  if(perm !== 'granted') throw new Error(tr('morning.errDenied'));
   const reg = await navigator.serviceWorker.register('./sillance-sw.js');
   await navigator.serviceWorker.ready;
-  if(!reg.pushManager) throw new Error("Push indisponible — sur iPhone, ajoute d'abord le site à l'écran d'accueil (voir le tuto)");
+  if(!reg.pushManager) throw new Error(tr('morning.errNoPush'));
   const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8(VAPID_PUBLIC_KEY) });
   if(window.PF?.user && PF.savePushSubscription) await PF.savePushSubscription(sub.toJSON());
   return reg;
@@ -1286,9 +1295,9 @@ function buildMorningPreview(){
   box.innerHTML = `
     <div class="mp-title">${m.title}</div>
     <ul class="mp-sessions">${m.sessions.map(l=>`<li>${l}</li>`).join('')}</ul>
-    <div class="mp-gear-lbl"><i class="ic ic-backpack"></i> À prévoir</div>
+    <div class="mp-gear-lbl"><i class="ic ic-backpack"></i> ${tr('morning.toBring')}</div>
     <div class="mp-gear">${m.gear.map(g=>`<span>${g}</span>`).join('')}</div>
-    <button class="mp-sync" id="syncActivityBtn"><i class="ic ic-refresh"></i> J'ai fini — synchroniser mon activité</button>`;
+    <button class="mp-sync" id="syncActivityBtn"><i class="ic ic-refresh"></i> ${tr('morning.syncActivity')}</button>`;
 
   const btn = document.getElementById('morningBtn');
   if(btn && !btn._wired){
@@ -1302,24 +1311,24 @@ function buildMorningPreview(){
         if(channel !== 'email'){
           const reg = await enableMorningPush();
           // notification de test immédiate pour valider le canal
-          reg.showNotification('Sillance — '+m.title, {body:'À prévoir : '+m.gear.join(', '), icon:'./icon-192.png', tag:'sillance-test'});
+          reg.showNotification('Sillance — '+m.title, {body:tr('morning.toBring')+' : '+m.gear.join(', '), icon:'./icon-192.png', tag:'sillance-test'});
         }
         if(window.PF?.user && PF.saveNotifPrefs){
           await PF.saveNotifPrefs({ hour:hh, minute:mm - (mm % 15),
             tz: Intl.DateTimeFormat().resolvedOptions().timeZone, channel });
         }
-        btn.innerHTML = `<i class="ic ic-check"></i> Rappel activé à ${h}`;
+        btn.innerHTML = `<i class="ic ic-check"></i> ${tr('morning.activatedAt', {h})}`;
         btn.classList.add('on');
         if(!window.PF?.user){
-          toast('Test envoyé (démo) — connecte-toi pour recevoir le rappel chaque matin');
+          toast(tr('toast.testEnvoyeDemoConnecteToi'));
         } else {
-          toast(channel==='email' ? 'Rappel email activé à '+h
-               : channel==='both' ? 'Notification + email activés à '+h
-               : 'Notifications activées à '+h+' — test envoyé');
+          toast(channel==='email' ? tr('morning.emailActivatedAt', {h})
+               : channel==='both' ? tr('morning.bothActivatedAt', {h})
+               : tr('morning.pushActivatedAt', {h}));
         }
       }catch(e){
         console.warn('[notif]', e);
-        toast(e && e.message ? e.message : 'Activation impossible sur ce navigateur', 'error');
+        toast(e && e.message ? e.message : tr('morning.errNoActivate'), 'error');
       }finally{ btn.disabled = false; }
     });
   }
@@ -1331,16 +1340,16 @@ function buildMorningPreview(){
       // on prend la séance la plus "marquante" du jour (longue ou intense)
       const s = todaySessions.slice().sort((a,b)=> (b.dur||0)-(a.dur||0))[0];
       if(!s) return;
-      sync.textContent='Activité synchronisée';
+      sync.textContent=tr('morning.activitySynced');
       sync.classList.add('done');
       const reminder = nutritionReminder(s);
       const n = nutritionForSession(s);
-      toast(`Activité reçue — pense à prendre : ${reminder}`);
+      toast(tr('morning.activityReceived', {reminder}));
       if('Notification' in window){
         if(Notification.permission==='granted'){
-          new Notification('Sillance — Récupération', {body:`Pense à prendre : ${reminder}. ${n.post}`});
+          new Notification(tr('morning.notifRecoveryTitle'), {body:tr('morning.notifRecoveryBody', {reminder})+' '+n.post});
         } else if(Notification.permission!=='denied'){
-          Notification.requestPermission().then(p=>{ if(p==='granted') new Notification('Sillance — Récupération', {body:`Pense à prendre : ${reminder}`}); });
+          Notification.requestPermission().then(p=>{ if(p==='granted') new Notification(tr('morning.notifRecoveryTitle'), {body:tr('morning.notifRecoveryBody', {reminder})}); });
         }
       }
     });
@@ -1393,7 +1402,7 @@ const STRAVA_DEMO_SETS = {
     {disc:'bike', name:'Home-trainer sweet spot',     dur:75,  dist:36.0, date:'il y a 3 j',src:'garmin'}
   ]
 };
-const DEMO_SET_LABELS = { triathlete:'Triathlète', course:'Course', hyrox:'Hyrox', velo:'Vélo' };
+const DEMO_SET_LABELS = { get triathlete(){return tr('demoSet.triathlete')}, get course(){return tr('demoSet.course')}, get hyrox(){return tr('demoSet.hyrox')}, get velo(){return tr('demoSet.velo')} };
 let stravaDemoSet = 'triathlete';   // profil démo actif (changeable via le sélecteur)
 
 function renderStravaCard(){
@@ -1404,16 +1413,16 @@ function renderStravaCard(){
   const providers = window.__pf_providers || [];
   if(!stravaConnected){
     box.innerHTML=`
-      <h2>Synchronisation</h2>
-      <p class="hint" style="margin-bottom:10px">Connecte ta montre pour importer tes activités automatiquement.</p>
-      <button class="strava-connect" id="stravaConnectBtn">${stravaLogo} Se connecter avec Strava</button>
+      <h2>${tr('sync.title')}</h2>
+      <p class="hint" style="margin-bottom:10px">${tr('sync.connectWatch')}</p>
+      <button class="strava-connect" id="stravaConnectBtn">${stravaLogo} ${tr('sync.connectStrava')}</button>
       <div class="dev-more">
         <button class="dev-mini" data-p="garmin">⌚ Garmin</button>
         <button class="dev-mini" data-p="coros">⌚ Coros</button>
-        <button class="dev-mini" id="importFitBtn" title="Importer un fichier .FIT/.TCX/.GPX exporté de ta montre"><i class="ic ic-upload"></i> Importer un fichier</button>
+        <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle')}"><i class="ic ic-upload"></i> ${tr('sync.importFile')}</button>
       </div>
-      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ Tes données <b>Strava</b> restent personnelles (conditions Strava). Pour les partager avec ton coach : <b>Garmin/Coros</b> ou <b>import de fichier</b>.</p>
-      <div class="strava-powered">Strava · Garmin · Coros — données en lecture seule</div>`;
+      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy')}</p>
+      <div class="strava-powered">${tr('sync.readOnly')}</div>`;
     document.getElementById('stravaConnectBtn').onclick=connectStrava;
     box.querySelectorAll('.dev-mini').forEach(b=> b.onclick=()=> connectProvider(b.dataset.p));
   } else {
@@ -1422,28 +1431,28 @@ function renderStravaCard(){
       const D=DISC[a.disc]||DISC.run;
       const src = a.src? ` · ${escAct(SRC[a.src]||a.src)}` : '';
       const clickable = a.id && a.src==='strava';
-      return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="Voir l'analyse détaillée"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${escAct(a.name)}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${escAct(a.date)}${src}</div></div></div>`;
-    }).join('')}</div>` : `<p class="hint" style="margin-top:9px">Aucune activité encore importée.</p>`;
+      return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="${tr('sync.seeDetailedAnalysis')}"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${escAct(a.name)}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${escAct(a.date)}${src}</div></div></div>`;
+    }).join('')}</div>` : `<p class="hint" style="margin-top:9px">${tr('sync.noActivity')}</p>`;
     const linked = providers.length? providers.map(p=>SRC[p]||p).join(' · ') : 'Strava';
     box.innerHTML=`
-      <h2>Activités synchronisées</h2>
+      <h2>${tr('sync.syncedActivities')}</h2>
       <div class="strava-state">
-        <div class="sline"><span class="sdot"></span>Comptes liés : ${linked}</div>
-        <div class="smeta">Dernière synchro : ${stravaActivities.length?'à l\'instant':'jamais'}</div>
-        <button class="strava-sync" id="stravaSyncBtn">${stravaLogo} Synchroniser mes dernières activités</button>
-        <button class="strava-disconnect" id="stravaDisconnectBtn">Déconnecter</button>
-        <button class="dev-mini" id="importFitBtn" title="Importer un fichier .FIT/.TCX/.GPX"><i class="ic ic-upload"></i> Importer un fichier (.FIT/.TCX/.GPX)</button>
+        <div class="sline"><span class="sdot"></span>${tr('sync.linkedAccounts')} : ${linked}</div>
+        <div class="smeta">${tr('sync.lastSync')} : ${stravaActivities.length?tr('sync.justNow'):tr('sync.never')}</div>
+        <button class="strava-sync" id="stravaSyncBtn">${stravaLogo} ${tr('sync.syncLatest')}</button>
+        <button class="strava-disconnect" id="stravaDisconnectBtn">${tr('sync.disconnect')}</button>
+        <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle2')}"><i class="ic ic-upload"></i> ${tr('sync.importFile2')}</button>
       </div>
-      ${(!window.PF?.user)?`<div class="demo-pick"><span class="dp-lbl">Profil démo</span>${Object.keys(STRAVA_DEMO_SETS).map(k=>`<button class="dp-chip${k===stravaDemoSet?' on':''}" data-set="${k}">${DEMO_SET_LABELS[k]}</button>`).join('')}</div>`:''}
+      ${(!window.PF?.user)?`<div class="demo-pick"><span class="dp-lbl">${tr('sync.demoProfile')}</span>${Object.keys(STRAVA_DEMO_SETS).map(k=>`<button class="dp-chip${k===stravaDemoSet?' on':''}" data-set="${k}">${DEMO_SET_LABELS[k]}</button>`).join('')}</div>`:''}
       ${actsHtml}
-      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ Les activités <b>Strava</b> restent personnelles à l'athlète (conditions Strava) et ne sont pas partagées au coach. Canaux partageables : <b>Garmin/Coros</b> ou <b>import .FIT/.TCX/.GPX</b>.</p>
-      <div class="strava-powered">Powered by Strava · Garmin · Coros</div>`;
+      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy2')}</p>
+      <div class="strava-powered">${tr('sync.poweredBy')}</div>`;
     document.getElementById('stravaSyncBtn').onclick=syncStrava;
     box.querySelectorAll('.strava-act.clickable').forEach(el=> el.onclick=()=>openStravaAnalysis(stravaActivities[+el.dataset.idx]));
     box.querySelectorAll('.dp-chip').forEach(b=> b.onclick=()=>{ stravaDemoSet=b.dataset.set; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); });
     document.getElementById('stravaDisconnectBtn').onclick=()=>{
-      if(window.PF?.user){ const p=providers[0]||'strava'; PF.disconnectDevice(p).then(()=>refreshDeviceState()).catch(e=>console.warn('[PF] disconnect:',e)); toast('Compte délié'); }
-      else { stravaConnected=false; stravaActivities=[]; renderStravaCard(); toast('Strava déconnecté'); }
+      if(window.PF?.user){ const p=providers[0]||'strava'; PF.disconnectDevice(p).then(()=>refreshDeviceState()).catch(e=>console.warn('[PF] disconnect:',e)); toast(tr('toast.compteDelie')); }
+      else { stravaConnected=false; stravaActivities=[]; renderStravaCard(); toast(tr('toast.stravaDeconnecte')); }
     };
   }
   const ib=document.getElementById('importFitBtn'); if(ib) ib.onclick=()=>ensureFitInput().click();
@@ -1461,17 +1470,17 @@ function ensureFitInput(){
   return inp;
 }
 function importActivityFile(file){
-  if(typeof PFFit==='undefined'){ toast('Module d\'import indisponible', 'error'); return; }
+  if(typeof PFFit==='undefined'){ toast(tr('toast.moduleDImportIndisponible'), 'error'); return; }
   const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
-  toast('Lecture du fichier…');
+  toast(tr('toast.lectureFichier'));
   PFFit.parseFile(file, {ftp}).then(res=>{
-    if(!res.ok){ toast('Import : '+res.error); return; }
+    if(!res.ok){ toast(tr('sync.importPrefix')+res.error); return; }
     const s=res.summary;
     stravaConnected=true;
-    stravaActivities.unshift({disc:s.disc, name:s.title, dur:s.durMin, dist:+(+s.dist).toFixed(1), date:'importé', src:'upload'});
+    stravaActivities.unshift({disc:s.disc, name:s.title, dur:s.durMin, dist:+(+s.dist).toFixed(1), date:tr('sync.imported'), src:'upload'});
     renderStravaCard();
     openAnalysis({id:'imp'+Date.now(), disc:s.disc, title:s.title, dur:s.durMin, zone:'Z2', _realData:res.data});
-    toast('Activité importée');
+    toast(tr('toast.activiteImportee'));
     if(window.PF?.user){
       PF.saveActivity(res.summary, res.data).catch(e=>console.warn('[PF] saveActivity échoué :', e));
     }
@@ -1484,49 +1493,49 @@ function importActivityFile(file){
 // le modal d'analyse habituel (découplage, comparateur, IA…).
 function openStravaAnalysis(act){
   if(!act || !act.id){ return; }
-  toast('Chargement du détail…');
+  toast(tr('toast.chargementDetail'));
   PF.getActivityStreams(act.id).then(points=>{
-    if(!points || !points.length){ toast('Pas de détail seconde-par-seconde pour cette activité'); return; }
+    if(!points || !points.length){ toast(tr('toast.pasDetailSecondeParSeconde')); return; }
     const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
     const res = PFFit.buildFromRaw(points, act.disc, [], {ftp});
-    if(!res.ok){ toast(res.error||'Analyse impossible', 'error'); return; }
+    if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
     openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
-  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast('Récupération du détail Strava impossible', 'error'); });
+  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(tr('toast.recuperationDetailStravaImpossible'), 'error'); });
 }
 
 function connectStrava(){
   // RÉEL (connecté à Sillance cloud) → OAuth Strava ; sinon démo.
   if(window.PF?.user){
     const btn=document.getElementById('stravaConnectBtn');
-    if(btn){ btn.textContent='Redirection vers Strava…'; btn.disabled=true; }
+    if(btn){ btn.textContent=tr('sync.redirectingStrava'); btn.disabled=true; }
     PF.connectDevice('strava').then(r=>{
-      if(r&&r.pending){ if(btn) btn.disabled=false; renderStravaCard(); toast(r.message||'Intégration bientôt disponible'); }
+      if(r&&r.pending){ if(btn) btn.disabled=false; renderStravaCard(); toast(r.message||tr('sync.integrationSoon')); }
       // sinon : redirection en cours vers Strava.
-    }).catch(e=>{ console.warn('[PF] connectDevice:',e); if(btn) btn.disabled=false; renderStravaCard(); toast('Connexion Strava impossible', 'error'); });
+    }).catch(e=>{ console.warn('[PF] connectDevice:',e); if(btn) btn.disabled=false; renderStravaCard(); toast(tr('toast.connexionStravaImpossible'), 'error'); });
     return;
   }
   // DÉMO : simule le retour de l'autorisation OAuth.
   const btn=document.getElementById('stravaConnectBtn');
-  if(btn){ btn.textContent='Connexion à Strava…'; btn.disabled=true; }
-  setTimeout(()=>{ stravaConnected=true; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); toast('Strava connecté'); }, 800);
+  if(btn){ btn.textContent=tr('sync.connectingStrava'); btn.disabled=true; }
+  setTimeout(()=>{ stravaConnected=true; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); toast(tr('toast.stravaConnecte')); }, 800);
 }
 
 function syncStrava(){
   const btn=document.getElementById('stravaSyncBtn');
-  if(btn){ btn.classList.add('syncing'); btn.textContent='Synchronisation…'; }
+  if(btn){ btn.classList.add('syncing'); btn.textContent=tr('sync.syncing'); }
   // RÉEL : l'edge function appelle l'API Strava avec le token stocké.
   if(window.PF?.user){
     PF.syncDevice('strava')
       .then(()=> refreshDeviceState())
-      .then(()=> toast(`${stravaActivities.length} activités synchronisées`))
-      .catch(e=>{ console.warn('[PF] syncDevice:',e); renderStravaCard(); toast('Synchro Strava impossible', 'error'); });
+      .then(()=> toast(tr('sync.nActivitiesSynced', {n:stravaActivities.length})))
+      .catch(e=>{ console.warn('[PF] syncDevice:',e); renderStravaCard(); toast(tr('toast.synchroStravaImpossible'), 'error'); });
     return;
   }
   // DÉMO : charge le profil d'activités sélectionné.
   setTimeout(()=>{
     stravaActivities = STRAVA_DEMO_SETS[stravaDemoSet].slice();
     renderStravaCard();
-    toast(`${stravaActivities.length} activités importées`);
+    toast(tr('sync.nActivitiesImported', {n:stravaActivities.length}));
   }, 1000);
 }
 
@@ -1543,7 +1552,7 @@ async function refreshDeviceState(){
       stravaActivities = acts.map(a=>({
         id: a.id,
         disc: a.disc || 'run',
-        name: a.name || 'Activité',
+        name: a.name || tr('sync.activity'),
         dur: a.duration_s ? Math.round(a.duration_s/60) : 0,
         dist: a.distance_m ? +(a.distance_m/1000).toFixed(1) : 0,
         date: fmtActDate(a.start_time),
@@ -1556,19 +1565,19 @@ async function refreshDeviceState(){
 
 // Connexion d'une plateforme autre que Strava (Garmin/Coros).
 function connectProvider(p){
-  if(!window.PF?.user){ toast('Connecte-toi au cloud puis réessaie'); return; }
-  PF.connectDevice(p).then(r=>{ if(r&&r.pending) toast(r.message||'Intégration bientôt disponible'); })
-    .catch(e=>{ console.warn('[PF] connectDevice:',e); toast('Connexion impossible', 'error'); });
+  if(!window.PF?.user){ toast(tr('toast.connecteToiCloudPuisReessaie')); return; }
+  PF.connectDevice(p).then(r=>{ if(r&&r.pending) toast(r.message||tr('sync.integrationSoon')); })
+    .catch(e=>{ console.warn('[PF] connectDevice:',e); toast(tr('toast.connexionImpossible'), 'error'); });
 }
 
 function fmtActDate(iso){
   if(!iso) return '';
   const d=new Date(iso);
   const days=Math.floor((new Date().setHours(0,0,0,0)-new Date(iso).setHours(0,0,0,0))/86400000);
-  if(days<=0) return 'auj.';
-  if(days===1) return 'hier';
-  if(days<7) return `il y a ${days} j`;
-  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+  if(days<=0) return tr('date.today');
+  if(days===1) return tr('date.yesterday');
+  if(days<7) return tr('date.daysAgo', {days});
+  return d.toLocaleDateString(localeStr(),{day:'2-digit',month:'2-digit'});
 }
 
 /* ============================================================
@@ -1592,8 +1601,8 @@ function tplZoneCat(t){
   return best? 'Z'+best : '—';
 }
 const ZONE_CATS=[
-  ['Z5','Z5 · VO2max / VMA'], ['Z4','Z4 · Seuil'], ['Z3','Z3 · Tempo'],
-  ['Z2','Z2 · Endurance'], ['Z1','Z1 · Récupération'], ['—','Renfo / autre']
+  ['Z5','Z5 · '+tr('zoneCat.vo2max')], ['Z4','Z4 · '+tr('zoneCat.threshold')], ['Z3','Z3 · '+tr('zoneCat.tempo')],
+  ['Z2','Z2 · '+tr('zoneCat.endurance')], ['Z1','Z1 · '+tr('zoneCat.recovery')], ['—',tr('zoneCat.strengthOther')]
 ];
 const ZONE_COLORS={Z1:'#2FD9FF',Z2:'#39E6A3',Z3:'#FFD43D',Z4:'#FFB13D',Z5:'#FF5470','—':'#8B93A7'};
 let libSport='all', libZone='all';
@@ -1602,12 +1611,12 @@ function buildTemplates(container){
   container.innerHTML='';
   const filt=document.createElement('div'); filt.className='lib-filters';
   filt.innerHTML=`
-    <select id="libSport" aria-label="Filtrer par sport">
-      <option value="all">Tous les sports</option>
+    <select id="libSport" aria-label="${tr('lib.filterBySport')}">
+      <option value="all">${tr('lib.allSports')}</option>
       ${Object.entries(DISC).map(([k,d])=>`<option value="${k}"${libSport===k?' selected':''}>${d.label}</option>`).join('')}
     </select>
-    <select id="libZone" aria-label="Filtrer par type de séance">
-      <option value="all">Tous les types de séance</option>
+    <select id="libZone" aria-label="${tr('lib.filterByType')}">
+      <option value="all">${tr('lib.allTypes')}</option>
       ${ZONE_CATS.map(([v,l])=>`<option value="${v}"${libZone===v?' selected':''}>${l}</option>`).join('')}
     </select>`;
   container.appendChild(filt);
@@ -1618,7 +1627,7 @@ function buildTemplates(container){
     .map(t=>({t, z:tplZoneCat(t)}))
     .filter(x=> (libSport==='all'||x.t.disc===libSport) && (libZone==='all'||x.z===libZone));
   if(!list.length){
-    container.insertAdjacentHTML('beforeend','<div class="lib-empty">Aucune séance — modifie les filtres ou crée-en une.</div>');
+    container.insertAdjacentHTML('beforeend',`<div class="lib-empty">${tr('lib.empty')}</div>`);
     return;
   }
   // filtres actifs → groupes ouverts ; sinon tout replié pour rester compact
@@ -1642,7 +1651,7 @@ function tplCard(t, z){
   el.style.setProperty('--c', D.color);
   el.innerHTML = `<div class="t">${t.title}<span class="zb" style="color:${ZONE_COLORS[z]}">${z}</span></div>
                   <div class="m">${t.dur}min · ${t.tss} TSS</div>
-                  <button class="tpl-assign" title="Attribuer à plusieurs athlètes" aria-label="Attribuer cette séance à plusieurs athlètes"><i class="ic ic-users"></i></button>`;
+                  <button class="tpl-assign" title="${tr('lib.assignToMultiple')}" aria-label="${tr('lib.assignToMultipleAria')}"><i class="ic ic-users"></i></button>`;
   el.addEventListener('dragstart', e=>{
     e.dataTransfer.setData('text/plain', JSON.stringify({type:'tpl', id:t.id}));
   });
@@ -1672,22 +1681,22 @@ function nextMonday(){ return addDays(mondayOf(0),7); }
 
 function buildCycles(container){
   container.innerHTML='';
-  if(!CYCLES.length){ container.innerHTML='<div class="lib-empty">Aucun cycle — crée ton premier programme.</div>'; return; }
+  if(!CYCLES.length){ container.innerHTML=`<div class="lib-empty">${tr('cycles.empty')}</div>`; return; }
   CYCLES.forEach(c=>{
     const el=document.createElement('div');
     el.className='tpl cycle-card';
     el.style.setProperty('--c','var(--accent)');
     el.innerHTML=`<div class="t">${c.name}</div>
-      <div class="m">${c.weeks} semaines · ${cycleCount(c)} séances</div>
-      <button class="cy-apply"><i class="ic ic-calendar"></i> Ajouter à l'athlète</button>
-      <button class="cy-multi"><i class="ic ic-users"></i> Attribuer à plusieurs</button>
-      <button class="cy-del" aria-label="Supprimer le cycle"><i class="ic ic-x"></i></button>`;
+      <div class="m">${c.weeks} ${tr('cycles.weeks')} · ${cycleCount(c)} ${tr('cycles.sessions')}</div>
+      <button class="cy-apply"><i class="ic ic-calendar"></i> ${tr('cycles.addToAthlete')}</button>
+      <button class="cy-multi"><i class="ic ic-users"></i> ${tr('cycles.assignMultiple')}</button>
+      <button class="cy-del" aria-label="${tr('cycles.deleteAria')}"><i class="ic ic-x"></i></button>`;
     el.querySelector('.cy-apply').addEventListener('click', e=>{ e.stopPropagation(); applyCycle(c, null); });
     el.querySelector('.cy-multi').addEventListener('click', e=>{ e.stopPropagation(); openAssign('cycle', c); });
     el.querySelector('.cy-del').addEventListener('click', e=>{
       e.stopPropagation();
       const i=CYCLES.findIndex(x=>x.id===c.id); if(i>-1) CYCLES.splice(i,1);
-      buildCycles(container); toast('Cycle supprimé');
+      buildCycles(container); toast(tr('toast.cycleSupprime'));
     });
     el.addEventListener('click', ()=> openCycleBuilder(c));
     container.appendChild(el);
@@ -1724,7 +1733,7 @@ function applyCycle(c, startIso){
   });
   weekOffset = Math.round((mon - mondayOf(0))/(7*864e5));
   render();
-  toast(`Cycle « ${c.name} » posé : ${out.length} séances sur ${c.weeks} semaines`);
+  toast(tr('cycles.appliedToast', {name:c.name, n:out.length, weeks:c.weeks}));
 }
 
 /* ============================================================
@@ -1766,8 +1775,8 @@ function doAssign(kind, obj, dateIso, targets){
   render();
   const nA = targets.length;
   toast(kind==='cycle'
-    ? `Cycle « ${obj.name} » posé pour ${nA} athlète${nA>1?'s':''} : ${entries.length} séances chacun`
-    : `Séance « ${obj.title} » attribuée à ${nA} athlète${nA>1?'s':''}`);
+    ? tr(nA>1?'assign.cyclePosedPlural':'assign.cyclePosedSingular', {name:obj.name, n:nA, entries:entries.length})
+    : tr(nA>1?'assign.sessionAssignedPlural':'assign.sessionAssignedSingular', {title:obj.title, n:nA}));
 }
 
 function openAssign(kind, obj){
@@ -1781,20 +1790,20 @@ function openAssign(kind, obj){
       ${g?`<span class="asg-grp" style="color:${g.color}">${g.name}</span>`:''}</label>`;
   }).join('');
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=`<div class="adh-modal asg-modal" role="dialog" aria-label="Attribuer à plusieurs athlètes">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Attribuer « ${isCycle?obj.name:obj.title} »</h3>
+  el.innerHTML=`<div class="adh-modal asg-modal" role="dialog" aria-label="${tr('assign.dialogAria')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('assign.title', {name:isCycle?obj.name:obj.title})}</h3>
     <p class="adh-sub">${isCycle
-      ? `Pose ce cycle (${obj.weeks} semaines, ${cycleCount(obj)} séances) sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`
-      : `Pose cette séance sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`}</p>
-    <div class="asg-date"><span>${isCycle?'Semaine du':'Le'}</span><input type="date" id="asgDate" value="${defDate}"></div>
+      ? tr('assign.subCycle', {weeks:obj.weeks, n:cycleCount(obj)})
+      : tr('assign.subSession')}</p>
+    <div class="asg-date"><span>${isCycle?tr('assign.weekOf'):tr('assign.onDate')}</span><input type="date" id="asgDate" value="${defDate}"></div>
     ${groups.length?`<div class="asg-groups">${groups.map(g=>{
       const n=ROSTER.filter(a=>a.group===g.id).length;
       return `<button class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name} · ${n}</button>`;
     }).join('')}</div>`:''}
-    <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">Aucun athlète lié — invite ton premier athlète pour lui attribuer des séances.</div>`}</div>
-    ${rows?`<label class="asg-all"><input type="checkbox" id="asgAll"> Tout sélectionner</label>
-    <button class="btn asg-go" id="asgGo" disabled>Attribuer</button>`:''}
+    <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">${tr('assign.noAthlete')}</div>`}</div>
+    ${rows?`<label class="asg-all"><input type="checkbox" id="asgAll"> ${tr('assign.selectAll')}</label>
+    <button class="btn asg-go" id="asgGo" disabled>${tr('assign.assign')}</button>`:''}
   </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('open'));
@@ -1808,7 +1817,7 @@ function openAssign(kind, obj){
   const sync=()=>{
     const n=boxes.filter(b=>b.checked).length;
     go.disabled=!n;
-    go.textContent = n ? `Attribuer à ${n} athlète${n>1?'s':''}` : 'Attribuer';
+    go.textContent = n ? tr(n>1?'assign.assignToNPlural':'assign.assignToNSingular', {n}) : tr('assign.assign');
     all.checked = n===boxes.length;
     el.querySelectorAll('.asg-chip').forEach(ch=>{
       const m=boxes.filter(b=>b.dataset.grp===ch.dataset.g);
@@ -1836,7 +1845,7 @@ function openCycleBuilder(existing){
                         : {id:'c'+(cycleUid++), name:'', weeks:4, plan:{}};
   document.getElementById('cyName').value = cycleState.name||'';
   document.getElementById('cyWeeks').value = String(cycleState.weeks);
-  document.getElementById('cycleBadge').textContent = existing ? 'Modifier le cycle' : 'Nouveau cycle';
+  document.getElementById('cycleBadge').textContent = existing ? tr('cycleBuilder.edit') : tr('cycleBuilder.new');
   document.getElementById('cyStart').value = iso(nextMonday());
   renderCycleGrid();
   document.getElementById('cycleOverlay').classList.add('open');
@@ -1848,13 +1857,13 @@ function renderCycleGrid(){
     const wk = Array.from({length:7},(_,d)=> (cycleState.plan[w+'-'+d]||[]));
     const wkTss = wk.flat().reduce((a,tid)=>{ const t=TEMPLATES.find(x=>x.id===tid); return a+(t?t.tss:0); },0);
     html += `<div class="cy-week">
-      <div class="cy-week-t">Semaine ${w+1} <em>${wkTss} TSS</em></div>
+      <div class="cy-week-t">${tr('cycleBuilder.week')} ${w+1} <em>${wkTss} TSS</em></div>
       <div class="cy-days">${wk.map((cell,d)=>`
         <div class="cy-day" data-w="${w}" data-d="${d}">
           <span class="d">${DAYS[d]}</span>
           ${cell.map((tid,i)=>{ const t=TEMPLATES.find(x=>x.id===tid); if(!t) return '';
-            return `<span class="cy-chip" style="--c:${DISC[t.disc].color}" data-i="${i}" title="Cliquer pour retirer">${t.title}</span>`; }).join('')}
-          <button class="cy-add-btn" aria-label="Ajouter une séance ce jour">+</button>
+            return `<span class="cy-chip" style="--c:${DISC[t.disc].color}" data-i="${i}" title="${tr('cycleBuilder.clickToRemove')}">${t.title}</span>`; }).join('')}
+          <button class="cy-add-btn" aria-label="${tr('cycleBuilder.addSessionThisDay')}">+</button>
         </div>`).join('')}
       </div>
     </div>`;
@@ -1893,7 +1902,7 @@ function openCyPicker(e, w, d){
   }), 0);
 }
 function saveCycleFromModal(){
-  cycleState.name = document.getElementById('cyName').value.trim() || 'Cycle sans nom';
+  cycleState.name = document.getElementById('cyName').value.trim() || tr('cycleBuilder.unnamed');
   cycleState.weeks = +document.getElementById('cyWeeks').value;
   const clean = {id:cycleState.id, name:cycleState.name, weeks:cycleState.weeks, plan:cycleState.plan};
   const i=CYCLES.findIndex(x=>x.id===clean.id);
@@ -1912,7 +1921,7 @@ document.getElementById('cyWeeks').addEventListener('change', e=>{
 document.getElementById('cySave').addEventListener('click', ()=>{
   saveCycleFromModal();
   document.getElementById('cycleOverlay').classList.remove('open');
-  toast('Cycle enregistré');
+  toast(tr('toast.cycleEnregistre'));
 });
 document.getElementById('cyApply').addEventListener('click', ()=>{
   const c=saveCycleFromModal();
@@ -1928,7 +1937,7 @@ document.getElementById('cyApply').addEventListener('click', ()=>{
    Démo : valeurs d'exemple ; connecté : les boutons pointent vers
    le vrai checkout / portail Stripe.
    ============================================================ */
-function fmtDateFr(d){ return d.toLocaleDateString('fr-FR'); }
+function fmtDateFr(d){ return d.toLocaleDateString(localeStr()); }
 function aiTrialDaysLeft(){
   if(window.__pf_aiDemo && window.__pf_aiDemoStart)
     return Math.max(0, 14 - Math.floor((Date.now()-window.__pf_aiDemoStart)/86400000));
@@ -1937,65 +1946,65 @@ function aiTrialDaysLeft(){
 function settingsStructureHtml(){
   const sub = window.__pf_subscribed===true || !window.PF?.user; // démo : montré actif
   return `
-    <div class="set-h">Abonnement Structure</div>
-    <div class="set-sub">La formule Sillance de ta structure — échéances, facturation et gestion.</div>
+    <div class="set-h">${tr('settings.structureSub')}</div>
+    <div class="set-sub">${tr('settings.structureSubText')}</div>
     <div class="set-plan">
       <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
         <div style="flex:1">
-          <div class="p-name">Sillance Coach — Mensuel</div>
-          <div class="p-price">29€<small> /mois</small></div>
+          <div class="p-name">${tr('settings.planName')}</div>
+          <div class="p-price">29€<small> /${tr('sidebar.perMonth')}</small></div>
         </div>
-        <span class="set-status ${sub?'on':'off'}">${sub?'Actif':'Inactif'}</span>
+        <span class="set-status ${sub?'on':'off'}">${sub?tr('settings.active'):tr('settings.inactive')}</span>
       </div>
       <div class="set-rows">
-        <div><div class="k">Créé le</div><div class="v">14/04/2026</div></div>
-        <div><div class="k">Valide jusqu'au</div><div class="v">09/08/2026</div></div>
-        <div><div class="k">Prochain paiement</div><div class="v">Renouvellement le 09/08/2026</div></div>
-        <div><div class="k">Statut du dernier paiement</div><div class="v" style="color:var(--good)">Payé</div></div>
-        <div><div class="k">Date d'émission</div><div class="v">09/07/2026</div></div>
-        <div><div class="k">Moyen de paiement</div><div class="v">Visa •••• 4242 — expire 11/2029</div></div>
+        <div><div class="k">${tr('settings.createdOn')}</div><div class="v">14/04/2026</div></div>
+        <div><div class="k">${tr('settings.validUntil')}</div><div class="v">09/08/2026</div></div>
+        <div><div class="k">${tr('settings.nextPayment')}</div><div class="v">${tr('settings.renewalOn', {date:'09/08/2026'})}</div></div>
+        <div><div class="k">${tr('settings.lastPaymentStatus')}</div><div class="v" style="color:var(--good)">${tr('settings.paid')}</div></div>
+        <div><div class="k">${tr('settings.issueDate')}</div><div class="v">09/07/2026</div></div>
+        <div><div class="k">${tr('settings.paymentMethod')}</div><div class="v">Visa •••• 4242 — ${tr('settings.expires')} 11/2029</div></div>
       </div>
       <div class="set-actions">
-        <button class="btn cy-ghost" id="setPortalBtn"><i class="ic ic-credit-card"></i> Détails et gestion</button>
-        ${sub?'':`<button class="btn" id="setSubscribeBtn">S'abonner — 29 €/mois</button>`}
+        <button class="btn cy-ghost" id="setPortalBtn"><i class="ic ic-credit-card"></i> ${tr('settings.detailsManage')}</button>
+        ${sub?'':`<button class="btn" id="setSubscribeBtn">${tr('settings.subscribe29')}</button>`}
       </div>
     </div>
     <div class="set-upsell">
-      <b>⭐ Passe ta structure en COACH PRO</b>
-      <p>Active les fonctionnalités PRO pour tous les coachs de ta structure et l'Assistant IA pour tes athlètes.</p>
-      <button class="btn btn-secondary" id="setProBtn">Découvrir</button>
+      <b>⭐ ${tr('settings.upgradeToPro')}</b>
+      <p>${tr('settings.upgradeToProText')}</p>
+      <button class="btn btn-secondary" id="setProBtn">${tr('settings.discover')}</button>
     </div>`;
 }
 function settingsCoachHtml(){
   const on = aiUnlocked();
   const days = aiTrialDaysLeft();
-  const chip = on ? (days!=null?`<span class="set-status trial">Essai — ${days} j restants</span>`:'<span class="set-status on">Actif</span>')
-                  : '<span class="set-status off">Inactif</span>';
+  const chip = on ? (days!=null?`<span class="set-status trial">${tr('settings.trialDaysLeft', {days})}</span>`:`<span class="set-status on">${tr('settings.active')}</span>`)
+                  : `<span class="set-status off">${tr('settings.inactive')}</span>`;
   return `
-    <div class="set-h">Abonnement coach — Assistant IA</div>
-    <div class="set-sub">L'add-on d'analyse automatique des séances réalisées : respect du plan, dérive cardiaque, découplage FC, temps en zone.</div>
+    <div class="set-h">${tr('settings.coachAiSub')}</div>
+    <div class="set-sub">${tr('settings.coachAiSubText')}</div>
     <div class="set-plan">
       <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
         <div style="flex:1">
-          <div class="p-name">Assistant IA (add-on coach)</div>
-          <div class="p-price">${AI_ADDON_PRICE}€<small> /mois · essai 14 j</small></div>
+          <div class="p-name">${tr('settings.aiAssistantAddon')}</div>
+          <div class="p-price">${AI_ADDON_PRICE}€<small> /${tr('sidebar.perMonth')} · ${tr('settings.trial14d')}</small></div>
         </div>
         ${chip}
       </div>
       ${on ? `
       <div class="set-rows">
-        <div><div class="k">Statut</div><div class="v">${days!=null?`Essai en cours — ${days} jour${days>1?'s':''} restant${days>1?'s':''}`:'Abonnement actif'}</div></div>
-        <div><div class="k">Prochain débit</div><div class="v">${days!=null?`${AI_ADDON_PRICE} € le ${fmtDateFr(addDays(new Date(window.__pf_aiDemoStart||Date.now()),14))} — sauf révocation`:`${AI_ADDON_PRICE} € à la prochaine échéance`}</div></div>
+        <div><div class="k">${tr('settings.status')}</div><div class="v">${days!=null?tr(days>1?'settings.trialInProgressPlural':'settings.trialInProgressSingular', {days}):tr('settings.subActive2')}</div></div>
+        <div><div class="k">${tr('settings.nextCharge')}</div><div class="v">${days!=null?tr('settings.chargeOn', {price:AI_ADDON_PRICE, date:fmtDateFr(addDays(new Date(window.__pf_aiDemoStart||Date.now()),14))}):tr('settings.chargeAtNextDeadline', {price:AI_ADDON_PRICE})}</div></div>
       </div>
       <div class="set-actions">
-        <button class="btn cy-ghost set-danger" id="setAiRevoke"><i class="ic ic-x"></i> Révoquer l'accès à l'assistant IA</button>
+        <button class="btn cy-ghost set-danger" id="setAiRevoke"><i class="ic ic-x"></i> ${tr('settings.revokeAiAccess')}</button>
       </div>
-      <div class="set-note">Aucun débit n'a lieu si tu révoques avant la fin de l'essai. Connecté, la révocation passe par le portail Stripe (accès conservé jusqu'à l'échéance).</div>`
+      <div class="set-note">${tr('settings.revokeNote')}</div>`
       : `
       <div class="set-actions" style="margin-top:12px">
-        <button class="btn" id="setAiStart">Commencer l'essai 14 jours</button>
+        <button class="btn" id="setAiStart">${tr('settings.start14dTrial')}</button>
       </div>
-      <div class="set-note">Carte enregistrée à l'activation. Débit automatique de ${AI_ADDON_PRICE} €/mois à la fin de l'essai, sauf révocation depuis cette page.</div>`}
+      <div class="set-note">${tr('settings.trialNote', {price:AI_ADDON_PRICE})}</div>`}
     </div>`;
 }
 let settingsTab='structure';
@@ -2004,24 +2013,24 @@ function renderSettings(){
   const body=document.getElementById('setBody');
   body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsCoachHtml();
   const portal=document.getElementById('setPortalBtn');
-  if(portal) portal.onclick=()=>{ if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast('Portail indisponible', 'error')); } else toast('Portail Stripe (démo)'); };
+  if(portal) portal.onclick=()=>{ if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast(tr('toast.portailIndisponible'), 'error')); } else toast(tr('toast.portailStripeDemo')); };
   const subB=document.getElementById('setSubscribeBtn');
-  if(subB) subB.onclick=()=>{ if(window.PF?.user && PF.startCheckout){ PF.startCheckout('coach').catch(()=>toast('Stripe indisponible', 'error')); } else toast('Checkout Stripe (démo)'); };
+  if(subB) subB.onclick=()=>{ if(window.PF?.user && PF.startCheckout){ PF.startCheckout('coach').catch(()=>toast(tr('toast.stripeIndisponible'), 'error')); } else toast(tr('toast.checkoutStripeDemo')); };
   const pro=document.getElementById('setProBtn');
-  if(pro) pro.onclick=()=>toast('COACH PRO — bientôt disponible');
+  if(pro) pro.onclick=()=>toast(tr('toast.coachProBientotDisponible'));
   const st=document.getElementById('setAiStart');
   if(st) st.onclick=()=>{
-    if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(()=>toast('Stripe indisponible', 'error')); return; }
+    if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(()=>toast(tr('toast.stripeIndisponible'), 'error')); return; }
     window.__pf_aiDemo=true; window.__pf_aiDemoStart=Date.now();
     renderSettings(); if(mode==='coach') renderSidebar();
-    toast('Assistant IA activé — essai 14 jours (démo)');
+    toast(tr('toast.assistantIaActiveEssai14'));
   };
   const rv=document.getElementById('setAiRevoke');
   if(rv) rv.onclick=()=>{
-    if(window.PF?.user && window.__pf_aiAddon===true && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast('Portail indisponible', 'error')); return; }
+    if(window.PF?.user && window.__pf_aiAddon===true && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast(tr('toast.portailIndisponible'), 'error')); return; }
     window.__pf_aiDemo=false; window.__pf_aiDemoStart=null;
     renderSettings(); if(mode==='coach') renderSidebar();
-    toast('Accès à l\'assistant IA révoqué');
+    toast(tr('toast.accesALAssistantIa'));
   };
 }
 function openSettings(tab){
@@ -2106,8 +2115,8 @@ function render(){
         <span class="dnum">${date.getDate()}</span>
       </div>
       ${isRace?`<div class="day-race-pill"><i class="ic ic-flag"></i>${race.name}</div>`:''}
-      ${isTaperStart?`<div class="day-taper-tag"><i class="ic ic-gradient"></i>Début affûtage</div>`:''}
-      ${mode==='coach'?`<button class="day-add" data-key="${key}" aria-label="Créer une séance ce jour">+</button>`:''}
+      ${isTaperStart?`<div class="day-taper-tag"><i class="ic ic-gradient"></i>${tr('week.taperStart')}</div>`:''}
+      ${mode==='coach'?`<button class="day-add" data-key="${key}" aria-label="${tr('week.createSessionThisDay')}">+</button>`:''}
       <div class="day-body"></div>
       <div class="day-load">
         ${sessions.map(s=>`<div class="bar" style="background:${DISC[s.disc].color};height:${Math.max(8, s.tss/maxDayTss*30)}px"></div>`).join('')||'<div class="bar" style="background:var(--line);height:3px"></div>'}
@@ -2144,8 +2153,8 @@ function render(){
 
   /* stats */
   document.getElementById('weekTss').innerHTML = `${totalTss}<em>TSS</em>`;
-  document.getElementById('weekHours').innerHTML = `${(totalMin/60).toFixed(1).replace('.',',')}<em>h</em>`;
-  document.getElementById('weekCount').textContent = `${count} séances`;
+  document.getElementById('weekHours').innerHTML = `${(totalMin/60).toLocaleString(localeStr(),{minimumFractionDigits:1,maximumFractionDigits:1})}<em>h</em>`;
+  document.getElementById('weekCount').textContent = tr(count>1?'week.nSessionsPlural':'week.nSessionsSingular', {n:count});
   document.getElementById('compliance').innerHTML = `${count?Math.round(doneCount/count*100):0}<em>%</em>`;
   renderWeekIntensity(mon);
   renderTaperHint(race, mon);
@@ -2163,13 +2172,11 @@ function renderTaperHint(race, mon){
   const overlaps = weekDays.some(k=> k>=race.taperStart && k<=race.date);
   if(!overlaps){ el.hidden=true; return; }
   const isCoach = (typeof mode!=='undefined' && mode==='coach');
-  const who = isCoach ? 'ton athlète' : 'toi';
+  const forClause = isCoach ? ' '+tr('taper.forYourAthlete') : '';
   el.hidden=false;
   el.innerHTML = `<i class="ic ic-gradient"></i><div class="th-txt">
-    <b>Affûtage — ${dispoSafe(race.name)}, J–${race.days}.</b>
-    Fenêtre recommandée : <span class="k">${race.taperDays} j</span>. Réduis le volume d'environ
-    <span class="k">${race.volCut}%</span> ${isCoach?'pour '+who:''} en gardant des <b>rappels d'intensité courts</b>
-    (VMA/seuil brefs) et la fréquence des séances — c'est le volume qu'on coupe, pas la vivacité.</div>`;
+    <b>${tr('taper.title', {name:dispoSafe(race.name), days:race.days})}</b>
+    ${tr('taper.body', {taperDays:race.taperDays, volCut:race.volCut, forClause})}</div>`;
 }
 /* Optimiseur de répartition hebdo : signale au coach les combinaisons à
    risque dans la semaine affichée (charge forte cumulée le même jour, ou
@@ -2183,12 +2190,12 @@ function weekRiskFindings(mon){
   days.forEach(d=>{
     if(d.high.length>=2){
       const discs=[...new Set(d.high.map(s=>DISC[s.disc].label))];
-      findings.push(`<b>${DAYS[d.i]}</b> cumule ${d.high.length} séances à forte intensité (${discs.join(' + ')}).`);
+      findings.push(`<b>${DAYS[d.i]}</b> ${tr('risk.stacksHighIntensity', {n:d.high.length, discs:discs.join(' + ')})}`);
     }
   });
   for(let i=0;i<6;i++){
     if(days[i].high.length && days[i+1].high.length){
-      findings.push(`<b>${DAYS[i]} → ${DAYS[i+1]}</b> deux jours d'affilée à forte intensité, peu de récup entre les deux.`);
+      findings.push(`<b>${DAYS[i]} → ${DAYS[i+1]}</b> ${tr('risk.twoDaysInARow')}`);
     }
   }
   return findings;
@@ -2199,7 +2206,7 @@ function renderWeekRiskHint(mon){
   const findings = weekRiskFindings(mon);
   if(!findings.length){ el.hidden=true; return; }
   el.hidden=false;
-  el.innerHTML = `<i class="ic ic-alert-triangle"></i><div class="th-txt"><b>Répartition à vérifier cette semaine.</b> ${findings.slice(0,3).join(' ')}</div>`;
+  el.innerHTML = `<i class="ic ic-alert-triangle"></i><div class="th-txt"><b>${tr('risk.checkDistribution')}</b> ${findings.slice(0,3).join(' ')}</div>`;
 }
 
 /* ============================================================
@@ -2211,7 +2218,7 @@ function renderWeekRiskHint(mon){
    de semaine ISO, comme les débriefs de course.
    ============================================================ */
 let WEEK_PULSES = {}; // clé "athleteId|weekMondayIso" -> {athleteFeel, athleteNote, coachNote}
-const WEEK_FEELS = { hard:{l:'Trop dur', c:'var(--run)'}, ok:{l:'Bien calibré', c:'var(--good)'}, easy:{l:'Trop facile', c:'var(--bike)'} };
+const WEEK_FEELS = { hard:{get l(){return tr('weekFeel.hard')}, c:'var(--run)'}, ok:{get l(){return tr('weekFeel.ok')}, c:'var(--good)'}, easy:{get l(){return tr('weekFeel.easy')}, c:'var(--bike)'} };
 /* id de l'athlète concerné par la vue courante : soi-même en vue Athlète,
    l'athlète suivi en vue Coach (démo ou réel). null en vue Club. */
 function activeAthleteKey(){
@@ -2231,24 +2238,24 @@ function renderWeekPulse(mon){
   const p = WEEK_PULSES[ck] || {};
   el.hidden = false;
   el.innerHTML = `
-    <div class="sn-head"><i class="ic ic-message-circle"></i> Bilan de la semaine</div>
+    <div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('pulse.weekReview')}</div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div>
-        <div class="sn-when" style="margin-bottom:6px">Ressenti de l'athlète</div>
+        <div class="sn-when" style="margin-bottom:6px">${tr('pulse.athleteFeeling')}</div>
         ${mode==='athlete' ? `
           <div class="wp-feel-seg ck-dispo-seg" id="wpFeelSeg">${Object.entries(WEEK_FEELS).map(([k,f])=>`<button type="button" data-feel="${k}" class="${p.athleteFeel===k?'sel':''}" style="--dc:${f.c}">${f.l}</button>`).join('')}</div>
-          <textarea id="wpAthNote" rows="2" placeholder="Comment s'est passée ta semaine…" style="width:100%;box-sizing:border-box;margin-top:6px">${p.athleteNote?dispoSafe(p.athleteNote):''}</textarea>
-          <button class="btn" id="wpAthSave" style="margin-top:6px">Enregistrer mon bilan</button>
+          <textarea id="wpAthNote" rows="2" placeholder="${tr('pulse.athNotePlaceholder')}" style="width:100%;box-sizing:border-box;margin-top:6px">${p.athleteNote?dispoSafe(p.athleteNote):''}</textarea>
+          <button class="btn" id="wpAthSave" style="margin-top:6px">${tr('pulse.saveMyReview')}</button>
         ` : (p.athleteFeel||p.athleteNote) ? `
           <div class="sn-txt">${p.athleteFeel&&WEEK_FEELS[p.athleteFeel]?`<b style="color:${WEEK_FEELS[p.athleteFeel].c}">${WEEK_FEELS[p.athleteFeel].l}</b>${p.athleteNote?' — ':''}`:''}${p.athleteNote?dispoSafe(p.athleteNote):''}</div>
-        ` : `<p class="club-hint">Pas encore de bilan de l'athlète pour cette semaine.</p>`}
+        ` : `<p class="club-hint">${tr('pulse.noAthleteReviewYet')}</p>`}
       </div>
       <div>
-        <div class="sn-when" style="margin-bottom:6px">Note du coach</div>
+        <div class="sn-when" style="margin-bottom:6px">${tr('pulse.coachNote')}</div>
         ${mode==='coach' ? `
-          <textarea id="wpCoachNote" rows="2" placeholder="Ta lecture de la semaine pour cet athlète…" style="width:100%;box-sizing:border-box">${p.coachNote?dispoSafe(p.coachNote):''}</textarea>
-          <button class="btn" id="wpCoachSave" style="margin-top:6px">Enregistrer ma note</button>
-        ` : p.coachNote ? `<div class="sn-txt">${dispoSafe(p.coachNote)}</div>` : `<p class="club-hint">Ton coach n'a pas encore laissé de note pour cette semaine.</p>`}
+          <textarea id="wpCoachNote" rows="2" placeholder="${tr('pulse.coachNotePlaceholder')}" style="width:100%;box-sizing:border-box">${p.coachNote?dispoSafe(p.coachNote):''}</textarea>
+          <button class="btn" id="wpCoachSave" style="margin-top:6px">${tr('pulse.saveMyNote')}</button>
+        ` : p.coachNote ? `<div class="sn-txt">${dispoSafe(p.coachNote)}</div>` : `<p class="club-hint">${tr('pulse.noCoachNoteYet')}</p>`}
       </div>
     </div>`;
   const fs = document.getElementById('wpFeelSeg');
@@ -2276,7 +2283,7 @@ function saveWeekPulseAthlete(key, wk){
   p.athleteFeel = feel; p.athleteNote = note;
   if(window.PF?.user){ PF.saveMyWeekFeel(wk, feel, note).catch(e=> console.warn('[PF] saveMyWeekFeel :', e)); }
   renderWeekPulse(mondayOf(weekOffset));
-  toast('Bilan de la semaine enregistré');
+  toast(tr('toast.bilanSemaineEnregistre'));
 }
 function saveWeekPulseCoach(key, wk){
   const note = document.getElementById('wpCoachNote').value.trim();
@@ -2285,7 +2292,7 @@ function saveWeekPulseCoach(key, wk){
   p.coachNote = note;
   if(window.PF?.user && rosterIsReal){ PF.saveCoachWeekNote(key, wk, note).catch(e=> console.warn('[PF] saveCoachWeekNote :', e)); }
   renderWeekPulse(mondayOf(weekOffset));
-  toast('Note enregistrée');
+  toast(tr('toast.noteEnregistree'));
 }
 
 /* ============================================================
@@ -2426,13 +2433,13 @@ function renderWeekIntensity(mon){
   let alert='';
   if(rpeN>=2){
     const d=(rpeSum-rpeExpSum)/rpeN, avg=(rpeSum/rpeN).toFixed(1);
-    if(d>=1.5) alert=`<div class="wk-alert hard"><i class="ic ic-alert-triangle"></i> RPE moyen ${avg} — la semaine est plus éprouvante que prévu : pense à alléger les prochaines séances.</div>`;
-    else if(d<=-1.5) alert=`<div class="wk-alert easy"><i class="ic ic-check"></i> RPE moyen ${avg} — la semaine passe mieux que prévu : la charge peut être maintenue, voire montée.</div>`;
+    if(d>=1.5) alert=`<div class="wk-alert hard"><i class="ic ic-alert-triangle"></i> ${tr('weekInt.alertHard', {avg})}</div>`;
+    else if(d<=-1.5) alert=`<div class="wk-alert easy"><i class="ic ic-check"></i> ${tr('weekInt.alertEasy', {avg})}</div>`;
   }
   el.innerHTML=`
-    <div class="wk-int-head">Intensités de la semaine <span>prévu vs réalisé — pour adapter la charge</span></div>
-    <div class="wk-row"><span class="wk-lbl">Prévu</span><div class="wk-bar">${bar(plan)}</div><span class="wk-tot">${fmtDur(Math.round(planMin))} · ${planTss} TSS</span></div>
-    <div class="wk-row"><span class="wk-lbl">Réalisé</span><div class="wk-bar">${realMin?bar(real):''}</div><span class="wk-tot">${realMin?`${fmtDur(Math.round(realMin))} · ${realTss} TSS (${planTss?Math.round(realTss/planTss*100):0}%)`:'—'}</span></div>
+    <div class="wk-int-head">${tr('weekInt.title')} <span>${tr('weekInt.subtitle')}</span></div>
+    <div class="wk-row"><span class="wk-lbl">${tr('weekInt.planned')}</span><div class="wk-bar">${bar(plan)}</div><span class="wk-tot">${fmtDur(Math.round(planMin))} · ${planTss} TSS</span></div>
+    <div class="wk-row"><span class="wk-lbl">${tr('weekInt.done')}</span><div class="wk-bar">${realMin?bar(real):''}</div><span class="wk-tot">${realMin?`${fmtDur(Math.round(realMin))} · ${realTss} TSS (${planTss?Math.round(realTss/planTss*100):0}%)`:'—'}</span></div>
     <div class="wk-legend">${Z.map(z=>`<span><i style="background:${ZONE_COLORS[z]}"></i>${z}</span>`).join('')}</div>
     ${alert}`;
 }
@@ -2448,13 +2455,13 @@ function sessionCard(s, dateKey){
   el.draggable = (mode==='coach');
   el.innerHTML = `
     <div class="t">${s.title}</div>
-    <div class="m"><span>${fmtDur(s.dur)}</span>${s.dist?`<span>${s.dist} km</span>`:''}<span>${s.tss} TSS</span><span>${s.zone}</span>${s.done&&s.rpe?`<span class="rpe-chip" style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}</span>`:''}${s.done&&s.rpeMuscle?`<span class="mus-chip" style="color:${rpeColor(s.rpeMuscle)}" title="Effort musculaire"><i class="ic ic-dumbbell" style="width:10px;height:10px;vertical-align:-1px"></i>${s.rpeMuscle}</span>`:''}</div>
+    <div class="m"><span>${fmtDur(s.dur)}</span>${s.dist?`<span>${s.dist} km</span>`:''}<span>${s.tss} TSS</span><span>${s.zone}</span>${s.done&&s.rpe?`<span class="rpe-chip" style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}</span>`:''}${s.done&&s.rpeMuscle?`<span class="mus-chip" style="color:${rpeColor(s.rpeMuscle)}" title="${tr('session.muscleEffort')}"><i class="ic ic-dumbbell" style="width:10px;height:10px;vertical-align:-1px"></i>${s.rpeMuscle}</span>`:''}</div>
     ${sessionProfileHTML(s)}
     ${vid?`<span class="video-chip">${vid.title}</span>`:''}
     ${s.done?'<span class="done-chip"><i class="ic ic-check"></i></span>':''}
-    ${mode==='coach'?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="Note pour l'athlète" title="${s.coachNote?dispoSafe(s.coachNote):`Ajouter une note pour l'athlète (pourquoi ce changement)`}"><i class="ic ic-message-circle"></i></button>`:''}
-    ${mode==='coach'?'<button class="del" aria-label="Supprimer"><i class="ic ic-x"></i></button>':''}
-    ${mode==='athlete'?`<button class="check-btn">${s.done?'<i class="ic ic-check"></i> Séance faite':'Marquer comme faite'}</button>`:''}
+    ${mode==='coach'?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="${tr('session.noteForAthlete')}" title="${s.coachNote?dispoSafe(s.coachNote):tr('session.addNoteForAthlete')}"><i class="ic ic-message-circle"></i></button>`:''}
+    ${mode==='coach'?`<button class="del" aria-label="${tr('common.delete')}"><i class="ic ic-x"></i></button>`:''}
+    ${mode==='athlete'?`<button class="check-btn">${s.done?'<i class="ic ic-check"></i> '+tr('session.done'):tr('session.markDone')}</button>`:''}
   `;
   el.addEventListener('dragstart', e=>{
     if(mode!=='coach') return;
@@ -2464,7 +2471,7 @@ function sessionCard(s, dateKey){
   el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
   el.addEventListener('click', e=>{
     if(e.target.closest('.note-btn')){
-      const next = prompt("Note pour l'athlète sur cette séance (pourquoi ce changement, ce qu'il faut savoir) :", s.coachNote||'');
+      const next = prompt(tr('session.notePrompt'), s.coachNote||'');
       if(next!=null){
         s.coachNote = next.trim() || null;
         if(window.PF?.user && s.id){ PF.setCoachNote(s.id, s.coachNote).catch(err=>console.warn('[PF] setCoachNote', err)); }
@@ -2518,18 +2525,18 @@ function openRpeModal(s){
   let rpe = null, rpeMuscle = null;
   modal.style.setProperty('--c', D.color);
   modal.innerHTML = `
-    <button class="close" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <span class="badge">${discIcon(D)} ${D.label}</span>
-    <h3>Bien joué ! C'était comment ?</h3>
-    <p class="desc">Ton ressenti aide ton coach à doser les prochaines séances — sois honnête, pas héroïque.</p>
-    <div class="rpe-lbl"><i class="ic ic-zap"></i> Effort cardio / respiratoire</div>
+    <h3>${tr('rpe.wellDone')}</h3>
+    <p class="desc">${tr('rpe.feelingHelps')}</p>
+    <div class="rpe-lbl"><i class="ic ic-zap"></i> ${tr('rpe.cardioEffort')}</div>
     <div class="rpe-grid" id="rpeCardio">${Array.from({length:10},(_,i)=>`<button data-r="${i+1}" style="--rc:${rpeColor(i+1)}">${i+1}</button>`).join('')}</div>
-    <div class="rpe-scale"><span>Très facile</span><span>À fond</span></div>
-    <div class="rpe-lbl" style="margin-top:14px"><i class="ic ic-dumbbell"></i> Effort musculaire (jambes) <span class="rpe-opt">facultatif</span></div>
+    <div class="rpe-scale"><span>${tr('rpe.veryEasy')}</span><span>${tr('rpe.allOut')}</span></div>
+    <div class="rpe-lbl" style="margin-top:14px"><i class="ic ic-dumbbell"></i> ${tr('rpe.muscleEffort')} <span class="rpe-opt">${tr('rpe.optional')}</span></div>
     <div class="rpe-grid" id="rpeMuscle">${Array.from({length:10},(_,i)=>`<button data-m="${i+1}" style="--rc:${rpeColor(i+1)}">${i+1}</button>`).join('')}</div>
-    <div class="rpe-scale"><span>Jambes fraîches</span><span>Jambes détruites</span></div>
-    <textarea class="rpe-note" placeholder="Un mot pour ton coach ? (sensations, douleurs, conditions…)"></textarea>
-    <button class="btn" id="rpeSave" disabled style="opacity:.5">Valider la séance <i class="ic ic-check"></i></button>`;
+    <div class="rpe-scale"><span>${tr('rpe.freshLegs')}</span><span>${tr('rpe.destroyedLegs')}</span></div>
+    <textarea class="rpe-note" placeholder="${tr('rpe.notePlaceholder')}"></textarea>
+    <button class="btn" id="rpeSave" disabled style="opacity:.5">${tr('rpe.validateSession')} <i class="ic ic-check"></i></button>`;
   overlay.classList.add('open');
   const save = modal.querySelector('#rpeSave');
   modal.querySelectorAll('#rpeCardio button').forEach(b=>{
@@ -2563,7 +2570,7 @@ function openRpeModal(s){
       if(rec && rec.shoe){
         const dist = Math.round((s.km || (s.dur||60)/60*11) * 10)/10;
         addGearKm(rec.shoe, dist);
-        setTimeout(()=> toast(`+${dist} km attribués à tes ${rec.shoe.name} (${rec.shoe.km}/${rec.shoe.max} km) — modifiable dans Matériel`), 900);
+        setTimeout(()=> toast(tr('rpe.kmAssigned', {dist, name:rec.shoe.name, km:rec.shoe.km, max:rec.shoe.max})), 900);
       }
     }
   };
@@ -2609,20 +2616,20 @@ function zedModelHTML(key){
   const rows = zones.map((z,i)=>`
     <div class="zed-row" data-i="${i}">
       <span class="zed-dot" style="background:${zoneColorAt(i,total)}"></span>
-      <input class="zed-name" value="${dispoSafe(z[0])}" data-zf="name" aria-label="Nom de la zone">
-      <span class="zed-lo">de ${z[1]}%</span>
-      <span class="zed-hiwrap">→ <input class="zed-hi" type="number" min="1" max="150" value="${z[2]}" data-zf="hi" aria-label="Borne haute"><span>%</span></span>
-      <button class="zed-drow" data-zdel="${i}" aria-label="Supprimer la zone" ${total<=1?'disabled style=opacity:.3':''}><i class="ic ic-x"></i></button>
+      <input class="zed-name" value="${dispoSafe(z[0])}" data-zf="name" aria-label="${tr('zoneEd.zoneName')}">
+      <span class="zed-lo">${tr('zoneEd.from')} ${z[1]}%</span>
+      <span class="zed-hiwrap">→ <input class="zed-hi" type="number" min="1" max="150" value="${z[2]}" data-zf="hi" aria-label="${tr('zoneEd.upperBound')}"><span>%</span></span>
+      <button class="zed-drow" data-zdel="${i}" aria-label="${tr('zoneEd.deleteZone')}" ${total<=1?'disabled style=opacity:.3':''}><i class="ic ic-x"></i></button>
     </div>`).join('');
   return `<div class="zed-model" data-model="${key}">
     <div class="zed-mhead">
       <span class="zed-mname">${m.label}</span>
-      <span class="zed-mtag ${isCustom?'custom':''}">${isCustom?'personnalisé':'standard'}</span>
-      <button class="zed-reset" data-zreset="${key}">Réinitialiser</button>
+      <span class="zed-mtag ${isCustom?'custom':''}">${isCustom?tr('zoneEd.custom'):tr('zoneEd.standard')}</span>
+      <button class="zed-reset" data-zreset="${key}">${tr('zoneEd.reset')}</button>
     </div>
     <div class="zed-bar">${bar}</div>
     ${rows}
-    <button class="zed-add" data-zadd="${key}">+ Ajouter une zone</button>
+    <button class="zed-add" data-zadd="${key}">+ ${tr('zoneEd.addZone')}</button>
   </div>`;
 }
 function zedRenderModel(key, root){
@@ -2643,7 +2650,7 @@ function zedWireModel(key, root){
   });
   sec.querySelector('[data-zadd]').onclick=()=>{
     const last=zones[zones.length-1];
-    zones.push(['Nouvelle zone', last[2], Math.min(150,last[2]+10)]); zedNormalize(zones); zedRenderModel(key, root);
+    zones.push([tr('zoneEd.newZone'), last[2], Math.min(150,last[2]+10)]); zedNormalize(zones); zedRenderModel(key, root);
   };
   sec.querySelector('[data-zreset]').onclick=()=>{
     ZED.models[key]=JSON.parse(JSON.stringify(INTENSITY_MODELS[key].zones));
@@ -2653,9 +2660,9 @@ function zedWireModel(key, root){
 }
 /* toutes les références utilisables pour une zone perso (« tout ce qui existe ») */
 const ZONE_REFS = [
-  ['ftp','% FTP · vélo'], ['pma','% PMA · vélo'], ['cpBike','% Puissance critique · vélo'],
-  ['vma','% VMA · course'], ['cv','% Vitesse critique · course'], ['seuilRun','% allure seuil · course'],
-  ['css','% CSS · natation'], ['fc','% FC max']
+  ['ftp','% FTP · '+tr('disc.bike')], ['pma','% '+tr('refs.map')+' · '+tr('disc.bike')], ['cpBike','% '+tr('zoneEd.criticalPower')+' · '+tr('disc.bike')],
+  ['vma','% '+tr('refs.vVo2max')+' · '+tr('disc.run')], ['cv','% '+tr('zoneEd.criticalSpeed')+' · '+tr('disc.run')], ['seuilRun','% '+tr('zoneEd.thresholdPace')+' · '+tr('disc.run')],
+  ['css','% CSS · '+tr('disc.swim')], ['fc','% '+tr('refs.maxHr')]
 ];
 function customZones(aid){ aid=aid||zoneAthleteId(); return (CUSTOM_ZONES[aid] && CUSTOM_ZONES[aid]._custom) || []; }
 /* aperçu de cible pour une zone perso (ex. "230 → 260 W") */
@@ -2667,17 +2674,17 @@ function zcTargetHint(ref, lo, hi){
 function zcRowHTML(z,i){
   return `<div class="zc-row" data-i="${i}">
     <span class="zc-dot" style="background:${zoneColorAt(i, Math.max(1,ZED.custom.length))}"></span>
-    <input class="zc-name" value="${dispoSafe(z.name)}" data-zc="name" placeholder="Nom de la zone">
+    <input class="zc-name" value="${dispoSafe(z.name)}" data-zc="name" placeholder="${tr('zoneEd.zoneName')}">
     <select data-zc="ref">${ZONE_REFS.map(([k,l])=>`<option value="${k}" ${k===z.ref?'selected':''}>${l}</option>`).join('')}</select>
-    <span class="zc-range">de <input type="number" min="0" max="200" value="${z.lo}" data-zc="lo"> à <input type="number" min="0" max="200" value="${z.hi}" data-zc="hi"> %</span>
-    <button class="zed-drow" data-zcdel="${i}" aria-label="Supprimer"><i class="ic ic-x"></i></button>
+    <span class="zc-range">${tr('zoneEd.from')} <input type="number" min="0" max="200" value="${z.lo}" data-zc="lo"> ${tr('zoneEd.to')} <input type="number" min="0" max="200" value="${z.hi}" data-zc="hi"> %</span>
+    <button class="zed-drow" data-zcdel="${i}" aria-label="${tr('common.delete')}"><i class="ic ic-x"></i></button>
     <div class="zc-tgt">${zcTargetHint(z.ref,z.lo,z.hi)}</div>
   </div>`;
 }
 function zedRenderCustom(root){
-  root.innerHTML = `<p class="zed-note">Crée tes propres zones de travail : nomme-les, choisis la référence (FTP, puissance critique, %VMA, CV, CSS, FC…) et l'intensité. Elles apparaissent dans le sélecteur de zone à la création de séance.</p>`
-    + (ZED.custom.length ? ZED.custom.map(zcRowHTML).join('') : `<div class="zc-empty">Aucune zone perso — ajoute ta première ci-dessous.</div>`)
-    + `<button class="zed-add" id="zcAdd">+ Ajouter une zone perso</button>`;
+  root.innerHTML = `<p class="zed-note">${tr('zoneEd.customNote')}</p>`
+    + (ZED.custom.length ? ZED.custom.map(zcRowHTML).join('') : `<div class="zc-empty">${tr('zoneEd.noCustomZone')}</div>`)
+    + `<button class="zed-add" id="zcAdd">+ ${tr('zoneEd.addCustomZone')}</button>`;
   zedWireCustom(root);
 }
 function zedWireCustom(root){
@@ -2694,31 +2701,31 @@ function zedWireCustom(root){
     rowEl.querySelector('[data-zcdel]').onclick=()=>{ ZED.custom.splice(i,1); zedRenderCustom(root); };
   });
   const add=root.querySelector('#zcAdd');
-  if(add) add.onclick=()=>{ ZED.custom.push({name:'Nouvelle zone', ref:'ftp', lo:88, hi:95}); zedRenderCustom(root); };
+  if(add) add.onclick=()=>{ ZED.custom.push({name:tr('zoneEd.newZone'), ref:'ftp', lo:88, hi:95}); zedRenderCustom(root); };
 }
 
 function openZoneEditor(){
   const aid=zoneAthleteId();
   const name=(typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].name)
-    || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'cet athlète');
+    || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:tr('zoneEd.thisAthlete'));
   const models=editableZoneModels();
   ZED={ aid, name, models:{}, custom: JSON.parse(JSON.stringify(customZones(aid))) };
   models.forEach(k=> ZED.models[k]=JSON.parse(JSON.stringify(zonesFor(k, aid))));
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=`<div class="adh-modal zed-modal" role="dialog" aria-label="Zones de travail">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Zones de travail — ${dispoSafe(name)}</h3>
-    <p class="adh-sub">Adapte les zones de l'athlète (test lactate, ressenti terrain…). Elles servent à la création de séance et à l'analyse.</p>
+  el.innerHTML=`<div class="adh-modal zed-modal" role="dialog" aria-label="${tr('zoneEd.workZones')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('zoneEd.workZones')} — ${dispoSafe(name)}</h3>
+    <p class="adh-sub">${tr('zoneEd.subtitle')}</p>
     <div class="zed-tabs">
-      <button class="zed-tab on" data-ztab="ref">Par référence</button>
-      <button class="zed-tab" data-ztab="custom">Zones perso</button>
+      <button class="zed-tab on" data-ztab="ref">${tr('zoneEd.byReference')}</button>
+      <button class="zed-tab" data-ztab="custom">${tr('zoneEd.customZones')}</button>
     </div>
     <div class="zed-panel" id="zedPanelRef">
       <div id="zedModels">${models.map(zedModelHTML).join('')}</div>
-      <p class="zed-note">La borne basse d'une zone suit la borne haute de la précédente. Les zones en allure (natation CSS, allure seuil course) gardent le modèle standard.</p>
+      <p class="zed-note">${tr('zoneEd.lowBoundNote')}</p>
     </div>
     <div class="zed-panel" id="zedPanelCustom" hidden></div>
-    <button class="btn asg-go" id="zedSave" style="margin-top:16px">Enregistrer les zones</button>
+    <button class="btn asg-go" id="zedSave" style="margin-top:16px">${tr('zoneEd.saveZones')}</button>
   </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('open'));
@@ -2745,7 +2752,7 @@ function openZoneEditor(){
       else CUSTOM_ZONES[aid][k]=z;
     });
     // zones perso libres : nettoyées (nom + bornes cohérentes) puis stockées
-    const clean = ZED.custom.map(z=>({ name:(z.name||'Zone').trim()||'Zone', ref:z.ref||'ftp',
+    const clean = ZED.custom.map(z=>({ name:(z.name||tr('zoneEd.zone')).trim()||tr('zoneEd.zone'), ref:z.ref||'ftp',
       lo:Math.max(0,Math.min(200,+z.lo||0)), hi:Math.max(0,Math.min(200,+z.hi||0)) }))
       .map(z=> (z.hi<z.lo?{...z,lo:z.hi,hi:z.lo}:z));
     if(clean.length) CUSTOM_ZONES[aid]._custom = clean; else delete CUSTOM_ZONES[aid]._custom;
@@ -2753,7 +2760,7 @@ function openZoneEditor(){
     persistCustomZones(aid);
     // rafraîchir le builder seulement s'il est réellement ouvert (builderState posé)
     if(typeof renderBlocks==='function' && typeof builderState!=='undefined' && builderState && document.getElementById('bBlocks') && document.getElementById('bBlocks').children.length) renderBlocks();
-    toast('Zones de travail enregistrées');
+    toast(tr('toast.zonesTravailEnregistrees'));
     close();
   };
 }
@@ -2763,21 +2770,21 @@ function lineLabel(ln){
   if(ln.type==='station'){ const st=hyroxStation(ln.station)||HYROX_STATIONS[0]; return st.name; }
   const T=LINE_TYPES[ln.type];
   const amt = (ln.metric==='dist') ? `${ln.dist||0} m` : `${(ln.dur&&ln.dur.m)||0}'`;
-  return `${T?T.l:'Intervalle'} · ${amt}`;
+  return `${T?T.l:tr('lineType.interval')} · ${amt}`;
 }
 /* section "Consignes du coach par intervalle" : liste les intervalles porteurs
    d'une note. Additif — n'apparaît que si au moins un commentaire existe. */
 const OBJECTIF_META = {
-  endurance:{l:'Endurance fondamentale', ic:'ic-mountain',
-    why:"Construit ta base aérobie : plus de mitochondries, un cœur plus efficace, une meilleure utilisation des graisses. C'est le socle qui rend les séances dures payantes plus tard."},
-  seuil:{l:'Seuil', ic:'ic-zap',
-    why:"Repousse la vitesse/puissance que tu peux tenir longtemps sans t'effondrer — le levier le plus direct pour progresser sur les distances moyennes à longues."},
-  vo2:{l:'VMA / VO2max', ic:'ic-chart',
-    why:"Développe ta capacité aérobie maximale, ta « cylindrée ». Séance courte et intense : elle élève le plafond sur lequel tout le reste s'appuie."},
-  recup:{l:'Récupération', ic:'ic-moon',
-    why:"Laisse le corps encaisser la charge des jours précédents. Sauter ces séances n'accélère pas la progression, ça l'annule."},
-  hyrox:{l:'Hyrox', ic:'ic-dumbbell',
-    why:"Travaille la transition course/effort musculaire — le vrai facteur limitant en Hyrox, plus que chaque discipline isolée."}
+  endurance:{get l(){return tr('objectif.endurance.l')}, ic:'ic-mountain',
+    get why(){return tr('objectif.endurance.why')}},
+  seuil:{get l(){return tr('objectif.seuil.l')}, ic:'ic-zap',
+    get why(){return tr('objectif.seuil.why')}},
+  vo2:{get l(){return tr('objectif.vo2.l')}, ic:'ic-chart',
+    get why(){return tr('objectif.vo2.why')}},
+  recup:{get l(){return tr('objectif.recup.l')}, ic:'ic-moon',
+    get why(){return tr('objectif.recup.why')}},
+  hyrox:{get l(){return tr('objectif.hyrox.l')}, ic:'ic-dumbbell',
+    get why(){return tr('objectif.hyrox.why')}}
 };
 /* Note du coach sur CETTE séance (traçabilité d'un ajustement : décalage,
    allègement, changement de contenu…) — posée via le bouton 💬 de la carte,
@@ -2785,12 +2792,12 @@ const OBJECTIF_META = {
    pédagogique générique (sessionWhyHTML). */
 function sessionCoachNoteHTML(s){
   if(!s.coachNote) return '';
-  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> Note de ton coach sur cette séance</div><div class="sn-item"><div class="sn-txt">${dispoSafe(s.coachNote)}</div></div></div>`;
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('session.coachNoteOnSession')}</div><div class="sn-item"><div class="sn-txt">${dispoSafe(s.coachNote)}</div></div></div>`;
 }
 function sessionWhyHTML(s){
   const type = (s.objectif&&s.objectif.type) || sessionType(s);
   const m = OBJECTIF_META[type]; if(!m) return '';
-  return `<div class="sn-block"><div class="sn-head"><i class="ic ${m.ic}"></i> Pourquoi cette séance</div><div class="sn-item"><div class="sn-txt">${m.why}</div></div></div>`;
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ${m.ic}"></i> ${tr('session.whyThisSession')}</div><div class="sn-item"><div class="sn-txt">${m.why}</div></div></div>`;
 }
 function sessionNotesHTML(s){
   if(!s.blocksV2 || !s.blocksV2.blocks) return '';
@@ -2805,39 +2812,39 @@ function sessionNotesHTML(s){
     });
   });
   if(!items.length) return '';
-  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> Consignes du coach par intervalle</div>${items.join('')}</div>`;
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('session.coachInstructionsPerInterval')}</div>${items.join('')}</div>`;
 }
 
 function openModal(s){
   const D = DISC[s.disc];
   modal.style.setProperty('--c', D.color);
   modal.innerHTML = `
-    <button class="close" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <span class="badge">${discIcon(D)} ${D.label}</span>
     <h3>${s.title}</h3>
     <div class="grid">
-      <div class="cell"><div class="k">Durée</div><div class="v">${s.dur}'</div></div>
-      <div class="cell"><div class="k">Charge</div><div class="v">${s.tss} TSS</div></div>
-      <div class="cell"><div class="k">Intensité</div><div class="v">${s.zone}</div></div>
+      <div class="cell"><div class="k">${tr('modal.duration')}</div><div class="v">${s.dur}'</div></div>
+      <div class="cell"><div class="k">${tr('modal.load')}</div><div class="v">${s.tss} TSS</div></div>
+      <div class="cell"><div class="k">${tr('modal.intensity')}</div><div class="v">${s.zone}</div></div>
     </div>
-    <p class="desc">${s.desc||'Séance planifiée.'}</p>
+    <p class="desc">${s.desc||tr('modal.plannedSession')}</p>
     ${sessionCoachNoteHTML(s)}
     ${sessionWhyHTML(s)}
     ${sessionNotesHTML(s)}
     ${(()=>{ const n=nutritionForSession(s); return `
       <div class="nutri-block nutri-pre">
-        <div class="nutri-head"><i class="ic ic-utensils"></i> Avant la séance</div>
+        <div class="nutri-head"><i class="ic ic-utensils"></i> ${tr('modal.beforeSession')}</div>
         <div class="nutri-txt">${n.pre}</div>
-        ${n.during?`<div class="nutri-during">⏱ Pendant : ${n.during}</div>`:''}
+        ${n.during?`<div class="nutri-during">⏱ ${tr('modal.during')} ${n.during}</div>`:''}
       </div>`; })()}
-    ${s.done&&s.rpe?`<div class="fb-block"><div class="k">Feedback athlète</div>Cardio <b style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}/10</b>${s.rpeMuscle?` · Musculaire <b style="color:${rpeColor(s.rpeMuscle)}">${s.rpeMuscle}/10</b>`:''}${s.note?` — «&nbsp;${s.note}&nbsp;»`:''}</div>`:''}
+    ${s.done&&s.rpe?`<div class="fb-block"><div class="k">${tr('modal.athleteFeedback')}</div>${tr('modal.cardio')} <b style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}/10</b>${s.rpeMuscle?` · ${tr('modal.muscular')} <b style="color:${rpeColor(s.rpeMuscle)}">${s.rpeMuscle}/10</b>`:''}${s.note?` — «&nbsp;${s.note}&nbsp;»`:''}</div>`:''}
     ${(()=>{ const n=nutritionForSession(s); return `
       <div class="nutri-block nutri-post">
-        <div class="nutri-head"><i class="ic ic-utensils"></i> Après la séance · récupération</div>
+        <div class="nutri-head"><i class="ic ic-utensils"></i> ${tr('modal.afterSession')}</div>
         <div class="nutri-txt">${n.post}</div>
       </div>`; })()}
-    ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> Analyse détaillée de la séance</button>`:''}
-    <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?'Fermer':"C'est noté, coach"}</button>`;
+    ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> ${tr('modal.detailedAnalysis')}</button>`:''}
+    <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?tr('common.close'):tr('modal.gotItCoach')}</button>`;
   overlay.classList.add('open');
   modal.querySelector('.close').onclick = closeModal;
   modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis') btn.onclick = closeModal; });
@@ -2862,7 +2869,7 @@ function realRoleMode(){
 function guardModeSwitch(target){
   const real = realRoleMode();
   if(real && real!==target){
-    toast("Cette vue n'est pas disponible pour ton compte — contacte le support pour changer de rôle.");
+    toast(tr('mode.notAvailable'));
     return false;
   }
   return true;
@@ -2872,7 +2879,7 @@ window.__pf_lockModes = function(realMode){
   Object.entries(map).forEach(([k,btn])=>{
     const locked = k!==realMode;
     btn.classList.toggle('mode-locked', locked);
-    btn.title = locked ? "Réservé à un autre type de compte — contacte le support pour changer de rôle" : '';
+    btn.title = locked ? tr('mode.reservedOther') : '';
   });
   const target = map[realMode];
   if(target && !target.classList.contains('active')) target.click();
@@ -2908,7 +2915,7 @@ function mulberry(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let
 
 function apRowHtml(a, i){
   const forme = athForme(a), fc = athFormeColor(forme);
-  const sub = a.race ? `${a.race.name} · J–${a.race.days}` : 'Athlète suivi';
+  const sub = a.race ? `${a.race.name} · J–${a.race.days}` : tr('athPicker.trackedAthlete');
   const dk = athDispo(a);
   const dchip = dk && dk!=='ok' ? `<span class="ap-dispo" style="--fc:${DISPO_META[dk].c}"><i class="ic ${DISPO_META[dk].ic}"></i>${DISPO_META[dk].l}</span>` : '';
   return `<button class="ap-row ${i===selectedAthleteIdx?'sel':''}" data-idx="${i}" role="option" aria-selected="${i===selectedAthleteIdx}">
@@ -2925,7 +2932,7 @@ function openAdherence(){
     const forme=athForme(a);
     const comp = (a.comp!=null ? Math.round(a.comp*100) : null);
     const cc = comp==null?'var(--muted)': comp>=85?'var(--good)': comp>=60?'var(--bike)':'var(--run)';
-    const status = comp==null?'—': comp>=85?'À jour': comp>=60?'À surveiller':'Décroche';
+    const status = comp==null?'—': comp>=85?tr('adherence.upToDate'): comp>=60?tr('adherence.toWatch'):tr('adherence.fallingBehind');
     const race = a.race ? `${a.race.name} · J–${a.race.days}` : '—';
     const dk = athDispo(a); const dm = dk ? DISPO_META[dk] : null;
     const dcell = dm ? `<span class="adh-pill" style="color:${dm.c};border-color:${dm.c}" ${a.checkin.dispoNote?`title="${dispoSafe(a.checkin.dispoNote)}"`:''}>${dm.l}</span>${dk!=='ok'&&a.checkin.dispoNote?`<div style="font-size:10px;color:var(--muted);margin-top:3px;max-width:150px">${dispoSafe(a.checkin.dispoNote)}</div>`:''}` : '—';
@@ -2937,14 +2944,14 @@ function openAdherence(){
       <td>${race}</td>
       <td><span class="adh-pill" style="color:${cc};border-color:${cc}">${status}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Aucun athlète pour l'instant. Invite un athlète pour suivre son adhérence au plan ici.</td></tr>`;
+  }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('adherence.noAthleteYet')}</td></tr>`;
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=`<div class="adh-modal" role="dialog" aria-label="Suivi de mes athlètes">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Suivi de mes athlètes</h3>
-    <p class="adh-sub">Adhérence au plan (séances réalisées vs prévues), forme et disponibilité du jour, pour repérer d'un coup d'œil qui décroche ou qui est blessé.</p>
+  el.innerHTML=`<div class="adh-modal" role="dialog" aria-label="${tr('sidebar.myAthletesTracking')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('sidebar.myAthletesTracking')}</h3>
+    <p class="adh-sub">${tr('adherence.subtitle')}</p>
     <div class="adh-scroll"><table class="adh-tbl">
-      <thead><tr><th>Athlète</th><th>Forme</th><th>Dispo</th><th>Adhérence</th><th>Prochaine course</th><th>Statut</th></tr></thead>
+      <thead><tr><th>${tr('adherence.athlete')}</th><th>${tr('adherence.form')}</th><th>${tr('adherence.avail')}</th><th>${tr('adherence.adherence')}</th><th>${tr('adherence.nextRace')}</th><th>${tr('adherence.status')}</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
   </div>`;
@@ -2960,24 +2967,24 @@ function openAdherence(){
    app) ; démo = 3 lignes fictives pour montrer le rendu. */
 function openCoachInvoices(){
   const renderRows=(invoices)=> invoices.length ? invoices.map(inv=>`<tr>
-      <td>${new Date(inv.created).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td>${new Date(inv.created).toLocaleDateString(localeStr(),{day:'2-digit',month:'short',year:'numeric'})}</td>
       <td>${inv.athlete_name}</td>
       <td>${inv.offer_name}</td>
       <td>${inv.amount_paid.toFixed(2)} €</td>
       <td style="color:var(--muted)">${inv.fee_amount!=null ? inv.fee_amount.toFixed(2)+' €' : '~'+(inv.amount_paid*inv.fee_percent/100).toFixed(2)+' €'} <small>(${inv.fee_percent}%)</small></td>
       <td>${inv.invoice_pdf ? `<a href="${inv.invoice_pdf}" target="_blank" rel="noopener">PDF</a>` : '—'}</td>
-    </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Aucune facture pour l'instant. Dès qu'un athlète paie son suivi, la facture Stripe apparaît ici automatiquement.</td></tr>`;
-  const shell=(rowsHtml)=>`<div class="adh-modal" role="dialog" aria-label="Mes factures">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Mes factures</h3>
-    <p class="adh-sub">Factures générées automatiquement par Stripe à chaque paiement de tes athlètes — montant encaissé, part Sillance (frais de service et facturation), lien PDF.</p>
+    </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('invoices.noneYet')}</td></tr>`;
+  const shell=(rowsHtml)=>`<div class="adh-modal" role="dialog" aria-label="${tr('invoices.myInvoices')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('invoices.myInvoices')}</h3>
+    <p class="adh-sub">${tr('invoices.subtitle')}</p>
     <div class="adh-scroll"><table class="adh-tbl">
-      <thead><tr><th>Date</th><th>Athlète</th><th>Offre</th><th>Montant</th><th>Part Sillance</th><th>Facture</th></tr></thead>
+      <thead><tr><th>${tr('invoices.date')}</th><th>${tr('adherence.athlete')}</th><th>${tr('invoices.offer')}</th><th>${tr('invoices.amount')}</th><th>${tr('invoices.sillanceShare')}</th><th>${tr('invoices.invoice')}</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table></div>
   </div>`;
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Chargement…</td></tr>`);
+  el.innerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('common.loading')}</td></tr>`);
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('open'));
   const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
@@ -2991,7 +2998,7 @@ function openCoachInvoices(){
     PF.getCoachInvoices().then(({invoices})=>{
       el.querySelector('.adh-modal').outerHTML=shell(renderRows(invoices||[]));
       wire();
-    }).catch(e=>{ console.warn('[PF] coach-invoices:',e); el.querySelector('.adh-modal').outerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Factures indisponibles pour l'instant.</td></tr>`); wire(); });
+    }).catch(e=>{ console.warn('[PF] coach-invoices:',e); el.querySelector('.adh-modal').outerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('invoices.unavailable')}</td></tr>`); wire(); });
   } else {
     const demo=[0,1,2].map(i=>({
       created:new Date(Date.now()-i*30*86400000).toISOString(),
@@ -3010,13 +3017,13 @@ function openCoachInvoices(){
    Backend déjà en place (invite-athlete + accept-invite, token dans l'URL
    ?invite=...) — ceci est l'UI qui le déclenche, elle manquait totalement. */
 function openInviteAthlete(){
-  const formHTML=()=>`<div class="adh-modal" role="dialog" aria-label="Inviter un athlète">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Inviter un athlète</h3>
-    <p class="adh-sub">Entre son e-mail : Sillance lui envoie un lien (par e-mail si possible, sinon tu le partages toi-même par WhatsApp, SMS…). Il crée son compte ou se connecte, et vous êtes reliés automatiquement.</p>
+  const formHTML=()=>`<div class="adh-modal" role="dialog" aria-label="${tr('sidebar.inviteAthlete')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('sidebar.inviteAthlete')}</h3>
+    <p class="adh-sub">${tr('invite.subtitle')}</p>
     <div class="invite-linkrow">
       <input type="email" id="invAthEmail" placeholder="email@athlete.fr" autocomplete="email">
-      <button class="cc-btn" id="invAthSend">Envoyer l'invitation</button>
+      <button class="cc-btn" id="invAthSend">${tr('invite.send')}</button>
     </div>
     <div id="invAthResult"></div>
   </div>`;
@@ -3033,37 +3040,37 @@ function openInviteAthlete(){
   wireClose();
   const showResult=(inviteUrl, emailed, email)=>{
     const msg = emailed
-      ? `<div class="cc-s" style="color:#39e6a3;margin-bottom:8px"><i class="ic ic-check"></i> Email envoyé à ${email}. Garde ce lien de secours au cas où :</div>`
-      : `<div class="cc-s" style="margin-bottom:8px">Copie ce lien et envoie-le toi-même (WhatsApp, SMS…) :</div>`;
+      ? `<div class="cc-s" style="color:#39e6a3;margin-bottom:8px"><i class="ic ic-check"></i> ${tr('invite.emailSentTo', {email})}</div>`
+      : `<div class="cc-s" style="margin-bottom:8px">${tr('invite.copyLink')}</div>`;
     document.getElementById('invAthResult').innerHTML = `${msg}
       <div class="invite-linkrow"><input type="text" id="invAthLink" readonly value="${inviteUrl}"></div>
       <div class="invite-share">
-        <button class="invite-copy cc-btn" id="invAthCopy">Copier le lien</button>
+        <button class="invite-copy cc-btn" id="invAthCopy">${tr('invite.copyLinkBtn')}</button>
         <button class="invite-wa" id="invAthWa">WhatsApp</button>
       </div>
-      <p class="cr-note" style="margin-top:10px">Une fois qu'il aura rejoint, retrouve « Fiche athlète » dans son bandeau pour renseigner VO2max, records, blessures et habitudes.</p>`;
+      <p class="cr-note" style="margin-top:10px">${tr('invite.afterJoinNote')}</p>`;
     document.getElementById('invAthCopy').onclick=()=>{
       const inp=document.getElementById('invAthLink'); inp.select();
       try{ navigator.clipboard.writeText(inp.value); }catch(e){ document.execCommand && document.execCommand('copy'); }
-      toast('Lien copié');
+      toast(tr('toast.lienCopie'));
     };
     document.getElementById('invAthWa').onclick=()=>{
-      const msgWa=`Rejoins-moi sur Sillance pour ton suivi d'entraînement : ${inviteUrl}`;
+      const msgWa=tr('invite.waMessage', {url:inviteUrl});
       window.open(`https://wa.me/?text=${encodeURIComponent(msgWa)}`, '_blank');
     };
   };
   document.getElementById('invAthSend').onclick=async ()=>{
     const email=document.getElementById('invAthEmail').value.trim();
-    if(!email || !email.includes('@')){ toast('Entre un e-mail valide'); return; }
+    if(!email || !email.includes('@')){ toast(tr('toast.entreEMailValide')); return; }
     if(window.PF?.user){
       try{
         const {inviteUrl, emailed} = await PF.inviteAthlete(email);
         showResult(inviteUrl, emailed, email);
-      }catch(e){ console.warn('[PF] inviteAthlete:',e); toast('Invitation impossible pour le moment', 'error'); }
+      }catch(e){ console.warn('[PF] inviteAthlete:',e); toast(tr('toast.invitationImpossiblePourMoment'), 'error'); }
     } else {
       const demoUrl = `${location.origin}${location.pathname}?invite=demo-${Date.now()}`;
       showResult(demoUrl, false, email);
-      toast('Démo — connecte-toi pour envoyer une vraie invitation');
+      toast(tr('toast.demoConnecteToiPourEnvoyer'));
     }
   };
 }
@@ -3146,7 +3153,7 @@ function applyDemoAthlete(i){
    récentes et matériel dans un document A4 clair et brandé. */
 function exportBilan(name){
   try{
-    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'Athlète');
+    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:tr('bilan.athlete'));
     const ref = (typeof ATHLETE_REF!=='undefined')?ATHLETE_REF:{};
     const recs = (typeof RECORDS!=='undefined')?RECORDS:[];
     let gear=[]; try{ gear=(GEAR||[]).filter(g=>g.type==='shoe'); }catch(e){}
@@ -3160,17 +3167,18 @@ function exportBilan(name){
     const comp = tot?Math.round(done/tot*100):null;
     recent = recent.slice(-10);
     let race=null; try{ race=UPCOMING_RACES&&UPCOMING_RACES[0]; }catch(e){}
-    const REFL={ftp:['FTP','W'],pma:['PMA','W'],cpBike:['CP vélo','W'],vma:['VMA','km/h'],cv:['VC','km/h'],seuilRun:['Seuil','s/km'],css:['CSS','s/100m'],fcMax:['FC max','bpm'],fcRepos:['FC repos','bpm']};
+    const REFL={ftp:['FTP','W'],pma:[tr('refs.map'),'W'],cpBike:[tr('refs.bikeCp'),'W'],vma:[tr('refs.vVo2max'),'km/h'],cv:['CV','km/h'],seuilRun:[tr('refs.threshold'),'s/km'],css:['CSS','s/100m'],fcMax:[tr('refs.maxHr'),'bpm'],fcRepos:[tr('refs.restHr'),'bpm']};
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    const dfmt=d=>{ try{ return new Date(d).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } };
-    const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+    const dfmt=d=>{ try{ return new Date(d).toLocaleDateString(localeStr(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } };
+    const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const tsbCls = tsb==null?'':tsb>=5?'good':tsb>-15?'warn':'bad';
     const compCls = comp==null?'':comp>=85?'good':comp>=60?'warn':'bad';
     const refRows = Object.keys(REFL).filter(k=>ref[k]!=null&&ref[k]!=='').map(k=>`<div class="row"><span class="l">${REFL[k][0]}</span><span class="v">${esc(ref[k])} <em>${REFL[k][1]}</em></span></div>`).join('');
-    const recRows = recs.length?recs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v">${esc(r.v)}${r.isNew?' <span class="tag" style="background:#e6f7ef;color:#0a9b6a">RECORD</span>':''}</span></div>`).join(''):'<div class="row"><span class="l">Aucun record enregistré</span></div>';
-    const sessRows = recent.length?recent.map(({date,s})=>`<tr><td>${dfmt(date)}</td><td>${esc(s.title||s.disc||'Séance')}</td><td>${s.tss?esc(s.tss)+' TSS':'—'}</td><td>${s.done?(s.rpe?'RPE '+esc(s.rpe):'<i class="ic ic-check"></i> fait'):'à venir'}</td></tr>`).join(''):'<tr><td colspan="4">Aucune séance sur la période.</td></tr>';
+    const recRows = recs.length?recs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v">${esc(r.v)}${r.isNew?` <span class="tag" style="background:#e6f7ef;color:#0a9b6a">${tr('bilan.record')}</span>`:''}</span></div>`).join(''):`<div class="row"><span class="l">${tr('bilan.noRecord')}</span></div>`;
+    const sessRows = recent.length?recent.map(({date,s})=>`<tr><td>${dfmt(date)}</td><td>${esc(s.title||s.disc||tr('bilan.session'))}</td><td>${s.tss?esc(s.tss)+' TSS':'—'}</td><td>${s.done?(s.rpe?'RPE '+esc(s.rpe):`<i class="ic ic-check"></i> ${tr('bilan.done')}`):tr('bilan.upcoming')}</td></tr>`).join(''):`<tr><td colspan="4">${tr('bilan.noSessionPeriod')}</td></tr>`;
     const gearRows = gear.length?gear.map(g=>{const p=g.max?Math.round(g.km/g.max*100):0;const c=p>=100?'bad':p>=85?'warn':'good';return `<div class="row"><span class="l">${esc(g.name)}</span><span class="v ${c}">${esc(g.km)} / ${esc(g.max||'?')} km · ${p}%</span></div>`;}).join(''):'';
-    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bilan — ${esc(name)}</title><style>
+    const lg=(window.SilI18n?SilI18n.getLang():'fr');
+    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.title')} — ${esc(name)}</title><style>
 @page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
 .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
@@ -3188,31 +3196,31 @@ table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{text-align:left
 .foot{margin-top:20px;border-top:1px solid #d8dfec;padding-top:9px;font-size:10px;color:#8593ad;display:flex;justify-content:space-between}
 .note{font-size:10px;color:#8593ad;margin-top:3px}
 </style></head><body>
-<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">Bilan d'entraînement<br>${today}</div></div>
+<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">${tr('bilan.title')}<br>${today}</div></div>
 <h1>${esc(name)}</h1>
-<div class="sub">${race?('Objectif : '+esc(race.name)+' · J–'+esc(race.inDays!=null?race.inDays:race.days)):'Suivi d\'entraînement'}</div>
+<div class="sub">${race?(tr('bilan.goal')+' : '+esc(race.name)+' · J–'+esc(race.inDays!=null?race.inDays:race.days)):tr('bilan.training')}</div>
 <div class="kpis">
-  <div class="kpi"><div class="v ${tsbCls}">${tsb==null?'—':(tsb>0?'+':'')+tsb}</div><div class="k">Forme (TSB)</div></div>
-  <div class="kpi"><div class="v">${ctl==null?'—':ctl}</div><div class="k">Fitness (CTL)</div></div>
-  <div class="kpi"><div class="v">${atl==null?'—':atl}</div><div class="k">Fatigue (ATL)</div></div>
-  <div class="kpi"><div class="v ${compCls}">${comp==null?'—':comp+'%'}</div><div class="k">Réalisé (semaine)</div></div>
+  <div class="kpi"><div class="v ${tsbCls}">${tsb==null?'—':(tsb>0?'+':'')+tsb}</div><div class="k">${tr('bilan.form')}</div></div>
+  <div class="kpi"><div class="v">${ctl==null?'—':ctl}</div><div class="k">${tr('bilan.fitness')}</div></div>
+  <div class="kpi"><div class="v">${atl==null?'—':atl}</div><div class="k">${tr('bilan.fatigue')}</div></div>
+  <div class="kpi"><div class="v ${compCls}">${comp==null?'—':comp+'%'}</div><div class="k">${tr('bilan.doneWeek')}</div></div>
 </div>
-<div class="note">Semaine en cours : ${done}/${tot} séance${tot>1?'s':''} réalisée${done>1?'s':''} · ${wtss} TSS planifiés.</div>
+<div class="note">${tr('bilan.currentWeek', {done, tot, wtss})}</div>
 <div class="cols">
-  <div><h2>Records personnels</h2>${recRows}</div>
-  <div><h2>Références physio</h2><div>${refRows||'<div class="row"><span class="l">Non renseignées</span></div>'}</div></div>
+  <div><h2>${tr('records.title')}</h2>${recRows}</div>
+  <div><h2>${tr('refs.title')}</h2><div>${refRows||`<div class="row"><span class="l">${tr('bilan.notEntered')}</span></div>`}</div></div>
 </div>
-<h2>Séances récentes</h2>
-<table><thead><tr><th>Date</th><th>Séance</th><th>Charge</th><th>Statut</th></tr></thead><tbody>${sessRows}</tbody></table>
-${gearRows?('<h2>Matériel — usure</h2>'+gearRows):''}
-<div class="foot"><span>Généré par Sillance — ${today}</span><span>sillance.app</span></div>
+<h2>${tr('bilan.recentSessions')}</h2>
+<table><thead><tr><th>${tr('invoices.date')}</th><th>${tr('bilan.session')}</th><th>${tr('modal.load')}</th><th>${tr('adherence.status')}</th></tr></thead><tbody>${sessRows}</tbody></table>
+${gearRows?(`<h2>${tr('bilan.gearWear')}</h2>`+gearRows):''}
+<div class="foot"><span>${tr('bilan.generatedBy')} — ${today}</span><span>sillance.app</span></div>
 </body></html>`;
     const w=window.open('','_blank');
-    if(!w){ if(typeof toast==='function') toast('Autorise les pop-ups pour exporter le bilan'); return; }
+    if(!w){ if(typeof toast==='function') toast(tr('toast.autorisePopUpsPourExporter')); return; }
     w.document.write(html); w.document.close();
     const go=()=>{ try{ w.focus(); w.print(); }catch(e){} };
     if(w.document.readyState==='complete') setTimeout(go,300); else w.onload=()=>setTimeout(go,300);
-  }catch(e){ console.error('exportBilan',e); if(typeof toast==='function') toast('Export du bilan indisponible', 'error'); }
+  }catch(e){ console.error('exportBilan',e); if(typeof toast==='function') toast(tr('toast.exportBilanIndisponible'), 'error'); }
 }
 
 /* Fiche de progression partageable ("case study") : ce que le coach peut
@@ -3223,8 +3231,8 @@ ${gearRows?('<h2>Matériel — usure</h2>'+gearRows):''}
    adhérence, + une citation courte que le coach écrit lui-même. */
 function exportCaseStudy(name){
   try{
-    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'Cet athlète');
-    const coachName = (window.PF?.profile?.full_name) || 'Ton coach Sillance';
+    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:tr('bilan.thisAthlete'));
+    const coachName = (window.PF?.profile?.full_name) || tr('bilan.yourCoach');
     const recs = (typeof RECORDS!=='undefined')?RECORDS:[];
     const newRecs = recs.filter(r=>r.isNew);
     const weeks = (typeof buildLoadWeeks==='function') ? buildLoadWeeks() : [];
@@ -3234,11 +3242,12 @@ function exportCaseStudy(name){
     let done=0, tot=0;
     for(let i=0;i<84;i++){ const d=iso(addDays(new Date(),-i)); (planning[d]||[]).forEach(s=>{ tot++; if(s.done) done++; }); }
     const adherence = tot ? Math.round(done/tot*100) : null;
-    const quote = (prompt("Un mot sur ce cycle avec "+name+" (optionnel, apparaît sur la fiche) :", "") || '').trim();
+    const quote = (prompt(tr('bilan.quotePrompt', {name}), "") || '').trim();
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+    const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const recRows = newRecs.length ? newRecs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v acc">${esc(r.v)}</span></div>`).join('') : '';
-    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Progression — ${esc(name)}</title><style>
+    const lg=(window.SilI18n?SilI18n.getLang():'fr');
+    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.progressTitle')} — ${esc(name)}</title><style>
 @page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
 .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
@@ -3256,25 +3265,25 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#0B1120;bo
 .quote{font-size:14px;font-style:italic;color:#0B1120;border-left:3px solid #0F9FBF;padding:4px 0 4px 14px;margin-top:16px}
 .foot{margin-top:22px;border-top:1px solid #d8dfec;padding-top:9px;font-size:10px;color:#8593ad;display:flex;justify-content:space-between}
 </style></head><body>
-<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">Fiche de progression<br>${today}</div></div>
-<div class="kicker">Coaching par ${esc(coachName)}</div>
+<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">${tr('bilan.progressTitle')}<br>${today}</div></div>
+<div class="kicker">${tr('bilan.coachingBy', {coachName:esc(coachName)})}</div>
 <h1>${esc(name)}</h1>
-${ctlDeltaPct!=null ? `<div class="hero"><div class="v">${ctlDeltaPct>0?'+':''}${ctlDeltaPct}%</div><div class="k">de charge d'entraînement absorbée en 12 semaines</div></div>` : ''}
+${ctlDeltaPct!=null ? `<div class="hero"><div class="v">${ctlDeltaPct>0?'+':''}${ctlDeltaPct}%</div><div class="k">${tr('bilan.loadAbsorbed12w')}</div></div>` : ''}
 <div class="kpis">
-  <div class="kpi"><div class="v acc">${newRecs.length}</div><div class="k">Record${newRecs.length>1?'s':''} amélioré${newRecs.length>1?'s':''}</div></div>
-  <div class="kpi"><div class="v">${adherence==null?'—':adherence+'%'}</div><div class="k">Adhérence au plan</div></div>
-  <div class="kpi"><div class="v">${now?now.ctl:'—'}</div><div class="k">Fitness (CTL) actuelle</div></div>
+  <div class="kpi"><div class="v acc">${newRecs.length}</div><div class="k">${tr(newRecs.length>1?'bilan.recordsImprovedPlural':'bilan.recordsImprovedSingular', {n:newRecs.length})}</div></div>
+  <div class="kpi"><div class="v">${adherence==null?'—':adherence+'%'}</div><div class="k">${tr('bilan.planAdherence')}</div></div>
+  <div class="kpi"><div class="v">${now?now.ctl:'—'}</div><div class="k">${tr('bilan.currentFitness')}</div></div>
 </div>
-${recRows?(`<h2>Records battus sur la période</h2>${recRows}`):''}
+${recRows?(`<h2>${tr('bilan.recordsBeaten')}</h2>${recRows}`):''}
 ${quote?(`<div class="quote">« ${esc(quote)} »<br><span style="font-style:normal;font-size:11px;color:#5a6a86">— ${esc(coachName)}</span></div>`):''}
-<div class="foot"><span>Généré par Sillance — ${today}</span><span>sillance.app</span></div>
+<div class="foot"><span>${tr('bilan.generatedBy')} — ${today}</span><span>sillance.app</span></div>
 </body></html>`;
     const w=window.open('','_blank');
-    if(!w){ if(typeof toast==='function') toast('Autorise les pop-ups pour exporter la fiche'); return; }
+    if(!w){ if(typeof toast==='function') toast(tr('toast.autorisePopUpsPourExporter2')); return; }
     w.document.write(html); w.document.close();
     const go=()=>{ try{ w.focus(); w.print(); }catch(e){} };
     if(w.document.readyState==='complete') setTimeout(go,300); else w.onload=()=>setTimeout(go,300);
-  }catch(e){ console.error('exportCaseStudy',e); if(typeof toast==='function') toast('Export indisponible', 'error'); }
+  }catch(e){ console.error('exportCaseStudy',e); if(typeof toast==='function') toast(tr('toast.exportIndisponible'), 'error'); }
 }
 
 function renderCoachBand(){
@@ -3293,9 +3302,9 @@ function renderCoachBand(){
   const compPct = tot ? Math.round(done/tot*100) : null;
   const flags = [];
   worn.slice(0,2).forEach(g=>{ const p=Math.round(g.km/g.max*100);
-    flags.push(`<span class="cb-flag ${p>=100?'danger':'warn'}"><i class="ic ic-shoe"></i>${g.name} · ${p}% d'usure</span>`); });
-  if(a.race && a.race.days<=14) flags.push(`<span class="cb-flag warn"><i class="ic ic-flag"></i>Course dans ${a.race.days} j — pense à l'affûtage</span>`);
-  if(compPct!=null && compPct<60) flags.push(`<span class="cb-flag danger"><i class="ic ic-alert-triangle"></i>Réalisé faible : ${compPct}% cette semaine</span>`);
+    flags.push(`<span class="cb-flag ${p>=100?'danger':'warn'}"><i class="ic ic-shoe"></i>${tr('coachBand.wearPct', {name:g.name, p})}</span>`); });
+  if(a.race && a.race.days<=14) flags.push(`<span class="cb-flag warn"><i class="ic ic-flag"></i>${tr('coachBand.raceInDays', {days:a.race.days})}</span>`);
+  if(compPct!=null && compPct<60) flags.push(`<span class="cb-flag danger"><i class="ic ic-alert-triangle"></i>${tr('coachBand.lowCompletion', {pct:compPct})}</span>`);
   const dk = athDispo(a);
   if(dk && dk!=='ok'){
     const d = DISPO_META[dk];
@@ -3308,27 +3317,27 @@ function renderCoachBand(){
   const cp = athCycle(a);
   if(cp && (cp==='menstrual' || cp==='luteal' || cp==='ovulation')){
     const cm = CYCLE_META[cp];
-    flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>Cycle · ${cm.l} — ${cm.tip}</span>`);
+    flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>${tr('coachBand.cycle')} · ${cm.l} — ${cm.tip}</span>`);
   }
   if(a.refsUpdatedAt){
     const refsAge = Math.floor((Date.now()-new Date(a.refsUpdatedAt).getTime())/86400000);
-    if(refsAge>=90) flags.push(`<span class="cb-flag warn"><i class="ic ic-target"></i>Références physio non retestées depuis ${refsAge} j</span>`);
+    if(refsAge>=90) flags.push(`<span class="cb-flag warn"><i class="ic ic-target"></i>${tr('coachBand.refsNotRetested', {days:refsAge})}</span>`);
   }
-  if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>Rien à signaler</span>`);
+  if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>${tr('coachBand.nothingToReport')}</span>`);
   const ck = a.checkin;
   band.style.setProperty('--cbc', a.color);
   band.innerHTML = `
     <div class="cb-id">
       <span class="cb-av">${a.ini}</span>
       <div>
-        <div class="cb-kicker">Athlète suivi</div>
+        <div class="cb-kicker">${tr('athPicker.trackedAthlete')}</div>
         <div class="cb-name">${a.name}</div>
         ${a.race?`<div class="cb-race"><i class="ic ic-flag"></i>${a.race.name} <b>J–${a.race.days}</b></div>`:''}
-        <button class="cb-bilan" id="bilanBtn" title="Exporter le bilan de l'athlète en PDF"><i class="ic ic-download"></i> Bilan PDF</button>
-        <button class="cb-bilan" id="caseStudyBtn" title="Fiche de progression partageable (records, charge, adhérence)"><i class="ic ic-sparkles"></i> Étude de cas</button>
-        ${a.race?`<button class="cb-bilan" id="shareSpecBtn" title="Lien à partager avec les proches pour cette course"><i class="ic ic-link"></i> Partager la course</button>`:''}
-        <button class="cb-bilan" id="zonesBtn" title="Personnaliser les zones de travail de l'athlète"><i class="ic ic-target"></i> Zones</button>
-        <button class="cb-bilan" id="profileBtn" title="VO2max, parcours, records, blessures, habitudes"><i class="ic ic-user"></i> Fiche athlète</button>
+        <button class="cb-bilan" id="bilanBtn" title="${tr('coachBand.exportBilanPdf')}"><i class="ic ic-download"></i> ${tr('coachBand.bilanPdf')}</button>
+        <button class="cb-bilan" id="caseStudyBtn" title="${tr('coachBand.caseStudyTitle')}"><i class="ic ic-sparkles"></i> ${tr('coachBand.caseStudy')}</button>
+        ${a.race?`<button class="cb-bilan" id="shareSpecBtn" title="${tr('coachBand.shareRaceLinkTitle')}"><i class="ic ic-link"></i> ${tr('coachBand.shareRace')}</button>`:''}
+        <button class="cb-bilan" id="zonesBtn" title="${tr('coachBand.customizeZonesTitle')}"><i class="ic ic-target"></i> ${tr('coachBand.zones')}</button>
+        <button class="cb-bilan" id="profileBtn" title="${tr('coachBand.athleteProfileTitle')}"><i class="ic ic-user"></i> ${tr('coachBand.athleteProfile')}</button>
       </div>
     </div>
     <div class="cb-forme">
@@ -3341,8 +3350,8 @@ function renderCoachBand(){
         <span class="pct" style="color:${fc}">${forme==null?'—':forme+'%'}</span>
       </div>
       <div class="cb-fdetail">
-        <div class="cb-kicker">Check-in de ce matin</div>
-        <div class="cb-note" style="color:${fc}">${forme==null?'Pas encore de check-in':athNote(forme)}</div>
+        <div class="cb-kicker">${tr('coachBand.thisMorningCheckin')}</div>
+        <div class="cb-note" style="color:${fc}">${forme==null?tr('coachBand.noCheckinYet'):athNote(forme)}</div>
         ${ck?`<div class="cb-checkin">
           <span><i class="ic ic-moon"></i>${ck.sommeil}/10</span>
           <span><i class="ic ic-battery"></i>${ck.fatigue}/10</span>
@@ -3365,15 +3374,15 @@ let profileAthId = null;
 function profRowHTML(kind, i, a, b){
   if(kind==='record'){
     return `<div class="prof-row" data-i="${i}">
-      <input type="text" placeholder="Ex. 10 km" data-f="d" value="${dispoSafe(a||'')}">
-      <input type="text" placeholder="Ex. 38:20" data-f="v" value="${dispoSafe(b||'')}">
-      <button class="prof-row-del" type="button" data-act="delrow" title="Supprimer"><i class="ic ic-x"></i></button>
+      <input type="text" placeholder="${tr('profile.eg10km')}" data-f="d" value="${dispoSafe(a||'')}">
+      <input type="text" placeholder="${tr('profile.eg3820')}" data-f="v" value="${dispoSafe(b||'')}">
+      <button class="prof-row-del" type="button" data-act="delrow" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
     </div>`;
   }
   return `<div class="prof-row" data-i="${i}">
     <input type="date" data-f="date" value="${a||''}" style="flex:0 0 150px">
-    <input type="text" placeholder="Ex. Tendinite rotulienne genou droit" data-f="desc" value="${dispoSafe(b||'')}">
-    <button class="prof-row-del" type="button" data-act="delrow" title="Supprimer"><i class="ic ic-x"></i></button>
+    <input type="text" placeholder="${tr('profile.egInjury')}" data-f="desc" value="${dispoSafe(b||'')}">
+    <button class="prof-row-del" type="button" data-act="delrow" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
   </div>`;
 }
 function wireProfRows(boxId, list, rerender){
@@ -3382,16 +3391,16 @@ function wireProfRows(boxId, list, rerender){
   });
 }
 function renderProfRecords(list){
-  document.getElementById('profRecords').innerHTML = list.map((r,i)=>profRowHTML('record',i,r.d,r.v)).join('') || '<p class="club-hint">Aucun record renseigné.</p>';
+  document.getElementById('profRecords').innerHTML = list.map((r,i)=>profRowHTML('record',i,r.d,r.v)).join('') || `<p class="club-hint">${tr('profile.noRecordEntered')}</p>`;
   wireProfRows('profRecords', list, renderProfRecords);
 }
 function renderProfInjuries(list){
-  document.getElementById('profInjuries').innerHTML = list.map((r,i)=>profRowHTML('injury',i,r.date,r.desc)).join('') || '<p class="club-hint">Aucune blessure renseignée.</p>';
+  document.getElementById('profInjuries').innerHTML = list.map((r,i)=>profRowHTML('injury',i,r.date,r.desc)).join('') || `<p class="club-hint">${tr('profile.noInjuryEntered')}</p>`;
   wireProfRows('profInjuries', list, renderProfInjuries);
 }
 function renderProfDebriefs(aid){
   const el = document.getElementById('profDebriefs'); if(!el) return;
-  el.innerHTML = debriefsBlockHTML(debriefsFor(aid), "Aucun débrief renseigné par l'athlète pour l'instant.");
+  el.innerHTML = debriefsBlockHTML(debriefsFor(aid), tr('profile.noDebriefFromAthlete'));
 }
 function renderProfCoTeam(aid){
   const el = document.getElementById('profCoTeam'); if(!el) return;
@@ -3432,7 +3441,7 @@ function openDebrief(){
 function saveDebrief(){
   const race = document.getElementById('dbRace').value.trim();
   const date = document.getElementById('dbDate').value;
-  if(!race || !date){ toast('Renseigne au moins le nom de la course et la date'); return; }
+  if(!race || !date){ toast(tr('toast.renseigneMoinsNomCourseEt')); return; }
   const d = { race, date,
     result: document.getElementById('dbResult').value.trim(),
     felt: document.getElementById('dbFelt').value.trim(),
@@ -3451,7 +3460,7 @@ function saveDebrief(){
   }
   document.getElementById('debriefOverlay').classList.remove('open');
   renderSidebar();
-  toast('Débrief enregistré');
+  toast(tr('toast.debriefEnregistre'));
 }
 (function initDebrief(){
   const ov=document.getElementById('debriefOverlay'); if(!ov) return;
@@ -3464,7 +3473,7 @@ function saveDebrief(){
 let spectatorTargetAthleteId = null;
 function openSpectatorShare(athleteId){
   const race = currentRace();
-  if(!race){ toast("Aucune course à venir enregistrée pour l'instant"); return; }
+  if(!race){ toast(tr('spectator.noUpcomingRace')); return; }
   spectatorTargetAthleteId = athleteId;
   document.getElementById('specRaceName').textContent = race.name;
   document.getElementById('specNotes').value = '';
@@ -3476,7 +3485,7 @@ async function generateSpectatorLink(){
   const notes = document.getElementById('specNotes').value.trim();
   const resEl = document.getElementById('specLinkResult');
   if(!window.PF?.user){
-    resEl.innerHTML = `<p class="club-hint">Disponible une fois connecté (démo non persistée).</p>`;
+    resEl.innerHTML = `<p class="club-hint">${tr('spectator.availableOnceConnected')}</p>`;
     return;
   }
   try{
@@ -3484,10 +3493,10 @@ async function generateSpectatorLink(){
     const base = location.href.replace(/[^/]*$/, '');
     const url = `${base}spectateur.html?token=${row.token}`;
     resEl.innerHTML = `<input type="text" readonly value="${url}" id="specUrl" style="width:100%;box-sizing:border-box;margin-bottom:6px">
-      <button class="btn btn-secondary" id="specCopy" type="button" style="width:100%">Copier le lien</button>`;
+      <button class="btn btn-secondary" id="specCopy" type="button" style="width:100%">${tr('invite.copyLinkBtn')}</button>`;
     document.getElementById('specUrl').onclick = function(){ this.select(); };
-    document.getElementById('specCopy').onclick = ()=>{ navigator.clipboard.writeText(url).then(()=> toast('Lien copié')); };
-  }catch(e){ console.warn('[PF] getOrCreateSpectatorLink :', e); resEl.innerHTML = `<p class="club-hint">Lien indisponible pour le moment.</p>`; }
+    document.getElementById('specCopy').onclick = ()=>{ navigator.clipboard.writeText(url).then(()=> toast(tr('toast.lienCopie'))); };
+  }catch(e){ console.warn('[PF] getOrCreateSpectatorLink :', e); resEl.innerHTML = `<p class="club-hint">${tr('spectator.linkUnavailable')}</p>`; }
 }
 (function initSpectator(){
   const ov=document.getElementById('spectatorOverlay'); if(!ov) return;
@@ -3513,7 +3522,7 @@ function saveAthleteProfile(){
     desc: row.querySelector('[data-f="desc"]').value.trim()
   })).filter(r=>r.date || r.desc);
   document.getElementById('profileOverlay').classList.remove('open');
-  toast(`Fiche mise à jour pour ${a?a.name:'l\'athlète'}`);
+  toast(tr('profile.updatedFor', {name:a?a.name:tr('bilan.thisAthlete')}));
 }
 (function initAthleteProfile(){
   const ov=document.getElementById('profileOverlay'); if(!ov) return;
@@ -3561,10 +3570,10 @@ function updateVideolibVisibility(){
   document.querySelectorAll('.ath-tab').forEach(b=> b.classList.toggle('active', b.dataset.tab===athView));
   // Matériel : côté coach, c'est celui que l'athlète a renseigné (lecture seule)
   const gt=document.getElementById('gearTitle'), gs=document.getElementById('gearSub');
-  if(gt) gt.innerHTML = mode==='coach' ? 'Matériel <span>de l\'athlète</span>' : 'Mon <span>matériel</span>';
+  if(gt) gt.innerHTML = mode==='coach' ? tr('gear.titleCoach') : tr('gear.titleAthlete');
   if(gs) gs.textContent = mode==='coach'
-    ? 'Le matériel que l\'athlète a renseigné dans son espace — surveille l\'usure avant de planifier de l\'intensité.'
-    : 'Suis le kilométrage de tes chaussures et de tes vélos. Chaque modèle du catalogue a sa propre durée de vie estimée : tu es alerté avant que l\'amorti ne se dégrade.';
+    ? tr('gear.subCoach')
+    : tr('gear.subAthlete');
 }
 // branchement des onglets
 document.querySelectorAll('.ath-tab').forEach(b=>{
@@ -3582,7 +3591,7 @@ document.querySelectorAll('.ath-tab').forEach(b=>{
   function apply(light){
     document.body.classList.toggle('light', light);
     if(icon) icon.innerHTML = light ? '<i class="ic ic-sun"></i>' : '<i class="ic ic-moon"></i>';
-    if(btn) btn.title = light ? 'Passer en mode sombre' : 'Passer en mode clair';
+    if(btn) btn.title = light ? tr('theme.switchDark') : tr('theme.switchLight');
     if(typeof rebuildCharts==='function') setTimeout(rebuildCharts, 0);
   }
   // Thème auto selon l'heure : mode jour (clair) de 7h00 à 18h59, mode nuit (sombre) de 19h00 à 6h59.
@@ -3621,7 +3630,7 @@ let CLUB_GROUPS = [
   {id:'g6', name:'Cyclisme Compétition', color:'#FF8A3D', desc:'Cyclisme sur route, groupe compétition'}
 ];
 function clubGroup(id){ return CLUB_GROUPS.find(g=>g.id===id); }
-const CLUB_DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const CLUB_DAYS = [tr('day.mon'),tr('day.tue'),tr('day.wed'),tr('day.thu'),tr('day.fri'),tr('day.sat'),tr('day.sun')];
 let CRENEAUX = [
   {id:'c1', disc:'run', title:'Séance piste collective', day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7']},
   {id:'c2', disc:'swim', title:'Technique natation', day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6']},
@@ -3641,17 +3650,17 @@ const DEMO_NAMES = ['Antoine Roche','Julie Vasseur','Nadia Lefort','Paul Chevali
 let demoNameIdx = 0;
 
 function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
-const CLUB_DISC_LABEL = {tri:'Tri', run:'Course', swim:'Natation', bike:'Vélo'};
+const CLUB_DISC_LABEL = {get tri(){return tr('clubDisc.tri')}, get run(){return tr('clubDisc.run')}, get swim(){return tr('clubDisc.swim')}, get bike(){return tr('clubDisc.bike')}};
 
 function renderClubStats(){
   const el = document.getElementById('clubStats'); if(!el) return; // bandeau retiré : no-op
   const totalSpots = CRENEAUX.reduce((a,c)=>a+c.attendees.length,0);
   const paid = CRENEAUX.filter(c=>c.price>0).length;
   el.innerHTML = [
-    {v:CLUB_ATHLETES.length, k:'athlètes'},
-    {v:CRENEAUX.length, k:'créneaux'},
-    {v:totalSpots, k:'inscriptions'},
-    {v:paid, k:'à la carte'}
+    {v:CLUB_ATHLETES.length, k:tr('club.athletes')},
+    {v:CRENEAUX.length, k:tr('club.slots')},
+    {v:totalSpots, k:tr('club.registrations')},
+    {v:paid, k:tr('club.aLaCarte')}
   ].map(s=>`<div class="club-stat"><div class="v">${s.v}</div><div class="k">${s.k}</div></div>`).join('');
 }
 
@@ -3660,32 +3669,32 @@ function renderClubStats(){
    (ops + argent, zéro analyse : la data reste côté coach)
    =========================================================== */
 const CLUB_OFFERS = [
-  {id:'sub', name:'Abonnement club', price:59, unit:'/ mois', feature:false,
-   pitch:'Toutes les séances collectives incluses.',
-   inc:['Créneaux collectifs illimités','Réservation prioritaire','Suivi des présences'],
-   who:'Le cœur du club — le volume.'},
-  {id:'coach', name:'Coaching +', price:119, unit:'/ mois', feature:true,
-   pitch:'Abonnement + un coach qui lit tes données et adapte tes séances.',
-   inc:["Tout l'abonnement club",'Coach dédié + plan perso','Check-in du matin → séance ajustée','Analyse montre (Garmin / Coros / .FIT)'],
-   who:'Athlètes engagés, prépa course ou triathlon compétition.'}
+  {id:'sub', get name(){return tr('clubOffer.sub.name')}, price:59, unit:'/ mois', feature:false,
+   get pitch(){return tr('clubOffer.sub.pitch')},
+   get inc(){return [tr('clubOffer.sub.inc1'),tr('clubOffer.sub.inc2'),tr('clubOffer.sub.inc3')]},
+   get who(){return tr('clubOffer.sub.who')}},
+  {id:'coach', get name(){return tr('clubOffer.coach.name')}, price:119, unit:'/ mois', feature:true,
+   get pitch(){return tr('clubOffer.coach.pitch')},
+   get inc(){return [tr('clubOffer.coach.inc1'),tr('clubOffer.coach.inc2'),tr('clubOffer.coach.inc3'),tr('clubOffer.coach.inc4')]},
+   get who(){return tr('clubOffer.coach.who')}}
 ];
 const clubOffer = id => CLUB_OFFERS.find(o=>o.id===id) || CLUB_OFFERS[0];
-const COACH_OFFER = { name:'Suivi coaching', price:99 };
+const COACH_OFFER = { get name(){return tr('coachOffer.name')}, price:99 };
 
 /* Abonnement Sillance du COACH (SaaS pour utiliser l'app) : 3 paliers selon
    le nombre d'athlètes coachés, auto-déclarés (pas de compteur bloquant). */
 const COACH_TIERS = [
-  {id:1, name:'1 à 10 athlètes',  price:19},
-  {id:2, name:'11 à 30 athlètes', price:29},
-  {id:3, name:'31+ athlètes',     price:49},
+  {id:1, get name(){return tr('coachTier.t1')},  price:19},
+  {id:2, get name(){return tr('coachTier.t2')}, price:29},
+  {id:3, get name(){return tr('coachTier.t3')},     price:49},
 ];
 let selectedCoachTier = (ROSTER && ROSTER.length > 30) ? 3 : (ROSTER && ROSTER.length > 10) ? 2 : 1;
 function coachTiersHTML(){
   return `<div class="csub-tiers">
     ${COACH_TIERS.map(t=>`<div class="csub-tier ${t.id===selectedCoachTier?'cur':''}" data-tier="${t.id}" role="button" tabindex="0">
-      ${t.id===selectedCoachTier?'<span class="csub-badge">Sélectionné</span>':''}
+      ${t.id===selectedCoachTier?`<span class="csub-badge">${tr('tier.selected')}</span>`:''}
       <div class="csub-name">${t.name}</div>
-      <div class="csub-price">${t.price} €<small>/mois</small></div>
+      <div class="csub-price">${t.price} €<small>/${tr('sidebar.perMonth')}</small></div>
     </div>`).join('')}
   </div>`;
 }
@@ -3701,9 +3710,9 @@ function wireCoachTiers(root){
    Facturation à la saison, par virement (pas de carte) → cette carte est
    informative + retient la formule ; l'encaissement réel se fait hors app. */
 const CLUB_TIERS = [
-  {id:'club',  name:'Club',          cap:"jusqu'à 50 athlètes",  max:50,       price:600,  perM:'0,99 €'},
-  {id:'grand', name:'Grand club',    cap:"jusqu'à 150 athlètes", max:150,      price:1350, perM:'0,75 €'},
-  {id:'illim', name:'Club illimité', cap:'athlètes illimités',   max:Infinity, price:1800, perM:'0,50 €'}
+  {id:'club',  get name(){return tr('clubTier.club.name')},          get cap(){return tr('clubTier.club.cap')},  max:50,       price:600,  perM:'0,99 €'},
+  {id:'grand', get name(){return tr('clubTier.grand.name')},    get cap(){return tr('clubTier.grand.cap')}, max:150,      price:1350, perM:'0,75 €'},
+  {id:'illim', get name(){return tr('clubTier.illim.name')}, get cap(){return tr('clubTier.illim.cap')},   max:Infinity, price:1800, perM:'0,50 €'}
 ];
 let clubFounder = true; // démo : on présente le tarif « club fondateur » (−50 %)
 function clubActivated(){ return CLUB_ATHLETES.filter(a=>a.group).length; }
@@ -3716,32 +3725,32 @@ function clubSillanceCardHTML(){
   <div class="csub">
     <div class="csub-head">
       <div>
-        <div class="csub-t"><i class="ic ic-star"></i> Abonnement Sillance</div>
-        <div class="csub-s">Ce que le club paie pour la plateforme — distinct de ce que tu factures à tes adhérents ci-dessous.</div>
+        <div class="csub-t"><i class="ic ic-star"></i> ${tr('sidebar.sillanceSub')}</div>
+        <div class="csub-s">${tr('clubSub.subtitle')}</div>
       </div>
-      <label class="csub-toggle"><input type="checkbox" id="clubFounderTgl" ${clubFounder?'checked':''}> Tarif club fondateur <b>−50 %</b></label>
+      <label class="csub-toggle"><input type="checkbox" id="clubFounderTgl" ${clubFounder?'checked':''}> ${tr('clubSub.founderRate')} <b>−50 %</b></label>
     </div>
     <div class="csub-body">
       <div class="csub-count">
         <div class="csub-n">${n}</div>
-        <div class="csub-nl">athlètes activés<span>placés dans un groupe</span></div>
+        <div class="csub-nl">${tr('clubSub.activatedAthletes')}<span>${tr('clubSub.placedInGroup')}</span></div>
       </div>
       <div class="csub-tiers">
         ${CLUB_TIERS.map(t=>{
           const cur=t.id===tier.id, fnd=Math.round(t.price/2);
           return `<div class="csub-tier ${cur?'cur':''}">
-            ${cur?'<span class="csub-badge">Ta formule</span>':''}
+            ${cur?`<span class="csub-badge">${tr('clubSub.yourPlan')}</span>`:''}
             <div class="csub-name">${t.name}</div>
             <div class="csub-cap">${t.cap}</div>
-            <div class="csub-price">${clubFounder?`<s>${t.price} €</s> ${fnd} €`:`${t.price} €`}<small>/saison</small></div>
-            <div class="csub-per">${t.perM} /mois/athlète</div>
+            <div class="csub-price">${clubFounder?`<s>${t.price} €</s> ${fnd} €`:`${t.price} €`}<small>/${tr('clubSub.perSeason')}</small></div>
+            <div class="csub-per">${t.perM} /${tr('sidebar.perMonth')}/${tr('adherence.athlete').toLowerCase()}</div>
           </div>`;
         }).join('')}
       </div>
     </div>
     <div class="csub-foot">
-      <div class="csub-terms"><i class="ic ic-calendar"></i><span>Facturé à la saison (sept. → août), une facture en septembre, par virement. Tu démarres aujourd'hui — la facture ne part qu'à la rentrée.</span></div>
-      <button class="cc-btn" id="clubChooseBtn">Choisir la formule ${tier.name}</button>
+      <div class="csub-terms"><i class="ic ic-calendar"></i><span>${tr('clubSub.terms')}</span></div>
+      <button class="cc-btn" id="clubChooseBtn">${tr('clubSub.choosePlan', {name:tier.name})}</button>
     </div>
   </div>`;
 }
@@ -3751,7 +3760,7 @@ function wireClubSillance(){
   const btn=document.getElementById('clubChooseBtn');
   if(btn) btn.onclick=()=>{
     const t=clubTierFor(clubActivated()), p=clubTierPrice(t);
-    toast(`Formule ${t.name} retenue — ${p} €/saison${clubFounder?' (fondateur)':''}. Facture envoyée en septembre.`);
+    toast(tr('clubSub.planChosenToast', {name:t.name, p, founder: clubFounder?tr('clubSub.founderSuffix'):''}));
     if(window.PF?.user && window.__pf_clubId && PF.saveClubPlan) PF.saveClubPlan(window.__pf_clubId, t.id, clubFounder).catch(e=>console.warn('saveClubPlan',e));
   };
 }
@@ -3761,13 +3770,13 @@ function wireClubSillance(){
 function clubBills(){
   const bills=[];
   CLUB_ATHLETES.forEach(a=>{
-    if(a.offer==='coach') bills.push({m:a.id, why:'Coaching + — juin', type:'sub', amt:clubOffer('coach').price, ok:true});
-    else if(a.offer==='sub') bills.push({m:a.id, why:'Abonnement club — juin', type:'sub', amt:clubOffer('sub').price, ok:true});
+    if(a.offer==='coach') bills.push({m:a.id, why:tr('billing.coachPlusJune'), type:'sub', amt:clubOffer('coach').price, ok:true});
+    else if(a.offer==='sub') bills.push({m:a.id, why:tr('billing.clubSubJune'), type:'sub', amt:clubOffer('sub').price, ok:true});
   });
   CRENEAUX.filter(c=>c.price>0).forEach(c=>{
     c.attendees.forEach(id=>{
       if(!CLUB_ATHLETES.find(x=>x.id===id)) return;
-      bills.push({m:id, why:`${c.title} — à la carte`, type:'card', amt:c.price, ok:true});
+      bills.push({m:id, why:`${c.title} — ${tr('club.aLaCarte')}`, type:'card', amt:c.price, ok:true});
     });
   });
   if(bills[2]) bills[2].ok=false;   // démo : 2 paiements en attente
@@ -3784,10 +3793,10 @@ function renderClubDash(){
   const rev=bills.filter(b=>b.ok).reduce((a,b)=>a+b.amt,0);
   const coachN=CLUB_ATHLETES.filter(a=>a.offer==='coach').length;
   const kpis=[
-    {v:avgFill+'%', k:'Remplissage moyen', c:'acc'},
-    {v:totalIns, k:'Inscriptions actives', c:''},
-    {v:rev+' €', k:'CA du mois', c:'good'},
-    {v:CLUB_ATHLETES.length, k:'Adhérents', c:'str', d:coachN+' en Coaching +'}
+    {v:avgFill+'%', k:tr('clubDash.avgFill'), c:'acc'},
+    {v:totalIns, k:tr('clubDash.activeRegistrations'), c:''},
+    {v:rev+' €', k:tr('clubDash.monthRevenue'), c:'good'},
+    {v:CLUB_ATHLETES.length, k:tr('clubDash.members'), c:'str', d:tr('clubDash.nInCoachPlus', {n:coachN})}
   ];
   const top=CRENEAUX.slice().sort((a,b)=>(b.attendees.length/b.cap)-(a.attendees.length/a.cap)).slice(0,4);
   const mix=CLUB_OFFERS.map(o=>({o, n:CLUB_ATHLETES.filter(a=>a.offer===o.id).length}));
@@ -3796,13 +3805,13 @@ function renderClubDash(){
     <div class="cdash-kpis">${kpis.map(k=>`<div class="cdash-kpi"><div class="v ${k.c}">${k.v}</div><div class="k">${k.k}</div>${k.d?`<div class="d">${k.d}</div>`:''}</div>`).join('')}</div>
     <div class="cdash-cols">
       <div class="cdash-card">
-        <h4>Créneaux les plus remplis</h4>
-        ${top.map(c=>{const D=DISC[c.disc];const pct=Math.round(100*c.attendees.length/c.cap);return `<div class="cdash-slot"><span class="ci" style="color:${D.color}">${discIcon(D)}</span><div class="cs-b"><div class="cs-t">${c.title}</div><div class="cs-m">${CLUB_DAYS[c.day]} ${c.time} · ${c.attendees.length}/${c.cap} inscrits</div><div class="cs-fill ${pct>=85?'hot':''}"><i style="width:${pct}%"></i></div></div><span class="cprice ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':'inclus'}</span></div>`;}).join('')}
+        <h4>${tr('clubDash.fullestSlots')}</h4>
+        ${top.map(c=>{const D=DISC[c.disc];const pct=Math.round(100*c.attendees.length/c.cap);return `<div class="cdash-slot"><span class="ci" style="color:${D.color}">${discIcon(D)}</span><div class="cs-b"><div class="cs-t">${c.title}</div><div class="cs-m">${CLUB_DAYS[c.day]} ${c.time} · ${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</div><div class="cs-fill ${pct>=85?'hot':''}"><i style="width:${pct}%"></i></div></div><span class="cprice ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':tr('clubDash.included')}</span></div>`;}).join('')}
       </div>
       <div class="cdash-card">
-        <h4>Répartition par formule</h4>
+        <h4>${tr('clubDash.planBreakdown')}</h4>
         ${mix.map(({o,n})=>{const pct=Math.round(100*n/tot);const col=o.id==='coach'?'var(--accent)':o.id==='sub'?'var(--good)':'var(--bike)';return `<div class="cmix"><div class="cmix-h"><span><b>${o.name}</b> · ${o.price}€</span><span style="color:var(--muted)">${n} · ${pct}%</span></div><div class="cs-fill"><i style="width:${pct}%;background:${col}"></i></div></div>`;}).join('')}
-        <p class="cdash-note">Le mix « Coaching + » est ta marge : suivi premium facturé plus cher.</p>
+        <p class="cdash-note">${tr('clubDash.coachPlusMarginNote')}</p>
       </div>
     </div>`;
 }
@@ -3814,15 +3823,15 @@ function renderClubBill(){
   const wait=bills.filter(b=>!b.ok).reduce((a,b)=>a+b.amt,0);
   const rec=bills.filter(b=>b.type==='sub'&&b.ok).length;
   box.innerHTML=clubSillanceCardHTML()+`
-    <p class="club-hint" style="margin:0 0 12px"><b>Revenus des adhérents</b> — ce que le club encaisse (distinct de l'abonnement Sillance ci-dessus).</p>
+    <p class="club-hint" style="margin:0 0 12px"><b>${tr('clubBill.memberRevenue')}</b> — ${tr('clubBill.memberRevenueNote')}</p>
     <div class="cdash-kpis cols3">
-      <div class="cdash-kpi"><div class="v good">${tot} €</div><div class="k">Encaissé ce mois</div></div>
-      <div class="cdash-kpi"><div class="v" style="color:var(--bike)">${wait} €</div><div class="k">En attente</div></div>
-      <div class="cdash-kpi"><div class="v acc">${rec}</div><div class="k">Abonnements actifs</div></div>
+      <div class="cdash-kpi"><div class="v good">${tot} €</div><div class="k">${tr('clubBill.collectedThisMonth')}</div></div>
+      <div class="cdash-kpi"><div class="v" style="color:var(--bike)">${wait} €</div><div class="k">${tr('clubBill.pending')}</div></div>
+      <div class="cdash-kpi"><div class="v acc">${rec}</div><div class="k">${tr('clubBill.activeSubs')}</div></div>
     </div>
-    <p class="club-hint" style="margin:4px 0 12px">Abonnements mensuels + réservations à la carte. Encaissé par Stripe, directement sur le compte du club.</p>
-    <table class="cbill"><thead><tr><th>Adhérent</th><th>Motif</th><th>Type</th><th>Montant</th><th>Statut</th></tr></thead><tbody>
-    ${bills.map(b=>{const a=CLUB_ATHLETES.find(x=>x.id===b.m);return `<tr><td><span class="cbav">${a?initials(a.name):'?'}</span>${a?a.name:'—'}</td><td>${b.why}</td><td>${b.type==='sub'?'Abonnement':'À la carte'}</td><td><b>${b.amt} €</b></td><td>${b.ok?'<span class="cpay ok">payé</span>':'<span class="cpay wait">en attente</span>'}</td></tr>`;}).join('')}
+    <p class="club-hint" style="margin:4px 0 12px">${tr('clubBill.stripeNote')}</p>
+    <table class="cbill"><thead><tr><th>${tr('clubBill.member')}</th><th>${tr('clubBill.reason')}</th><th>${tr('clubBill.type')}</th><th>${tr('invoices.amount')}</th><th>${tr('adherence.status')}</th></tr></thead><tbody>
+    ${bills.map(b=>{const a=CLUB_ATHLETES.find(x=>x.id===b.m);return `<tr><td><span class="cbav">${a?initials(a.name):'?'}</span>${a?a.name:'—'}</td><td>${b.why}</td><td>${b.type==='sub'?tr('sidebar.subscribe'):tr('club.aLaCarte')}</td><td><b>${b.amt} €</b></td><td>${b.ok?`<span class="cpay ok">${tr('clubBill.paid')}</span>`:`<span class="cpay wait">${tr('clubBill.waiting')}</span>`}</td></tr>`;}).join('')}
     </tbody></table>`;
   wireClubSillance();
 }
@@ -3831,31 +3840,31 @@ function renderClubOffres(){
   const box=document.getElementById('clubViewOffres'); if(!box) return;
   box.innerHTML=`
   <div class="cconnect">
-    <div><b><i class="ic ic-credit-card"></i> Encaisse tes adhérents</b><div class="cconnect-s">Relie le compte Stripe du club → tu perçois abonnements &amp; séances à la carte directement (commission plateforme configurable).</div></div>
-    <button class="co-edit" id="clubConnectBtn" style="border-color:var(--accent);color:var(--accent)">Relier Stripe</button>
+    <div><b><i class="ic ic-credit-card"></i> ${tr('clubOffres.collectFromMembers')}</b><div class="cconnect-s">${tr('clubOffres.connectStripeNote')}</div></div>
+    <button class="co-edit" id="clubConnectBtn" style="border-color:var(--accent);color:var(--accent)">${tr('sidebar.connectStripe')}</button>
   </div>
-  <p class="club-hint" style="margin-bottom:14px">Une échelle de valeur : on monte → on paie plus → plus de suivi et de data. Clique un tarif pour l'ajuster.</p>
+  <p class="club-hint" style="margin-bottom:14px">${tr('clubOffres.valueScale')}</p>
   <div class="coffers">${CLUB_OFFERS.map(o=>`
     <div class="coffer ${o.feature?'feat':''}">
-      ${o.feature?'<span class="cribbon"><i class="ic ic-star"></i> Marge premium</span>':''}
+      ${o.feature?`<span class="cribbon"><i class="ic ic-star"></i> ${tr('clubOffres.premiumMargin')}</span>`:''}
       <div class="co-name">${o.name}</div>
       <div class="co-pitch">${o.pitch}</div>
       <div class="co-price">${o.price} €<small> ${o.unit}</small></div>
-      <button class="co-edit" data-o="${o.id}"><i class="ic ic-edit"></i> Modifier le tarif</button>
+      <button class="co-edit" data-o="${o.id}"><i class="ic ic-edit"></i> ${tr('clubOffres.editPrice')}</button>
       <ul>${o.inc.map(i=>`<li>${i}</li>`).join('')}</ul>
       <div class="co-who">${o.who}</div>
     </div>`).join('')}</div>`;
   box.querySelectorAll('.co-edit[data-o]').forEach(btn=>btn.onclick=()=>{
-    const o=clubOffer(btn.dataset.o); const v=prompt(`Tarif de « ${o.name} » (€) :`, o.price);
+    const o=clubOffer(btn.dataset.o); const v=prompt(tr('clubOffres.pricePrompt', {name:o.name}), o.price);
     if(v!==null && !isNaN(+v) && v!==''){
-      o.price=+v; renderClubOffres(); toast('Tarif mis à jour');
+      o.price=+v; renderClubOffres(); toast(tr('toast.tarifMisAJour'));
       if(window.PF?.user && window.__pf_clubId) PF.saveClubOffer(window.__pf_clubId, o.id, o.price).catch(e=>console.warn('saveClubOffer',e));
     }
   });
   const cc=document.getElementById('clubConnectBtn');
   if(cc) cc.onclick=()=>{
-    if(window.PF?.user && window.__pf_clubId) PF.connectClubStripe(window.__pf_clubId).catch(e=>{console.warn(e);toast('Stripe indisponible', 'error');});
-    else toast('Connecte ton espace club pour relier Stripe');
+    if(window.PF?.user && window.__pf_clubId) PF.connectClubStripe(window.__pf_clubId).catch(e=>{console.warn(e);toast(tr('toast.stripeIndisponible'), 'error');});
+    else toast(tr('toast.connecteEspaceClubPourRelier'));
   };
 }
 
@@ -3873,25 +3882,25 @@ function renderSessionReminder(){
   box.innerHTML=`<div class="sess-reminder">
     <span class="sr-icon">⏰</span>
     <div class="sr-body">
-      <div class="sr-title">Rappel — ${CLUB_DAYS[c.day]} ${c.time} : ${c.title}</div>
+      <div class="sr-title">${tr('reminder.title', {day:CLUB_DAYS[c.day], time:c.time, title:c.title})}</div>
       <div class="sr-meta">${discIcon(D)} ${D.label} · <i class="ic ic-pin"></i> ${c.place} · ${fmtDur(c.dur)}${c.price>0?` · ${c.price}€`:''}</div>
     </div>
     <div class="sr-actions">
-      <button class="sr-confirm ${reminderStatus==='confirmed'?'done':''}" data-act="confirm">${reminderStatus==='confirmed'?'<i class="ic ic-check"></i> Confirmé':'Je confirme'}</button>
-      <button class="sr-cancel ${reminderStatus==='cancelled'?'done':''}" data-act="cancel">${reminderStatus==='cancelled'?'Absent noté':'J\'annule'}</button>
+      <button class="sr-confirm ${reminderStatus==='confirmed'?'done':''}" data-act="confirm">${reminderStatus==='confirmed'?`<i class="ic ic-check"></i> ${tr('reminder.confirmed')}`:tr('reminder.iConfirm')}</button>
+      <button class="sr-cancel ${reminderStatus==='cancelled'?'done':''}" data-act="cancel">${reminderStatus==='cancelled'?tr('reminder.absentNoted'):tr('reminder.iCancel')}</button>
     </div>
   </div>`;
   box.querySelector('[data-act="confirm"]').onclick=()=>{
     reminderStatus='confirmed';
     if(!c.attendees.includes(ME_CLUB_ID)) c.attendees.push(ME_CLUB_ID);
     renderCreneaux(); renderClubStats();
-    toast('Présence confirmée — le coach est prévenu');
+    toast(tr('toast.presenceConfirmeeCoachEstPrevenu'));
   };
   box.querySelector('[data-act="cancel"]').onclick=()=>{
     reminderStatus='cancelled';
     const i=c.attendees.indexOf(ME_CLUB_ID); if(i>-1) c.attendees.splice(i,1);
     renderCreneaux(); renderClubStats();
-    toast('Absence notée — tu peux faire la séance de ton côté. Le coach voit la mise à jour');
+    toast(tr('toast.absenceNoteeTuPeuxFaire'));
   };
 }
 
@@ -3907,21 +3916,21 @@ function renderClubHistory(){
   const h=CLUB_HISTORY;
   const totalPaid=h.paid.reduce((a,p)=>a+p.amount,0);
   const paidHtml = h.paid.length? `
-    <div class="ch-paid-title">Séances à la carte consommées</div>
+    <div class="ch-paid-title">${tr('clubHist.aLaCarteConsumed')}</div>
     <div class="ch-paid-list">${h.paid.map(p=>`<div class="ch-paid"><span>${p.label} · <span style="color:var(--muted)">${p.date}</span></span><span class="amt">${p.amount} €</span></div>`).join('')}</div>
-    <div class="ch-total"><span>Total réglé ce trimestre</span><span>${totalPaid} €</span></div>` : '';
+    <div class="ch-total"><span>${tr('clubHist.totalPaidQuarter')}</span><span>${totalPaid} €</span></div>` : '';
   box.innerHTML=`<div class="club-hist">
     <div class="ch-top">
       <span class="ch-badge"><i class="ic ic-trophy"></i></span>
       <div>
-        <div class="ch-headline">Tu as fait <b>${h.trimestre} séances club</b> ce trimestre !</div>
-        <div class="ch-sub">Continue comme ça</div>
+        <div class="ch-headline">${tr('clubHist.headline', {n:h.trimestre})}</div>
+        <div class="ch-sub">${tr('clubHist.keepGoing')}</div>
       </div>
     </div>
     <div class="ch-stats">
-      <div class="ch-stat"><div class="v">${h.trimestre}</div><div class="k">séances</div></div>
-      <div class="ch-stat"><div class="v">${h.heures}<span style="font-size:13px">h</span></div><div class="k">cumulées</div></div>
-      <div class="ch-stat"><div class="v">${h.presence}<span style="font-size:13px">%</span></div><div class="k">présence</div></div>
+      <div class="ch-stat"><div class="v">${h.trimestre}</div><div class="k">${tr('bilan.session').toLowerCase()}s</div></div>
+      <div class="ch-stat"><div class="v">${h.heures}<span style="font-size:13px">h</span></div><div class="k">${tr('clubHist.accumulated')}</div></div>
+      <div class="ch-stat"><div class="v">${h.presence}<span style="font-size:13px">%</span></div><div class="k">${tr('clubHist.attendance')}</div></div>
     </div>
     ${paidHtml}
   </div>`;
@@ -3940,10 +3949,10 @@ function renderCreneaux(){
     : CRENEAUX;
   const hidden = CRENEAUX.length - seen.length;
   box.innerHTML = `<div class="cr-viewbar">
-      <span>Affichage :</span>
-      <button class="cr-viewbtn ${!crMemberView?'on':''}" data-v="coach">Vue coach — tout</button>
-      <button class="cr-viewbtn ${crMemberView?'on':''}" data-v="member">Vue adhérent${me?` (${me.name.split(' ')[0]} · ${me.group?clubGroup(me.group).name:'sans groupe'})`:''}</button>
-      ${crMemberView&&hidden?`<em>${hidden} créneau${hidden>1?'x':''} d'autres groupes masqué${hidden>1?'s':''}</em>`:''}
+      <span>${tr('creneau.display')}</span>
+      <button class="cr-viewbtn ${!crMemberView?'on':''}" data-v="coach">${tr('creneau.coachViewAll')}</button>
+      <button class="cr-viewbtn ${crMemberView?'on':''}" data-v="member">${tr('creneau.memberView')}${me?` (${me.name.split(' ')[0]} · ${me.group?clubGroup(me.group).name:tr('creneau.noGroup')})`:''}</button>
+      ${crMemberView&&hidden?`<em>${tr(hidden>1?'creneau.hiddenSlotsPlural':'creneau.hiddenSlotsSingular', {n:hidden})}</em>`:''}
     </div>` + seen.slice().sort((a,b)=>a.day-b.day||a.time.localeCompare(b.time)).map(c=>{
     const D=DISC[c.disc];
     const inIt = c.attendees.includes(ME_CLUB_ID);
@@ -3953,11 +3962,11 @@ function renderCreneaux(){
     return `<div class="creneau-card" data-id="${c.id}" style="--cc:${D.color}">
       <div class="cr-top">
         <span class="cr-disc"><span class="ci">${discIcon(D)}</span>${c.title}</span>
-        <span class="cr-price ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':'inclus'}</span>
+        <span class="cr-price ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':tr('clubDash.included')}</span>
       </div>
       <div class="cr-meta">
-        <span><b>${c.recur==='once'&&c.date?new Date(c.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):CLUB_DAYS[c.day]}</b> ${c.time}</span>
-        ${c.recur==='once'?'<span title="Séance ponctuelle">ponctuel</span>':'<span title="Se répète chaque semaine"><i class="ic ic-refresh"></i> hebdo</span>'}
+        <span><b>${c.recur==='once'&&c.date?new Date(c.date+'T00:00:00').toLocaleDateString(localeStr(),{day:'numeric',month:'short'}):CLUB_DAYS[c.day]}</b> ${c.time}</span>
+        ${c.recur==='once'?`<span title="${tr('creneau.oneTimeTitle')}">${tr('creneau.oneTime')}</span>`:`<span title="${tr('creneau.weeklyTitle')}"><i class="ic ic-refresh"></i> ${tr('creneau.weekly')}</span>`}
         <span>${fmtDur(c.dur)}</span>
         <span><i class="ic ic-pin"></i> ${c.place}</span>
         <span><i class="ic ic-user"></i> ${c.coach}</span>
@@ -3967,20 +3976,20 @@ function renderCreneaux(){
         const canSee=!g || (me && me.group===c.group);
         const chip=g?`<span class="cr-grp" style="--gc:${g.color}">${g.name}</span>`:'';
         const body=c.desc ? (canSee?`<div class="cr-desc">${c.desc}</div>`
-          :`<div class="cr-desc locked"><i class="ic ic-lock"></i> Contenu réservé au groupe ${g.name}</div>`) : '';
-        const pend=(c.invited&&c.invited.length)?`<div class="cr-pending">${c.invited.length} invité${c.invited.length>1?'s':''} du groupe — en attente de confirmation</div>`:'';
+          :`<div class="cr-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContent', {name:g.name})}</div>`) : '';
+        const pend=(c.invited&&c.invited.length)?`<div class="cr-pending">${tr(c.invited.length>1?'creneau.invitedPendingPlural':'creneau.invitedPendingSingular', {n:c.invited.length})}</div>`:'';
         return chip+body+pend; })()}
       <div class="cr-fill"><i style="width:${fillPct}%"></i></div>
-      <div class="cr-fillrow"><span>${c.attendees.length}/${c.cap} inscrits</span><span>${c.cap-c.attendees.length} places restantes</span></div>
-      <div class="cr-attendees">${avatars||'<span class="cr-roster">Aucun inscrit pour l\'instant</span>'}</div>
+      <div class="cr-fillrow"><span>${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</span><span>${tr('creneau.spotsLeft', {n:c.cap-c.attendees.length})}</span></div>
+      <div class="cr-attendees">${avatars||`<span class="cr-roster">${tr('creneau.noOneRegistered')}</span>`}</div>
       <div class="cr-cta">
         ${(c.invited||[]).includes(ME_CLUB_ID)
-          ? `<button class="cr-join" data-act="confirm"><i class="ic ic-check"></i> Confirmer ma présence</button>`
-          : `<button class="cr-join ${inIt?'in':''}" data-act="join">${inIt?'<i class="ic ic-check"></i> Inscrit':(c.price>0?`S'inscrire · ${c.price}€`:'S\'inscrire')}</button>`}
-        <button data-act="roster">Liste</button>
+          ? `<button class="cr-join" data-act="confirm"><i class="ic ic-check"></i> ${tr('creneau.confirmMyAttendance')}</button>`
+          : `<button class="cr-join ${inIt?'in':''}" data-act="join">${inIt?`<i class="ic ic-check"></i> ${tr('creneau.registered')}`:(c.price>0?tr('creneau.registerPrice', {price:c.price}):tr('creneau.register'))}</button>`}
+        <button data-act="roster">${tr('creneau.list')}</button>
       </div>
     </div>`;
-  }).join('') + (seen.length?'':'<p class="club-hint">Aucun créneau visible pour ce profil.</p>');
+  }).join('') + (seen.length?'':`<p class="club-hint">${tr('creneau.noneVisible')}</p>`);
   // wiring
   box.querySelectorAll('.cr-viewbtn').forEach(b=>b.onclick=()=>{ crMemberView=b.dataset.v==='member'; renderCreneaux(); });
   box.querySelectorAll('.creneau-card').forEach(card=>{
@@ -3989,17 +3998,17 @@ function renderCreneaux(){
     if(cf) cf.onclick=()=>{
       const i=(c.invited||[]).indexOf(ME_CLUB_ID);
       if(i>-1){ c.invited.splice(i,1); if(!c.attendees.includes(ME_CLUB_ID)) c.attendees.push(ME_CLUB_ID); }
-      toast('Présence confirmée');
+      toast(tr('toast.presenceConfirmee'));
       renderCreneaux(); renderClubStats(); if(typeof renderPresence==='function') renderPresence();
     };
     const jb=card.querySelector('[data-act="join"]');
     if(jb) jb.onclick=()=>{
       const i=c.attendees.indexOf(ME_CLUB_ID);
-      if(i>-1){ c.attendees.splice(i,1); toast('Inscription annulée'); }
+      if(i>-1){ c.attendees.splice(i,1); toast(tr('toast.inscriptionAnnulee')); }
       else {
-        if(c.attendees.length>=c.cap){ toast('Créneau complet'); return; }
+        if(c.attendees.length>=c.cap){ toast(tr('toast.creneauComplet')); return; }
         c.attendees.push(ME_CLUB_ID);
-        toast(c.price>0?`Inscrit (${c.price}€ — paiement à la séance)`:'Inscrit au créneau');
+        toast(c.price>0?tr('creneau.registeredPricePay', {price:c.price}):tr('creneau.registeredToSlot'));
       }
       renderCreneaux(); renderClubStats(); renderPresence();
     };
@@ -4023,7 +4032,7 @@ function openClubAthleteCalendar(a){
   if(typeof renderCoachBand==='function') renderCoachBand();
   if(typeof renderGear==='function') renderGear();
   window.scrollTo({top:0, behavior:'smooth'});
-  toast(`Calendrier de ${a.name}` + (rosterIsReal?'':' — démo : plan type du club'));
+  toast(tr('clubAth.calendarOf', {name:a.name}) + (rosterIsReal?'':tr('clubAth.demoTypicalPlan')));
 }
 let clubOnlyUnassigned = false;
 function renderClubAthletes(filter){
@@ -4035,26 +4044,26 @@ function renderClubAthletes(filter){
   if(clubOnlyUnassigned) list=list.filter(a=>!a.group);
   if(clubLicenceOnly) list=list.filter(a=>licenceStatus(a)!=='ok');
   const banner = clubOnlyUnassigned
-    ? `<div class="grp-unassigned-banner" id="clubUnassignedClear"><span>Filtré sur les athlètes <b>sans groupe</b></span><span><i class="ic ic-x"></i> Tout afficher</span></div>` : '';
+    ? `<div class="grp-unassigned-banner" id="clubUnassignedClear"><span>${tr('clubAthList.filteredNoGroup')}</span><span><i class="ic ic-x"></i> ${tr('clubAthList.showAll')}</span></div>` : '';
   const rows = list.map(a=>{
     const nbInscr = CRENEAUX.filter(c=>c.attendees.includes(a.id)).length;
     const g = a.group ? clubGroup(a.group) : null;
-    const grpOptions = '<option value="">Sans groupe</option>' + CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${a.group===gr.id?'selected':''}>${gr.name}</option>`).join('');
+    const grpOptions = `<option value="">${tr('clubAthList.noGroup')}</option>` + CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${a.group===gr.id?'selected':''}>${gr.name}</option>`).join('');
     return `<div class="club-ath">
       <div class="club-ath-av">${initials(a.name)}</div>
       <div class="club-ath-i">
         <div class="club-ath-n">${a.name}</div>
-        <div class="club-ath-m">membre depuis ${a.since} · ${nbInscr} créneau${nbInscr>1?'x':''}</div>
-        <select class="club-ath-grp-sel ${g?'':'none'}" data-aid="${a.id}" style="${g?`--gc:${g.color}`:''}" title="Changer de groupe">${grpOptions}</select>
-        <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="Cliquer pour changer de formule">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
-        <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="Bientôt disponible — contenu vidéo en cours d'ajout"><i class="ic ic-film"></i> Vidéos <span class="cc-soon" style="margin-left:4px">Bientôt</span></span>
-        <span class="club-ath-cal" data-caid="${a.id}" title="Ouvrir le calendrier d'entraînement de cet athlète"><i class="ic ic-calendar"></i> Calendrier</span>
+        <div class="club-ath-m">${tr('clubAthList.memberSince', {since:a.since})} · ${tr(nbInscr>1?'clubAthList.nSlotsPlural':'clubAthList.nSlotsSingular', {n:nbInscr})}</div>
+        <select class="club-ath-grp-sel ${g?'':'none'}" data-aid="${a.id}" style="${g?`--gc:${g.color}`:''}" title="${tr('clubAthList.changeGroup')}">${grpOptions}</select>
+        <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="${tr('clubAthList.clickToChangePlan')}">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
+        <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="${tr('clubAthList.videosSoonTitle')}"><i class="ic ic-film"></i> ${tr('clubAthList.videos')} <span class="cc-soon" style="margin-left:4px">${tr('sidebar.comingSoon')}</span></span>
+        <span class="club-ath-cal" data-caid="${a.id}" title="${tr('clubAthList.openCalendarTitle')}"><i class="ic ic-calendar"></i> ${tr('clubAthList.calendar')}</span>
         ${minorChip(a)}
         ${licenceChip(a)}
       </div>
-      <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||'Tri'}</span>
+      <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||tr('clubDisc.tri')}</span>
     </div>`;
-  }).join('') || '<p class="club-hint">Aucun athlète trouvé.</p>';
+  }).join('') || `<p class="club-hint">${tr('clubAthList.noAthleteFound')}</p>`;
   box.innerHTML = banner + rows;
   const clearBtn = document.getElementById('clubUnassignedClear');
   if(clearBtn) clearBtn.onclick=()=>{ clubOnlyUnassigned=false; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
@@ -4063,7 +4072,7 @@ function renderClubAthletes(filter){
     a.group = sel.value || null;
     renderClubAthletes(filter);
     renderClubStats();
-    toast(`${a.name} → ${a.group?clubGroup(a.group).name:'Sans groupe'}`);
+    toast(`${a.name} → ${a.group?clubGroup(a.group).name:tr('clubAthList.noGroup')}`);
     if(window.PF?.user && window.__pf_clubId){
       PF.assignMemberGroup(a.id, a.group).catch(e=>console.warn('[PF] assignMemberGroup échoué :',e));
     }
@@ -4075,11 +4084,11 @@ function renderClubAthletes(filter){
     renderClubAthletes(filter); renderClubStats();
     toast(`${a.name} → ${clubOffer(a.offer).name}`);
     if(window.PF?.user && window.__pf_clubId && (a.offer==='sub'||a.offer==='coach')){
-      PF.subscribeToClubOffer(window.__pf_clubId, a.id, a.offer).catch(e=>{console.warn('subscribe',e);toast('Paiement indisponible (démo)', 'error');});
+      PF.subscribeToClubOffer(window.__pf_clubId, a.id, a.offer).catch(e=>{console.warn('subscribe',e);toast(tr('toast.paiementIndisponibleDemo'), 'error');});
     }
   });
   box.querySelectorAll('.club-ath-vid').forEach(el=>el.onclick=()=>{
-    toast('Bibliothèque vidéo bientôt disponible — contenu en cours d\'ajout');
+    toast(tr('toast.bibliothequeVideoBientotDisponibleContenu'));
   });
   box.querySelectorAll('.club-ath-minor').forEach(el=>el.onclick=()=> openConsent(el.dataset.maid, filter));
   box.querySelectorAll('.club-ath-licence').forEach(el=>el.onclick=()=> openLicence(el.dataset.lid, filter));
@@ -4099,7 +4108,7 @@ function renderLicenceAlert(){
   const box=document.getElementById('licenceAlert'); if(!box) return;
   const n = CLUB_ATHLETES.filter(a=>licenceStatus(a)!=='ok').length;
   if(!n){ box.innerHTML=''; return; }
-  box.innerHTML = `<div class="grp-unassigned-banner" id="licenceAlertBanner"><span><b>${n}</b> licence${n>1?'s':''} à traiter (certificat manquant, à renouveler ou expiré)</span><span>${clubLicenceOnly?'<i class="ic ic-x"></i> Tout afficher':'Voir →'}</span></div>`;
+  box.innerHTML = `<div class="grp-unassigned-banner" id="licenceAlertBanner"><span>${tr(n>1?'licence.toHandlePlural':'licence.toHandleSingular', {n})}</span><span>${clubLicenceOnly?`<i class="ic ic-x"></i> ${tr('clubAthList.showAll')}`:tr('licence.see')}</span></div>`;
   const bn=document.getElementById('licenceAlertBanner');
   if(bn) bn.onclick=()=>{ clubLicenceOnly=!clubLicenceOnly; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
 }
@@ -4108,10 +4117,10 @@ function renderLicenceAlert(){
 function licenceChip(a){
   const st = licenceStatus(a);
   const fed = a.licence?.fed || '';
-  if(st==='ok') return `<span class="club-ath-licence ok" data-lid="${a.id}" title="Licence ${fed} à jour — cliquer pour voir/modifier"><i class="ic ic-check"></i> ${fed} · à jour</span>`;
-  if(st==='soon') return `<span class="club-ath-licence soon" data-lid="${a.id}" title="Certificat médical ${fed} à renouveler bientôt — cliquer pour modifier"><i class="ic ic-alert-triangle"></i> ${fed} · à renouveler</span>`;
-  if(st==='expired') return `<span class="club-ath-licence warn" data-lid="${a.id}" title="Certificat médical ${fed} expiré — cliquer pour modifier"><i class="ic ic-alert-triangle"></i> ${fed} · expiré</span>`;
-  return `<span class="club-ath-licence" data-lid="${a.id}" title="Aucune licence enregistrée — cliquer pour renseigner">Licence ?</span>`;
+  if(st==='ok') return `<span class="club-ath-licence ok" data-lid="${a.id}" title="${tr('licence.upToDateTitle', {fed})}"><i class="ic ic-check"></i> ${fed} · ${tr('licence.upToDate')}</span>`;
+  if(st==='soon') return `<span class="club-ath-licence soon" data-lid="${a.id}" title="${tr('licence.toRenewTitle', {fed})}"><i class="ic ic-alert-triangle"></i> ${fed} · ${tr('licence.toRenew')}</span>`;
+  if(st==='expired') return `<span class="club-ath-licence warn" data-lid="${a.id}" title="${tr('licence.expiredTitle', {fed})}"><i class="ic ic-alert-triangle"></i> ${fed} · ${tr('licence.expired')}</span>`;
+  return `<span class="club-ath-licence" data-lid="${a.id}" title="${tr('licence.noneRegisteredTitle')}">${tr('licence.questionMark')}</span>`;
 }
 
 /* ---- Modal licence & certificat médical ---- */
@@ -4134,7 +4143,7 @@ function saveLicence(){
   else { a.licence = {fed, num, medCertUntil: cert||null}; }
   document.getElementById('licenceOverlay').classList.remove('open');
   renderClubAthletes(licenceFilter);
-  toast(`Licence mise à jour pour ${a.name}`);
+  toast(tr('licence.updatedFor', {name:a.name}));
 }
 (function initLicence(){
   const ov=document.getElementById('licenceOverlay'); if(!ov) return;
@@ -4148,10 +4157,10 @@ function minorConsentOk(a){ return !!(a.consentAt || a.guardian_consent_at); }
 function minorChip(a){
   if(a.minor){
     return minorConsentOk(a)
-      ? `<span class="club-ath-minor ok" data-maid="${a.id}" title="Autorisation parentale recueillie — cliquer pour voir/modifier"><i class="ic ic-check"></i> Mineur · consentement OK</span>`
-      : `<span class="club-ath-minor warn" data-maid="${a.id}" title="Athlète mineur : autorisation parentale à recueillir"><i class="ic ic-alert-triangle"></i> Mineur · consentement requis</span>`;
+      ? `<span class="club-ath-minor ok" data-maid="${a.id}" title="${tr('minor.consentCollectedTitle')}"><i class="ic ic-check"></i> ${tr('minor.consentOk')}</span>`
+      : `<span class="club-ath-minor warn" data-maid="${a.id}" title="${tr('minor.consentNeededTitle')}"><i class="ic ic-alert-triangle"></i> ${tr('minor.consentRequired')}</span>`;
   }
-  return `<span class="club-ath-minor" data-maid="${a.id}" title="Marquer comme mineur (déclenche le consentement parental)">Mineur ?</span>`;
+  return `<span class="club-ath-minor" data-maid="${a.id}" title="${tr('minor.markAsMinorTitle')}">${tr('minor.questionMark')}</span>`;
 }
 
 /* ---- Modal de consentement parental ---- */
@@ -4192,10 +4201,10 @@ function saveConsent(){
   else { delete a.guardian; delete a.consentAt; }
   document.getElementById('consentOverlay').classList.remove('open');
   renderClubAthletes(consentFilter);
-  toast(on ? (attest?`Consentement parental enregistré pour ${a.name}`:`${a.name} marqué mineur`) : `${a.name} : statut mineur retiré`);
+  toast(on ? (attest?tr('minor.consentSavedFor', {name:a.name}):tr('minor.markedAsMinor', {name:a.name})) : tr('minor.statusRemoved', {name:a.name}));
   if(window.PF?.user){
     PF.setParentalConsent(a.id, {is_minor:on, guardian_name:gName, guardian_email:gMail, consent:attest})
-      .catch(e=>{console.warn('consent',e); toast('Enregistrement indisponible (démo)', 'error');});
+      .catch(e=>{console.warn('consent',e); toast(tr('toast.enregistrementIndisponibleDemo'), 'error');});
   }
 }
 (function initConsent(){
@@ -4214,17 +4223,17 @@ function renderJoinRequests(){
   const box=document.getElementById('joinRequests'); if(!box) return;
   if(!JOIN_REQUESTS.length){ box.innerHTML=''; return; }
   box.innerHTML=`<div class="join-block">
-    <div class="join-head">⏳ ${JOIN_REQUESTS.length} demande${JOIN_REQUESTS.length>1?'s':''} d'adhésion en attente</div>
+    <div class="join-head">⏳ ${tr(JOIN_REQUESTS.length>1?'join.pendingPlural':'join.pendingSingular', {n:JOIN_REQUESTS.length})}</div>
     <div class="join-list">${JOIN_REQUESTS.map(r=>`
       <div class="join-req" data-id="${r.id}">
         <div class="join-av">${initials(r.name)}</div>
         <div class="join-i">
-          <div class="join-n">${r.name} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||'Tri'}</span></div>
-          <div class="join-m">${r.msg||'Souhaite rejoindre le club'}</div>
+          <div class="join-n">${r.name} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||tr('clubDisc.tri')}</span></div>
+          <div class="join-m">${r.msg||tr('join.wantsToJoin')}</div>
         </div>
         <div class="join-acts">
-          <button class="join-accept" data-act="accept">Accepter</button>
-          <button class="join-reject" data-act="reject">Refuser</button>
+          <button class="join-accept" data-act="accept">${tr('join.accept')}</button>
+          <button class="join-reject" data-act="reject">${tr('join.reject')}</button>
         </div>
       </div>`).join('')}</div>
   </div>`;
@@ -4233,7 +4242,7 @@ function renderJoinRequests(){
     row.querySelector('[data-act="accept"]').onclick=()=> openAcceptModal(r);
     row.querySelector('[data-act="reject"]').onclick=()=>{
       JOIN_REQUESTS=JOIN_REQUESTS.filter(x=>x.id!==r.id);
-      renderClubAthletes(); toast('Demande refusée');
+      renderClubAthletes(); toast(tr('toast.demandeRefusee'));
     };
   });
 }
@@ -4243,7 +4252,7 @@ let acceptingReq=null, acceptGroupId=null;
 const acceptOverlay=document.getElementById('acceptOverlay');
 function openAcceptModal(r){
   acceptingReq=r; acceptGroupId=null;
-  document.getElementById('acceptName').textContent=`Accepter ${r.name}`;
+  document.getElementById('acceptName').textContent=tr('join.acceptName', {name:r.name});
   document.getElementById('acceptGroups').innerHTML=CLUB_GROUPS.map(g=>`
     <div class="accept-grp" data-g="${g.id}">
       <span class="agdot" style="background:${g.color}"></span>
@@ -4259,14 +4268,14 @@ document.getElementById('acceptClose').onclick=()=> acceptOverlay.classList.remo
 acceptOverlay.addEventListener('click', e=>{ if(e.target===acceptOverlay) acceptOverlay.classList.remove('open'); });
 document.getElementById('acceptSave').onclick=()=>{
   if(!acceptingReq) return;
-  if(!acceptGroupId){ toast('Choisis un groupe pour cet athlète'); return; }
+  if(!acceptGroupId){ toast(tr('toast.choisisGroupePourCetAthlete')); return; }
   const newA={ id:'a'+Date.now(), name:acceptingReq.name, disc:acceptingReq.disc, since:String(new Date().getFullYear()), group:acceptGroupId };
   CLUB_ATHLETES.push(newA);
   JOIN_REQUESTS=JOIN_REQUESTS.filter(x=>x.id!==acceptingReq.id);
   acceptOverlay.classList.remove('open');
   renderClubAthletes(); renderClubStats();
   const g=clubGroup(acceptGroupId);
-  toast(`${newA.name} ajouté au club dans « ${g.name} »`);
+  toast(tr('join.addedToClub', {name:newA.name, group:g.name}));
 };
 
 /* lien d'invitation : copier, partager, simuler une demande */
@@ -4274,20 +4283,20 @@ document.getElementById('inviteCopy').onclick=()=>{
   const inp=document.getElementById('inviteLink');
   inp.select();
   try{ navigator.clipboard.writeText(inp.value); }catch(e){ document.execCommand && document.execCommand('copy'); }
-  const btn=document.getElementById('inviteCopy'); btn.textContent='Copié'; btn.classList.add('done');
-  setTimeout(()=>{ btn.textContent='Copier'; btn.classList.remove('done'); }, 1600);
-  toast('Lien copié — partage-le à tes athlètes');
+  const btn=document.getElementById('inviteCopy'); btn.textContent=tr('common.copied'); btn.classList.add('done');
+  setTimeout(()=>{ btn.textContent=tr('invite.copyLinkBtn'); btn.classList.remove('done'); }, 1600);
+  toast(tr('toast.lienCopiePartageAAthletes'));
 };
 document.getElementById('inviteWhatsapp').onclick=()=>{
   const link=document.getElementById('inviteLink').value;
-  const msg=`Rejoins le club Muret Goat Squad sur Sillance : ${link}`;
+  const msg=tr('join.waJoinClub', {link});
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 };
 document.getElementById('inviteSimulate').onclick=()=>{
   const name=DEMO_NAMES[demoNameIdx % DEMO_NAMES.length]; demoNameIdx++;
-  JOIN_REQUESTS.push({id:'r'+Date.now(), name, disc: Math.random()>0.5?'tri':'bike', msg:'Souhaite rejoindre le club via le lien'});
+  JOIN_REQUESTS.push({id:'r'+Date.now(), name, disc: Math.random()>0.5?'tri':'bike', msg:tr('join.wantsToJoinViaLink')});
   renderClubAthletes();
-  toast(`Nouvelle demande reçue : ${name}`);
+  toast(tr('join.newRequestReceived', {name}));
 };
 
 function renderPresence(){
@@ -4298,9 +4307,9 @@ function renderPresence(){
     return `<div class="pres-card">
       <div class="pres-head">
         <span class="pres-title">${discIcon(D)} ${c.title} <span style="color:var(--muted);font-weight:400">· ${CLUB_DAYS[c.day]} ${c.time}</span></span>
-        <span class="pres-count">${c.attendees.length}/${c.cap} présents</span>
+        <span class="pres-count">${tr('presence.nPresent', {n:c.attendees.length, cap:c.cap})}</span>
       </div>
-      <div class="pres-list">${chips||'<span class="pres-empty">Personne inscrit pour l\'instant</span>'}</div>
+      <div class="pres-list">${chips||`<span class="pres-empty">${tr('presence.noOneYet')}</span>`}</div>
     </div>`;
   }).join('');
 }
@@ -4330,7 +4339,7 @@ function renderGroups(){
   const box=document.getElementById('groupList');
   const unassigned = CLUB_ATHLETES.filter(a=>!a.group);
   const banner = unassigned.length
-    ? `<div class="grp-unassigned-banner" id="grpUnassignedBanner"><span><b>${unassigned.length}</b> athlète${unassigned.length>1?'s':''} sans groupe</span><span>Voir →</span></div>` : '';
+    ? `<div class="grp-unassigned-banner" id="grpUnassignedBanner"><span>${tr(unassigned.length>1?'group.unassignedPlural':'group.unassignedSingular', {n:unassigned.length})}</span><span>${tr('licence.see')}</span></div>` : '';
   const cards = CLUB_GROUPS.map(g=>{
     const members=CLUB_ATHLETES.filter(a=>a.group===g.id);
     const avs = members.slice(0,8).map(a=>`<div class="group-av" title="${a.name}">${initials(a.name)}</div>`).join('')
@@ -4338,13 +4347,13 @@ function renderGroups(){
     return `<div class="group-card" data-id="${g.id}" style="--gc:${g.color}">
       <div class="group-card-head">
         <span class="group-name"><span class="gdot"></span>${g.name}</span>
-        <button class="group-edit" data-act="editgroup">Modifier</button>
+        <button class="group-edit" data-act="editgroup">${tr('sidebar.edit')}</button>
       </div>
       ${g.desc?`<div class="group-desc">${g.desc}</div>`:''}
-      <div class="group-count">${members.length} athlète${members.length>1?'s':''}</div>
-      <div class="group-avs">${avs||'<span class="group-desc">Aucun athlète affecté</span>'}</div>
+      <div class="group-count">${tr(members.length>1?'group.nAthletesPlural':'group.nAthletesSingular', {n:members.length})}</div>
+      <div class="group-avs">${avs||`<span class="group-desc">${tr('group.noneAssigned')}</span>`}</div>
     </div>`;
-  }).join('') || '<p class="club-hint">Aucun groupe. Crée le premier !</p>';
+  }).join('') || `<p class="club-hint">${tr('group.noneCreateFirst')}</p>`;
   box.innerHTML = banner + cards;
   const bn = document.getElementById('grpUnassignedBanner');
   if(bn) bn.onclick=()=>{ clubOnlyUnassigned=true; clubView='athletes'; switchClubView(); };
@@ -4360,7 +4369,7 @@ const groupOverlay=document.getElementById('groupOverlay');
 function openGroupModal(id){
   editingGroupId = id || null;
   const g = id ? clubGroup(id) : null;
-  document.getElementById('groupModalTitle').textContent = g ? 'Modifier le groupe' : 'Nouveau groupe';
+  document.getElementById('groupModalTitle').textContent = g ? tr('group.editGroup') : tr('group.newGroup');
   document.getElementById('grpName').value = g?.name || '';
   document.getElementById('grpDesc').value = g?.desc || '';
   const selColor = g?.color || GROUP_COLORS[0];
@@ -4378,7 +4387,7 @@ function openGroupModal(id){
     const other = (a.group && (!g || a.group!==g.id)) ? clubGroup(a.group) : null;
     return `<label class="grp-mem" data-name="${a.name.toLowerCase()}"><input type="checkbox" data-aid="${a.id}" ${checked?'checked':''}>
       <span class="gm-av">${initials(a.name)}</span><span class="gm-n">${a.name}</span>
-      ${other?`<span class="grp-mem-other" style="border-color:${other.color}">déjà dans ${other.name}</span>`:''}</label>`;
+      ${other?`<span class="grp-mem-other" style="border-color:${other.color}">${tr('group.alreadyIn', {name:other.name})}</span>`:''}</label>`;
   }).join('');
   const search = document.getElementById('grpMemberSearch');
   search.value = '';
@@ -4398,7 +4407,7 @@ document.getElementById('grpSave').onclick=()=>{
   // DB) : CLUB_GROUPS est ensuite affiché à de nombreux endroits via
   // innerHTML sans ré-échapper — sans ça, un nom de groupe contenant du
   // HTML/JS s'exécuterait immédiatement dans la session de celui qui l'a tapé.
-  const name=dispoSafe(document.getElementById('grpName').value.trim()||'Nouveau groupe');
+  const name=dispoSafe(document.getElementById('grpName').value.trim()||tr('group.newGroup'));
   const desc=dispoSafe(document.getElementById('grpDesc').value.trim());
   const color=(document.querySelector('.grp-color.sel')?.dataset.c)||GROUP_COLORS[0];
   const isEdit=!!editingGroupId;
@@ -4432,7 +4441,7 @@ document.getElementById('grpSave').onclick=()=>{
   }
   groupOverlay.classList.remove('open');
   clubView='groupes'; switchClubView();
-  toast(isEdit?'Groupe mis à jour':'Groupe créé');
+  toast(isEdit?tr('group.updated'):tr('group.created'));
 };
 
 
@@ -4454,8 +4463,8 @@ function openCreneauDetail(c, tab){
 }
 function crdWhen(c){
   return c.recur==='once' && c.date
-    ? `${new Date(c.date+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} ${c.time}`
-    : `${CLUB_DAYS[c.day]} ${c.time} · chaque semaine`;
+    ? `${new Date(c.date+'T00:00:00').toLocaleDateString(localeStr(),{weekday:'long',day:'numeric',month:'long'})} ${c.time}`
+    : `${CLUB_DAYS[c.day]} ${c.time} · ${tr('creneau.everyWeek')}`;
 }
 function renderCreneauDetail(){
   const c=crdCurrent; if(!c) return;
@@ -4468,9 +4477,9 @@ function renderCreneauDetail(){
     const me=CLUB_ATHLETES.find(a=>a.id===ME_CLUB_ID);
     const canSee=!g || (me && me.group===c.group);
     body.innerHTML = canSee
-      ? `<div class="crd-desc">${c.desc||'Aucune description pour ce créneau — ajoute le contenu dans l\'onglet Paramètres.'}</div>
-         <div class="crd-hint">Visible par ${g?`le groupe ${g.name}`:'tout le club'} — les absents retrouvent ici le contenu de la séance pour la faire de leur côté.</div>`
-      : `<div class="crd-desc locked"><i class="ic ic-lock"></i> Contenu réservé au groupe ${g.name}.</div>`;
+      ? `<div class="crd-desc">${c.desc||tr('crd.noDesc')}</div>
+         <div class="crd-hint">${tr('crd.visibleBy', {who: g?tr('crd.theGroup', {name:g.name}):tr('crd.wholeClub')})}</div>`
+      : `<div class="crd-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContentDot', {name:g.name})}</div>`;
   }
   else if(crdTab==='participants'){
     const rows=[
@@ -4479,31 +4488,31 @@ function renderCreneauDetail(){
     ].map(r=>{
       const a=CLUB_ATHLETES.find(x=>x.id===r.id);
       return `<div class="crd-p"><div class="cr-att">${a?initials(a.name):'?'}</div>${a?a.name:'—'}
-        <span class="st ${r.st}">${r.st==='ok'?'présent':'invité — à confirmer'}</span></div>`;
+        <span class="st ${r.st}">${r.st==='ok'?tr('crd.present'):tr('crd.invitedPending')}</span></div>`;
     }).join('');
-    body.innerHTML = rows ? `<div class="crd-list">${rows}</div>` : '<p class="club-hint">Personne pour l\'instant.</p>';
+    body.innerHTML = rows ? `<div class="crd-list">${rows}</div>` : `<p class="club-hint">${tr('crd.noOneYet')}</p>`;
   }
   else {
     body.innerHTML = `
       <div class="crd-form">
-        <div class="b-fld"><label>Récurrence</label>
+        <div class="b-fld"><label>${tr('crd.recurrence')}</label>
           <select id="crdRecur">
-            <option value="weekly" ${c.recur!=='once'?'selected':''}>Chaque semaine</option>
-            <option value="once" ${c.recur==='once'?'selected':''}>Séance ponctuelle (date)</option>
+            <option value="weekly" ${c.recur!=='once'?'selected':''}>${tr('creneau.everyWeek')}</option>
+            <option value="once" ${c.recur==='once'?'selected':''}>${tr('crd.oneTimeDated')}</option>
           </select></div>
         <div class="b-fld" id="crdWhenFld">${c.recur==='once'
-          ? `<label for="crdDate">Date</label><input type="date" id="crdDate" value="${c.date||''}">`
-          : `<label for="crdDay">Jour</label><select id="crdDay">${CLUB_DAYS.map((d,i)=>`<option value="${i}" ${i===c.day?'selected':''}>${d}</option>`).join('')}</select>`}</div>
-        <div class="b-fld"><label for="crdTime">Heure</label><input type="time" id="crdTime" value="${c.time}"></div>
-        <div class="b-fld"><label for="crdDur">Durée (min)</label><input type="number" id="crdDur" min="15" max="240" value="${c.dur}"></div>
-        <div class="b-fld"><label for="crdPlace">Lieu</label><input type="text" id="crdPlace" value="${c.place}"></div>
-        <div class="b-fld"><label for="crdCap">Places max</label><input type="number" id="crdCap" min="1" max="200" value="${c.cap}"></div>
-        <div class="b-fld"><label>Groupe (contenu réservé)</label>
-          <select id="crdGroup"><option value="">Tout le club</option>${CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${gr.id===c.group?'selected':''}>${gr.name}</option>`).join('')}</select></div>
-        <div class="b-fld"><label for="crdPrice">Tarif (€)</label><input type="number" id="crdPrice" min="0" step="0.5" value="${c.price}"></div>
-        <div class="b-fld full"><label for="crdDesc">Contenu de la séance</label><textarea id="crdDesc" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical">${c.desc||''}</textarea></div>
+          ? `<label for="crdDate">${tr('invoices.date')}</label><input type="date" id="crdDate" value="${c.date||''}">`
+          : `<label for="crdDay">${tr('crd.day')}</label><select id="crdDay">${CLUB_DAYS.map((d,i)=>`<option value="${i}" ${i===c.day?'selected':''}>${d}</option>`).join('')}</select>`}</div>
+        <div class="b-fld"><label for="crdTime">${tr('crd.time')}</label><input type="time" id="crdTime" value="${c.time}"></div>
+        <div class="b-fld"><label for="crdDur">${tr('crd.durationMin')}</label><input type="number" id="crdDur" min="15" max="240" value="${c.dur}"></div>
+        <div class="b-fld"><label for="crdPlace">${tr('crd.place')}</label><input type="text" id="crdPlace" value="${c.place}"></div>
+        <div class="b-fld"><label for="crdCap">${tr('crd.maxSpots')}</label><input type="number" id="crdCap" min="1" max="200" value="${c.cap}"></div>
+        <div class="b-fld"><label>${tr('crd.groupReserved')}</label>
+          <select id="crdGroup"><option value="">${tr('crd.wholeClub')}</option>${CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${gr.id===c.group?'selected':''}>${gr.name}</option>`).join('')}</select></div>
+        <div class="b-fld"><label for="crdPrice">${tr('crd.price')}</label><input type="number" id="crdPrice" min="0" step="0.5" value="${c.price}"></div>
+        <div class="b-fld full"><label for="crdDesc">${tr('crd.sessionContent')}</label><textarea id="crdDesc" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical">${c.desc||''}</textarea></div>
       </div>
-      <button class="btn crd-save" id="crdSave"><i class="ic ic-check"></i> Enregistrer les paramètres</button>`;
+      <button class="btn crd-save" id="crdSave"><i class="ic ic-check"></i> ${tr('crd.saveSettings')}</button>`;
     document.getElementById('crdRecur').onchange=e=>{
       c.recur = e.target.value==='once' ? 'once' : 'weekly';
       if(c.recur==='once' && !c.date) c.date = iso(addDays(new Date(),7));
@@ -4527,7 +4536,7 @@ function renderCreneauDetail(){
       }
       document.getElementById('crDetailOverlay').classList.remove('open');
       renderCreneaux(); renderClubStats();
-      toast('Créneau mis à jour');
+      toast(tr('toast.creneauMisAJour'));
     };
   }
 }
@@ -4539,7 +4548,7 @@ document.querySelectorAll('#crdTabs .crd-tab').forEach(b=>b.onclick=()=>{ crdTab
 const creneauOverlay=document.getElementById('creneauOverlay');
 document.getElementById('clubAddCreneau').onclick=()=>{
   const sel=document.getElementById('crDay'); sel.innerHTML=CLUB_DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
-  document.getElementById('crGroup').innerHTML='<option value="">Tout le club</option>'+CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  document.getElementById('crGroup').innerHTML=`<option value="">${tr('crd.wholeClub')}</option>`+CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
   creneauOverlay.classList.add('open');
 };
 document.getElementById('creneauClose').onclick=()=> creneauOverlay.classList.remove('open');
@@ -4551,13 +4560,13 @@ document.getElementById('crSave').onclick=()=>{
   const c={
     id:'c'+Date.now(),
     disc:document.getElementById('crDisc').value,
-    title:dispoSafe(document.getElementById('crTitle').value||'Créneau collectif'),
+    title:dispoSafe(document.getElementById('crTitle').value||tr('crd.groupSlot')),
     day:+document.getElementById('crDay').value,
     time:document.getElementById('crTime').value,
     dur:+document.getElementById('crDur').value,
-    place:dispoSafe(document.getElementById('crPlace').value||'À définir'),
+    place:dispoSafe(document.getElementById('crPlace').value||tr('crd.tbd')),
     cap:+document.getElementById('crCap').value,
-    coach:dispoSafe(document.getElementById('crCoach').value||'Coach'),
+    coach:dispoSafe(document.getElementById('crCoach').value||tr('crd.coach')),
     price:+document.getElementById('crPrice').value,
     desc:dispoSafe(document.getElementById('crDesc').value.trim()),
     group:document.getElementById('crGroup').value||null,
@@ -4580,7 +4589,7 @@ document.getElementById('crSave').onclick=()=>{
   }
   creneauOverlay.classList.remove('open');
   clubView='creneaux'; switchClubView(); renderClubStats();
-  toast('Créneau publié — les athlètes peuvent s\'inscrire');
+  toast(tr('toast.creneauPublieAthletesPeuventS'));
 };
 function renderClub(){
   renderClubStats();
@@ -4650,15 +4659,15 @@ let CHAT_MSGS = [
   {from:'them', text:'Salut coach ! Prêt pour la semaine', t:'08:12'},
   {from:'me',   text:'Yes ! Belle séance de seuil prévue demain.', t:'08:15'}
 ];
-const QUICK_COACH_DEFAULT = ['Repose-toi aujourd\'hui','Allège la séance du jour','Bravo pour la séance !','On décale à demain ?','Hydrate-toi bien'];
-const QUICK_ATHLETE = ['Bien récupéré','Jambes fatiguées aujourd\'hui','Séance validée','Une question sur la séance ?'];
+const QUICK_COACH_DEFAULT = [tr('chat.q.restToday'),tr('chat.q.lightenToday'),tr('chat.q.wellDone'),tr('chat.q.shiftTomorrow'),tr('chat.q.hydrate')];
+const QUICK_ATHLETE = [tr('chat.q.recoveredWell'),tr('chat.q.tiredLegs'),tr('chat.q.sessionDone'),tr('chat.q.questionAboutSession')];
 /* Réponses rapides du coach — personnalisables, persistées en local.
    Le chip "Gérer" ouvre un éditeur texte simple (une réponse par ligne)
    plutôt qu'une UI dédiée : rapide à livrer, suffisant pour un coach qui
    gère 20-30 athlètes au clavier. */
 let CHAT_MACROS = (()=>{ try{ const s=JSON.parse(localStorage.getItem('sil_chat_macros')||'null'); return (Array.isArray(s)&&s.length) ? s : QUICK_COACH_DEFAULT.slice(); }catch(e){ return QUICK_COACH_DEFAULT.slice(); } })();
 function manageChatMacros(){
-  const next = prompt('Tes réponses rapides (une par ligne) :', CHAT_MACROS.join('\n'));
+  const next = prompt(tr('chat.macrosPrompt'), CHAT_MACROS.join('\n'));
   if(next==null) return;
   // Échappé à la saisie : rendu ensuite en boutons via innerHTML sans
   // ré-échapper (`<button>${x}</button>`).
@@ -4671,14 +4680,14 @@ const chatPanel=document.getElementById('chatPanel');
 const chatBody=document.getElementById('chatBody');
 function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function renderChat(){
-  chatBody.innerHTML = `<div class="chat-day">Aujourd'hui</div>` + CHAT_MSGS.map(m=>
+  chatBody.innerHTML = `<div class="chat-day">${tr('chat.today')}</div>` + CHAT_MSGS.map(m=>
     `<div class="chat-msg ${m.from}">${m.text}<span class="time">${m.t}</span></div>`).join('');
   chatBody.scrollTop = chatBody.scrollHeight;
   const quick = (mode==='coach') ? CHAT_MACROS : QUICK_ATHLETE;
   const q=document.getElementById('chatQuick');
-  q.innerHTML = quick.map(x=>`<button>${x}</button>`).join('') + (mode==='coach' ? `<button id="chatMacroManage" title="Personnaliser tes réponses rapides"><i class="ic ic-edit"></i> Gérer</button>` : '');
+  q.innerHTML = quick.map(x=>`<button>${x}</button>`).join('') + (mode==='coach' ? `<button id="chatMacroManage" title="${tr('chat.customizeQuickReplies')}"><i class="ic ic-edit"></i> ${tr('chat.manage')}</button>` : '');
   q.querySelectorAll('button').forEach((b,i)=>{ if(b.id==='chatMacroManage') b.onclick=manageChatMacros; else b.onclick=()=> sendChat(quick[i]); });
-  document.getElementById('chatPeerName').textContent = (mode==='coach')?'Romain D.':'Coach';
+  document.getElementById('chatPeerName').textContent = (mode==='coach')?'Romain D.':tr('crd.coach');
   document.getElementById('chatAvatar').textContent = (mode==='coach')?'RD':'CO';
 }
 function sendChat(text){
@@ -4687,7 +4696,7 @@ function sendChat(text){
   // innerHTML, sans ré-échapper (écriture optimiste locale, chat 100% front).
   CHAT_MSGS.push({from:'me', text:dispoSafe(text), t:nowHM()});
   document.getElementById('chatText').value=''; renderChat();
-  setTimeout(()=>{ CHAT_MSGS.push({from:'them', text:'Bien reçu, merci coach !', t:nowHM()}); renderChat(); }, 1400);
+  setTimeout(()=>{ CHAT_MSGS.push({from:'them', text:tr('chat.autoReply'), t:nowHM()}); renderChat(); }, 1400);
 }
 function openChat(prefill){
   chatPanel.classList.add('open'); renderChat();
@@ -4700,7 +4709,7 @@ document.getElementById('chatSend').onclick=()=> sendChat(document.getElementByI
 document.getElementById('chatText').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(e.target.value); });
 document.getElementById('chatWhatsapp').onclick=()=>{
   const draft = document.getElementById('chatText').value.trim()
-    || 'Salut ! Vu ton check-in de ce matin : je te conseille du repos aujourd\'hui. On en parle ?';
+    || tr('chat.waDraft');
   window.open(`https://wa.me/${ATHLETE_PHONE}?text=${encodeURIComponent(draft)}`, '_blank');
 };
 
@@ -4765,7 +4774,7 @@ const ZONES = [
 (function zonesTable(){
   const g = document.getElementById('zonesGrid');
   if(!g) return;
-  g.innerHTML = `<div class="zh">Zone</div><div class="zh">FC</div><div class="zh">Allure course</div><div class="zh">Puissance vélo</div>` +
+  g.innerHTML = `<div class="zh">${tr('zonesTbl.zone')}</div><div class="zh">${tr('zonesTbl.hr')}</div><div class="zh">${tr('zonesTbl.runPace')}</div><div class="zh">${tr('zonesTbl.bikePower')}</div>` +
     ZONES.map(z=>`
       <div class="zn"><i style="background:${z.c}"></i>${z.z}</div>
       <div class="zv">${z.fc}</div><div class="zv">${z.run}</div><div class="zv">${z.bike}</div>`).join('');
@@ -4787,14 +4796,14 @@ function renderVideoGrid(){
   // numéral (data set large) : nombre de vidéos du sport filtré
   const cEl=document.getElementById('vlCount'), dEl=document.getElementById('vlCountDisc');
   if(cEl) cEl.textContent=String(list.length).padStart(2,'0');
-  if(dEl) dEl.textContent=(DISC[vlFilter]&&DISC[vlFilter].label)||'Toutes';
+  if(dEl) dEl.textContent=(DISC[vlFilter]&&DISC[vlFilter].label)||tr('video.all');
   if(window.__pf_vlOptical) window.__pf_vlOptical();
-  if(!list.length){ grid.innerHTML=`<div class="vl-empty">Aucune vidéo ne correspond. Essaie un autre mot-clé.</div>`; return; }
+  if(!list.length){ grid.innerHTML=`<div class="vl-empty">${tr('video.noMatch')}</div>`; return; }
   grid.innerHTML=list.map(v=>{
     const D=DISC[v.disc];
     const locked = v.premium && !window.__pf_subscribed;
     return `<div class="vcard${locked?' vlocked':''}" data-id="${v.id}" style="--c:${D.color}">
-      <div class="thumb"><span class="disc">${discIcon(D)}</span><span class="play"></span><span class="dur">${v.dur}</span>${locked?'<span class="vlock"><i class="ic ic-lock"></i> Premium</span>':''}</div>
+      <div class="thumb"><span class="disc">${discIcon(D)}</span><span class="play"></span><span class="dur">${v.dur}</span>${locked?`<span class="vlock"><i class="ic ic-lock"></i> Premium</span>`:''}</div>
       <div class="vbody">
         <div class="vt">${v.title}</div>
         <div class="vmeta"><span class="lvl">${v.level}</span><span>${D.label}</span></div>
@@ -4861,8 +4870,8 @@ function openVideo(v){
   if(!v) return;
   // Gate premium : contenu payant verrouillé tant que l'utilisateur n'est pas abonné.
   if(v.premium && !window.__pf_subscribed){
-    if(window.PF?.user){ toast('Contenu Premium — redirection vers l\'abonnement…'); PF.startCheckout('athlete').catch(e=>{ console.warn(e); toast('Abonnement indisponible', 'error'); }); }
-    else { toast('Contenu Premium — réservé aux abonnés'); }
+    if(window.PF?.user){ toast(tr('toast.contenuPremiumRedirectionVersL')); PF.startCheckout('athlete').catch(e=>{ console.warn(e); toast(tr('toast.abonnementIndisponible'), 'error'); }); }
+    else { toast(tr('toast.contenuPremiumReserveAbonnes')); }
     return;
   }
   const D=DISC[v.disc];
@@ -4875,7 +4884,7 @@ function openVideo(v){
     // vidéo réelle (mp4 direct). Pour un embed YouTube/Vimeo, remplacer par une <iframe>.
     frame.innerHTML=`<video src="${v.src}" controls autoplay playsinline></video>`;
   } else {
-    frame.innerHTML=`<div class="ph"><div class="pico"><i class="ic ic-film"></i></div>Emplacement vidéo — branche l'URL dans <b>VIDEOS</b><br><small>(mp4 hébergé, ou embed YouTube/Vimeo)</small></div>`;
+    frame.innerHTML=`<div class="ph"><div class="pico"><i class="ic ic-film"></i></div>${tr('video.placeholder')}<br><small>${tr('video.placeholderHint')}</small></div>`;
   }
   videoOverlay.classList.add('open');
 }
@@ -4896,7 +4905,7 @@ function showVidPopover(e, v){
   vpop.style.setProperty('--vpc', D.color);
   document.getElementById('vpThumb').style.setProperty('--vpc', D.color);
   document.getElementById('vpTitle').textContent=v.title;
-  document.getElementById('vpHint').textContent=`${v.dur} · clic pour ouvrir en grand`;
+  document.getElementById('vpHint').textContent=`${v.dur} · ${tr('video.clickToOpen')}`;
   vpop.classList.add('show'); vpop.setAttribute('aria-hidden','false');
   positionVidPopover(e);
 }
@@ -4934,11 +4943,11 @@ let builderState = null;
 let builderUid = 1;
 
 const LINE_TYPES = {
-  warmup:   {l:'Échauffement', c:'#39E6A3'},
-  exo:      {l:'Exercice',     c:'#FF5470'},
-  contre:   {l:'Contre-effort',c:'#FFB13D'},
-  recov:    {l:'Récupération',  c:'#2FD9FF'},
-  cooldown: {l:'Retour calme', c:'#9D7BFF'}
+  warmup:   {get l(){return tr('lineType.warmup')}, c:'#39E6A3'},
+  exo:      {get l(){return tr('lineType.exo')},     c:'#FF5470'},
+  contre:   {get l(){return tr('lineType.contre')},c:'#FFB13D'},
+  recov:    {get l(){return tr('lineType.recov')},  c:'#2FD9FF'},
+  cooldown: {get l(){return tr('lineType.cooldown')}, c:'#9D7BFF'}
 };
 
 /* références activables par sport (le coach coche celles qu'il veut voir) */
@@ -4984,9 +4993,9 @@ function exactDefault(disc){
 }
 /* options de type de cible exacte par sport */
 function exactKinds(disc){
-  if(disc==='bike') return [['power','Watts'],['pace','Allure /km'],['speed','km/h'],['rpe','RPE (sans capteur)']];
-  if(disc==='run')  return [['pace','Allure /km'],['speed','km/h'],['time','Temps total'],['rpe','RPE (sans capteur)']];
-  if(disc==='swim') return [['time100','Temps /100m'],['pace','Allure /100m'],['time','Temps total'],['rpe','RPE (sans capteur)']];
+  if(disc==='bike') return [['power',tr('exact.watts')],['pace',tr('exact.paceKm')],['speed','km/h'],['rpe',tr('exact.rpeNoSensor')]];
+  if(disc==='run')  return [['pace',tr('exact.paceKm')],['speed','km/h'],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
+  if(disc==='swim') return [['time100',tr('exact.time100')],['pace',tr('exact.pace100')],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
   return [['rpe','RPE']];
 }
 function defaultBlockNew(disc){
@@ -5027,9 +5036,9 @@ function openBuilder(dateKey, existing){
       title: existing?.title||'', disc,
       activeRefs: defaultActiveRefs(disc),
       blocks: [
-        {bid:'b'+(builderUid++), series:1, title:'Échauffement', lines:[defaultLine('warmup',disc)]},
+        {bid:'b'+(builderUid++), series:1, title:tr('builder.warmupTitle'), lines:[defaultLine('warmup',disc)]},
         {bid:'b'+(builderUid++), series:5, title:'', lines:[defaultLine('exo',disc), defaultLine('contre',disc)]},
-        {bid:'b'+(builderUid++), series:1, title:'Retour au calme', lines:[defaultLine('cooldown',disc)]}
+        {bid:'b'+(builderUid++), series:1, title:tr('builder.cooldownTitle'), lines:[defaultLine('cooldown',disc)]}
       ],
       targetDate: dateKey||null
     };
@@ -5039,7 +5048,7 @@ function openBuilder(dateKey, existing){
   if(builderState.objectif==null) builderState.objectif = (existing&&existing.objectif&&existing.objectif.type) ? existing.objectif.type+'|'+existing.objectif.zone : '';
   document.getElementById('bTitle').value = builderState.title||'';
   document.getElementById('bObjectif').value = builderState.objectif||'';
-  document.getElementById('builderBadge').textContent = existing ? 'Modifier la séance' : 'Nouvelle séance';
+  document.getElementById('builderBadge').textContent = existing ? tr('builder.editSession') : tr('builder.newSession');
   document.getElementById('bDiscPick').value = builderState.disc;
   renderRefs();
   renderBlocks();
@@ -5061,7 +5070,7 @@ function renderRefs(){
   const rpeOnly = builderState.activeRefs.length===1 && builderState.activeRefs[0]==='rpe';
   wrap.innerHTML = refsForDisc(builderState.disc).map(k=>
     `<span class="b-ref-chip ${builderState.activeRefs.includes(k)?'on':''}" data-ref="${k}">${REF_LABEL[k]}</span>`
-  ).join('') + `<span class="b-ref-chip nosensor ${rpeOnly?'on':''}" id="bNoSensor" title="Athlète sans montre GPS ni capteur : toutes les cibles passent en ressenti RPE 1-10">⌚ Sans capteur — tout en RPE</span>`;
+  ).join('') + `<span class="b-ref-chip nosensor ${rpeOnly?'on':''}" id="bNoSensor" title="${tr('builder.noSensorTitle')}">⌚ ${tr('builder.noSensorChip')}</span>`;
   wrap.querySelectorAll('.b-ref-chip').forEach(ch=>{
     ch.onclick=()=>{
       const k=ch.dataset.ref;
@@ -5082,11 +5091,11 @@ function renderRefs(){
         ln.mode='exact';
         ln.exact={kind:'rpe', rpe: ln.exact&&ln.exact.kind==='rpe'?(ln.exact.rpe||ln.rpe||6):(ln.rpe||rpeFromPct(ln.pct||70)), tol:0};
       }));
-      toast('Séance en RPE uniquement — parfaite sans montre ni capteur');
+      toast(tr('toast.seanceEnRpeUniquementParfaite'));
     } else {
       builderState.activeRefs=defaultActiveRefs(builderState.disc);
       builderState.blocks.forEach(blk=>blk.lines.forEach(ln=>{ if(ln.type!=='station') ln.mode='zone'; }));
-      toast('Retour aux références % (FTP/VMA/CSS…)');
+      toast(tr('toast.retourReferencesFtpVmaCss'));
     }
     renderRefs(); renderBlocks();
   };
@@ -5100,25 +5109,25 @@ function renderBlocks(){
     return `<div class="bk" data-bid="${blk.bid}">
       <div class="bk-head">
         <div class="bk-move">
-          <button data-mv="up" ${bi===0?'disabled style=opacity:.3':''} aria-label="Monter">▲</button>
-          <button data-mv="down" ${bi===builderState.blocks.length-1?'disabled style=opacity:.3':''} aria-label="Descendre">▼</button>
+          <button data-mv="up" ${bi===0?'disabled style=opacity:.3':''} aria-label="${tr('builder.moveUp')}">▲</button>
+          <button data-mv="down" ${bi===builderState.blocks.length-1?'disabled style=opacity:.3':''} aria-label="${tr('builder.moveDown')}">▼</button>
         </div>
-        <div class="bk-series"><span class="x">×</span><input type="number" min="1" max="40" value="${blk.series}" data-f="series"><small>série${blk.series>1?'s':''}</small></div>
-        <input class="bk-title-in" placeholder="Titre du bloc (optionnel)" value="${blk.title||''}" data-f="btitle">
+        <div class="bk-series"><span class="x">×</span><input type="number" min="1" max="40" value="${blk.series}" data-f="series"><small>${tr(blk.series>1?'builder.seriesPlural':'builder.seriesSingular')}</small></div>
+        <input class="bk-title-in" placeholder="${tr('builder.blockTitlePlaceholder')}" value="${blk.title||''}" data-f="btitle">
         <div class="bk-tools">
-          <button data-act="dup" title="Dupliquer">⧉</button>
-          <button class="del" data-act="delblock" title="Supprimer"><i class="ic ic-x"></i></button>
+          <button data-act="dup" title="${tr('builder.duplicate')}">⧉</button>
+          <button class="del" data-act="delblock" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
         </div>
       </div>
       <div class="bk-lines">${lines}</div>
       <div class="bk-addline">
         ${builderState.disc==='hyrox'
-          ? `<button data-addstation="">+ Ajouter une station</button>` + HYROX_STATIONS.map(s=>`<button data-addstation="${s.key}">${s.name}</button>`).join('')
-          : `<button data-add="warmup">+ Échauffement</button>
-             <button data-add="exo">+ Exercice</button>
-             <button data-add="contre">+ Contre-effort</button>
-             <button data-add="recov">+ Récup</button>
-             <button data-add="cooldown">+ Retour</button>`}
+          ? `<button data-addstation="">+ ${tr('builder.addStation')}</button>` + HYROX_STATIONS.map(s=>`<button data-addstation="${s.key}">${s.name}</button>`).join('')
+          : `<button data-add="warmup">+ ${tr('lineType.warmup')}</button>
+             <button data-add="exo">+ ${tr('lineType.exo')}</button>
+             <button data-add="contre">+ ${tr('lineType.contre')}</button>
+             <button data-add="recov">+ ${tr('lineType.recov')}</button>
+             <button data-add="cooldown">+ ${tr('lineType.cooldown')}</button>`}
       </div>
     </div>`;
   }).join('');
@@ -5136,7 +5145,7 @@ function lnActionsHTML(ln, delLabel){
     </div>
     <div class="ln-note">
       <i class="ic ic-message-circle"></i>
-      <input type="text" class="ln-note-in" data-f="note" placeholder="Commentaire pour l'athlète (facultatif)…" value="${dispoSafe(ln.note||'')}">
+      <input type="text" class="ln-note-in" data-f="note" placeholder="${tr('builder.commentPlaceholder')}" value="${dispoSafe(ln.note||'')}">
     </div>`;
 }
 
@@ -5148,7 +5157,7 @@ function lineHTML(blk, ln){
     const stationSel = HYROX_STATIONS.map(s=>`<option value="${s.key}" ${s.key===ln.station?'selected':''}>${s.name}</option>`).join('');
     const weightField = st.weighted
       ? `<div class="hx-weight"><input type="number" min="0" max="300" step="0.5" value="${ln.weight||0}" data-hx="weight"><span>kg</span></div>`
-      : `<div class="hx-weight hx-noweight">— poids libre —</div>`;
+      : `<div class="hx-weight hx-noweight">${tr('builder.freeWeight')}</div>`;
     return `<div class="ln ln-hyrox" data-lid="${ln.lid}" style="--lc:${DISC.hyrox.color}">
       <span class="ln-grip">⠿</span>
       <select class="ln-type hx-station" data-hx="station">${stationSel}</select>
@@ -5156,7 +5165,7 @@ function lineHTML(blk, ln){
         <input type="number" min="0" max="5000" value="${ln.target||0}" data-hx="target"><span>${unitLbl}</span>
       </div>
       ${weightField}
-      ${lnActionsHTML(ln, 'Supprimer la station')}
+      ${lnActionsHTML(ln, tr('builder.deleteStation'))}
     </div>`;
   }
 
@@ -5182,15 +5191,15 @@ function lineHTML(blk, ln){
     // zones perso compatibles avec la discipline de la séance (index d'origine gardé)
     const custZ = customZones().map((z,ci)=>({z,ci}))
       .filter(({z})=>{ const m=INTENSITY_MODELS[z.ref]; return m && (m.disc===builderState.disc || m.disc==='all'); });
-    const zoneSel = `<select class="ln-zonesel" data-f="zonesel" style="--lz:${zCol}" title="Choisir la zone de travail">
+    const zoneSel = `<select class="ln-zonesel" data-f="zonesel" style="--lz:${zCol}" title="${tr('builder.chooseWorkZone')}">
         ${zList.map((z,i)=>`<option value="${i}" ${i===zIdx?'selected':''}>${dispoSafe(z[0])}</option>`).join('')}
         ${zIdx<0?`<option value="-1" selected>${zn||'—'}</option>`:''}
-        ${custZ.length?`<optgroup label="Zones perso">${custZ.map(({z,ci})=>`<option value="c${ci}">${dispoSafe(z.name)} · ${REF_LABEL[z.ref]||z.ref}</option>`).join('')}</optgroup>`:''}
+        ${custZ.length?`<optgroup label="${tr('zoneEd.customZones')}">${custZ.map(({z,ci})=>`<option value="c${ci}">${dispoSafe(z.name)} · ${REF_LABEL[z.ref]||z.ref}</option>`).join('')}</optgroup>`:''}
       </select>`;
     intHTML = `
       <div class="ln-zone-row">
-        <select class="ln-zone" data-f="model" title="Référence de calcul">${models.map(k=>`<option value="${k}" ${k===ln.model?'selected':''}>${REF_LABEL[k]}</option>`).join('')}</select>
-        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="Intensité en %"><span class="pv-unit">%</span></div>
+        <select class="ln-zone" data-f="model" title="${tr('builder.calcReference')}">${models.map(k=>`<option value="${k}" ${k===ln.model?'selected':''}>${REF_LABEL[k]}</option>`).join('')}</select>
+        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="${tr('builder.intensityPctAria')}"><span class="pv-unit">%</span></div>
       </div>
       <div class="ln-targets">${targets}${zoneSel}</div>`;
   } else {
@@ -5200,8 +5209,8 @@ function lineHTML(blk, ln){
   // champ durée OU distance selon la métrique de la ligne
   const metric = ln.metric || 'time';
   const durField = metric==='dist'
-    ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="Basculer temps / distance">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
-    : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="Basculer temps / distance">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
+    ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
+    : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
 
   return `<div class="ln" data-lid="${ln.lid}" style="--lc:${T.c}">
     <span class="ln-grip">⠿</span>
@@ -5209,12 +5218,12 @@ function lineHTML(blk, ln){
     ${durField}
     <div class="ln-int">
       <div class="ln-mode">
-        <button class="${ln.mode==='zone'?'on':''}" data-mode="zone">Zone %</button>
-        <button class="${ln.mode==='exact'?'on':''}" data-mode="exact">Exact</button>
+        <button class="${ln.mode==='zone'?'on':''}" data-mode="zone">${tr('builder.zonePct')}</button>
+        <button class="${ln.mode==='exact'?'on':''}" data-mode="exact">${tr('builder.exact')}</button>
       </div>
       ${intHTML}
     </div>
-    ${lnActionsHTML(ln, 'Supprimer la ligne')}
+    ${lnActionsHTML(ln, tr('builder.deleteLine'))}
   </div>`;
 }
 
@@ -5418,7 +5427,7 @@ function updateBuilderSummary(){
   const {min,tss}=builderTotals();
   const nbBlocks=builderState.blocks.length;
   const nbLines=builderState.blocks.reduce((a,b)=>a+b.lines.length*b.series,0);
-  document.getElementById('bSummary').innerHTML=`<b>${fmtDur(min)}</b> total · <b>${tss}</b> TSS estimé · ${nbBlocks} bloc${nbBlocks>1?'s':''} · ${nbLines} intervalles`;
+  document.getElementById('bSummary').innerHTML=tr('builder.summary', {dur:fmtDur(min), tss, nbBlocks:tr(nbBlocks>1?'builder.nBlocksPlural':'builder.nBlocksSingular', {n:nbBlocks}), nLines:nbLines});
 }
 
 function builderToText(){
@@ -5456,7 +5465,7 @@ function builderToSession(){
   const post=document.getElementById('bNutriPost').value.trim();
   const s={
     disc: builderState.disc,
-    title: builderState.title || document.getElementById('bTitle').value || 'Séance personnalisée',
+    title: builderState.title || document.getElementById('bTitle').value || tr('builder.customSession'),
     dur: min, tss, zone: domZone,
     desc: builderToText(),
     objectif: builderState.objectif ? {type:builderState.objectif.split('|')[0], zone:builderState.objectif.split('|')[1]} : null,
@@ -5484,7 +5493,7 @@ function initBuilderNutrition(existing){
     const tmp={disc:builderState.disc, title:builderState.title, dur:builderTotals().min, zone:'Z3'};
     const n=nutritionForSession(tmp);
     pre.placeholder=n.pre; post.placeholder=n.post;
-    auto.textContent=`· suggestion auto : ${n.key}`;
+    auto.textContent=tr('builder.autoSuggestion', {key:n.key});
   };
   if(existing && existing.nutrition){ pre.value=existing.nutrition.pre||''; post.value=existing.nutrition.post||''; }
   else { pre.value=''; post.value=''; }
@@ -5536,7 +5545,7 @@ document.getElementById('bSaveLib').addEventListener('click', ()=>{
       .catch(e=> console.warn('[PF] saveTemplate échoué :', e));
   }
   closeBuilder(); if(mode==='coach') renderSidebar();
-  toast('Séance rangée en bibliothèque');
+  toast(tr('toast.seanceRangeeEnBibliotheque'));
 });
 document.getElementById('bSaveCal').addEventListener('click', ()=>{
   const s=builderToSession();
@@ -5550,7 +5559,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
       .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
   }
   closeBuilder(); render();
-  toast('Séance ajoutée au calendrier');
+  toast(tr('toast.seanceAjouteeCalendrier'));
 });
 
 /* ============================================================
@@ -5668,12 +5677,12 @@ function computeImpact(s, data){
   }
   const heatSecPerKm = basePaceSec * heatPctPerKm;
   const heatTotal = heatSecPerKm * distKm;
-  items.push({key:'Chaleur', ico:'ic-thermometer', color:'var(--run)',
+  items.push({key:tr('impact.heat'), ico:'ic-thermometer', color:'var(--run)',
     cost: heatSecPerKm, total: heatTotal,
-    cond:`${c.temp}°C · ${c.humidity}% humidité`,
+    cond:tr('impact.heatCond', {temp:c.temp, hum:c.humidity}),
     detail: c.temp>15
-      ? `La chaleur t'a coûté ~${heatSecPerKm.toFixed(0)} s/km. Sans elle, tu aurais pu aller plus vite.`
-      : `Température idéale (${c.temp}°C) : aucun surcoût thermique.`});
+      ? tr('impact.heatDetailCost', {sec:heatSecPerKm.toFixed(0)})
+      : tr('impact.heatDetailIdeal', {temp:c.temp})});
 
   // — Vent —
   let windSecPerKm = 0;
@@ -5686,23 +5695,23 @@ function computeImpact(s, data){
     windSecPerKm = basePaceSec * windPct;
   }
   const windTotal = windSecPerKm * distKm;
-  items.push({key:'Vent', ico:'ic-wind', color:'var(--swim)',
+  items.push({key:tr('impact.wind'), ico:'ic-wind', color:'var(--swim)',
     cost: windSecPerKm, total: windTotal,
-    cond:`${c.wind} km/h · ${c.windHead?'de face':'favorable'}`,
+    cond:`${c.wind} km/h · ${c.windHead?tr('impact.headwind'):tr('impact.favorable')}`,
     detail: c.windHead
-      ? `Vent de face : ~${Math.abs(windSecPerKm).toFixed(0)} s/km perdues sur les sections exposées.`
-      : `Vent plutôt favorable : il t'a fait gagner ~${Math.abs(windSecPerKm).toFixed(0)} s/km.`});
+      ? tr('impact.windDetailHead', {sec:Math.abs(windSecPerKm).toFixed(0)})
+      : tr('impact.windDetailFavorable', {sec:Math.abs(windSecPerKm).toFixed(0)})});
 
   // — Dénivelé (D+) —
   // coût ~ 6 s par mètre de D+ en course (réparti sur la distance)
   const dplusSecTotal = isRun ? data.dplus*5.5 : data.dplus*3.2;
   const dplusSecPerKm = dplusSecTotal/distKm;
-  items.push({key:'Dénivelé', ico:'ic-mountain', color:'var(--bike)',
+  items.push({key:tr('impact.elevation'), ico:'ic-mountain', color:'var(--bike)',
     cost: dplusSecPerKm, total: dplusSecTotal,
     cond:`${data.dplus} m D+`,
     detail: data.dplus>20
-      ? `Le relief t'a coûté ~${fmtMMSS(dplusSecTotal)} sur l'ensemble (≈${dplusSecPerKm.toFixed(0)} s/km).`
-      : `Parcours quasi plat : impact du dénivelé négligeable.`});
+      ? tr('impact.elevDetailCost', {time:fmtMMSS(dplusSecTotal), sec:dplusSecPerKm.toFixed(0)})
+      : tr('impact.elevDetailFlat')});
 
   const totalLost = items.reduce((a,i)=>a+Math.max(0,i.total),0);
   const totalGain = items.reduce((a,i)=>a+Math.min(0,i.total),0);
@@ -5729,11 +5738,12 @@ function renderImpact(s, data){
   // synthèse : allure "corrigée" si conditions neutres
   const correctedPace = imp.basePaceSec - (imp.totalLost+imp.totalGain)/imp.distKm;
   const summary = `<div class="imp-summary">
-    <div class="is-h"><i class="ic ic-chart"></i> Allure corrigée des conditions</div>
-    <div class="is-txt">Dans des conditions neutres (15°C, sans vent, à plat), ton allure moyenne aurait été d'environ
-      <b>${paceFromSpeed(3600/correctedPace)}/km</b> au lieu de <b>${paceFromSpeed(data.avgSpeed)}/km</b>.
-      Au total, l'environnement t'a ${imp.totalLost+imp.totalGain>=0?'coûté':'fait gagner'}
-      <b>~${fmtMMSS(imp.totalLost+imp.totalGain)}</b> sur cette séance.</div>
+    <div class="is-h"><i class="ic ic-chart"></i> ${tr('impact.correctedPace')}</div>
+    <div class="is-txt">${tr('impact.summaryText', {
+      corrected:paceFromSpeed(3600/correctedPace), actual:paceFromSpeed(data.avgSpeed),
+      verb: imp.totalLost+imp.totalGain>=0?tr('impact.cost'):tr('impact.gained'),
+      time: fmtMMSS(imp.totalLost+imp.totalGain)
+    })}</div>
   </div>`;
   box.innerHTML = cards + summary;
 }
@@ -5753,13 +5763,13 @@ function openAnalysis(s){
   const isSwim=s.disc==='swim';
   // restaure les sections (au cas où une analyse Hyrox les a masquées)
   document.getElementById('anSpeedTitle').parentElement.parentElement.style.display='';
-  document.getElementById('anHr').parentElement.querySelector('h4').textContent='Fréquence cardiaque';
-  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent='Détail par lap';
+  document.getElementById('anHr').parentElement.querySelector('h4').textContent=tr('analysis.heartRate');
+  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent=tr('analysis.lapDetail');
 
 
 
   // titre vitesse selon le sport
-  const spTitle = s.disc==='bike'?'Vitesse (km/h)' : s.disc==='run'?'Allure (min/km)' : 'Allure (/100m)';
+  const spTitle = s.disc==='bike'?tr('analysis.speedKmh') : s.disc==='run'?tr('analysis.paceMinKm') : tr('analysis.pace100m');
   document.getElementById('anSpeedTitle').textContent = spTitle;
   // réinitialise le registre des graphes (curseur)
   AN_CHARTS.speed=AN_CHARTS.hr=AN_CHARTS.elev=AN_CHARTS.power=AN_CHARTS.decouple=null;
@@ -5831,23 +5841,23 @@ function openHyroxAnalysis(s){
   const maxHr = hrs.length?Math.max(...hrs):0;
   const totalDist = log.filter(st=>st.unit==='m').reduce((a,st)=>a+(+st.done||0),0);
   document.getElementById('anKpis').innerHTML=[
-    {k:'Temps total', v:totalSec?fmtClock(totalSec/60):'—', u:''},
-    {k:'Distance cumulée', v:totalDist, u:'m'},
-    {k:'FC moy', v:avgHr||'—', u:'bpm'},
-    {k:'FC max', v:maxHr||'—', u:'bpm'},
-    {k:'Stations', v:log.length, u:''}
+    {k:tr('analysis.totalTime'), v:totalSec?fmtClock(totalSec/60):'—', u:''},
+    {k:tr('analysis.totalDistance'), v:totalDist, u:'m'},
+    {k:tr('analysis.avgHr'), v:avgHr||'—', u:'bpm'},
+    {k:tr('refs.maxHr'), v:maxHr||'—', u:'bpm'},
+    {k:tr('analysis.stations'), v:log.length, u:''}
   ].map(x=>`<div class="an-kpi"><div class="k">${x.k}</div><div class="v">${x.v}</div><div class="u">${x.u}</div></div>`).join('');
 
   // on masque les graphes vitesse/altitude, on garde la FC en barres par station
   document.getElementById('anSpeedTitle').parentElement.parentElement.style.display='none';
   document.getElementById('anElevWrap').style.display='none';
   document.getElementById('anPowerWrap').style.display='none';
-  document.getElementById('anHr').parentElement.querySelector('h4').textContent='Fréquence cardiaque par station';
+  document.getElementById('anHr').parentElement.querySelector('h4').textContent=tr('analysis.hrByStation');
   drawHyroxHr(log);
 
   // tableau éditable des stations
-  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent='Détail par station';
-  document.getElementById('anLapHint').textContent='saisis tes valeurs réalisées';
+  document.querySelector('#anLaps').closest('.an-section').querySelector('h4').textContent=tr('analysis.detailByStation');
+  document.getElementById('anLapHint').textContent=tr('analysis.enterActualValues');
   renderHyroxStations(s);
   // comparateur Hyrox (vs simulations passées)
   const wb=log.find(st=>/wall/i.test(st.name));
@@ -5877,7 +5887,7 @@ function renderHyroxStations(s){
   const log=s._hyroxLog;
   const box=document.getElementById('anLaps');
   box.innerHTML = `<div class="hx-an-head">
-      <span>Station</span><span>Réalisé</span><span>Poids</span><span>Temps</span><span>FC moy</span>
+      <span>${tr('analysis.station')}</span><span>${tr('analysis.achieved')}</span><span>${tr('analysis.weight')}</span><span>${tr('modal.duration')}</span><span>${tr('analysis.avgHr')}</span>
     </div>` + log.map((st,i)=>`
     <div class="hx-an-row" data-i="${i}">
       <div class="hx-an-name">${st.name}</div>
@@ -5991,14 +6001,14 @@ function sessionType(s){
 const SIM_METRICS = {
   bike:[ {k:'np',label:'NP',fmt:v=>Math.round(v)+' W',better:'high'},
          {k:'ifv',label:'IF',fmt:v=>(+v).toFixed(2),better:'high'},
-         {k:'avgHr',label:'FC moy',fmt:v=>Math.round(v)+' bpm',better:'low'},
-         {k:'dist',label:'Distance',fmt:v=>(+v).toFixed(0)+' km',better:'high'} ],
-  run:[  {k:'pace',label:'Allure',fmt:v=>fmtPace(v)+'/km',better:'low'},
-         {k:'avgHr',label:'FC moy',fmt:v=>Math.round(v)+' bpm',better:'low'},
-         {k:'dist',label:'Distance',fmt:v=>(+v).toFixed(1)+' km',better:'high'} ],
-  hyrox:[{k:'total',label:'Temps total',fmt:v=>fmtClock(v/60),better:'low'},
+         {k:'avgHr',get label(){return tr('simMetric.avgHr')},fmt:v=>Math.round(v)+' bpm',better:'low'},
+         {k:'dist',get label(){return tr('simMetric.dist')},fmt:v=>(+v).toFixed(0)+' km',better:'high'} ],
+  run:[  {k:'pace',get label(){return tr('simMetric.pace')},fmt:v=>fmtPace(v)+'/km',better:'low'},
+         {k:'avgHr',get label(){return tr('simMetric.avgHr')},fmt:v=>Math.round(v)+' bpm',better:'low'},
+         {k:'dist',get label(){return tr('simMetric.dist2')},fmt:v=>(+v).toFixed(1)+' km',better:'high'} ],
+  hyrox:[{k:'total',get label(){return tr('simMetric.total')},fmt:v=>fmtClock(v/60),better:'low'},
          {k:'wbtime',label:'Wall balls',fmt:v=>fmtClock(v/60),better:'low'},
-         {k:'avgHr',label:'FC moy',fmt:v=>Math.round(v)+' bpm',better:'low'} ],
+         {k:'avgHr',get label(){return tr('simMetric.avgHr')},fmt:v=>Math.round(v)+' bpm',better:'low'} ],
 };
 function currentSimMetrics(s, data){
   if(s.disc==='bike'){ const ftp=lapFTPval();
@@ -6027,11 +6037,11 @@ function renderSimilar(disc, type, cur){
   if(disc==='swim'||!cur){ wrap.style.display='none'; return; }
   wrap.style.display=''; injectSimCss();
   const box=document.getElementById('anSimilar');
-  const TYPELBL={seuil:'Seuil',vo2:'VO2max / intervalles',endurance:'Endurance',hyrox:'Hyrox'};
+  const TYPELBL={seuil:tr('simType.threshold'),vo2:tr('simType.vo2'),endurance:tr('simType.endurance'),hyrox:'Hyrox'};
   const matches=SESSION_HISTORY.filter(h=>h.disc===disc&&h.type===type).slice(0,2);
-  if(!matches.length){ box.innerHTML=`<p class="an-sim-empty">Aucune séance « ${TYPELBL[type]||type} » comparable dans l'historique récent.</p>`; return; }
+  if(!matches.length){ box.innerHTML=`<p class="an-sim-empty">${tr('simType.noComparable', {type:TYPELBL[type]||type})}</p>`; return; }
   const M=SIM_METRICS[disc]||[];
-  const head=`<div class="sim-row sim-head"><span>${TYPELBL[type]||type}</span><span class="sim-cur">Cette séance</span>${matches.map(m=>`<span>${m.date}</span>`).join('')}</div>`;
+  const head=`<div class="sim-row sim-head"><span>${TYPELBL[type]||type}</span><span class="sim-cur">${tr('simType.thisSession')}</span>${matches.map(m=>`<span>${m.date}</span>`).join('')}</div>`;
   const rows=M.map(met=>{
     const cv=cur[met.k], hasCur=cv!=null&&cv!==0;
     const cells=matches.map(m=>{ const pv=m[met.k]; if(pv==null) return '<span>—</span>';
@@ -6074,20 +6084,20 @@ function computeDecouple(data, disc){
   return {pct:(r1-r2)/r1*100, r1, r2, warm, mid};
 }
 function decoupleVerdict(pct){
-  if(pct<5)  return {c:'var(--good)', lbl:'Aérobie solide'};
-  if(pct<=10) return {c:'var(--bike)', lbl:'Dérive modérée'};
-  return {c:'var(--run)', lbl:'Forte dérive'};
+  if(pct<5)  return {c:'var(--good)', lbl:tr('decouple.solidAerobic')};
+  if(pct<=10) return {c:'var(--bike)', lbl:tr('decouple.moderateDrift')};
+  return {c:'var(--run)', lbl:tr('decouple.strongDrift')};
 }
 function decoupleInterp(type, pct, disc){
   if(type==='endurance'){
-    if(pct<5)  return "Allure bien tenue en zone aérobie : le cœur ne dérive pas, l'endurance fondamentale est au rendez-vous.";
-    if(pct<=10) return "Légère dérive cardiaque : l'allure était un peu haute pour du Z2 (ou fatigue/chaleur). À surveiller.";
-    return "Forte dérive : ce footing n'est pas resté aérobie. Ralentir l'allure pour rester en Z2.";
+    if(pct<5)  return tr('decouple.endLow');
+    if(pct<=10) return tr('decouple.endMid');
+    return tr('decouple.endHigh');
   }
   // seuil / LT1
-  if(pct<5)  return "Effort soutenable : tu es resté sous le seuil, c'est la bonne zone de travail.";
-  if(pct<=10) return "Dérive modérée : tu étais à la limite haute du seuil.";
-  return "Dérive trop forte : l'intensité dépassait le seuil aérobie. Recaler la zone un cran plus bas.";
+  if(pct<5)  return tr('decouple.thrLow');
+  if(pct<=10) return tr('decouple.thrMid');
+  return tr('decouple.thrHigh');
 }
 function injectDecoupleCss(){
   if(document.getElementById('pf-dc-css')) return;
@@ -6121,14 +6131,14 @@ function drawDecouple(data, disc, dc){
   // bande d'échauffement grisée
   const warmI=pts.findIndex(p=>p.t>=dc.warm);
   const warmX=xs(warmI<1?0:warmI);
-  if(warmI>0){ svg.insertAdjacentHTML('beforeend',`<rect x="${P.l}" y="${P.t}" width="${warmX-P.l}" height="${H-P.t-P.b}" fill="rgba(148,163,196,.06)"/><text x="${(P.l+warmX)/2}" y="${P.t+11}" fill="var(--muted)" font-size="8" text-anchor="middle" font-family="var(--font-data)">échauf.</text>`); }
+  if(warmI>0){ svg.insertAdjacentHTML('beforeend',`<rect x="${P.l}" y="${P.t}" width="${warmX-P.l}" height="${H-P.t-P.b}" fill="rgba(148,163,196,.06)"/><text x="${(P.l+warmX)/2}" y="${P.t+11}" fill="var(--muted)" font-size="8" text-anchor="middle" font-family="var(--font-data)">${tr('decouple.warmupAbbr')}</text>`); }
   // ligne de séparation des 2 moitiés
   let midI=pts.findIndex(p=>p.t>=dc.mid); if(midI<0) midI=Math.floor(pts.length/2);
   const mx=xs(midI), endX=xs(pts.length-1);
   svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${mx}" y1="${P.t}" y2="${H-P.b}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3" opacity=".6"/>`);
   // segments moyens de chaque moitié
-  if(dc.r1>=vMin&&dc.r1<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${warmX}" x2="${mx}" y1="${y(dc.r1)}" y2="${y(dc.r1)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${warmX+4}" y="${y(dc.r1)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)">1ʳᵉ ½</text>`);
-  if(dc.r2>=vMin&&dc.r2<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${endX}" y1="${y(dc.r2)}" y2="${y(dc.r2)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${endX-4}" y="${y(dc.r2)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)" text-anchor="end">2ᵉ ½</text>`);
+  if(dc.r1>=vMin&&dc.r1<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${warmX}" x2="${mx}" y1="${y(dc.r1)}" y2="${y(dc.r1)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${warmX+4}" y="${y(dc.r1)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)">${tr('decouple.half1')}</text>`);
+  if(dc.r2>=vMin&&dc.r2<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${endX}" y1="${y(dc.r2)}" y2="${y(dc.r2)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${endX-4}" y="${y(dc.r2)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)" text-anchor="end">${tr('decouple.half2')}</text>`);
   // courbe lissée
   let path='';
   pts.forEach((p,i)=>{ const x=xs(i),yy=y(p._dr); path+=(i?'L':'M')+x+' '+yy; });
@@ -6142,11 +6152,11 @@ function drawDecouple(data, disc, dc){
 function renderDecoupleTrend(disc, type, curPct){
   const box=document.getElementById('anDecoupleTrend'); if(!box) return;
   const hist=SESSION_HISTORY.filter(h=>h.disc===disc&&h.type===type&&h.dec!=null).slice(0,3).reverse();
-  const all=[...hist.map(h=>({date:h.date,dec:h.dec,cur:false})),{date:'Cette séance',dec:curPct,cur:true}];
+  const all=[...hist.map(h=>({date:h.date,dec:h.dec,cur:false})),{date:tr('simType.thisSession'),dec:curPct,cur:true}];
   if(all.length<2){ box.style.display='none'; return; }
   box.style.display='';
   const maxV=Math.max(...all.map(a=>Math.abs(a.dec)),6);
-  box.innerHTML=`<span class="an-dc-tlabel">Tendance</span>`+all.map(a=>{
+  box.innerHTML=`<span class="an-dc-tlabel">${tr('decouple.trend')}</span>`+all.map(a=>{
     const v=decoupleVerdict(a.dec), h=Math.max(6,Math.abs(a.dec)/maxV*52);
     return `<div class="an-dc-bar ${a.cur?'cur':''}"><b style="color:${v.c}">${a.dec.toFixed(1)}%</b><i style="height:${h}px;--bc:${v.c}"></i><span>${a.date}</span></div>`;
   }).join('');
@@ -6164,7 +6174,7 @@ function renderDecouple(s, data){
   kpi.innerHTML=`<span class="an-dc-big">${dc.pct>=0?'':'−'}${Math.abs(dc.pct).toFixed(1)}%</span>`+
     `<span class="an-dc-pill"><span class="dot"></span>${v.lbl}</span>`+
     `<span class="an-dc-txt">${decoupleInterp(type, dc.pct, s.disc)}</span>`;
-  document.getElementById('anDecoupleHint').textContent = s.disc==='bike'?'Puissance / FC (Pw:Hr)':'Allure corrigée / FC (Pa:Hr)';
+  document.getElementById('anDecoupleHint').textContent = s.disc==='bike'?tr('decouple.hintBike'):tr('decouple.hintRun');
   drawDecouple(data, s.disc, dc);
   renderDecoupleTrend(s.disc, type, dc.pct);
 }
@@ -6214,50 +6224,50 @@ function aiSummary(s, b){
   // conformité au plan : la séance réalisée correspond-elle à la séance prévue ?
   if(b.plannedDur){
     const ecart=Math.round((b.dur-b.plannedDur)/b.plannedDur*100);
-    bullets.push({s:Math.abs(ecart)<=15?'ok':'warn', t:`Prévu ${fmtDur(b.plannedDur)} — réalisé ${fmtDur(b.dur)} (${ecart>=0?'+':''}${ecart}%)`});
-    if(ecart<-15) recos.push('Séance écourtée par rapport au plan : vérifier fatigue ou contrainte horaire, replanifier le volume manquant si besoin.');
-    if(ecart>15) recos.push('Séance nettement rallongée : attention au volume non prévu qui alourdit la charge de la semaine.');
+    bullets.push({s:Math.abs(ecart)<=15?'ok':'warn', t:tr('ai.plannedVsDone', {planned:fmtDur(b.plannedDur), done:fmtDur(b.dur), sign:ecart>=0?'+':'', pct:ecart})});
+    if(ecart<-15) recos.push(tr('ai.recoShortened'));
+    if(ecart>15) recos.push(tr('ai.recoLengthened'));
   }
   if(b.hrDrift!=null) bullets.push({s:b.hrDrift<5?'ok':(b.hrDrift<8?'warn':'bad'),
-    t:`Dérive cardiaque : ${b.hrDrift>=0?'+':''}${b.hrDrift} bpm entre la 1ʳᵉ et la 2ᵉ moitié`});
+    t:tr('ai.hrDrift', {sign:b.hrDrift>=0?'+':'', bpm:b.hrDrift})});
   if(b.type==='endurance'){
     const okDec=b.decouple!=null && b.decouple<5, okZone=b.timeInTarget>=60;
-    bullets.push({s:okZone?'ok':'warn', t:`${b.timeInTarget}% du temps en ${b.target} (objectif : rester en zone aérobie)`});
-    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:`Découplage ${b.decouple}% ${okDec?'— le cœur ne dérive pas, séance bien aérobie':'— dérive cardiaque, allure trop haute'}`});
-    bullets.push({s:b.pctFcMax<88?'ok':'warn', t:`Pic FC à ${b.pctFcMax}% FCmax`});
-    if(okZone&&okDec){ tenu='oui'; headline='Objectif tenu : la séance est bien restée en zone aérobie.'; }
-    else { tenu=(okZone||okDec)?'partiel':'non'; headline='Zone aérobie partiellement tenue.';
-      if(!okDec) recos.push('Ralentir d’environ 10–15 s/km (ou ~5 bpm) pour contenir la dérive et rester franchement en Z2.');
-      if(!okZone) recos.push(`Trop de temps hors Z2 (${100-b.timeInTarget}%). Brider l’intensité, surtout dans les bosses.`); }
+    bullets.push({s:okZone?'ok':'warn', t:tr('ai.pctTimeInZone', {pct:b.timeInTarget, zone:b.target})});
+    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:tr('ai.decouplePct', {pct:b.decouple, verdict:okDec?tr('ai.decoupleOkEnd'):tr('ai.decoupleBadEnd')})});
+    bullets.push({s:b.pctFcMax<88?'ok':'warn', t:tr('ai.hrPeak', {pct:b.pctFcMax})});
+    if(okZone&&okDec){ tenu='oui'; headline=tr('ai.headlineEndOk'); }
+    else { tenu=(okZone||okDec)?'partiel':'non'; headline=tr('ai.headlineEndPartial');
+      if(!okDec) recos.push(tr('ai.recoSlowDown'));
+      if(!okZone) recos.push(tr('ai.recoTooMuchOutZone', {pct:100-b.timeInTarget})); }
   }
   else if(b.type==='vo2'){
     const peaks=b.hardReps.map(r=>r.peakPct), maxPeak=peaks.length?Math.max(...peaks):b.pctFcMax, reach=maxPeak>=90;
-    bullets.push({s:reach?'ok':'bad', t:`Pic FC sur les séries : ${maxPeak}% FCmax (cible ≥ 90–95%)`});
+    bullets.push({s:reach?'ok':'bad', t:tr('ai.hrPeakIntervals', {pct:maxPeak})});
     if(b.hardReps.length){ const f=b.hardReps[0], l=b.hardReps[b.hardReps.length-1], drift=l.paceSec-f.paceSec;
-      bullets.push({s:Math.abs(drift)<8?'ok':'warn', t:`Allure des séries : ${fmtPace(f.paceSec)} → ${fmtPace(l.paceSec)}/km ${drift>8?'(dégradation)':drift<-8?'(négatif split)':'(stable)'}`}); }
-    if(reach){ tenu='oui'; headline='Objectif atteint : les zones hautes sont bien touchées.'; }
-    else { tenu='non'; headline='Zone cible VO2max pas atteinte sur cette séance.';
-      recos.push(`Pics à ${maxPeak}% FCmax seulement : rallonger les intervalles (+30 à 60 s) ou raccourcir la récup pour faire monter le cœur dans la zone VO2max.`); }
+      bullets.push({s:Math.abs(drift)<8?'ok':'warn', t:tr('ai.intervalPace', {p1:fmtPace(f.paceSec), p2:fmtPace(l.paceSec), verdict:drift>8?tr('ai.degraded'):drift<-8?tr('ai.negativeSplit'):tr('ai.stable')})}); }
+    if(reach){ tenu='oui'; headline=tr('ai.headlineVo2Ok'); }
+    else { tenu='non'; headline=tr('ai.headlineVo2Missed');
+      recos.push(tr('ai.recoPeaksLow', {pct:maxPeak})); }
     if(b.hardReps.length){ const f=b.hardReps[0], l=b.hardReps[b.hardReps.length-1];
-      if(l.paceSec-f.paceSec>10) recos.push('Forte dégradation d’allure sur les dernières séries : retirer 1–2 répétitions pour tenir la cible sur l’ensemble.'); }
+      if(l.paceSec-f.paceSec>10) recos.push(tr('ai.recoStrongDegradation')); }
   }
   else if(b.type==='seuil'){
     const okDec=b.decouple==null||b.decouple<8;
-    bullets.push({s:b.timeInTarget>=40?'ok':'warn', t:`${b.timeInTarget}% du temps en ${b.target}`});
-    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:`Découplage ${b.decouple}% ${okDec?'— effort soutenable, bonne zone de seuil':'— dérive trop forte, au-dessus du seuil'}`});
-    bullets.push({s:'ok', t:`FC moyenne à ${b.avgPctFcMax}% FCmax`});
-    if(okDec){ tenu='oui'; headline='Séance de seuil bien calibrée.'; }
-    else { tenu='non'; headline='Intensité au-dessus du seuil aérobie.';
-      recos.push('Découplage élevé : l’allure dépassait le seuil. Recaler la zone cible un cran plus bas (≈ −10 s/km ou −10 W).'); }
+    bullets.push({s:b.timeInTarget>=40?'ok':'warn', t:tr('ai.pctTimeInZone', {pct:b.timeInTarget, zone:b.target})});
+    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:tr('ai.decouplePct', {pct:b.decouple, verdict:okDec?tr('ai.decoupleOkThr'):tr('ai.decoupleBadThr')})});
+    bullets.push({s:'ok', t:tr('ai.avgHrPct', {pct:b.avgPctFcMax})});
+    if(okDec){ tenu='oui'; headline=tr('ai.headlineThrOk'); }
+    else { tenu='non'; headline=tr('ai.headlineThrMissed');
+      recos.push(tr('ai.recoHighDecouple')); }
   }
   else {
-    bullets.push({s:'ok', t:`${b.dur} min · FC moyenne ${b.avgHr} bpm (${b.avgPctFcMax}% FCmax)`});
-    bullets.push({s:'ok', t:`Répartition FC : Z2 ${b.zonePct.Z2}% · Z3 ${b.zonePct.Z3}% · Z4 ${b.zonePct.Z4}% · Z5 ${b.zonePct.Z5}%`});
-    tenu='oui'; headline='Séance enregistrée — synthèse des zones ci-dessous.';
+    bullets.push({s:'ok', t:tr('ai.durAvgHr', {dur:b.dur, hr:b.avgHr, pct:b.avgPctFcMax})});
+    bullets.push({s:'ok', t:tr('ai.zoneBreakdown', {z2:b.zonePct.Z2, z3:b.zonePct.Z3, z4:b.zonePct.Z4, z5:b.zonePct.Z5})});
+    tenu='oui'; headline=tr('ai.headlineGeneric');
   }
   return {headline, tenu, bullets, recos};
 }
-function aiVerdictMeta(tenu){ return tenu==='oui'?{c:'var(--good)',l:'Objectif tenu'}:tenu==='partiel'?{c:'var(--bike)',l:'Partiellement tenu'}:{c:'var(--run)',l:'Objectif manqué'}; }
+function aiVerdictMeta(tenu){ return tenu==='oui'?{c:'var(--good)',l:tr('aiVerdict.met')}:tenu==='partiel'?{c:'var(--bike)',l:tr('aiVerdict.partial')}:{c:'var(--run)',l:tr('aiVerdict.missed')}; }
 function injectAiCss(){
   if(document.getElementById('pf-ai-css')) return;
   const st=document.createElement('style'); st.id='pf-ai-css';
@@ -6291,29 +6301,29 @@ function injectAiCss(){
 }
 function aiPaywallHtml(){
   return `<div class="ai-pay">
-    <h5><i class="ic ic-brain"></i> Assistant IA — résumé & recommandations par séance</h5>
-    <div class="ai-sub">Add-on coach · analyse automatique de chaque activité</div>
+    <h5><i class="ic ic-brain"></i> ${tr('ai.paywallTitle')}</h5>
+    <div class="ai-sub">${tr('ai.paywallSub')}</div>
     <div class="ai-feat">
-      <div><span class="ck"><i class="ic ic-check"></i></span><span>Résumé clair de chaque séance : zones FC, allure/puissance, découplage.</span></div>
-      <div><span class="ck"><i class="ic ic-check"></i></span><span>Verdict par rapport à l’objectif (Z2 tenu ? zone VO2max atteinte ?).</span></div>
-      <div><span class="ck"><i class="ic ic-check"></i></span><span>Recommandations actionnables (rallonger les intervalles, recaler la zone…).</span></div>
+      <div><span class="ck"><i class="ic ic-check"></i></span><span>${tr('ai.feat1')}</span></div>
+      <div><span class="ck"><i class="ic ic-check"></i></span><span>${tr('ai.feat2')}</span></div>
+      <div><span class="ck"><i class="ic ic-check"></i></span><span>${tr('ai.feat3')}</span></div>
     </div>
-    <div class="ai-trial">Essai gratuit 14 jours</div>
-    <div class="ai-price">0€<small> pendant 14 jours, puis ${AI_ADDON_PRICE} €/mois</small></div>
-    <button class="ai-cta" id="aiActivate">Commencer l’essai 14 jours</button>
-    <div class="ai-legal">Carte enregistrée à l’activation. Débit automatique de ${AI_ADDON_PRICE} €/mois à la fin de l’essai, sauf révocation de l’accès avant — résiliable à tout moment depuis « Gérer / révoquer l’accès ».</div>
+    <div class="ai-trial">${tr('ai.freeTrial14d')}</div>
+    <div class="ai-price">0€<small> ${tr('ai.priceDetail', {price:AI_ADDON_PRICE})}</small></div>
+    <button class="ai-cta" id="aiActivate">${tr('settings.start14dTrial')}</button>
+    <div class="ai-legal">${tr('ai.legalNote', {price:AI_ADDON_PRICE})}</div>
   </div>`;
 }
 function aiResultHtml(s, b, r, isDemo){
   const v=aiVerdictMeta(r.tenu);
   const ico=st=>st==='ok'?'<span style="color:var(--good)"><i class="ic ic-check"></i></span>':st==='warn'?'<span style="color:var(--bike)"><i class="ic ic-alert-triangle"></i></span>':'<span style="color:var(--run)"><i class="ic ic-x"></i></span>';
   const bul=r.bullets.map(x=>`<div><span class="ai-ico">${ico(x.s)}</span><span>${x.t}</span></div>`).join('');
-  const recos=r.recos.length?`<div class="ai-recobox"><h6>Recommandations</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
+  const recos=r.recos.length?`<div class="ai-recobox"><h6>${tr('ai.recommendations')}</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
   const foot=isDemo
-    ? 'Généré à partir des données réelles de la séance (zones FC, découplage, pics). En production : rédigé par Claude via l’add-on IA.'
-    : 'Rédigé par Claude à partir du bilan chiffré de la séance (zones FC, découplage, pics) — aucune donnée inventée.';
+    ? tr('ai.footDemo')
+    : tr('ai.footReal');
   return `<div class="ai-result" style="--av:${v.c}">
-    <div class="ai-verdict">${v.l} ${isDemo?'<span class="ai-badge-demo">démo</span>':''}</div>
+    <div class="ai-verdict">${v.l} ${isDemo?`<span class="ai-badge-demo">${tr('ai.demoBadge')}</span>`:''}</div>
     <div class="ai-headline">${r.headline}</div>
     <div class="ai-bul">${bul}</div>
     ${recos}
@@ -6331,11 +6341,11 @@ function renderAi(s, data){
     if(btn) btn.onclick=()=>{
       // En prod (connecté) : vrai checkout Stripe de l'add-on. En démo : déverrouillage immédiat.
       if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>console.warn('[PF] ai-addon:',e)); return; }
-      window.__pf_aiDemo=true; renderAi(s, data); toast('Assistant IA activé (démo)');
+      window.__pf_aiDemo=true; renderAi(s, data); toast(tr('toast.assistantIaActiveDemo'));
     };
     return;
   }
-  body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> Analyse de la séance en cours…</div>`;
+  body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> ${tr('ai.analyzingInProgress')}</div>`;
   const b=computeSessionBilan(s, data);
   // Connecté + add-on réel (pas juste le déverrouillage démo) → vrai résumé Claude.
   if(window.PF?.user && window.__pf_aiAddon===true && typeof PF.summarizeSession==='function'){
@@ -6349,7 +6359,7 @@ function renderAi(s, data){
     }).then(r=>{
       if(r && r.error){
         if(r.error==='add_on_required') window.__pf_aiAddon=false;
-        else toast('Analyse IA indisponible, résumé local affiché', 'error');
+        else toast(tr('toast.analyseIaIndisponibleResumeLocal'), 'error');
         const rl=aiSummary(s, b); body.innerHTML=aiResultHtml(s, b, rl, true);
         return;
       }
@@ -6433,8 +6443,8 @@ function showAnTip(evt, i){
   if(sp) html+=`<div style="color:var(--swim);font-weight:700">${sp.label(p)}</div>`;
   if(pw) html+=`<div style="color:var(--bike);font-weight:700">${pw.label(p)}</div>`;
   if(hr) html+=`<div style="color:var(--run);font-weight:700">${hr.label(p)}</div>`;
-  if(el) html+=`<div style="color:var(--bike)">${Math.round(p.alt)} m · pente ${p.grade>0?'+':''}${p.grade.toFixed(1)}%</div>`;
-  const dcc=AN_CHARTS.decouple; if(dcc&&p._dr) html+=`<div style="color:var(--accent)">éff. ${dcc.label(p)}</div>`;
+  if(el) html+=`<div style="color:var(--bike)">${Math.round(p.alt)} m · ${tr('analysis.grade')} ${p.grade>0?'+':''}${p.grade.toFixed(1)}%</div>`;
+  const dcc=AN_CHARTS.decouple; if(dcc&&p._dr) html+=`<div style="color:var(--accent)">${tr('analysis.effAbbr')} ${dcc.label(p)}</div>`;
   const cad=AN_CHARTS.cadence; if(cad&&p._cadReal) html+=`<div style="color:var(--accent)">${cad.label(p)}</div>`;
   const stl=AN_CHARTS.steplen; if(stl&&p.stepLen) html+=`<div style="color:var(--strength)">${stl.label(p)}</div>`;
   tip.innerHTML=html;
@@ -6462,7 +6472,7 @@ function drawElevation(data){
   svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="var(--bike)" opacity="0.14"/>`);
   svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--bike)" stroke-width="1.8"/>`);
   [aMin,aMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-6}" y="${y(v)+3}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${Math.round(v)}m</text>`); });
-  svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="${H-6}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">D+ total ${data.dplus} m</text>`);
+  svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="${H-6}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${tr('analysis.totalDplus', {m:data.dplus})}</text>`);
   AN_CHARTS.elev = {svg, pts, W, H, P, xs, y:(p)=>y(p.alt), color:'var(--bike)', label:(p)=>`${Math.round(p.alt)} m`};
   attachCursor('elev');
 }
@@ -6476,7 +6486,7 @@ function drawCadence(data){
   const pts=data.pts;
   if(!pts.some(p=>p.cad>0)){ svg.style.display='none'; na.style.display=''; delete AN_CHARTS.cadence; return; }
   na.style.display='none'; svg.style.display=''; svg.innerHTML='';
-  const unit = data.disc==='run' ? 'pas/min' : 'rpm';
+  const unit = data.disc==='run' ? tr('analysis.stepsPerMin') : 'rpm';
   pts.forEach(p=>{ p._cadReal = data.disc==='run' ? (p.cad||0)*2 : (p.cad||0); });
   const W=720,H=150,P={l:44,r:14,t:10,b:20};
   const xs=i=>P.l+i/(pts.length-1)*(W-P.l-P.r);
@@ -6510,7 +6520,7 @@ function drawStepLen(data){
   svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--strength)" stroke-width="1.8"/>`);
   [vMin,vMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-6}" y="${y(v)+3}" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${v.toFixed(2)}m</text>`); });
   svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">m</text>`);
-  AN_CHARTS.steplen = {svg, pts, W, H, P, xs, y:(p)=>y(p.stepLen||vMin), color:'var(--strength)', label:(p)=>`${p.stepLen?.toFixed(2)} m foulée`};
+  AN_CHARTS.steplen = {svg, pts, W, H, P, xs, y:(p)=>y(p.stepLen||vMin), color:'var(--strength)', label:(p)=>tr('analysis.strideLen', {m:p.stepLen?.toFixed(2)})};
   attachCursor('steplen');
 }
 
@@ -6528,21 +6538,21 @@ function lapZone(power){
 }
 function colApplies(app,disc){ if(app==='all')return true; if(app[0]==='!')return disc!==app.slice(1); return app===disc; }
 const LAP_COLS = [
-  {key:'time', label:'Temps', def:1, app:'all', v:l=>fmtLapTime(l.durMin)},
-  {key:'dist', label:'Distance', def:1, app:'all', v:l=>l.dist.toFixed(2)+'<small> km</small>'},
-  {key:'speed',label:d=>d==='bike'?'Vitesse':'Allure', def:1, app:'all', v:(l,_,d)=>d==='bike'?l.avgSpeed.toFixed(1)+'<small> km/h</small>':(d==='run'?paceFromSpeed(l.avgSpeed)+'<small>/km</small>':paceFromSpeed2(l.avgSpeed)+'<small>/100m</small>')},
+  {key:'time', get label(){return tr('modal.duration')}, def:1, app:'all', v:l=>fmtLapTime(l.durMin)},
+  {key:'dist', get label(){return tr('simMetric.dist2')}, def:1, app:'all', v:l=>l.dist.toFixed(2)+'<small> km</small>'},
+  {key:'speed',label:d=>d==='bike'?tr('lapCol.speed'):tr('lapCol.pace'), def:1, app:'all', v:(l,_,d)=>d==='bike'?l.avgSpeed.toFixed(1)+'<small> km/h</small>':(d==='run'?paceFromSpeed(l.avgSpeed)+'<small>/km</small>':paceFromSpeed2(l.avgSpeed)+'<small>/100m</small>')},
   {key:'hr',   label:'FC', def:1, app:'all', v:l=>`<b style="color:var(--run)">${l.avgHr}</b><small> bpm</small>`},
   {key:'pw',   label:'Watts', def:1, app:'bike', v:l=>`<b style="color:var(--bike)">${l.avgPower}</b><small> W</small>`},
   {key:'np',   label:'NP', def:1, app:'bike', v:l=>`<b>${l.np}</b><small> W</small>`},
-  {key:'zone', label:'Zone', def:1, app:'bike', v:l=>{const z=lapZone(l.np);return `<span class="zbadge" style="background:${z.c}22;color:${z.c};border-color:${z.c}66">${z.z}</span>`;}},
+  {key:'zone', get label(){return tr('lapCol.zone')}, def:1, app:'bike', v:l=>{const z=lapZone(l.np);return `<span class="zbadge" style="background:${z.c}22;color:${z.c};border-color:${z.c}66">${z.z}</span>`;}},
   {key:'if',   label:'IF', def:0, app:'bike', v:l=>l.if.toFixed(2)},
   {key:'wkg',  label:'W/kg', def:0, app:'bike', v:l=>(l.avgPower/lapWeightVal()).toFixed(1)},
-  {key:'cad',  label:'Cadence', def:0, app:'bike', v:l=>`${l.cad}<small> rpm</small>`},
+  {key:'cad',  get label(){return tr('lapCol.cadence')}, def:0, app:'bike', v:l=>`${l.cad}<small> rpm</small>`},
   {key:'kj',   label:'kJ', def:0, app:'bike', v:l=>l.kj},
-  {key:'hrmax',label:'FC max', def:0, app:'all', v:l=>`${l.maxHr}<small> bpm</small>`},
+  {key:'hrmax',get label(){return tr('refs.maxHr')}, def:0, app:'all', v:l=>`${l.maxHr}<small> bpm</small>`},
   {key:'vap',  label:'VAP', def:0, app:'!bike', v:(l,_,d)=>d==='swim'?paceFromSpeed2(l.avgGap)+'<small>/100m</small>':paceFromSpeed(l.avgGap)+'<small>/km</small>'},
   {key:'dplus',label:'D+', def:0, app:'!swim', v:l=>`${l.dplus}<small> m</small>`},
-  {key:'temp', label:'Temp.', def:0, app:'all', v:(l,data)=>`${data.cond.temp}<small>°C</small>`},
+  {key:'temp', get label(){return tr('lapCol.temp')}, def:0, app:'all', v:(l,data)=>`${data.cond.temp}<small>°C</small>`},
 ];
 function injectLapCss(){
   if(document.getElementById('pf-lap-css')) return;
@@ -6593,7 +6603,7 @@ function renderLapChart(data){
   const box=document.getElementById('anLapChart'); if(!box) return;
   injectLapChartCss();
   const laps=data.laps, disc=data.disc;
-  if(!laps || !laps.length){ box.innerHTML='<p class="hint">Pas assez de laps pour un visuel.</p>'; return; }
+  if(!laps || !laps.length){ box.innerHTML=`<p class="hint">${tr('lapCol.notEnoughLaps')}</p>`; return; }
   const speedLbl=l=> disc==='bike' ? l.avgSpeed.toFixed(1)+' km/h' : (disc==='swim' ? paceFromSpeed2(l.avgSpeed)+'/100m' : paceFromSpeed(l.avgSpeed)+'/km');
   const maxSpeed=Math.max(...laps.map(l=>l.avgSpeed), 0.001);
   const maxHr=Math.max(...laps.map(l=>l.avgHr||0), 1);
@@ -6602,8 +6612,8 @@ function renderLapChart(data){
     const hrH=l.avgHr ? Math.max(6, Math.round((l.avgHr/maxHr)*100)) : 4;
     return `<div class="lch-col">
       <div class="lch-bars">
-        <div class="lch-bar sp ${l.hard?'hard':''}" style="height:${spH}%" title="Allure/vitesse — lap ${l.n}"></div>
-        <div class="lch-bar hr" style="height:${hrH}%" title="FC moyenne — lap ${l.n}"></div>
+        <div class="lch-bar sp ${l.hard?'hard':''}" style="height:${spH}%" title="${tr('lapCol.paceSpeedLap', {n:l.n})}"></div>
+        <div class="lch-bar hr" style="height:${hrH}%" title="${tr('lapCol.avgHrLap', {n:l.n})}"></div>
       </div>
       <div class="lch-vals">
         <span class="lch-sp">${speedLbl(l)}</span>
@@ -6615,7 +6625,7 @@ function renderLapChart(data){
 }
 function renderLaps(data, isSwim){
   const box=document.getElementById('anLaps'); const disc=data.disc; injectLapCss();
-  document.getElementById('anLapHint').textContent = (isSwim?'par série':'splits automatiques')+' · colonnes au choix';
+  document.getElementById('anLapHint').textContent = (isSwim?tr('lapCol.perSet'):tr('lapCol.autoSplits'))+' · '+tr('lapCol.chooseColumns');
   const cols=LAP_COLS.filter(c=>colApplies(c.app,disc));
   const sel=lapColSet(disc);
   const lbl=c=>typeof c.label==='function'?c.label(disc):c.label;
@@ -6888,8 +6898,8 @@ const RUN_ZONES = {
 };
 function renderRunDynamics(){
   const box=document.getElementById('runDynBody'); if(!box) return;
-  const metrics=[['Cadence','cadence','pas/min'],['Oscillation verticale','vertOsc','cm'],
-    ['Ratio vertical','vertRatio','%'],['Temps de contact au sol','gct','ms']];
+  const metrics=[[tr('runDyn.cadence'),'cadence','pas/min'],[tr('runDyn.vertOsc'),'vertOsc','cm'],
+    [tr('runDyn.vertRatio'),'vertRatio','%'],[tr('runDyn.gct'),'gct','ms']];
   box.innerHTML=metrics.map(([name,key,unit])=>{
     const z=RUN_ZONES[key], val=RUN_DYN[key];
     const sMin=z.min, sMax=z.zones[z.zones.length-1][1];
@@ -6898,7 +6908,7 @@ function renderRunDynamics(){
     const markPct=Math.max(1,Math.min(99,(val-sMin)/(sMax-sMin)*100));
     const curZone=z.zones.find(zz=>val<=zz[1])||z.zones[z.zones.length-1];
     return `<div class="rd-metric">
-      <div class="rd-top"><span class="rd-name">${name}<em>${z.better==='low'?'↓ = mieux':'↑ = mieux'}</em></span>
+      <div class="rd-top"><span class="rd-name">${name}<em>${z.better==='low'?tr('runDyn.lowerBetter'):tr('runDyn.higherBetter')}</em></span>
         <span class="rd-val" style="color:${curZone[2]}">${val}<small>${unit}</small></span></div>
       <div class="rd-bar">${segs}<span class="rd-mark" style="left:${markPct}%"></span></div>
     </div>`;
@@ -6906,18 +6916,18 @@ function renderRunDynamics(){
 }
 function renderRunTiles(){
   const box=document.getElementById('runTilesBody'); if(!box) return;
-  const tiles=[['Longueur de foulée','strideLen','m','à '+RUN_DYN.cadence+' pas/min'],
-    ['Puissance de course','runPower','W','si capteur type Stryd']];
+  const tiles=[[tr('runTile.strideLen'),'strideLen','m',tr('runTile.strideLenDetail', {cad:RUN_DYN.cadence})],
+    [tr('runTile.runPower'),'runPower','W',tr('runTile.runPowerDetail')]];
   box.innerHTML=tiles.map(([k,key,u,d])=>`<div class="rd-tile"><div class="k">${k}</div><div class="v">${RUN_DYN[key]}<small> ${u}</small></div><div class="d">${d}</div></div>`).join('');
 }
 function renderRunSymmetry(){
   const box=document.getElementById('runSymBody'); if(!box) return;
-  const rows=[['Temps de contact au sol',RUN_DYN.gctBalanceL],['Longueur de foulée',RUN_DYN.strideBalanceL],['Puissance',RUN_DYN.powerBalanceL]];
+  const rows=[[tr('runDyn.gct'),RUN_DYN.gctBalanceL],[tr('runTile.strideLen'),RUN_DYN.strideBalanceL],[tr('runSym.power'),RUN_DYN.powerBalanceL]];
   box.innerHTML=rows.map(([name,l])=>{ const r=100-l, dev=Math.abs(50-l);
-    const st=dev<0.8?['équilibré','var(--good)']:dev<1.8?['léger déséquilibre','var(--bike)']:['à surveiller','var(--run)'];
+    const st=dev<0.8?[tr('runSym.balanced'),'var(--good)']:dev<1.8?[tr('runSym.slightImbalance'),'var(--bike)']:[tr('runSym.toWatch'),'var(--run)'];
     return `<div class="rd-sym"><div class="lbl"><span>${name}</span><span style="color:${st[1]}">${st[0]}</span></div>
       <div class="rd-symbar"><span class="l" style="width:${l}%"></span><span class="r" style="width:${r}%"></span><span class="mid"></span></div>
-      <div class="rd-symlbl"><span>G ${l.toFixed(1)}%</span><span>${r.toFixed(1)}% D</span></div></div>`;
+      <div class="rd-symlbl"><span>${tr('runSym.left')} ${l.toFixed(1)}%</span><span>${r.toFixed(1)}% ${tr('runSym.right')}</span></div></div>`;
   }).join('');
 }
 renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
@@ -6939,22 +6949,22 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
    Biomécanique / Hyrox) → l'utilisateur coche ce qu'il affiche. Persisté. */
 (function initChartFilter(){
   const box=document.getElementById('chartFilter'); if(!box) return;
-  const CATS=[['charge','Charge & puissance'],['physio','Physio'],['biomeca','Biomécanique'],['hyrox','Hyrox']];
+  const CATS=[['charge',tr('chartCat.charge')],['physio',tr('chartCat.physio')],['biomeca',tr('chartCat.biomeca')],['hyrox',tr('chartCat.hyrox')]];
   const REG=[
-    {key:'loadstack', label:'Charge cumulée',   a:'loadStackChart', cat:'charge'},
-    {key:'load',      label:'Charge & forme',   a:'loadChart',      cat:'charge'},
-    {key:'ftp',       label:'FTP & PMA',        a:'ftpChart',       cat:'charge'},
-    {key:'dist',      label:'Distance hebdo',   a:'distChart',      cat:'charge'},
-    {key:'mmp',       label:'Puissance–durée',  a:'mmpChart',       cat:'charge'},
-    {key:'durab',     label:'Durabilité',       a:'durabChart',     cat:'charge'},
-    {key:'loadmix',   label:'Méthode de charge',a:'loadMixBody',    cat:'charge'},
-    {key:'hr',        label:'Zones FC',         a:'hrChart',        cat:'physio'},
-    {key:'lactate',   label:'Lactate & seuils', a:'lactateBike',    cat:'physio'},
-    {key:'runDyn',    label:'Dynamiques de foulée', a:'runDynBody', cat:'biomeca'},
-    {key:'runTiles',  label:'Foulée & puissance',   a:'runTilesBody', cat:'biomeca'},
-    {key:'runSym',    label:'Symétrie G/D',     a:'runSymBody',     cat:'biomeca'},
-    {key:'runTrend',  label:'Tendance cadence', a:'runTrendChart',  cat:'biomeca'},
-    {key:'hyrox',     label:'Profil Hyrox',     a:'hyroxBody',      cat:'hyrox'},
+    {key:'loadstack', get label(){return tr('chart.loadstack')},   a:'loadStackChart', cat:'charge'},
+    {key:'load',      get label(){return tr('chart.load')},   a:'loadChart',      cat:'charge'},
+    {key:'ftp',       get label(){return tr('chart.ftp')},        a:'ftpChart',       cat:'charge'},
+    {key:'dist',      get label(){return tr('chart.dist')},   a:'distChart',      cat:'charge'},
+    {key:'mmp',       get label(){return tr('chart.mmp')},  a:'mmpChart',       cat:'charge'},
+    {key:'durab',     get label(){return tr('chart.durab')},       a:'durabChart',     cat:'charge'},
+    {key:'loadmix',   get label(){return tr('chart.loadmix')},a:'loadMixBody',    cat:'charge'},
+    {key:'hr',        get label(){return tr('chart.hr')},         a:'hrChart',        cat:'physio'},
+    {key:'lactate',   get label(){return tr('chart.lactate')}, a:'lactateBike',    cat:'physio'},
+    {key:'runDyn',    get label(){return tr('chart.runDyn')}, a:'runDynBody', cat:'biomeca'},
+    {key:'runTiles',  get label(){return tr('chart.runTiles')},   a:'runTilesBody', cat:'biomeca'},
+    {key:'runSym',    get label(){return tr('chart.runSym')},     a:'runSymBody',     cat:'biomeca'},
+    {key:'runTrend',  get label(){return tr('chart.runTrend')}, a:'runTrendChart',  cat:'biomeca'},
+    {key:'hyrox',     get label(){return tr('chart.hyrox')},     a:'hyroxBody',      cat:'hyrox'},
   ];
   const DEFAULT=['loadstack','load','hr'];   // sélection de départ resserrée
   let sel; try{ sel=new Set(JSON.parse(localStorage.getItem('sil_chart_filter'))); if(!sel.size) sel=new Set(DEFAULT); }
@@ -6972,7 +6982,7 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     return `<div class="cf-cat"><span class="cf-cat-lbl">${cl}</span>`+
       items.map(r=>`<button type="button" class="cf-chip" data-key="${r.key}" aria-pressed="false"><span class="cf-box"><i class="ic ic-check"></i></span>${r.label}</button>`).join('')+
       `</div>`;
-  }).join('') + `<div class="cf-actions"><button type="button" class="cf-all" id="cfAll">Tout</button><button type="button" class="cf-all" id="cfNone">Aucun</button></div>`;
+  }).join('') + `<div class="cf-actions"><button type="button" class="cf-all" id="cfAll">${tr('chart.all')}</button><button type="button" class="cf-all" id="cfNone">${tr('chart.none')}</button></div>`;
   box.querySelectorAll('.cf-chip').forEach(ch=> ch.onclick=()=>{ const k=ch.dataset.key; sel.has(k)?sel.delete(k):sel.add(k); apply(); save(); });
   box.querySelector('#cfAll').onclick=()=>{ REG.forEach(r=>{ if(cards[r.key]) sel.add(r.key); }); apply(); save(); };
   box.querySelector('#cfNone').onclick=()=>{ sel.clear(); apply(); save(); };
@@ -6992,8 +7002,8 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     el('path',{d:smoothPath(pts),fill:'none',stroke:color,'stroke-width':2.2},svg);
     pts.forEach((p,i)=>{ const c=el('circle',{cx:p[0],cy:p[1],r:3,fill:'#0D121E',stroke:color,'stroke-width':2},svg);
       c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${color}">${name} ${data[i]} ${unit}</b> · ${weeks[i]}`)); c.addEventListener('mouseleave',tipHide); }); };
-  draw(cad,yC,'#2FD9FF','Cadence','pas/min');
-  draw(gct,yG,'#DD5C72','Contact au sol','ms');
+  draw(cad,yC,'#2FD9FF',tr('lapCol.cadence'),tr('analysis.stepsPerMin'));
+  draw(gct,yG,'#DD5C72',tr('runDyn.gct'),'ms');
 })();
 
 /* ---- 4. Charge & forme — double courbe + bande optimale ---- */
@@ -7026,7 +7036,7 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     el('path',{d:smoothPath(pts),class:'glow-line draw',stroke:color,filter:'url(#glowL)'},svg);
     pts.forEach((p,i)=>{
       const c=el('circle',{cx:p[0],cy:p[1],r:3.5,fill:'#0D121E',stroke:color,'stroke-width':2,class:'dot'},svg);
-      c.addEventListener('mousemove',e=>{ tipShow(e,`<b style="color:${color}">${data===ctl?'Fitness':'Fatigue'} ${data[i]}</b> · ${weeks[i]} · TSB ${ctl[i]-atl[i]>=0?'+':''}${ctl[i]-atl[i]}`); TSYNC.hover(i); });
+      c.addEventListener('mousemove',e=>{ tipShow(e,`<b style="color:${color}">${data===ctl?tr('chart.fitness'):tr('chart.fatigue')} ${data[i]}</b> · ${weeks[i]} · TSB ${ctl[i]-atl[i]>=0?'+':''}${ctl[i]-atl[i]}`); TSYNC.hover(i); });
       c.addEventListener('mouseleave',tipHide);
     });
   };
@@ -7062,7 +7072,7 @@ function buildLoadPeriods(period){
     const key = period==='month' ? (d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')) : String(d.getFullYear());
     if(!groups[key]){
       groups[key]={ wk:key, mon:d,
-        label: period==='month' ? d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'}) : String(d.getFullYear()),
+        label: period==='month' ? d.toLocaleDateString(localeStr(),{month:'short',year:'2-digit'}) : String(d.getFullYear()),
         load:{swim:0,bike:0,run:0,strength:0}, hours:0, total:0, _atl:0,_tsb:0,_acwr:0,_n:0 };
       order.push(key);
     }
@@ -7156,12 +7166,12 @@ function drawLoadStack(){
     hit.style.cursor='crosshair';
     hit.addEventListener('mousemove',e=>{
       cursor.setAttribute('x1',cx); cursor.setAttribute('x2',cx); cursor.style.opacity=1;
-      const risk=w.acwr>1.5?'<span style="color:#FF5470">élevé</span>':w.acwr<0.8?'<span style="color:#FFB13D">sous-charge</span>':'<span style="color:#39E6A3">maîtrisé</span>';
+      const risk=w.acwr>1.5?`<span style="color:#FF5470">${tr('loadStack.high')}</span>`:w.acwr<0.8?`<span style="color:#FFB13D">${tr('loadStack.underload')}</span>`:`<span style="color:#39E6A3">${tr('loadStack.controlled')}</span>`;
       const dd=w.mon;
-      const periodLbl = loadStackPeriod==='week' ? `Sem. ${dd.getDate()}/${dd.getMonth()+1}`
-        : loadStackPeriod==='month' ? `Mois de ${dd.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}`
-        : `Année ${dd.getFullYear()}`;
-      tipShow(e,`<b>${periodLbl}</b> · charge <b>${w.total}</b> · <b>${w.hours.toFixed(1)} h</b><br>Nat ${w.load.swim} · Vélo ${w.load.bike} · Course ${w.load.run} · Renfo ${w.load.strength}<br>Fatigue ${w.atl} · Risque ACWR <b>${w.acwr.toFixed(2)}</b> (${risk}) · Forme ${w.tsb>=0?'+':''}${w.tsb}`);
+      const periodLbl = loadStackPeriod==='week' ? tr('loadStack.week', {d:dd.getDate(), m:dd.getMonth()+1})
+        : loadStackPeriod==='month' ? tr('loadStack.monthOf', {month:dd.toLocaleDateString(localeStr(),{month:'long',year:'numeric'})})
+        : tr('loadStack.year', {y:dd.getFullYear()});
+      tipShow(e,`<b>${periodLbl}</b> · ${tr('modal.load')} <b>${w.total}</b> · <b>${w.hours.toFixed(1)} h</b><br>${tr('disc.swim')} ${w.load.swim} · ${tr('disc.bike')} ${w.load.bike} · ${tr('disc.run')} ${w.load.run} · ${tr('disc.strength')} ${w.load.strength}<br>${tr('chart.fatigue')} ${w.atl} · ${tr('loadStack.riskAcwr')} <b>${w.acwr.toFixed(2)}</b> (${risk}) · ${tr('loadStack.formLabel')} ${w.tsb>=0?'+':''}${w.tsb}`);
     });
     hit.addEventListener('mouseleave',()=>{ cursor.style.opacity=0; tipHide(); });
   });
@@ -7170,7 +7180,7 @@ function drawLoadStack(){
 /* barre de séries cochables + rendu initial (défile en fin d'année) */
 (function initLoadStack(){
   const box=document.getElementById('loadStackToggles'); if(!box) return;
-  const items=[['charge','Charge',LOAD_COLS.bike],['fatigue','Fatigue (ATL)','#FF5470'],['risque','Risque (ACWR)',LOAD_COLS.bike],['forme','Forme (TSB)','#39E6A3']];
+  const items=[['charge',tr('modal.load'),LOAD_COLS.bike],['fatigue',tr('bilan.fatigue'),'#FF5470'],['risque',tr('loadStack.riskAcwrLabel'),LOAD_COLS.bike],['forme',tr('bilan.form'),'#39E6A3']];
   box.innerHTML=items.map(([k,l,c])=>`<button class="ls-tog ${loadStackShow[k]?'on':''}" data-ls="${k}" style="--ls-c:${c}"><span class="sw"></span>${l}</button>`).join('');
   box.querySelectorAll('[data-ls]').forEach(b=> b.onclick=()=>{ const k=b.dataset.ls; loadStackShow[k]=!loadStackShow[k]; b.classList.toggle('on',loadStackShow[k]); drawLoadStack(); });
 
@@ -7178,7 +7188,7 @@ function drawLoadStack(){
   const pbox=document.getElementById('loadStackPeriodTog');
   if(pbox){
     try{ const saved=localStorage.getItem('sil_loadstack_period'); if(saved) loadStackPeriod=saved; }catch(e){}
-    const periods=[['week','Semaine'],['month','Mois'],['year','Année']];
+    const periods=[['week',tr('loadStack.weekOpt')],['month',tr('loadStack.monthOpt')],['year',tr('loadStack.yearOpt')]];
     const renderPeriodTog=()=>{ pbox.innerHTML=periods.map(([k,l])=>`<button class="${loadStackPeriod===k?'on':''}" data-lsp="${k}">${l}</button>`).join('');
       pbox.querySelectorAll('[data-lsp]').forEach(b=> b.onclick=()=>{
         loadStackPeriod=b.dataset.lsp;
@@ -7249,8 +7259,8 @@ function drawLactate(svgId, thId, data, lineColor){
   // cartouches seuils
   const th=document.getElementById(thId);
   if(th) th.innerHTML=`
-    <div class="lt-th" style="--tc:#39E6A3"><div class="k">Seuil aérobie · LT1 (SV1)</div><div class="v">${data.sv1lbl}</div><div class="s">≈ 2 mmol/L</div></div>
-    <div class="lt-th" style="--tc:#FFB13D"><div class="k">Seuil anaérobie · LT2 (SV2)</div><div class="v">${data.sv2lbl}</div><div class="s">≈ 4 mmol/L</div></div>`;
+    <div class="lt-th" style="--tc:#39E6A3"><div class="k">${tr('lactate.aerobicThreshold')}</div><div class="v">${data.sv1lbl}</div><div class="s">≈ 2 mmol/L</div></div>
+    <div class="lt-th" style="--tc:#FFB13D"><div class="k">${tr('lactate.anaerobicThreshold')}</div><div class="v">${data.sv2lbl}</div><div class="s">≈ 4 mmol/L</div></div>`;
 }
 function lactateCharts(){
   const runC = getComputedStyle(document.body).getPropertyValue('--run').trim() || '#FF5470';
@@ -7326,7 +7336,7 @@ function buildDurabLevels(){
     document.head.appendChild(st);
   }
   if(box.dataset.built) return; box.dataset.built='1';
-  const lab=document.createElement('span'); lab.className='dl-lbl'; lab.textContent='Paliers kJ'; box.appendChild(lab);
+  const lab=document.createElement('span'); lab.className='dl-lbl'; lab.textContent=tr('durab.kjLevels'); box.appendChild(lab);
   DURAB_LEVELS.forEach(l=>{
     const chip=document.createElement('button'); chip.type='button'; chip.className='ctog'; chip.dataset.kj=l.kj;
     chip.style.setProperty('--lc', l.color);
@@ -7354,20 +7364,20 @@ function durabChart(){
   }
   el('path',{d:smoothPath(fp),class:'glow-line',stroke:DURAB_FRESH,'stroke-width':2.5},svg);
   fresh.forEach((d,i)=>{ const c=el('circle',{cx:fp[i][0],cy:fp[i][1],r:3.2,fill:'#0D121E',stroke:DURAB_FRESH,'stroke-width':2,class:'dot'},svg);
-    c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${DURAB_FRESH}">${d[1]} W</b> · ${fmtSecs(d[0])} · à froid`)); c.addEventListener('mouseleave',tipHide); });
+    c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${DURAB_FRESH}">${d[1]} W</b> · ${fmtSecs(d[0])} · ${tr('durab.fresh')}`)); c.addEventListener('mouseleave',tipHide); });
   sel.forEach(l=>{ const data=mmpAfter(l.kj), pts=data.map(d=>[x(d[0]),y(d[1])]);
     el('path',{d:smoothPath(pts),class:'glow-line draw',stroke:l.color,'stroke-width':2.5},svg);
     pts.forEach((p,i)=>{ const ret=Math.round(100*data[i][1]/fresh[i][1]);
       const c=el('circle',{cx:p[0],cy:p[1],r:3.2,fill:'#0D121E',stroke:l.color,'stroke-width':2,class:'dot'},svg);
-      c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${l.color}">${data[i][1]} W</b> · ${fmtSecs(data[i][0])} · après ${l.kj} kJ<br><span style="color:var(--good)">${ret}% conservé</span>`));
+      c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${l.color}">${data[i][1]} W</b> · ${fmtSecs(data[i][0])} · ${tr('durab.after', {kj:l.kj})}<br><span style="color:var(--good)">${tr('durab.retained', {pct:ret})}</span>`));
       c.addEventListener('mouseleave',tipHide); });
   });
   const elNow=document.getElementById('durabNow');
   if(elNow){ if(sel.length){ const deep=sel.at(-1), da=mmpAfter(deep.kj), i5=fresh.findIndex(d=>d[0]===300);
-      const ret=i5>=0?Math.round(100*da[i5][1]/fresh[i5][1]):0; elNow.innerHTML=`${ret}% à 5 min <span style="font-size:12px;color:var(--muted)">@ ${deep.kj} kJ</span>`;
+      const ret=i5>=0?Math.round(100*da[i5][1]/fresh[i5][1]):0; elNow.innerHTML=tr('durab.retainedAt5min', {pct:ret, kj:deep.kj});
     } else elNow.textContent='—'; }
   const leg=document.getElementById('durabLegend');
-  if(leg) leg.innerHTML=`<span><i style="background:${DURAB_FRESH}"></i>À froid</span>`+sel.map(l=>`<span><i style="background:${l.color}"></i>${l.kj} kJ</span>`).join('');
+  if(leg) leg.innerHTML=`<span><i style="background:${DURAB_FRESH}"></i>${tr('durab.fresh')}</span>`+sel.map(l=>`<span><i style="background:${l.color}"></i>${l.kj} kJ</span>`).join('');
 }
 /* ============================================================
    CHARGE MIXTE (méthode transparente) + PROFIL HYROX
@@ -7424,27 +7434,27 @@ function renderLoadMix(){
     return `<div class="lm-row"><span class="lm-ic" style="color:${D.color}">${discIcon(D)}</span><span class="lm-n">${s.name}</span><span class="lm-m">${s.metric}</span><span class="lm-v">${sessionLoad(s)}</span></div>`; }).join('');
   box.innerHTML=`
     <div class="lm-kpis">
-      <div><div class="v" style="color:var(--swim)">${Math.round(ctl)}</div><div class="k">Fitness · CTL</div></div>
-      <div><div class="v" style="color:var(--run)">${Math.round(atl)}</div><div class="k">Fatigue · ATL</div></div>
-      <div><div class="v" style="color:${tsb>=0?'var(--good)':'var(--bike)'}">${tsb>=0?'+':''}${tsb}</div><div class="k">Forme · TSB</div></div>
+      <div><div class="v" style="color:var(--swim)">${Math.round(ctl)}</div><div class="k">${tr('chart.fitness')} · CTL</div></div>
+      <div><div class="v" style="color:var(--run)">${Math.round(atl)}</div><div class="k">${tr('chart.fatigue')} · ATL</div></div>
+      <div><div class="v" style="color:${tsb>=0?'var(--good)':'var(--bike)'}">${tsb>=0?'+':''}${tsb}</div><div class="k">${tr('loadStack.formLabel')} · TSB</div></div>
     </div>
     <div class="lm-list">${rows}</div>
-    <p class="lm-note">Charge = mix <b>TSS</b> vélo · <b>rTSS</b> course · <b>sTSS</b> nat · <b>hrTSS</b> FC · <b>sRPE</b> renfo/Hyrox, calibré <b>1 h seuil = 100</b>. Estimé — le coach tranche.</p>`;
+    <p class="lm-note">${tr('loadMix.note')}</p>`;
 }
 function renderHyrox(){
   const box=document.getElementById('hyroxBody'); if(!box) return; injectLoadHxCss();
   const h=HYROX_DEMO, r0=h.runs[0], rN=h.runs.at(-1), deg=Math.round((rN/r0-1)*100);
   const comp=Math.round((h.fatiguePace/h.freshPace-1)*100), maxR=Math.max(...h.runs), minR=Math.min(...h.runs);
   const bars=h.runs.map((s,i)=>{ const pct=Math.round((s-minR)/(maxR-minR||1)*68)+32;
-    return `<div class="hx-bar" title="Run ${i+1} : ${fmtPace(s)}/km"><i style="height:${pct}%"></i><span>${i+1}</span></div>`; }).join('');
+    return `<div class="hx-bar" title="${tr('hyrox.runTitle', {n:i+1, pace:fmtPace(s)})}"><i style="height:${pct}%"></i><span>${i+1}</span></div>`; }).join('');
   box.innerHTML=`
     <div class="hx-loads">
-      <div class="hx-load"><div class="hx-lh"><span>Charge aérobie</span><b>${h.aero}</b></div><div class="hx-track"><i style="width:${h.aero}%;background:var(--run)"></i></div></div>
-      <div class="hx-load"><div class="hx-lh"><span>Charge musculaire</span><b>${h.musc}</b></div><div class="hx-track"><i style="width:${h.musc}%;background:var(--strength)"></i></div></div>
+      <div class="hx-load"><div class="hx-lh"><span>${tr('hyrox.aerobicLoad')}</span><b>${h.aero}</b></div><div class="hx-track"><i style="width:${h.aero}%;background:var(--run)"></i></div></div>
+      <div class="hx-load"><div class="hx-lh"><span>${tr('hyrox.muscularLoad')}</span><b>${h.musc}</b></div><div class="hx-track"><i style="width:${h.musc}%;background:var(--strength)"></i></div></div>
     </div>
-    <div class="hx-sub">Dégradation d'allure sur les 8 runs · <b style="color:var(--bike)">+${deg}%</b> · survole une barre</div>
+    <div class="hx-sub">${tr('hyrox.paceDegradation')} · <b style="color:var(--bike)">+${deg}%</b> · ${tr('hyrox.hoverBar')}</div>
     <div class="hx-bars">${bars}</div>
-    <div class="hx-comp"><i class="ic ic-run"></i> Course sous fatigue (« compromised running ») : à froid <b>${fmtPace(h.freshPace)}/km</b> → après station <b style="color:var(--bike)">${fmtPace(h.fatiguePace)}/km</b> <span style="color:var(--bike)">(+${comp}%)</span></div>`;
+    <div class="hx-comp"><i class="ic ic-run"></i> ${tr('hyrox.compromisedRunning', {fresh:fmtPace(h.freshPace), fatigue:fmtPace(h.fatiguePace), pct:comp})}</div>`;
 }
 mmpChart(); durabChart(); renderLoadMix(); renderHyrox();
 
@@ -7526,14 +7536,14 @@ function renderRecords(){
     html = REC_BIKE_DIST.map((d,i)=>{
       const kmh=bikeSpeedForDistance(d.km);
       const totalMin=d.km/kmh*60;
-      return recCard(d.k, kmh.toFixed(1), 'km/h', recDate(i), 'var(--bike)', fmtClock(totalMin)+' au total');
+      return recCard(d.k, kmh.toFixed(1), 'km/h', recDate(i), 'var(--bike)', tr('records.totalTime', {time:fmtClock(totalMin)}));
     }).join('');
   } else {
     grid.style.setProperty('--rc','var(--run)');
     html = REC_RUN_DIST.map((d,i)=>{
       const sPerKm=runPaceForDistance(d.m);
       const totalSec=sPerKm*d.m/1000;
-      return recCard(d.k, fmtPace(sPerKm), '/km', recDate(i), 'var(--run)', fmtClock(totalSec/60)+' au total');
+      return recCard(d.k, fmtPace(sPerKm), '/km', recDate(i), 'var(--run)', tr('records.totalTime', {time:fmtClock(totalSec/60)}));
     }).join('');
   }
   grid.innerHTML=html;
@@ -7604,22 +7614,22 @@ function scoreReadiness(){
   const global = Math.round(sAcwr*0.32 + sTsb*0.20 + sSubj*0.26 + sRpe*0.22);
 
   return {global, factors:[
-    {key:'Charge (ACWR)',  sub:`ratio ${a.toFixed(2)}`,                 score:sAcwr},
-    {key:'Forme (TSB)',    sub:`${t>=0?'+':''}${t}`,                    score:sTsb},
-    {key:'Ressenti',       sub:`check-in ${sSubj}%`,                    score:sSubj},
-    {key:'RPE récent',     sub:`moy. ${meanRpe.toFixed(1)}/10`,         score:sRpe}
+    {key:tr('ready.acwr'),  sub:`ratio ${a.toFixed(2)}`,                 score:sAcwr},
+    {key:tr('ready.tsb'),    sub:`${t>=0?'+':''}${t}`,                    score:sTsb},
+    {key:tr('ready.subjective'),       sub:`check-in ${sSubj}%`,                    score:sSubj},
+    {key:tr('ready.rpe'),     sub:`moy. ${meanRpe.toFixed(1)}/10`,         score:sRpe}
   ]};
 }
 
 function readinessVerdict(g){
-  if(g>=70) return {flag:'Poursuivre le plan', color:'#39E6A3',
-    advice:"Les signaux sont au vert : charge maîtrisée, ressenti correct. La séance prévue peut être maintenue telle quelle."};
-  if(g>=50) return {flag:'Maintenir, avec vigilance', color:'#FFB13D',
-    advice:"Globalement OK, mais un ou deux signaux se tendent. Garde la séance mais surveille l'intensité, et n'hésite pas à raccourcir si les sensations ne suivent pas."};
-  if(g>=32) return {flag:'Allègement suggéré', color:'#FF8A4D',
-    advice:"Charge élevée et/ou ressenti en baisse. Mieux vaut réduire le volume ou l'intensité aujourd'hui, ou décaler la séance qualité. À valider avec le coach."};
-  return {flag:'Repos recommandé', color:'#FF5470',
-    advice:"Plusieurs signaux d'alerte convergent : risque de surmenage. Privilégie la récupération, et préviens ton coach pour réajuster le bloc."};
+  if(g>=70) return {flag:tr('ready.flag.continue'), color:'#39E6A3',
+    advice:tr('ready.advice.continue')};
+  if(g>=50) return {flag:tr('ready.flag.watch'), color:'#FFB13D',
+    advice:tr('ready.advice.watch')};
+  if(g>=32) return {flag:tr('ready.flag.lighten'), color:'#FF8A4D',
+    advice:tr('ready.advice.lighten')};
+  return {flag:tr('ready.flag.rest'), color:'#FF5470',
+    advice:tr('ready.advice.rest')};
 }
 
 function scoreColor(s){
@@ -7680,27 +7690,27 @@ function renderToday(){
   const frClass = fraicheur>=70?'ti-good':fraicheur>=50?'ti-warn':'ti-bad';
 
   // 2. Risque de blessure depuis l'ACWR (sweet spot 0.8–1.3)
-  let risque, rqClass, rqHint;
-  if(acwr>1.5){ risque='Élevé'; rqClass='ti-bad'; rqHint='Charge récente bien au-dessus de ton habitude'; }
-  else if(acwr>1.3){ risque='Modéré'; rqClass='ti-warn'; rqHint='Surveille les sensations, évite d\'en rajouter'; }
-  else if(acwr<0.8){ risque='Sous-charge'; rqClass='ti-info'; rqHint='Tu peux te permettre un peu plus de volume'; }
-  else { risque='Faible'; rqClass='ti-good'; rqHint='Charge bien équilibrée, continue'; }
+  let risque, risqueLbl, rqClass, rqHint;
+  if(acwr>1.5){ risque='Élevé'; risqueLbl=tr('today.riskHigh'); rqClass='ti-bad'; rqHint=tr('today.riskHighHint'); }
+  else if(acwr>1.3){ risque='Modéré'; risqueLbl=tr('today.riskModerate'); rqClass='ti-warn'; rqHint=tr('today.riskModerateHint'); }
+  else if(acwr<0.8){ risque='Sous-charge'; risqueLbl=tr('today.riskUnderload'); rqClass='ti-info'; rqHint=tr('today.riskUnderloadHint'); }
+  else { risque='Faible'; risqueLbl=tr('today.riskLow'); rqClass='ti-good'; rqHint=tr('today.riskLowHint'); }
 
   // 3. Séance du jour
   const s = todaySession();
   let seance, scClass, scHint;
-  if(!s){ seance='Repos'; scClass='ti-info'; scHint='Journée sans séance prévue'; }
-  else if(s.done){ seance='Validée <i class="ic ic-check"></i>'; scClass='ti-good'; scHint=s.title; }
-  else { seance='À faire'; scClass='ti-warn'; scHint=s.title; }
+  if(!s){ seance=tr('today.restDay'); scClass='ti-info'; scHint=tr('today.noSessionPlanned'); }
+  else if(s.done){ seance=tr('today.validated')+' <i class="ic ic-check"></i>'; scClass='ti-good'; scHint=s.title; }
+  else { seance=tr('today.toDo'); scClass='ti-warn'; scHint=s.title; }
 
   // 4. Nutrition recommandée (g glucides/h) selon durée & intensité de la séance
   let carbs, nutHint;
   if(s){
     const long = (s.dur||0)>=120, hard=['Z4','Z5'].includes(s.zone)||/vma|seuil|vo2/i.test(s.title||'');
-    if(long){ carbs='80–90 g/h'; nutHint='Sortie longue : ravitaille-toi régulièrement'; }
-    else if(hard){ carbs='60 g/h'; nutHint='Séance intense : glucides + protéines en récup'; }
-    else { carbs='30 g/h'; nutHint='Séance courte : hydratation suffit souvent'; }
-  } else { carbs='—'; nutHint='Repos : alimentation équilibrée habituelle'; }
+    if(long){ carbs='80–90 g/h'; nutHint=tr('today.nutLongHint'); }
+    else if(hard){ carbs='60 g/h'; nutHint=tr('today.nutHardHint'); }
+    else { carbs='30 g/h'; nutHint=tr('today.nutEasyHint'); }
+  } else { carbs='—'; nutHint=tr('today.nutRestHint'); }
 
   // 5. Heure idéale de coucher : réveil habituel - besoin de sommeil (ajusté si grosse séance demain)
   const wake = 6.5;                       // réveil ~6h30 (démo)
@@ -7714,46 +7724,46 @@ function renderToday(){
   const bedStr = `${String(bh).padStart(2,'0')} h ${String(bm).padStart(2,'0')}`;
 
   const today = new Date();
-  const dateStr = today.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+  const dateStr = today.toLocaleDateString(localeStr(), {weekday:'long', day:'numeric', month:'long'});
 
   box.innerHTML = `<div class="today-card">
     <div class="today-head">
-      <div class="today-title"><i class="ic ic-sun"></i> Ton point du jour</div>
+      <div class="today-title"><i class="ic ic-sun"></i> ${tr('today.yourDailyPoint')}</div>
       <div class="today-head-r">
-        <button class="cb-bilan" id="cbBilanBtn" title="Exporter ton bilan en PDF"><i class="ic ic-download"></i> Mon bilan PDF</button>
+        <button class="cb-bilan" id="cbBilanBtn" title="${tr('today.exportBilanTitle')}"><i class="ic ic-download"></i> ${tr('today.myBilanPdf')}</button>
         <div class="today-date">${dateStr}</div>
       </div>
     </div>
     <div class="today-grid">
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-battery"></i></div>
-        <div class="ti-label">État de fraîcheur</div>
+        <div class="ti-label">${tr('today.freshnessState')}</div>
         <div class="ti-value ${frClass}">${fraicheur} %</div>
-        <div class="ti-hint">${fraicheur>=70?'En forme, prêt à performer':fraicheur>=50?'Correct, gère l\'intensité':'Fatigue marquée, allège'}</div>
+        <div class="ti-hint">${fraicheur>=70?tr('today.freshnessGoodHint'):fraicheur>=50?tr('today.freshnessOkHint'):tr('today.freshnessBadHint')}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-shield"></i></div>
-        <div class="ti-label">Risque de blessure</div>
-        <div class="ti-value ${rqClass}">${risque}</div>
+        <div class="ti-label">${tr('today.injuryRisk')}</div>
+        <div class="ti-value ${rqClass}">${risqueLbl}</div>
         <div class="ti-hint">${rqHint}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-target"></i></div>
-        <div class="ti-label">Séance du jour</div>
+        <div class="ti-label">${tr('today.todaySession')}</div>
         <div class="ti-value ${scClass}">${seance}</div>
         <div class="ti-hint">${scHint}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-cup"></i></div>
-        <div class="ti-label">Nutrition recommandée</div>
+        <div class="ti-label">${tr('today.recommendedNutrition')}</div>
         <div class="ti-value ti-info">${carbs}</div>
         <div class="ti-hint">${nutHint}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-moon"></i></div>
-        <div class="ti-label">Heure idéale de coucher</div>
+        <div class="ti-label">${tr('today.idealBedtime')}</div>
         <div class="ti-value ti-info">${bedStr}</div>
-        <div class="ti-hint">~${need.toFixed(1).replace('.0','')} h de sommeil visées</div>
+        <div class="ti-hint">${tr('today.sleepTargetHint', {h:need.toFixed(1).replace('.0','')})}</div>
       </div>
     </div>
     <div class="today-foot"><i class="ic ic-lightbulb"></i> ${todayAdvice(fraicheur, risque, s)}</div>
@@ -7762,11 +7772,11 @@ function renderToday(){
   if(_cbBilanBtn) _cbBilanBtn.onclick = function(){ exportBilan(typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:''); };
 }
 function todayAdvice(fr, risque, s){
-  if(risque==='Élevé') return 'Ta charge récente est haute : privilégie la qualité du sommeil et reste à l\'écoute de ton corps cette semaine.';
-  if(fr<50) return 'Tes signaux de récupération sont bas. Une séance plus douce aujourd\'hui te fera repartir plus fort demain.';
-  if(s && !s.done) return 'Tout est au vert pour ta séance du jour. Pense à t\'hydrater et à bien t\'échauffer.';
-  if(s && s.done) return 'Belle séance bouclée ! Soigne ta récup (collation, étirements, sommeil) pour enchaîner la semaine.';
-  return 'Journée de repos : c\'est là que les progrès se construisent. Repose-toi vraiment.';
+  if(risque==='Élevé') return tr('advice.highLoad');
+  if(fr<50) return tr('advice.lowRecovery');
+  if(s && !s.done) return tr('advice.greenLight');
+  if(s && s.done) return tr('advice.sessionDone');
+  return tr('advice.restDay');
 }
 renderToday();
 
@@ -7876,7 +7886,7 @@ const SHOE_CATALOG = [
  {b:'Kiprun',m:'KS900',cat:'daily',life:850,comm:800},
  {b:'Kiprun',m:'KD900X LD',cat:'race',life:450,comm:410}
 ];
-const SHOE_CAT_LABEL = {daily:'Entraînement', tempo:'Dynamique', race:'Compétition', trail:'Trail'};
+const SHOE_CAT_LABEL = {get daily(){return tr('shoeCat.daily')}, get tempo(){return tr('shoeCat.tempo')}, get race(){return tr('shoeCat.race')}, get trail(){return tr('shoeCat.trail')}};
 const SHOE_CAT_ICON  = {daily:'ic-run', tempo:'ic-zap', race:'ic-flag', trail:'ic-mountain'};
 const SHOE_CAT_COLOR = {daily:'var(--good)', tempo:'var(--bike)', race:'var(--run)', trail:'var(--strength)'};
 
@@ -7924,10 +7934,10 @@ function raceGearForecast(){
       const projected = g.km + (cat==='daily'? kmUntil*0.65 : cat==='tempo'? kmUntil*0.25 : kmUntil*0.10);
       if(cat===r.needCat && projected >= g.max*0.95){
         out.push({race:r, gear:g, projected:Math.round(projected),
-          msg:`<b>${r.name}</b> dans ${r.inDays} j : tes <b>${g.name}</b> seront à environ ${Math.round(projected)} km (durée de vie ${g.max} km). Prévois une nouvelle paire de compétition et rode-la avant la course.`});
+          msg:tr('gear.forecastRaceCat', {race:r.name, days:r.inDays, name:g.name, proj:Math.round(projected), max:g.max})});
       } else if(cat!==r.needCat && projected >= g.max*0.90){
         out.push({race:r, gear:g, projected:Math.round(projected),
-          msg:`D'ici <b>${r.name}</b> (${r.inDays} j), tes <b>${g.name}</b> dépasseront leur durée de vie (environ ${Math.round(projected)}/${g.max} km). Anticipe le remplacement pour t'entraîner sur un amorti sain.`});
+          msg:tr('gear.forecastOtherCat', {race:r.name, days:r.inDays, name:g.name, proj:Math.round(projected), max:g.max})});
       }
     });
   });
@@ -7944,12 +7954,12 @@ function shoeMilestones(g){
 }
 
 function gearAlert(g){
-  if(g.type!=='shoe') return {cls:'ok', ic:'ic-check', txt:`${g.km} km au compteur. Entretien régulier recommandé.`};
+  if(g.type!=='shoe') return {cls:'ok', ic:'ic-check', txt:tr('gear.kmOnClock', {km:g.km})};
   const p = g.km/g.max*100;
-  if(p>=100) return {cls:'danger', ic:'ic-alert-triangle', txt:`Durée de vie dépassée (${g.max} km pour ce modèle) : remplacement fortement conseillé, l'amorti est dégradé.`};
-  if(p>=85) return {cls:'danger', ic:'ic-alert-triangle', txt:`${Math.round(p)}% de la durée de vie : pense à les remplacer bientôt, le risque de blessure augmente.`};
-  if(p>=60) return {cls:'warn', ic:'ic-bell', txt:`${Math.round(p)}% de la durée de vie de ce modèle : surveille l'usure de la semelle et les sensations.`};
-  return {cls:'ok', ic:'ic-check', txt:`Encore environ ${Math.round(g.max*0.6-g.km)} km avant le premier palier de surveillance de ce modèle.`};
+  if(p>=100) return {cls:'danger', ic:'ic-alert-triangle', txt:tr('gear.lifeExceeded', {max:g.max})};
+  if(p>=85) return {cls:'danger', ic:'ic-alert-triangle', txt:tr('gear.life85', {pct:Math.round(p)})};
+  if(p>=60) return {cls:'warn', ic:'ic-bell', txt:tr('gear.life60', {pct:Math.round(p)})};
+  return {cls:'ok', ic:'ic-check', txt:tr('gear.beforeFirstMilestone', {km:Math.round(g.max*0.6-g.km)})};
 }
 
 function renderGear(){
@@ -7973,45 +7983,44 @@ function renderGear(){
     const al=gearAlert(g);
     const catBadge = cat ? `<span class="gear-cat" style="--gc:${SHOE_CAT_COLOR[cat]}"><i class="ic ${SHOE_CAT_ICON[cat]}"></i>${SHOE_CAT_LABEL[cat]}</span>` : '';
     const costKm = (g.price && g.km>0) ? `<span class="gear-cost">${(g.price/g.km).toFixed(2)} €/km</span>` : (g.price?`<span class="gear-cost">${g.price} € neuve</span>`:'');
-    const commHtml = (g.type==='shoe' && comm) ? `<div class="gear-comm"><i class="ic ic-users"></i> Les athlètes Sillance retirent ce modèle à <b>${comm} km</b> en moyenne</div>` : '';
+    const commHtml = (g.type==='shoe' && comm) ? `<div class="gear-comm"><i class="ic ic-users"></i> ${tr('gear.communityAvg', {km:comm})}</div>` : '';
     return `<div class="gear-card" data-id="${g.id}">
       <div class="gear-card-h">
         <span class="gear-ico"><i class="ic ${g.type==='shoe'?'ic-shoe':'ic-bike'}"></i></span>
         <div class="gear-i">
           <div class="gear-name">${g.name}</div>
-          <div class="gear-type">${g.type==='shoe'?'Chaussures de course':'Vélo'} ${catBadge}</div>
+          <div class="gear-type">${g.type==='shoe'?tr('gear.runningShoes'):tr('gear.bike')} ${catBadge}</div>
         </div>
-        <button class="gear-del" data-act="del">Retirer</button>
+        <button class="gear-del" data-act="del">${tr('gear.remove')}</button>
       </div>
-      <div class="gear-km">${g.km.toLocaleString('fr-FR')}<small> / ${g.max.toLocaleString('fr-FR')} km</small> ${costKm}</div>
-      <div class="gear-sub">${Math.round(pct)}% de la durée de vie du modèle</div>
+      <div class="gear-km">${g.km.toLocaleString(localeStr())}<small> / ${g.max.toLocaleString(localeStr())} km</small> ${costKm}</div>
+      <div class="gear-sub">${tr('gear.pctLifespan', {pct:Math.round(pct)})}</div>
       <div class="gear-bar">${marks}<i style="width:${pct}%;background:${barColor}"></i></div>
       ${milestones}
       ${commHtml}
       <div class="gear-alert ${al.cls}"><i class="ic ${al.ic}"></i><span>${al.txt}</span></div>
       <div style="margin-top:10px;display:flex;gap:7px">
-        <button class="gear-del" data-act="add10" style="border-color:var(--line-strong)">+ Simuler 50 km</button>
+        <button class="gear-del" data-act="add10" style="border-color:var(--line-strong)">+ ${tr('gear.simulate50km')}</button>
       </div>
     </div>`;
   }).join('') || `<p class="club-hint">${mode==='coach'
-    ? 'Cet athlète n\'a renseigné aucun équipement dans son espace.'
-    : 'Aucun équipement. Ajoute tes chaussures pour suivre leur usure.'}</p>`;
+    ? tr('gear.coachNoGear')
+    : tr('gear.athleteNoGear')}</p>`;
 
   // — bandeau conseil du jour + garde-fou courses à venir —
   const advisor=document.getElementById('gearAdvisor');
   if(advisor){
     // séance course du jour, sinon la prochaine course planifiée
-    let target = todaySession(); let when='ta séance du jour';
+    let target = todaySession(); let when=tr('gear.yourTodaySession');
     if(!target || target.disc!=='run'){
       const todayK = iso(new Date());
       const keys = Object.keys(planning).filter(k=>k>=todayK).sort();
-      for(const k of keys){ const f=(planning[k]||[]).find(x=>x.disc==='run' && !x.done); if(f){ target=f; when=`ta prochaine séance course (« ${f.title} »)`; break; } }
+      for(const k of keys){ const f=(planning[k]||[]).find(x=>x.disc==='run' && !x.done); if(f){ target=f; when=tr('gear.yourNextRunSession', {title:f.title}); break; } }
     }
     const rec = recommendShoe(target);
     const recHtml = rec ? `<div class="gear-advice">
       <i class="ic ic-sparkles ga-ico"></i>
-      <div><b>Paire conseillée pour ${when}</b> — profil ${SHOE_CAT_LABEL[rec.want]} recommandé :
-      porte tes <b>${rec.shoe.name}</b> (${rec.shoe.km}/${rec.shoe.max} km).</div></div>` : '';
+      <div>${tr('gear.recommendedPairFor', {when, profile:SHOE_CAT_LABEL[rec.want], name:rec.shoe.name, km:rec.shoe.km, max:rec.shoe.max})}</div></div>` : '';
     const forecasts = raceGearForecast();
     const fcHtml = forecasts.map(f=>`<div class="gear-advice warn"><i class="ic ic-flag ga-ico"></i><div>${f.msg}</div></div>`).join('');
     advisor.innerHTML = recHtml + fcHtml;
@@ -8041,11 +8050,11 @@ function addGearKm(g, km){
 
 function notifyShoe(g, m){
   const msgs={
-    watch:`Tes ${g.name} passent ${m.km} km (60% de leur durée de vie). Surveille l'usure de la semelle et les sensations.`,
-    soon:`Tes ${g.name} atteignent ${m.km} km (85% de leur durée de vie). Pense à prévoir une nouvelle paire.`,
-    replace:`Tes ${g.name} ont dépassé leur durée de vie (${g.max} km). Remplace-les pour éviter les blessures.`
+    watch:tr('gear.notifyWatch', {name:g.name, km:m.km}),
+    soon:tr('gear.notifySoon', {name:g.name, km:m.km}),
+    replace:tr('gear.notifyReplace', {name:g.name, max:g.max})
   };
-  toast(msgs[m.lvl]||`${g.name} : ${m.km} km atteints`);
+  toast(msgs[m.lvl]||tr('gear.notifyGeneric', {name:g.name, km:m.km}));
 }
 
 /* modal d'ajout */
@@ -8079,11 +8088,11 @@ function pickShoe(e){
   shoeResultsEl.innerHTML=''; document.getElementById('gearSearch').value='';
   shoePickedEl.hidden=false;
   shoePickedEl.innerHTML = `<span class="gear-cat" style="--gc:${SHOE_CAT_COLOR[e.cat]}"><i class="ic ${SHOE_CAT_ICON[e.cat]}"></i>${SHOE_CAT_LABEL[e.cat]}</span>
-    Durée de vie du modèle : <b>${e.life} km</b> · <i class="ic ic-users"></i> retrait moyen communauté : <b>${e.comm} km</b>`;
+    ${tr('gear.modelLifespan')} : <b>${e.life} km</b> · <i class="ic ic-users"></i> ${tr('gear.communityAvgRetire')} : <b>${e.comm} km</b>`;
 }
 function renderShoeBrands(){
   const brands=[...new Set(SHOE_CATALOG.map(e=>e.b))];
-  shoeBrandsEl.innerHTML = `<span class="sb-hint">…ou parcours par marque :</span>` +
+  shoeBrandsEl.innerHTML = `<span class="sb-hint">${tr('gear.orBrowseByBrand')}</span>` +
     brands.map(b=>`<button class="brand-chip" data-b="${b}">${b}</button>`).join('');
   shoeBrandsEl.querySelectorAll('.brand-chip').forEach(ch=> ch.onclick=()=>{
     shoeBrandsEl.querySelectorAll('.brand-chip').forEach(x=>x.classList.toggle('sel', x===ch));
@@ -8100,7 +8109,7 @@ document.getElementById('gearSearch').addEventListener('input', e=>{
   pickedShoe=null; shoePickedEl.hidden=true;
   if(q.length<2){ shoeResultsEl.innerHTML=''; return; }
   const hits=SHOE_CATALOG.filter(x=>(x.b+' '+x.m).toLowerCase().includes(q)).slice(0,8);
-  shoeResultsEl.innerHTML = hits.map(shoeResultRow).join('') || '<div class="sr-cat">Aucun modèle — saisis-le librement ci-dessous</div>';
+  shoeResultsEl.innerHTML = hits.map(shoeResultRow).join('') || `<div class="sr-cat">${tr('gear.noModelFreeEntry')}</div>`;
   wireShoeRows();
 });
 document.getElementById('gearType').addEventListener('change', e=>{
@@ -8116,7 +8125,7 @@ document.getElementById('gearSave').onclick=()=>{
   const g={
     id:'g'+Date.now(),
     type,
-    name:dispoSafe(document.getElementById('gearName').value||'Équipement'),
+    name:dispoSafe(document.getElementById('gearName').value||tr('gear.equipment')),
     km:+document.getElementById('gearKm').value||0,
     max:+document.getElementById('gearMax').value||1000,
     price:+document.getElementById('gearPrice').value||null,
@@ -8136,7 +8145,7 @@ document.getElementById('gearSave').onclick=()=>{
   document.getElementById('gearName').value=''; document.getElementById('gearSearch').value=''; shoeResultsEl.innerHTML='';
   gearOverlay.classList.remove('open');
   renderGear();
-  toast('Équipement ajouté — suivi d\'usure calibré sur ton modèle');
+  toast(tr('toast.equipementAjouteSuiviDUsure'));
 };
 
 /* initialisation au chargement de la page */
@@ -8152,9 +8161,9 @@ renderGear();
    Accessible à tous les athlètes (coachés comme autonomes).
    ============================================================ */
 const PREPA_MENTALE = [
-  { id:'eric', name:'Éric', role:'Préparateur mental',
+  { id:'eric', name:'Éric', get role(){return tr('mental.role')},
     calendly:'https://calendly.com/VOTRE-LIEN-ERIC/prepa-mentale',
-    blurb:'Gestion du stress de course, visualisation, routines pré-compétition.' },
+    get blurb(){return tr('mental.ericBlurb')} },
   // { id:'…', name:'…', role:'Préparateur mental', calendly:'https://calendly.com/…', blurb:'…' },
 ];
 
@@ -8175,16 +8184,16 @@ function showPmCalendar(pm){
   calendlyWrap.hidden = false;
   mentalFallback.hidden = false;
   mentalBack.hidden = PREPA_MENTALE.length < 2;     // pas de « changer » si un seul PM
-  mentalDesc.textContent = `Choisis ton créneau avec ${pm.name} (visio, 45 min).`;
+  mentalDesc.textContent = tr('mental.chooseSlotWith', {name:pm.name});
 }
 function showPmPicker(){
   calendlyWrap.hidden = true; mentalFallback.hidden = true; mentalBack.hidden = true;
-  mentalDesc.textContent = 'Choisis ton préparateur mental, puis ton créneau.';
+  mentalDesc.textContent = tr('mental.choosePrepThenSlot');
   mentalPicker.innerHTML = PREPA_MENTALE.map((pm,i)=>`
     <button class="pm-card" data-i="${i}" type="button">
       <span class="pm-av">${(pm.name||'?').slice(0,1)}</span>
-      <span class="pm-info"><span class="pm-name">${pm.name}</span><span class="pm-role">${pm.role||'Préparateur mental'}</span>${pm.blurb?`<span class="pm-blurb">${pm.blurb}</span>`:''}</span>
-      <span class="pm-go">Réserver →</span>
+      <span class="pm-info"><span class="pm-name">${pm.name}</span><span class="pm-role">${pm.role||tr('mental.role')}</span>${pm.blurb?`<span class="pm-blurb">${pm.blurb}</span>`:''}</span>
+      <span class="pm-go">${tr('mental.book')}</span>
     </button>`).join('');
   mentalPicker.querySelectorAll('.pm-card').forEach(c=> c.addEventListener('click', ()=> showPmCalendar(PREPA_MENTALE[+c.dataset.i])));
   mentalPicker.hidden = false;
@@ -8217,17 +8226,17 @@ document.getElementById('lactestSend').addEventListener('click', ()=>{
   const fb = document.getElementById('lactestFallback');
   if(!name || !email){
     fb.style.display='block'; fb.style.color='var(--run)';
-    fb.textContent='Merci de renseigner au moins ton nom et ton email.';
+    fb.textContent=tr('lactest.fillNameEmail');
     return;
   }
-  const subject = encodeURIComponent(`Demande de test lactate — ${name}`);
+  const subject = encodeURIComponent(tr('lactest.subject', {name}));
   const body = encodeURIComponent(
-    `Nom : ${name}\nEmail : ${email}\nType de test : ${type}\nPériode souhaitée : ${period||'—'}\n\nMessage :\n${msg||'—'}`
+    tr('lactest.body', {name, email, type, period:period||'—', msg:msg||'—'})
   );
   // ouvre le client mail pré-rempli. Backend : remplacer par un POST vers votre API.
   window.location.href = `mailto:${LACTEST_EMAIL}?subject=${subject}&body=${body}`;
   fb.style.display='block'; fb.style.color='var(--good)';
-  fb.innerHTML = `Ton client mail s'ouvre… s'il ne s'ouvre pas, écris-nous à <a href="mailto:${LACTEST_EMAIL}">${LACTEST_EMAIL}</a>.`;
+  fb.innerHTML = tr('lactest.mailOpening', {email:LACTEST_EMAIL});
 });
 
 /* ============================================================
