@@ -836,8 +836,7 @@ function renderSidebar(){
           ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> ${tr('sidebar.subActive')}</div>
              <button class="cc-btn" id="coachManageBtn">${tr('sidebar.manageSub')}</button>`
           : `<div class="cc-s">${tr('sidebar.unlockCoach')}</div>
-             ${coachTiersHTML()}
-             <button class="cc-btn" id="coachSubscribeBtn" style="margin-top:10px">${tr('sidebar.subscribe')} — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/${tr('sidebar.perMonth')}</button>`}
+             <button class="cc-btn" id="coachSeePlansBtn" style="margin-top:10px">${tr('sidebar.seePlans')}</button>`}
       </div>
       <div class="coach-connect" style="margin-top:14px;opacity:.85">
         <div class="cc-t"><b><i class="ic ic-brain"></i> ${tr('sidebar.aiAssistant')}</b> <span class="cc-soon">${tr('sidebar.comingSoon')}</span></div>
@@ -877,12 +876,8 @@ function renderSidebar(){
     };
     const cib=document.getElementById('coachInvoicesBtn');
     if(cib) cib.onclick=()=> openCoachInvoices();
-    wireCoachTiers(sidebarContent);
-    const csb=document.getElementById('coachSubscribeBtn');
-    if(csb) csb.onclick=()=>{
-      if(window.PF?.user){ toast(tr('toast.redirectionVersPaiement')); PF.startCheckout('coach', selectedCoachTier).catch(e=>{console.warn(e);toast(tr('toast.paiementIndisponible'), 'error');}); }
-      else toast(tr('toast.connecteEspaceCoachPourT'));
-    };
+    const cspb=document.getElementById('coachSeePlansBtn');
+    if(cspb) cspb.onclick=()=> openSettings('structure');
     const cmb=document.getElementById('coachManageBtn');
     if(cmb) cmb.onclick=()=> openSettings('structure');
     const cpe=document.getElementById('coachPriceEdit');
@@ -1944,17 +1939,22 @@ function aiTrialDaysLeft(){
   return null;
 }
 function settingsStructureHtml(){
-  const sub = window.__pf_subscribed===true || !window.PF?.user; // démo : montré actif
+  // Même source de vérité que la carte sidebar (audit 04/08/2026) : l'ancien
+  // bypass démo (|| !window.PF?.user) affichait toujours « actif » ici même
+  // quand la sidebar affichait « non abonné » juste à côté — incohérent une
+  // fois les deux écrans reliés par le bouton « Voir les formules ».
+  const sub = window.__pf_subscribed===true;
   return `
     <div class="set-h">${tr('settings.structureSub')}</div>
     <div class="set-sub">${tr('settings.structureSubText')}</div>
     <div class="set-plan">
+      ${sub ? `
       <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
         <div style="flex:1">
-          <div class="p-name">${tr('settings.planName')}</div>
-          <div class="p-price">29€<small> /${tr('sidebar.perMonth')}</small></div>
+          <div class="p-name">${COACH_TIERS.find(t=>t.id===selectedCoachTier).name}</div>
+          <div class="p-price">${COACH_TIERS.find(t=>t.id===selectedCoachTier).price}€<small> /${tr('sidebar.perMonth')}</small></div>
         </div>
-        <span class="set-status ${sub?'on':'off'}">${sub?tr('settings.active'):tr('settings.inactive')}</span>
+        <span class="set-status on">${tr('settings.active')}</span>
       </div>
       <div class="set-rows">
         <div><div class="k">${tr('settings.createdOn')}</div><div class="v">14/04/2026</div></div>
@@ -1966,8 +1966,13 @@ function settingsStructureHtml(){
       </div>
       <div class="set-actions">
         <button class="btn cy-ghost" id="setPortalBtn"><i class="ic ic-credit-card"></i> ${tr('settings.detailsManage')}</button>
-        ${sub?'':`<button class="btn" id="setSubscribeBtn">${tr('settings.subscribe29')}</button>`}
-      </div>
+      </div>` : `
+      <div class="p-name">${tr('settings.planName')}</div>
+      <p class="set-sub" style="margin:2px 0 12px">${tr('sidebar.unlockCoach')}</p>
+      ${coachTiersHTML()}
+      <div class="set-actions">
+        <button class="btn" id="setSubscribeBtn">${tr('sidebar.subscribe')} — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/${tr('sidebar.perMonth')}</button>
+      </div>`}
     </div>
     <div class="set-upsell">
       <b>⭐ ${tr('settings.upgradeToPro')}</b>
@@ -2012,10 +2017,14 @@ function renderSettings(){
   document.querySelectorAll('#setNav .set-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===settingsTab));
   const body=document.getElementById('setBody');
   body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsCoachHtml();
+  wireCoachTiers(body, renderSettings);
   const portal=document.getElementById('setPortalBtn');
   if(portal) portal.onclick=()=>{ if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast(tr('toast.portailIndisponible'), 'error')); } else toast(tr('toast.portailStripeDemo')); };
   const subB=document.getElementById('setSubscribeBtn');
-  if(subB) subB.onclick=()=>{ if(window.PF?.user && PF.startCheckout){ PF.startCheckout('coach').catch(()=>toast(tr('toast.stripeIndisponible'), 'error')); } else toast(tr('toast.checkoutStripeDemo')); };
+  if(subB) subB.onclick=()=>{
+    if(window.PF?.user){ toast(tr('toast.redirectionVersPaiement')); PF.startCheckout('coach', selectedCoachTier).catch(e=>{console.warn(e);toast(tr('toast.paiementIndisponible'), 'error');}); }
+    else toast(tr('toast.connecteEspaceCoachPourT'));
+  };
   const pro=document.getElementById('setProBtn');
   if(pro) pro.onclick=()=>toast(tr('toast.coachProBientotDisponible'));
   const st=document.getElementById('setAiStart');
@@ -3703,9 +3712,10 @@ function coachTiersHTML(){
     </div>`).join('')}
   </div>`;
 }
-function wireCoachTiers(root){
+function wireCoachTiers(root, onSelect){
+  const rerender = onSelect || renderSidebar;
   root.querySelectorAll('.csub-tier').forEach(el=>{
-    el.onclick=()=>{ selectedCoachTier=+el.dataset.tier; renderSidebar(); };
+    el.onclick=()=>{ selectedCoachTier=+el.dataset.tier; rerender(); };
     el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } };
   });
 }
@@ -6657,8 +6667,8 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') analysisOverlay.c
    2e argument garde l'apparence par défaut (liseré vert, comme avant mais
    désormais explicite plutôt qu'absent). */
 function toast(msg, type='ok'){
-  let t=document.getElementById('apexToast');
-  if(!t){ t=document.createElement('div'); t.id='apexToast'; document.body.appendChild(t);
+  let t=document.getElementById('silToast');
+  if(!t){ t=document.createElement('div'); t.id='silToast'; document.body.appendChild(t);
     t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);z-index:80;'+
       'background:var(--panel-2);border:1px solid var(--line-strong);border-left:4px solid var(--good);border-radius:12px;padding:13px 20px;'+
       'font-size:14px;font-weight:600;color:var(--text);box-shadow:0 12px 34px rgba(0,0,0,.5);opacity:0;transition:.25s';
