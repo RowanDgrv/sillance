@@ -466,6 +466,35 @@
     "clubBill.collectedThisMonth": `Encaissé ce mois`, "clubBill.pending": `En attente`, "clubBill.activeSubs": `Abonnements actifs`,
     "clubBill.stripeNote": `Abonnements mensuels + réservations à la carte. Encaissé par Stripe, directement sur le compte du club.`,
     "clubBill.member": `Adhérent`, "clubBill.reason": `Motif`, "clubBill.type": `Type`, "clubBill.paid": `payé`, "clubBill.waiting": `en attente`,
+
+    "clubOffres.collectFromMembers": `Encaisse tes adhérents`,
+    "clubOffres.connectStripeNote": `Relie le compte Stripe du club → tu perçois abonnements &amp; séances à la carte directement (commission plateforme configurable).`,
+    "clubOffres.valueScale": `Une échelle de valeur : on monte → on paie plus → plus de suivi et de data. Clique un tarif pour l'ajuster.`,
+    "clubOffres.premiumMargin": `Marge premium`, "clubOffres.editPrice": `Modifier le tarif`,
+    "clubOffres.pricePrompt": `Tarif de « {name} » (€) :`,
+
+    "reminder.title": `Rappel — {day} {time} : {title}`, "reminder.confirmed": `Confirmé`, "reminder.iConfirm": `Je confirme`,
+    "reminder.absentNoted": `Absent noté`, "reminder.iCancel": `J'annule`,
+
+    "clubHist.aLaCarteConsumed": `Séances à la carte consommées`, "clubHist.totalPaidQuarter": `Total réglé ce trimestre`,
+    "clubHist.headline": `Tu as fait <b>{n} séances club</b> ce trimestre !`, "clubHist.keepGoing": `Continue comme ça`,
+    "clubHist.accumulated": `cumulées`, "clubHist.attendance": `présence`,
+
+    "creneau.display": `Affichage :`, "creneau.coachViewAll": `Vue coach — tout`, "creneau.memberView": `Vue adhérent`,
+    "creneau.noGroup": `sans groupe`,
+    "creneau.hiddenSlotsPlural": `{n} créneaux d'autres groupes masqués`, "creneau.hiddenSlotsSingular": `{n} créneau d'autres groupes masqué`,
+    "creneau.oneTime": `ponctuel`, "creneau.oneTimeTitle": `Séance ponctuelle`,
+    "creneau.weekly": `hebdo`, "creneau.weeklyTitle": `Se répète chaque semaine`,
+    "creneau.groupOnlyContent": `Contenu réservé au groupe {name}`,
+    "creneau.invitedPendingPlural": `{n} invités du groupe — en attente de confirmation`,
+    "creneau.invitedPendingSingular": `{n} invité du groupe — en attente de confirmation`,
+    "creneau.spotsLeft": `{n} places restantes`, "creneau.noOneRegistered": `Aucun inscrit pour l'instant`,
+    "creneau.confirmMyAttendance": `Confirmer ma présence`, "creneau.registered": `Inscrit`,
+    "creneau.registerPrice": `S'inscrire · {price}€`, "creneau.register": `S'inscrire`, "creneau.list": `Liste`,
+    "creneau.noneVisible": `Aucun créneau visible pour ce profil.`,
+    "creneau.registeredPricePay": `Inscrit ({price}€ — paiement à la séance)`, "creneau.registeredToSlot": `Inscrit au créneau`,
+
+    "clubAth.calendarOf": `Calendrier de {name}`, "clubAth.demoTypicalPlan": ` — démo : plan type du club`,
   };
 
   var en = {
@@ -931,6 +960,35 @@
     "clubBill.collectedThisMonth": `Collected this month`, "clubBill.pending": `Pending`, "clubBill.activeSubs": `Active subscriptions`,
     "clubBill.stripeNote": `Monthly subscriptions + à la carte bookings. Collected via Stripe, directly to the club's account.`,
     "clubBill.member": `Member`, "clubBill.reason": `Reason`, "clubBill.type": `Type`, "clubBill.paid": `paid`, "clubBill.waiting": `pending`,
+
+    "clubOffres.collectFromMembers": `Collect from your members`,
+    "clubOffres.connectStripeNote": `Connect the club's Stripe account → you receive subscriptions &amp; à la carte sessions directly (configurable platform fee).`,
+    "clubOffres.valueScale": `A value ladder: you go up → you pay more → more tracking and data. Click a price to adjust it.`,
+    "clubOffres.premiumMargin": `Premium margin`, "clubOffres.editPrice": `Edit the price`,
+    "clubOffres.pricePrompt": `Price of "{name}" (€):`,
+
+    "reminder.title": `Reminder — {day} {time}: {title}`, "reminder.confirmed": `Confirmed`, "reminder.iConfirm": `I confirm`,
+    "reminder.absentNoted": `Absence noted`, "reminder.iCancel": `I'm cancelling`,
+
+    "clubHist.aLaCarteConsumed": `À la carte sessions used`, "clubHist.totalPaidQuarter": `Total paid this quarter`,
+    "clubHist.headline": `You've done <b>{n} club sessions</b> this quarter!`, "clubHist.keepGoing": `Keep it up`,
+    "clubHist.accumulated": `accumulated`, "clubHist.attendance": `attendance`,
+
+    "creneau.display": `Display:`, "creneau.coachViewAll": `Coach view — all`, "creneau.memberView": `Member view`,
+    "creneau.noGroup": `no group`,
+    "creneau.hiddenSlotsPlural": `{n} slots from other groups hidden`, "creneau.hiddenSlotsSingular": `{n} slot from another group hidden`,
+    "creneau.oneTime": `one-time`, "creneau.oneTimeTitle": `One-time session`,
+    "creneau.weekly": `weekly`, "creneau.weeklyTitle": `Repeats every week`,
+    "creneau.groupOnlyContent": `Content reserved for the {name} group`,
+    "creneau.invitedPendingPlural": `{n} invited from the group — awaiting confirmation`,
+    "creneau.invitedPendingSingular": `{n} invited from the group — awaiting confirmation`,
+    "creneau.spotsLeft": `{n} spots left`, "creneau.noOneRegistered": `No one registered yet`,
+    "creneau.confirmMyAttendance": `Confirm my attendance`, "creneau.registered": `Registered`,
+    "creneau.registerPrice": `Register · €{price}`, "creneau.register": `Register`, "creneau.list": `List`,
+    "creneau.noneVisible": `No slot visible for this profile.`,
+    "creneau.registeredPricePay": `Registered (€{price} — payment at the session)`, "creneau.registeredToSlot": `Registered for the slot`,
+
+    "clubAth.calendarOf": `{name}'s calendar`, "clubAth.demoTypicalPlan": ` — demo: club's typical plan`,
   };
 
   var es = {
@@ -1396,6 +1454,35 @@
     "clubBill.collectedThisMonth": `Cobrado este mes`, "clubBill.pending": `Pendiente`, "clubBill.activeSubs": `Suscripciones activas`,
     "clubBill.stripeNote": `Suscripciones mensuales + reservas a la carta. Cobrado por Stripe, directamente en la cuenta del club.`,
     "clubBill.member": `Socio`, "clubBill.reason": `Motivo`, "clubBill.type": `Tipo`, "clubBill.paid": `pagado`, "clubBill.waiting": `pendiente`,
+
+    "clubOffres.collectFromMembers": `Cobra a tus socios`,
+    "clubOffres.connectStripeNote": `Conecta la cuenta Stripe del club → recibes suscripciones &amp; sesiones a la carta directamente (comisión de plataforma configurable).`,
+    "clubOffres.valueScale": `Una escala de valor: subes → pagas más → más seguimiento y datos. Haz clic en una tarifa para ajustarla.`,
+    "clubOffres.premiumMargin": `Margen premium`, "clubOffres.editPrice": `Modificar la tarifa`,
+    "clubOffres.pricePrompt": `Tarifa de «{name}» (€):`,
+
+    "reminder.title": `Recordatorio — {day} {time}: {title}`, "reminder.confirmed": `Confirmado`, "reminder.iConfirm": `Confirmo`,
+    "reminder.absentNoted": `Ausencia registrada`, "reminder.iCancel": `Cancelo`,
+
+    "clubHist.aLaCarteConsumed": `Sesiones a la carta consumidas`, "clubHist.totalPaidQuarter": `Total pagado este trimestre`,
+    "clubHist.headline": `¡Has hecho <b>{n} sesiones de club</b> este trimestre!`, "clubHist.keepGoing": `Sigue así`,
+    "clubHist.accumulated": `acumuladas`, "clubHist.attendance": `asistencia`,
+
+    "creneau.display": `Mostrando:`, "creneau.coachViewAll": `Vista coach — todo`, "creneau.memberView": `Vista socio`,
+    "creneau.noGroup": `sin grupo`,
+    "creneau.hiddenSlotsPlural": `{n} franjas de otros grupos ocultas`, "creneau.hiddenSlotsSingular": `{n} franja de otro grupo oculta`,
+    "creneau.oneTime": `puntual`, "creneau.oneTimeTitle": `Sesión puntual`,
+    "creneau.weekly": `semanal`, "creneau.weeklyTitle": `Se repite cada semana`,
+    "creneau.groupOnlyContent": `Contenido reservado al grupo {name}`,
+    "creneau.invitedPendingPlural": `{n} invitados del grupo — pendientes de confirmación`,
+    "creneau.invitedPendingSingular": `{n} invitado del grupo — pendiente de confirmación`,
+    "creneau.spotsLeft": `{n} plazas restantes`, "creneau.noOneRegistered": `Nadie inscrito por ahora`,
+    "creneau.confirmMyAttendance": `Confirmar mi asistencia`, "creneau.registered": `Inscrito`,
+    "creneau.registerPrice": `Inscribirse · {price}€`, "creneau.register": `Inscribirse`, "creneau.list": `Lista`,
+    "creneau.noneVisible": `Ninguna franja visible para este perfil.`,
+    "creneau.registeredPricePay": `Inscrito ({price}€ — pago en la sesión)`, "creneau.registeredToSlot": `Inscrito en la franja`,
+
+    "clubAth.calendarOf": `Calendario de {name}`, "clubAth.demoTypicalPlan": ` — demo: plan tipo del club`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

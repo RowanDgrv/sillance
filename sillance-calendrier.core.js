@@ -3840,22 +3840,22 @@ function renderClubOffres(){
   const box=document.getElementById('clubViewOffres'); if(!box) return;
   box.innerHTML=`
   <div class="cconnect">
-    <div><b><i class="ic ic-credit-card"></i> Encaisse tes adhérents</b><div class="cconnect-s">Relie le compte Stripe du club → tu perçois abonnements &amp; séances à la carte directement (commission plateforme configurable).</div></div>
-    <button class="co-edit" id="clubConnectBtn" style="border-color:var(--accent);color:var(--accent)">Relier Stripe</button>
+    <div><b><i class="ic ic-credit-card"></i> ${tr('clubOffres.collectFromMembers')}</b><div class="cconnect-s">${tr('clubOffres.connectStripeNote')}</div></div>
+    <button class="co-edit" id="clubConnectBtn" style="border-color:var(--accent);color:var(--accent)">${tr('sidebar.connectStripe')}</button>
   </div>
-  <p class="club-hint" style="margin-bottom:14px">Une échelle de valeur : on monte → on paie plus → plus de suivi et de data. Clique un tarif pour l'ajuster.</p>
+  <p class="club-hint" style="margin-bottom:14px">${tr('clubOffres.valueScale')}</p>
   <div class="coffers">${CLUB_OFFERS.map(o=>`
     <div class="coffer ${o.feature?'feat':''}">
-      ${o.feature?'<span class="cribbon"><i class="ic ic-star"></i> Marge premium</span>':''}
+      ${o.feature?`<span class="cribbon"><i class="ic ic-star"></i> ${tr('clubOffres.premiumMargin')}</span>`:''}
       <div class="co-name">${o.name}</div>
       <div class="co-pitch">${o.pitch}</div>
       <div class="co-price">${o.price} €<small> ${o.unit}</small></div>
-      <button class="co-edit" data-o="${o.id}"><i class="ic ic-edit"></i> Modifier le tarif</button>
+      <button class="co-edit" data-o="${o.id}"><i class="ic ic-edit"></i> ${tr('clubOffres.editPrice')}</button>
       <ul>${o.inc.map(i=>`<li>${i}</li>`).join('')}</ul>
       <div class="co-who">${o.who}</div>
     </div>`).join('')}</div>`;
   box.querySelectorAll('.co-edit[data-o]').forEach(btn=>btn.onclick=()=>{
-    const o=clubOffer(btn.dataset.o); const v=prompt(`Tarif de « ${o.name} » (€) :`, o.price);
+    const o=clubOffer(btn.dataset.o); const v=prompt(tr('clubOffres.pricePrompt', {name:o.name}), o.price);
     if(v!==null && !isNaN(+v) && v!==''){
       o.price=+v; renderClubOffres(); toast(tr('toast.tarifMisAJour'));
       if(window.PF?.user && window.__pf_clubId) PF.saveClubOffer(window.__pf_clubId, o.id, o.price).catch(e=>console.warn('saveClubOffer',e));
@@ -3882,12 +3882,12 @@ function renderSessionReminder(){
   box.innerHTML=`<div class="sess-reminder">
     <span class="sr-icon">⏰</span>
     <div class="sr-body">
-      <div class="sr-title">Rappel — ${CLUB_DAYS[c.day]} ${c.time} : ${c.title}</div>
+      <div class="sr-title">${tr('reminder.title', {day:CLUB_DAYS[c.day], time:c.time, title:c.title})}</div>
       <div class="sr-meta">${discIcon(D)} ${D.label} · <i class="ic ic-pin"></i> ${c.place} · ${fmtDur(c.dur)}${c.price>0?` · ${c.price}€`:''}</div>
     </div>
     <div class="sr-actions">
-      <button class="sr-confirm ${reminderStatus==='confirmed'?'done':''}" data-act="confirm">${reminderStatus==='confirmed'?'<i class="ic ic-check"></i> Confirmé':'Je confirme'}</button>
-      <button class="sr-cancel ${reminderStatus==='cancelled'?'done':''}" data-act="cancel">${reminderStatus==='cancelled'?'Absent noté':'J\'annule'}</button>
+      <button class="sr-confirm ${reminderStatus==='confirmed'?'done':''}" data-act="confirm">${reminderStatus==='confirmed'?`<i class="ic ic-check"></i> ${tr('reminder.confirmed')}`:tr('reminder.iConfirm')}</button>
+      <button class="sr-cancel ${reminderStatus==='cancelled'?'done':''}" data-act="cancel">${reminderStatus==='cancelled'?tr('reminder.absentNoted'):tr('reminder.iCancel')}</button>
     </div>
   </div>`;
   box.querySelector('[data-act="confirm"]').onclick=()=>{
@@ -3916,21 +3916,21 @@ function renderClubHistory(){
   const h=CLUB_HISTORY;
   const totalPaid=h.paid.reduce((a,p)=>a+p.amount,0);
   const paidHtml = h.paid.length? `
-    <div class="ch-paid-title">Séances à la carte consommées</div>
+    <div class="ch-paid-title">${tr('clubHist.aLaCarteConsumed')}</div>
     <div class="ch-paid-list">${h.paid.map(p=>`<div class="ch-paid"><span>${p.label} · <span style="color:var(--muted)">${p.date}</span></span><span class="amt">${p.amount} €</span></div>`).join('')}</div>
-    <div class="ch-total"><span>Total réglé ce trimestre</span><span>${totalPaid} €</span></div>` : '';
+    <div class="ch-total"><span>${tr('clubHist.totalPaidQuarter')}</span><span>${totalPaid} €</span></div>` : '';
   box.innerHTML=`<div class="club-hist">
     <div class="ch-top">
       <span class="ch-badge"><i class="ic ic-trophy"></i></span>
       <div>
-        <div class="ch-headline">Tu as fait <b>${h.trimestre} séances club</b> ce trimestre !</div>
-        <div class="ch-sub">Continue comme ça</div>
+        <div class="ch-headline">${tr('clubHist.headline', {n:h.trimestre})}</div>
+        <div class="ch-sub">${tr('clubHist.keepGoing')}</div>
       </div>
     </div>
     <div class="ch-stats">
-      <div class="ch-stat"><div class="v">${h.trimestre}</div><div class="k">séances</div></div>
-      <div class="ch-stat"><div class="v">${h.heures}<span style="font-size:13px">h</span></div><div class="k">cumulées</div></div>
-      <div class="ch-stat"><div class="v">${h.presence}<span style="font-size:13px">%</span></div><div class="k">présence</div></div>
+      <div class="ch-stat"><div class="v">${h.trimestre}</div><div class="k">${tr('bilan.session').toLowerCase()}s</div></div>
+      <div class="ch-stat"><div class="v">${h.heures}<span style="font-size:13px">h</span></div><div class="k">${tr('clubHist.accumulated')}</div></div>
+      <div class="ch-stat"><div class="v">${h.presence}<span style="font-size:13px">%</span></div><div class="k">${tr('clubHist.attendance')}</div></div>
     </div>
     ${paidHtml}
   </div>`;
@@ -3949,10 +3949,10 @@ function renderCreneaux(){
     : CRENEAUX;
   const hidden = CRENEAUX.length - seen.length;
   box.innerHTML = `<div class="cr-viewbar">
-      <span>Affichage :</span>
-      <button class="cr-viewbtn ${!crMemberView?'on':''}" data-v="coach">Vue coach — tout</button>
-      <button class="cr-viewbtn ${crMemberView?'on':''}" data-v="member">Vue adhérent${me?` (${me.name.split(' ')[0]} · ${me.group?clubGroup(me.group).name:'sans groupe'})`:''}</button>
-      ${crMemberView&&hidden?`<em>${hidden} créneau${hidden>1?'x':''} d'autres groupes masqué${hidden>1?'s':''}</em>`:''}
+      <span>${tr('creneau.display')}</span>
+      <button class="cr-viewbtn ${!crMemberView?'on':''}" data-v="coach">${tr('creneau.coachViewAll')}</button>
+      <button class="cr-viewbtn ${crMemberView?'on':''}" data-v="member">${tr('creneau.memberView')}${me?` (${me.name.split(' ')[0]} · ${me.group?clubGroup(me.group).name:tr('creneau.noGroup')})`:''}</button>
+      ${crMemberView&&hidden?`<em>${tr(hidden>1?'creneau.hiddenSlotsPlural':'creneau.hiddenSlotsSingular', {n:hidden})}</em>`:''}
     </div>` + seen.slice().sort((a,b)=>a.day-b.day||a.time.localeCompare(b.time)).map(c=>{
     const D=DISC[c.disc];
     const inIt = c.attendees.includes(ME_CLUB_ID);
@@ -3962,11 +3962,11 @@ function renderCreneaux(){
     return `<div class="creneau-card" data-id="${c.id}" style="--cc:${D.color}">
       <div class="cr-top">
         <span class="cr-disc"><span class="ci">${discIcon(D)}</span>${c.title}</span>
-        <span class="cr-price ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':'inclus'}</span>
+        <span class="cr-price ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':tr('clubDash.included')}</span>
       </div>
       <div class="cr-meta">
         <span><b>${c.recur==='once'&&c.date?new Date(c.date+'T00:00:00').toLocaleDateString(localeStr(),{day:'numeric',month:'short'}):CLUB_DAYS[c.day]}</b> ${c.time}</span>
-        ${c.recur==='once'?'<span title="Séance ponctuelle">ponctuel</span>':'<span title="Se répète chaque semaine"><i class="ic ic-refresh"></i> hebdo</span>'}
+        ${c.recur==='once'?`<span title="${tr('creneau.oneTimeTitle')}">${tr('creneau.oneTime')}</span>`:`<span title="${tr('creneau.weeklyTitle')}"><i class="ic ic-refresh"></i> ${tr('creneau.weekly')}</span>`}
         <span>${fmtDur(c.dur)}</span>
         <span><i class="ic ic-pin"></i> ${c.place}</span>
         <span><i class="ic ic-user"></i> ${c.coach}</span>
@@ -3976,20 +3976,20 @@ function renderCreneaux(){
         const canSee=!g || (me && me.group===c.group);
         const chip=g?`<span class="cr-grp" style="--gc:${g.color}">${g.name}</span>`:'';
         const body=c.desc ? (canSee?`<div class="cr-desc">${c.desc}</div>`
-          :`<div class="cr-desc locked"><i class="ic ic-lock"></i> Contenu réservé au groupe ${g.name}</div>`) : '';
-        const pend=(c.invited&&c.invited.length)?`<div class="cr-pending">${c.invited.length} invité${c.invited.length>1?'s':''} du groupe — en attente de confirmation</div>`:'';
+          :`<div class="cr-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContent', {name:g.name})}</div>`) : '';
+        const pend=(c.invited&&c.invited.length)?`<div class="cr-pending">${tr(c.invited.length>1?'creneau.invitedPendingPlural':'creneau.invitedPendingSingular', {n:c.invited.length})}</div>`:'';
         return chip+body+pend; })()}
       <div class="cr-fill"><i style="width:${fillPct}%"></i></div>
-      <div class="cr-fillrow"><span>${c.attendees.length}/${c.cap} inscrits</span><span>${c.cap-c.attendees.length} places restantes</span></div>
-      <div class="cr-attendees">${avatars||'<span class="cr-roster">Aucun inscrit pour l\'instant</span>'}</div>
+      <div class="cr-fillrow"><span>${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</span><span>${tr('creneau.spotsLeft', {n:c.cap-c.attendees.length})}</span></div>
+      <div class="cr-attendees">${avatars||`<span class="cr-roster">${tr('creneau.noOneRegistered')}</span>`}</div>
       <div class="cr-cta">
         ${(c.invited||[]).includes(ME_CLUB_ID)
-          ? `<button class="cr-join" data-act="confirm"><i class="ic ic-check"></i> Confirmer ma présence</button>`
-          : `<button class="cr-join ${inIt?'in':''}" data-act="join">${inIt?'<i class="ic ic-check"></i> Inscrit':(c.price>0?`S'inscrire · ${c.price}€`:'S\'inscrire')}</button>`}
-        <button data-act="roster">Liste</button>
+          ? `<button class="cr-join" data-act="confirm"><i class="ic ic-check"></i> ${tr('creneau.confirmMyAttendance')}</button>`
+          : `<button class="cr-join ${inIt?'in':''}" data-act="join">${inIt?`<i class="ic ic-check"></i> ${tr('creneau.registered')}`:(c.price>0?tr('creneau.registerPrice', {price:c.price}):tr('creneau.register'))}</button>`}
+        <button data-act="roster">${tr('creneau.list')}</button>
       </div>
     </div>`;
-  }).join('') + (seen.length?'':'<p class="club-hint">Aucun créneau visible pour ce profil.</p>');
+  }).join('') + (seen.length?'':`<p class="club-hint">${tr('creneau.noneVisible')}</p>`);
   // wiring
   box.querySelectorAll('.cr-viewbtn').forEach(b=>b.onclick=()=>{ crMemberView=b.dataset.v==='member'; renderCreneaux(); });
   box.querySelectorAll('.creneau-card').forEach(card=>{
@@ -4008,7 +4008,7 @@ function renderCreneaux(){
       else {
         if(c.attendees.length>=c.cap){ toast(tr('toast.creneauComplet')); return; }
         c.attendees.push(ME_CLUB_ID);
-        toast(c.price>0?`Inscrit (${c.price}€ — paiement à la séance)`:'Inscrit au créneau');
+        toast(c.price>0?tr('creneau.registeredPricePay', {price:c.price}):tr('creneau.registeredToSlot'));
       }
       renderCreneaux(); renderClubStats(); renderPresence();
     };
@@ -4032,7 +4032,7 @@ function openClubAthleteCalendar(a){
   if(typeof renderCoachBand==='function') renderCoachBand();
   if(typeof renderGear==='function') renderGear();
   window.scrollTo({top:0, behavior:'smooth'});
-  toast(`Calendrier de ${a.name}` + (rosterIsReal?'':' — démo : plan type du club'));
+  toast(tr('clubAth.calendarOf', {name:a.name}) + (rosterIsReal?'':tr('clubAth.demoTypicalPlan')));
 }
 let clubOnlyUnassigned = false;
 function renderClubAthletes(filter){
