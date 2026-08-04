@@ -25,12 +25,12 @@ const OFFERS = [
 const OFFER = id => OFFERS.find(o=>o.id===id);
 
 let SLOTS = [
-  {id:'c1', disc:'hyrox', title:'Hyrox — simulation complète', day:4, time:'19:00', dur:75, coach:'Karim', cap:14, price:0, att:9, inscrits:['m3','m5','m8','m1','m11','m6','m9','m2','m12']},
-  {id:'c2', disc:'hyrox', title:'Hyrox — ateliers stations', day:4, time:'12:15', dur:60, coach:'Karim', cap:12, price:0, att:7, inscrits:['m2','m4','m7','m10','m6','m1','m12']},
-  {id:'c3', disc:'strength', title:'Force / Compromised running', day:4, time:'18:00', dur:60, coach:'Julie', cap:16, price:0, att:5, inscrits:['m3','m9','m11','m5','m8']},
-  {id:'c4', disc:'hyrox', title:'Open Box — drop-in libre', day:4, time:'07:00', dur:60, coach:'—', cap:20, price:12, att:4, inscrits:['m4','m7','m10','m2']},
-  {id:'c5', disc:'run', title:'Sortie seuil collective', day:2, time:'18:30', dur:75, coach:'Éric', cap:24, price:0, att:13, inscrits:[]},
-  {id:'c6', disc:'hyrox', title:'Hyrox Doubles — par équipe', day:6, time:'10:00', dur:90, coach:'Karim', cap:16, price:18, att:11, inscrits:[]},
+  {id:'c1', disc:'hyrox', get title(){return tr('slot.c1')}, day:4, time:'19:00', dur:75, coach:'Karim', cap:14, price:0, att:9, inscrits:['m3','m5','m8','m1','m11','m6','m9','m2','m12']},
+  {id:'c2', disc:'hyrox', get title(){return tr('slot.c2')}, day:4, time:'12:15', dur:60, coach:'Karim', cap:12, price:0, att:7, inscrits:['m2','m4','m7','m10','m6','m1','m12']},
+  {id:'c3', disc:'strength', get title(){return tr('slot.c3')}, day:4, time:'18:00', dur:60, coach:'Julie', cap:16, price:0, att:5, inscrits:['m3','m9','m11','m5','m8']},
+  {id:'c4', disc:'hyrox', get title(){return tr('slot.c4')}, day:4, time:'07:00', dur:60, coach:'—', cap:20, price:12, att:4, inscrits:['m4','m7','m10','m2']},
+  {id:'c5', disc:'run', get title(){return tr('slot.c5')}, day:2, time:'18:30', dur:75, coach:'Éric', cap:24, price:0, att:13, inscrits:[]},
+  {id:'c6', disc:'hyrox', get title(){return tr('slot.c6')}, day:6, time:'10:00', dur:90, coach:'Karim', cap:16, price:18, att:11, inscrits:[]},
 ];
 
 let MEMBERS = [
@@ -50,18 +50,18 @@ let MEMBERS = [
 const MEM = id => MEMBERS.find(m=>m.id===id);
 
 let BILLS = [
-  {m:'m1', why:'Coaching + — juin', type:'sub', amt:119, ok:true},
-  {m:'m3', why:'Coaching + — juin', type:'sub', amt:119, ok:true},
-  {m:'m6', why:'Coaching + — juin', type:'sub', amt:119, ok:false},
-  {m:'m9', why:'Coaching + — juin', type:'sub', amt:119, ok:true},
-  {m:'m2', why:'Abonnement club — juin', type:'sub', amt:59, ok:true},
-  {m:'m5', why:'Abonnement club — juin', type:'sub', amt:59, ok:true},
-  {m:'m8', why:'Abonnement club — juin', type:'sub', amt:59, ok:true},
-  {m:'m10', why:'Abonnement club — juin', type:'sub', amt:59, ok:false},
-  {m:'m11', why:'Abonnement club — juin', type:'sub', amt:59, ok:true},
-  {m:'m4', why:'Open Box drop-in', type:'card', amt:12, ok:true},
-  {m:'m7', why:'Hyrox Doubles à la carte', type:'card', amt:18, ok:true},
-  {m:'m12', why:'Open Box drop-in', type:'card', amt:12, ok:true},
+  {m:'m1', get why(){return tr('billing.coachPlusJune')}, type:'sub', amt:119, ok:true},
+  {m:'m3', get why(){return tr('billing.coachPlusJune')}, type:'sub', amt:119, ok:true},
+  {m:'m6', get why(){return tr('billing.coachPlusJune')}, type:'sub', amt:119, ok:false},
+  {m:'m9', get why(){return tr('billing.coachPlusJune')}, type:'sub', amt:119, ok:true},
+  {m:'m2', get why(){return tr('billing.clubSubJune')}, type:'sub', amt:59, ok:true},
+  {m:'m5', get why(){return tr('billing.clubSubJune')}, type:'sub', amt:59, ok:true},
+  {m:'m8', get why(){return tr('billing.clubSubJune')}, type:'sub', amt:59, ok:true},
+  {m:'m10', get why(){return tr('billing.clubSubJune')}, type:'sub', amt:59, ok:false},
+  {m:'m11', get why(){return tr('billing.clubSubJune')}, type:'sub', amt:59, ok:true},
+  {m:'m4', get why(){return tr('club.openBoxDropin')}, type:'card', amt:12, ok:true},
+  {m:'m7', get why(){return tr('club.hyroxDoublesCarte')}, type:'card', amt:18, ok:true},
+  {m:'m12', get why(){return tr('club.openBoxDropin')}, type:'card', amt:12, ok:true},
 ];
 
 const presState = {}; // key slot:member -> 'ok'|'no'

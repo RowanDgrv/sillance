@@ -71,6 +71,12 @@
     "club.members.plan": `Formule`, "club.members.att30": `Présences (30j)`,
     "club.offers.title": `Les 3 formules de la salle`,
     "club.offers.hint": `Une échelle de valeur : on monte → on paie plus → plus de suivi et de data. Clique un prix pour l'ajuster.`,
+
+    "billing.coachPlusJune": `Coaching + — juin`, "billing.clubSubJune": `Abonnement club — juin`,
+    "club.openBoxDropin": `Open Box drop-in`, "club.hyroxDoublesCarte": `Hyrox Doubles à la carte`,
+    "slot.c1": `Hyrox — simulation complète`, "slot.c2": `Hyrox — ateliers stations`,
+    "slot.c3": `Force / Compromised running`, "slot.c4": `Open Box — drop-in libre`,
+    "slot.c5": `Sortie seuil collective`, "slot.c6": `Hyrox Doubles — par équipe`,
   };
 
   var en = {
@@ -144,6 +150,12 @@
     "club.members.plan": `Plan`, "club.members.att30": `Attendance (30d)`,
     "club.offers.title": `The gym's 3 plans`,
     "club.offers.hint": `A value ladder: you go up → you pay more → more tracking and data. Click a price to adjust it.`,
+
+    "billing.coachPlusJune": `Coaching + — June`, "billing.clubSubJune": `Club membership — June`,
+    "club.openBoxDropin": `Open Box drop-in`, "club.hyroxDoublesCarte": `Hyrox Doubles à la carte`,
+    "slot.c1": `Hyrox — full simulation`, "slot.c2": `Hyrox — station workshops`,
+    "slot.c3": `Strength / Compromised running`, "slot.c4": `Open Box — free drop-in`,
+    "slot.c5": `Group threshold session`, "slot.c6": `Hyrox Doubles — team format`,
   };
 
   var es = {
@@ -217,6 +229,12 @@
     "club.members.plan": `Plan`, "club.members.att30": `Asistencia (30d)`,
     "club.offers.title": `Los 3 planes del gimnasio`,
     "club.offers.hint": `Una escala de valor: subes → pagas más → más seguimiento y datos. Haz clic en un precio para ajustarlo.`,
+
+    "billing.coachPlusJune": `Coaching + — junio`, "billing.clubSubJune": `Suscripción club — junio`,
+    "club.openBoxDropin": `Open Box drop-in`, "club.hyroxDoublesCarte": `Hyrox Doubles a la carta`,
+    "slot.c1": `Hyrox — simulación completa`, "slot.c2": `Hyrox — talleres de estaciones`,
+    "slot.c3": `Fuerza / Compromised running`, "slot.c4": `Open Box — drop-in libre`,
+    "slot.c5": `Salida de umbral colectiva`, "slot.c6": `Hyrox Doubles — por equipos`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
