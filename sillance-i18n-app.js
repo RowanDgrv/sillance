@@ -685,6 +685,17 @@
     "loadStack.weekOpt": `Semaine`, "loadStack.monthOpt": `Mois`, "loadStack.yearOpt": `Année`,
 
     "lactate.aerobicThreshold": `Seuil aérobie · LT1 (SV1)`, "lactate.anaerobicThreshold": `Seuil anaérobie · LT2 (SV2)`,
+
+    "durab.kjLevels": `Paliers kJ`, "durab.fresh": `à froid`,
+    "durab.after": `après {kj} kJ`, "durab.retained": `{pct}% conservé`,
+    "durab.retainedAt5min": `{pct}% à 5 min <span style="font-size:12px;color:var(--muted)">@ {kj} kJ</span>`,
+
+    "loadMix.note": `Charge = mix <b>TSS</b> vélo · <b>rTSS</b> course · <b>sTSS</b> nat · <b>hrTSS</b> FC · <b>sRPE</b> renfo/Hyrox, calibré <b>1 h seuil = 100</b>. Estimé — le coach tranche.`,
+
+    "hyrox.runTitle": `Run {n} : {pace}/km`,
+    "hyrox.aerobicLoad": `Charge aérobie`, "hyrox.muscularLoad": `Charge musculaire`,
+    "hyrox.paceDegradation": `Dégradation d'allure sur les 8 runs`, "hyrox.hoverBar": `survole une barre`,
+    "hyrox.compromisedRunning": `Course sous fatigue (« compromised running ») : à froid <b>{fresh}/km</b> → après station <b style="color:var(--bike)">{fatigue}/km</b> <span style="color:var(--bike)">(+{pct}%)</span>`,
   };
 
   var en = {
@@ -1369,6 +1380,17 @@
     "loadStack.weekOpt": `Week`, "loadStack.monthOpt": `Month`, "loadStack.yearOpt": `Year`,
 
     "lactate.aerobicThreshold": `Aerobic threshold · LT1 (SV1)`, "lactate.anaerobicThreshold": `Anaerobic threshold · LT2 (SV2)`,
+
+    "durab.kjLevels": `kJ levels`, "durab.fresh": `fresh`,
+    "durab.after": `after {kj} kJ`, "durab.retained": `{pct}% retained`,
+    "durab.retainedAt5min": `{pct}% at 5 min <span style="font-size:12px;color:var(--muted)">@ {kj} kJ</span>`,
+
+    "loadMix.note": `Load = mix of <b>TSS</b> bike · <b>rTSS</b> run · <b>sTSS</b> swim · <b>hrTSS</b> HR · <b>sRPE</b> strength/Hyrox, calibrated so <b>1 h at threshold = 100</b>. Estimated — the coach has the final call.`,
+
+    "hyrox.runTitle": `Run {n}: {pace}/km`,
+    "hyrox.aerobicLoad": `Aerobic load`, "hyrox.muscularLoad": `Muscular load`,
+    "hyrox.paceDegradation": `Pace degradation over the 8 runs`, "hyrox.hoverBar": `hover a bar`,
+    "hyrox.compromisedRunning": `Running under fatigue ("compromised running"): fresh <b>{fresh}/km</b> → after station <b style="color:var(--bike)">{fatigue}/km</b> <span style="color:var(--bike)">(+{pct}%)</span>`,
   };
 
   var es = {
@@ -2053,6 +2075,17 @@
     "loadStack.weekOpt": `Semana`, "loadStack.monthOpt": `Mes`, "loadStack.yearOpt": `Año`,
 
     "lactate.aerobicThreshold": `Umbral aeróbico · LT1 (SV1)`, "lactate.anaerobicThreshold": `Umbral anaeróbico · LT2 (SV2)`,
+
+    "durab.kjLevels": `Niveles kJ`, "durab.fresh": `en frío`,
+    "durab.after": `después de {kj} kJ`, "durab.retained": `{pct}% conservado`,
+    "durab.retainedAt5min": `{pct}% a los 5 min <span style="font-size:12px;color:var(--muted)">@ {kj} kJ</span>`,
+
+    "loadMix.note": `Carga = mezcla de <b>TSS</b> ciclismo · <b>rTSS</b> carrera · <b>sTSS</b> natación · <b>hrTSS</b> FC · <b>sRPE</b> fuerza/Hyrox, calibrado con <b>1 h a umbral = 100</b>. Estimado — el coach decide.`,
+
+    "hyrox.runTitle": `Run {n}: {pace}/km`,
+    "hyrox.aerobicLoad": `Carga aeróbica`, "hyrox.muscularLoad": `Carga muscular`,
+    "hyrox.paceDegradation": `Degradación del ritmo en los 8 runs`, "hyrox.hoverBar": `pasa el cursor sobre una barra`,
+    "hyrox.compromisedRunning": `Carrera bajo fatiga («compromised running»): en frío <b>{fresh}/km</b> → tras estación <b style="color:var(--bike)">{fatigue}/km</b> <span style="color:var(--bike)">(+{pct}%)</span>`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

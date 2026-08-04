@@ -7336,7 +7336,7 @@ function buildDurabLevels(){
     document.head.appendChild(st);
   }
   if(box.dataset.built) return; box.dataset.built='1';
-  const lab=document.createElement('span'); lab.className='dl-lbl'; lab.textContent='Paliers kJ'; box.appendChild(lab);
+  const lab=document.createElement('span'); lab.className='dl-lbl'; lab.textContent=tr('durab.kjLevels'); box.appendChild(lab);
   DURAB_LEVELS.forEach(l=>{
     const chip=document.createElement('button'); chip.type='button'; chip.className='ctog'; chip.dataset.kj=l.kj;
     chip.style.setProperty('--lc', l.color);
@@ -7364,20 +7364,20 @@ function durabChart(){
   }
   el('path',{d:smoothPath(fp),class:'glow-line',stroke:DURAB_FRESH,'stroke-width':2.5},svg);
   fresh.forEach((d,i)=>{ const c=el('circle',{cx:fp[i][0],cy:fp[i][1],r:3.2,fill:'#0D121E',stroke:DURAB_FRESH,'stroke-width':2,class:'dot'},svg);
-    c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${DURAB_FRESH}">${d[1]} W</b> · ${fmtSecs(d[0])} · à froid`)); c.addEventListener('mouseleave',tipHide); });
+    c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${DURAB_FRESH}">${d[1]} W</b> · ${fmtSecs(d[0])} · ${tr('durab.fresh')}`)); c.addEventListener('mouseleave',tipHide); });
   sel.forEach(l=>{ const data=mmpAfter(l.kj), pts=data.map(d=>[x(d[0]),y(d[1])]);
     el('path',{d:smoothPath(pts),class:'glow-line draw',stroke:l.color,'stroke-width':2.5},svg);
     pts.forEach((p,i)=>{ const ret=Math.round(100*data[i][1]/fresh[i][1]);
       const c=el('circle',{cx:p[0],cy:p[1],r:3.2,fill:'#0D121E',stroke:l.color,'stroke-width':2,class:'dot'},svg);
-      c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${l.color}">${data[i][1]} W</b> · ${fmtSecs(data[i][0])} · après ${l.kj} kJ<br><span style="color:var(--good)">${ret}% conservé</span>`));
+      c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${l.color}">${data[i][1]} W</b> · ${fmtSecs(data[i][0])} · ${tr('durab.after', {kj:l.kj})}<br><span style="color:var(--good)">${tr('durab.retained', {pct:ret})}</span>`));
       c.addEventListener('mouseleave',tipHide); });
   });
   const elNow=document.getElementById('durabNow');
   if(elNow){ if(sel.length){ const deep=sel.at(-1), da=mmpAfter(deep.kj), i5=fresh.findIndex(d=>d[0]===300);
-      const ret=i5>=0?Math.round(100*da[i5][1]/fresh[i5][1]):0; elNow.innerHTML=`${ret}% à 5 min <span style="font-size:12px;color:var(--muted)">@ ${deep.kj} kJ</span>`;
+      const ret=i5>=0?Math.round(100*da[i5][1]/fresh[i5][1]):0; elNow.innerHTML=tr('durab.retainedAt5min', {pct:ret, kj:deep.kj});
     } else elNow.textContent='—'; }
   const leg=document.getElementById('durabLegend');
-  if(leg) leg.innerHTML=`<span><i style="background:${DURAB_FRESH}"></i>À froid</span>`+sel.map(l=>`<span><i style="background:${l.color}"></i>${l.kj} kJ</span>`).join('');
+  if(leg) leg.innerHTML=`<span><i style="background:${DURAB_FRESH}"></i>${tr('durab.fresh')}</span>`+sel.map(l=>`<span><i style="background:${l.color}"></i>${l.kj} kJ</span>`).join('');
 }
 /* ============================================================
    CHARGE MIXTE (méthode transparente) + PROFIL HYROX
@@ -7434,27 +7434,27 @@ function renderLoadMix(){
     return `<div class="lm-row"><span class="lm-ic" style="color:${D.color}">${discIcon(D)}</span><span class="lm-n">${s.name}</span><span class="lm-m">${s.metric}</span><span class="lm-v">${sessionLoad(s)}</span></div>`; }).join('');
   box.innerHTML=`
     <div class="lm-kpis">
-      <div><div class="v" style="color:var(--swim)">${Math.round(ctl)}</div><div class="k">Fitness · CTL</div></div>
-      <div><div class="v" style="color:var(--run)">${Math.round(atl)}</div><div class="k">Fatigue · ATL</div></div>
-      <div><div class="v" style="color:${tsb>=0?'var(--good)':'var(--bike)'}">${tsb>=0?'+':''}${tsb}</div><div class="k">Forme · TSB</div></div>
+      <div><div class="v" style="color:var(--swim)">${Math.round(ctl)}</div><div class="k">${tr('chart.fitness')} · CTL</div></div>
+      <div><div class="v" style="color:var(--run)">${Math.round(atl)}</div><div class="k">${tr('chart.fatigue')} · ATL</div></div>
+      <div><div class="v" style="color:${tsb>=0?'var(--good)':'var(--bike)'}">${tsb>=0?'+':''}${tsb}</div><div class="k">${tr('loadStack.formLabel')} · TSB</div></div>
     </div>
     <div class="lm-list">${rows}</div>
-    <p class="lm-note">Charge = mix <b>TSS</b> vélo · <b>rTSS</b> course · <b>sTSS</b> nat · <b>hrTSS</b> FC · <b>sRPE</b> renfo/Hyrox, calibré <b>1 h seuil = 100</b>. Estimé — le coach tranche.</p>`;
+    <p class="lm-note">${tr('loadMix.note')}</p>`;
 }
 function renderHyrox(){
   const box=document.getElementById('hyroxBody'); if(!box) return; injectLoadHxCss();
   const h=HYROX_DEMO, r0=h.runs[0], rN=h.runs.at(-1), deg=Math.round((rN/r0-1)*100);
   const comp=Math.round((h.fatiguePace/h.freshPace-1)*100), maxR=Math.max(...h.runs), minR=Math.min(...h.runs);
   const bars=h.runs.map((s,i)=>{ const pct=Math.round((s-minR)/(maxR-minR||1)*68)+32;
-    return `<div class="hx-bar" title="Run ${i+1} : ${fmtPace(s)}/km"><i style="height:${pct}%"></i><span>${i+1}</span></div>`; }).join('');
+    return `<div class="hx-bar" title="${tr('hyrox.runTitle', {n:i+1, pace:fmtPace(s)})}"><i style="height:${pct}%"></i><span>${i+1}</span></div>`; }).join('');
   box.innerHTML=`
     <div class="hx-loads">
-      <div class="hx-load"><div class="hx-lh"><span>Charge aérobie</span><b>${h.aero}</b></div><div class="hx-track"><i style="width:${h.aero}%;background:var(--run)"></i></div></div>
-      <div class="hx-load"><div class="hx-lh"><span>Charge musculaire</span><b>${h.musc}</b></div><div class="hx-track"><i style="width:${h.musc}%;background:var(--strength)"></i></div></div>
+      <div class="hx-load"><div class="hx-lh"><span>${tr('hyrox.aerobicLoad')}</span><b>${h.aero}</b></div><div class="hx-track"><i style="width:${h.aero}%;background:var(--run)"></i></div></div>
+      <div class="hx-load"><div class="hx-lh"><span>${tr('hyrox.muscularLoad')}</span><b>${h.musc}</b></div><div class="hx-track"><i style="width:${h.musc}%;background:var(--strength)"></i></div></div>
     </div>
-    <div class="hx-sub">Dégradation d'allure sur les 8 runs · <b style="color:var(--bike)">+${deg}%</b> · survole une barre</div>
+    <div class="hx-sub">${tr('hyrox.paceDegradation')} · <b style="color:var(--bike)">+${deg}%</b> · ${tr('hyrox.hoverBar')}</div>
     <div class="hx-bars">${bars}</div>
-    <div class="hx-comp"><i class="ic ic-run"></i> Course sous fatigue (« compromised running ») : à froid <b>${fmtPace(h.freshPace)}/km</b> → après station <b style="color:var(--bike)">${fmtPace(h.fatiguePace)}/km</b> <span style="color:var(--bike)">(+${comp}%)</span></div>`;
+    <div class="hx-comp"><i class="ic ic-run"></i> ${tr('hyrox.compromisedRunning', {fresh:fmtPace(h.freshPace), fatigue:fmtPace(h.fatiguePace), pct:comp})}</div>`;
 }
 mmpChart(); durabChart(); renderLoadMix(); renderHyrox();
 
