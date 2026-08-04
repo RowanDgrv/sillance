@@ -530,6 +530,23 @@
     "presence.nPresent": `{n}/{cap} présents`, "presence.noOneYet": `Personne inscrit pour l'instant`,
 
     "group.unassignedPlural": `<b>{n}</b> athlètes sans groupe`, "group.unassignedSingular": `<b>{n}</b> athlète sans groupe`,
+
+    "group.nAthletesPlural": `{n} athlètes`, "group.nAthletesSingular": `{n} athlète`,
+    "group.noneAssigned": `Aucun athlète affecté`, "group.noneCreateFirst": `Aucun groupe. Crée le premier !`,
+    "group.editGroup": `Modifier le groupe`, "group.newGroup": `Nouveau groupe`,
+    "group.alreadyIn": `déjà dans {name}`, "group.updated": `Groupe mis à jour`, "group.created": `Groupe créé`,
+
+    "creneau.everyWeek": `chaque semaine`, "creneau.groupOnlyContentDot": `Contenu réservé au groupe {name}.`,
+
+    "crd.noDesc": `Aucune description pour ce créneau — ajoute le contenu dans l'onglet Paramètres.`,
+    "crd.visibleBy": `Visible par {who} — les absents retrouvent ici le contenu de la séance pour la faire de leur côté.`,
+    "crd.theGroup": `le groupe {name}`, "crd.wholeClub": `Tout le club`,
+    "crd.present": `présent`, "crd.invitedPending": `invité — à confirmer`, "crd.noOneYet": `Personne pour l'instant.`,
+    "crd.recurrence": `Récurrence`, "crd.oneTimeDated": `Séance ponctuelle (date)`,
+    "crd.day": `Jour`, "crd.time": `Heure`, "crd.durationMin": `Durée (min)`, "crd.place": `Lieu`, "crd.maxSpots": `Places max`,
+    "crd.groupReserved": `Groupe (contenu réservé)`, "crd.price": `Tarif (€)`, "crd.sessionContent": `Contenu de la séance`,
+    "crd.saveSettings": `Enregistrer les paramètres`,
+    "crd.groupSlot": `Créneau collectif`, "crd.tbd": `À définir`, "crd.coach": `Coach`,
   };
 
   var en = {
@@ -1059,6 +1076,23 @@
     "presence.nPresent": `{n}/{cap} present`, "presence.noOneYet": `No one registered yet`,
 
     "group.unassignedPlural": `<b>{n}</b> athletes without a group`, "group.unassignedSingular": `<b>{n}</b> athlete without a group`,
+
+    "group.nAthletesPlural": `{n} athletes`, "group.nAthletesSingular": `{n} athlete`,
+    "group.noneAssigned": `No athlete assigned`, "group.noneCreateFirst": `No groups yet. Create the first one!`,
+    "group.editGroup": `Edit group`, "group.newGroup": `New group`,
+    "group.alreadyIn": `already in {name}`, "group.updated": `Group updated`, "group.created": `Group created`,
+
+    "creneau.everyWeek": `every week`, "creneau.groupOnlyContentDot": `Content reserved for the {name} group.`,
+
+    "crd.noDesc": `No description for this slot — add content in the Settings tab.`,
+    "crd.visibleBy": `Visible to {who} — those absent can find the session content here to do it on their own.`,
+    "crd.theGroup": `the {name} group`, "crd.wholeClub": `Whole club`,
+    "crd.present": `present`, "crd.invitedPending": `invited — to confirm`, "crd.noOneYet": `No one yet.`,
+    "crd.recurrence": `Recurrence`, "crd.oneTimeDated": `One-time session (date)`,
+    "crd.day": `Day`, "crd.time": `Time`, "crd.durationMin": `Duration (min)`, "crd.place": `Place`, "crd.maxSpots": `Max spots`,
+    "crd.groupReserved": `Group (reserved content)`, "crd.price": `Price (€)`, "crd.sessionContent": `Session content`,
+    "crd.saveSettings": `Save settings`,
+    "crd.groupSlot": `Group slot`, "crd.tbd": `TBD`, "crd.coach": `Coach`,
   };
 
   var es = {
@@ -1588,6 +1622,23 @@
     "presence.nPresent": `{n}/{cap} presentes`, "presence.noOneYet": `Nadie inscrito por ahora`,
 
     "group.unassignedPlural": `<b>{n}</b> atletas sin grupo`, "group.unassignedSingular": `<b>{n}</b> atleta sin grupo`,
+
+    "group.nAthletesPlural": `{n} atletas`, "group.nAthletesSingular": `{n} atleta`,
+    "group.noneAssigned": `Ningún atleta asignado`, "group.noneCreateFirst": `Ningún grupo. ¡Crea el primero!`,
+    "group.editGroup": `Editar el grupo`, "group.newGroup": `Nuevo grupo`,
+    "group.alreadyIn": `ya en {name}`, "group.updated": `Grupo actualizado`, "group.created": `Grupo creado`,
+
+    "creneau.everyWeek": `cada semana`, "creneau.groupOnlyContentDot": `Contenido reservado al grupo {name}.`,
+
+    "crd.noDesc": `Ninguna descripción para esta franja — añade el contenido en la pestaña Ajustes.`,
+    "crd.visibleBy": `Visible por {who} — los ausentes encuentran aquí el contenido de la sesión para hacerla por su cuenta.`,
+    "crd.theGroup": `el grupo {name}`, "crd.wholeClub": `Todo el club`,
+    "crd.present": `presente`, "crd.invitedPending": `invitado — por confirmar`, "crd.noOneYet": `Nadie por ahora.`,
+    "crd.recurrence": `Recurrencia`, "crd.oneTimeDated": `Sesión puntual (fecha)`,
+    "crd.day": `Día`, "crd.time": `Hora`, "crd.durationMin": `Duración (min)`, "crd.place": `Lugar`, "crd.maxSpots": `Plazas máx`,
+    "crd.groupReserved": `Grupo (contenido reservado)`, "crd.price": `Tarifa (€)`, "crd.sessionContent": `Contenido de la sesión`,
+    "crd.saveSettings": `Guardar los ajustes`,
+    "crd.groupSlot": `Franja colectiva`, "crd.tbd": `Por definir`, "crd.coach": `Coach`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

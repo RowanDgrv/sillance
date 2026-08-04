@@ -4350,10 +4350,10 @@ function renderGroups(){
         <button class="group-edit" data-act="editgroup">${tr('sidebar.edit')}</button>
       </div>
       ${g.desc?`<div class="group-desc">${g.desc}</div>`:''}
-      <div class="group-count">${members.length} athlète${members.length>1?'s':''}</div>
-      <div class="group-avs">${avs||'<span class="group-desc">Aucun athlète affecté</span>'}</div>
+      <div class="group-count">${tr(members.length>1?'group.nAthletesPlural':'group.nAthletesSingular', {n:members.length})}</div>
+      <div class="group-avs">${avs||`<span class="group-desc">${tr('group.noneAssigned')}</span>`}</div>
     </div>`;
-  }).join('') || '<p class="club-hint">Aucun groupe. Crée le premier !</p>';
+  }).join('') || `<p class="club-hint">${tr('group.noneCreateFirst')}</p>`;
   box.innerHTML = banner + cards;
   const bn = document.getElementById('grpUnassignedBanner');
   if(bn) bn.onclick=()=>{ clubOnlyUnassigned=true; clubView='athletes'; switchClubView(); };
@@ -4369,7 +4369,7 @@ const groupOverlay=document.getElementById('groupOverlay');
 function openGroupModal(id){
   editingGroupId = id || null;
   const g = id ? clubGroup(id) : null;
-  document.getElementById('groupModalTitle').textContent = g ? 'Modifier le groupe' : 'Nouveau groupe';
+  document.getElementById('groupModalTitle').textContent = g ? tr('group.editGroup') : tr('group.newGroup');
   document.getElementById('grpName').value = g?.name || '';
   document.getElementById('grpDesc').value = g?.desc || '';
   const selColor = g?.color || GROUP_COLORS[0];
@@ -4387,7 +4387,7 @@ function openGroupModal(id){
     const other = (a.group && (!g || a.group!==g.id)) ? clubGroup(a.group) : null;
     return `<label class="grp-mem" data-name="${a.name.toLowerCase()}"><input type="checkbox" data-aid="${a.id}" ${checked?'checked':''}>
       <span class="gm-av">${initials(a.name)}</span><span class="gm-n">${a.name}</span>
-      ${other?`<span class="grp-mem-other" style="border-color:${other.color}">déjà dans ${other.name}</span>`:''}</label>`;
+      ${other?`<span class="grp-mem-other" style="border-color:${other.color}">${tr('group.alreadyIn', {name:other.name})}</span>`:''}</label>`;
   }).join('');
   const search = document.getElementById('grpMemberSearch');
   search.value = '';
@@ -4407,7 +4407,7 @@ document.getElementById('grpSave').onclick=()=>{
   // DB) : CLUB_GROUPS est ensuite affiché à de nombreux endroits via
   // innerHTML sans ré-échapper — sans ça, un nom de groupe contenant du
   // HTML/JS s'exécuterait immédiatement dans la session de celui qui l'a tapé.
-  const name=dispoSafe(document.getElementById('grpName').value.trim()||'Nouveau groupe');
+  const name=dispoSafe(document.getElementById('grpName').value.trim()||tr('group.newGroup'));
   const desc=dispoSafe(document.getElementById('grpDesc').value.trim());
   const color=(document.querySelector('.grp-color.sel')?.dataset.c)||GROUP_COLORS[0];
   const isEdit=!!editingGroupId;
@@ -4441,7 +4441,7 @@ document.getElementById('grpSave').onclick=()=>{
   }
   groupOverlay.classList.remove('open');
   clubView='groupes'; switchClubView();
-  toast(isEdit?'Groupe mis à jour':'Groupe créé');
+  toast(isEdit?tr('group.updated'):tr('group.created'));
 };
 
 
@@ -4464,7 +4464,7 @@ function openCreneauDetail(c, tab){
 function crdWhen(c){
   return c.recur==='once' && c.date
     ? `${new Date(c.date+'T00:00:00').toLocaleDateString(localeStr(),{weekday:'long',day:'numeric',month:'long'})} ${c.time}`
-    : `${CLUB_DAYS[c.day]} ${c.time} · chaque semaine`;
+    : `${CLUB_DAYS[c.day]} ${c.time} · ${tr('creneau.everyWeek')}`;
 }
 function renderCreneauDetail(){
   const c=crdCurrent; if(!c) return;
@@ -4477,9 +4477,9 @@ function renderCreneauDetail(){
     const me=CLUB_ATHLETES.find(a=>a.id===ME_CLUB_ID);
     const canSee=!g || (me && me.group===c.group);
     body.innerHTML = canSee
-      ? `<div class="crd-desc">${c.desc||'Aucune description pour ce créneau — ajoute le contenu dans l\'onglet Paramètres.'}</div>
-         <div class="crd-hint">Visible par ${g?`le groupe ${g.name}`:'tout le club'} — les absents retrouvent ici le contenu de la séance pour la faire de leur côté.</div>`
-      : `<div class="crd-desc locked"><i class="ic ic-lock"></i> Contenu réservé au groupe ${g.name}.</div>`;
+      ? `<div class="crd-desc">${c.desc||tr('crd.noDesc')}</div>
+         <div class="crd-hint">${tr('crd.visibleBy', {who: g?tr('crd.theGroup', {name:g.name}):tr('crd.wholeClub')})}</div>`
+      : `<div class="crd-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContentDot', {name:g.name})}</div>`;
   }
   else if(crdTab==='participants'){
     const rows=[
@@ -4488,31 +4488,31 @@ function renderCreneauDetail(){
     ].map(r=>{
       const a=CLUB_ATHLETES.find(x=>x.id===r.id);
       return `<div class="crd-p"><div class="cr-att">${a?initials(a.name):'?'}</div>${a?a.name:'—'}
-        <span class="st ${r.st}">${r.st==='ok'?'présent':'invité — à confirmer'}</span></div>`;
+        <span class="st ${r.st}">${r.st==='ok'?tr('crd.present'):tr('crd.invitedPending')}</span></div>`;
     }).join('');
-    body.innerHTML = rows ? `<div class="crd-list">${rows}</div>` : '<p class="club-hint">Personne pour l\'instant.</p>';
+    body.innerHTML = rows ? `<div class="crd-list">${rows}</div>` : `<p class="club-hint">${tr('crd.noOneYet')}</p>`;
   }
   else {
     body.innerHTML = `
       <div class="crd-form">
-        <div class="b-fld"><label>Récurrence</label>
+        <div class="b-fld"><label>${tr('crd.recurrence')}</label>
           <select id="crdRecur">
-            <option value="weekly" ${c.recur!=='once'?'selected':''}>Chaque semaine</option>
-            <option value="once" ${c.recur==='once'?'selected':''}>Séance ponctuelle (date)</option>
+            <option value="weekly" ${c.recur!=='once'?'selected':''}>${tr('creneau.everyWeek')}</option>
+            <option value="once" ${c.recur==='once'?'selected':''}>${tr('crd.oneTimeDated')}</option>
           </select></div>
         <div class="b-fld" id="crdWhenFld">${c.recur==='once'
-          ? `<label for="crdDate">Date</label><input type="date" id="crdDate" value="${c.date||''}">`
-          : `<label for="crdDay">Jour</label><select id="crdDay">${CLUB_DAYS.map((d,i)=>`<option value="${i}" ${i===c.day?'selected':''}>${d}</option>`).join('')}</select>`}</div>
-        <div class="b-fld"><label for="crdTime">Heure</label><input type="time" id="crdTime" value="${c.time}"></div>
-        <div class="b-fld"><label for="crdDur">Durée (min)</label><input type="number" id="crdDur" min="15" max="240" value="${c.dur}"></div>
-        <div class="b-fld"><label for="crdPlace">Lieu</label><input type="text" id="crdPlace" value="${c.place}"></div>
-        <div class="b-fld"><label for="crdCap">Places max</label><input type="number" id="crdCap" min="1" max="200" value="${c.cap}"></div>
-        <div class="b-fld"><label>Groupe (contenu réservé)</label>
-          <select id="crdGroup"><option value="">Tout le club</option>${CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${gr.id===c.group?'selected':''}>${gr.name}</option>`).join('')}</select></div>
-        <div class="b-fld"><label for="crdPrice">Tarif (€)</label><input type="number" id="crdPrice" min="0" step="0.5" value="${c.price}"></div>
-        <div class="b-fld full"><label for="crdDesc">Contenu de la séance</label><textarea id="crdDesc" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical">${c.desc||''}</textarea></div>
+          ? `<label for="crdDate">${tr('invoices.date')}</label><input type="date" id="crdDate" value="${c.date||''}">`
+          : `<label for="crdDay">${tr('crd.day')}</label><select id="crdDay">${CLUB_DAYS.map((d,i)=>`<option value="${i}" ${i===c.day?'selected':''}>${d}</option>`).join('')}</select>`}</div>
+        <div class="b-fld"><label for="crdTime">${tr('crd.time')}</label><input type="time" id="crdTime" value="${c.time}"></div>
+        <div class="b-fld"><label for="crdDur">${tr('crd.durationMin')}</label><input type="number" id="crdDur" min="15" max="240" value="${c.dur}"></div>
+        <div class="b-fld"><label for="crdPlace">${tr('crd.place')}</label><input type="text" id="crdPlace" value="${c.place}"></div>
+        <div class="b-fld"><label for="crdCap">${tr('crd.maxSpots')}</label><input type="number" id="crdCap" min="1" max="200" value="${c.cap}"></div>
+        <div class="b-fld"><label>${tr('crd.groupReserved')}</label>
+          <select id="crdGroup"><option value="">${tr('crd.wholeClub')}</option>${CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${gr.id===c.group?'selected':''}>${gr.name}</option>`).join('')}</select></div>
+        <div class="b-fld"><label for="crdPrice">${tr('crd.price')}</label><input type="number" id="crdPrice" min="0" step="0.5" value="${c.price}"></div>
+        <div class="b-fld full"><label for="crdDesc">${tr('crd.sessionContent')}</label><textarea id="crdDesc" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical">${c.desc||''}</textarea></div>
       </div>
-      <button class="btn crd-save" id="crdSave"><i class="ic ic-check"></i> Enregistrer les paramètres</button>`;
+      <button class="btn crd-save" id="crdSave"><i class="ic ic-check"></i> ${tr('crd.saveSettings')}</button>`;
     document.getElementById('crdRecur').onchange=e=>{
       c.recur = e.target.value==='once' ? 'once' : 'weekly';
       if(c.recur==='once' && !c.date) c.date = iso(addDays(new Date(),7));
@@ -4548,7 +4548,7 @@ document.querySelectorAll('#crdTabs .crd-tab').forEach(b=>b.onclick=()=>{ crdTab
 const creneauOverlay=document.getElementById('creneauOverlay');
 document.getElementById('clubAddCreneau').onclick=()=>{
   const sel=document.getElementById('crDay'); sel.innerHTML=CLUB_DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
-  document.getElementById('crGroup').innerHTML='<option value="">Tout le club</option>'+CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  document.getElementById('crGroup').innerHTML=`<option value="">${tr('crd.wholeClub')}</option>`+CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
   creneauOverlay.classList.add('open');
 };
 document.getElementById('creneauClose').onclick=()=> creneauOverlay.classList.remove('open');
@@ -4560,13 +4560,13 @@ document.getElementById('crSave').onclick=()=>{
   const c={
     id:'c'+Date.now(),
     disc:document.getElementById('crDisc').value,
-    title:dispoSafe(document.getElementById('crTitle').value||'Créneau collectif'),
+    title:dispoSafe(document.getElementById('crTitle').value||tr('crd.groupSlot')),
     day:+document.getElementById('crDay').value,
     time:document.getElementById('crTime').value,
     dur:+document.getElementById('crDur').value,
-    place:dispoSafe(document.getElementById('crPlace').value||'À définir'),
+    place:dispoSafe(document.getElementById('crPlace').value||tr('crd.tbd')),
     cap:+document.getElementById('crCap').value,
-    coach:dispoSafe(document.getElementById('crCoach').value||'Coach'),
+    coach:dispoSafe(document.getElementById('crCoach').value||tr('crd.coach')),
     price:+document.getElementById('crPrice').value,
     desc:dispoSafe(document.getElementById('crDesc').value.trim()),
     group:document.getElementById('crGroup').value||null,
