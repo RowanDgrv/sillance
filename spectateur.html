@@ -22,7 +22,7 @@
   h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);line-height:1.05;text-transform:uppercase;color:var(--ink);letter-spacing:-.01em;margin-bottom:6px}
   .sub{font-size:14px;color:var(--muted);margin-bottom:28px}
   .card{background:var(--panel);border:1px solid var(--line-strong);border-radius:14px;padding:18px 20px;margin-bottom:14px}
-  .card h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+  .card h2,#errCard h1{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:7px;font-family:inherit;font-weight:400;line-height:inherit}
   .card p{font-size:15px;line-height:1.55;color:var(--ink);white-space:pre-wrap}
   .card.muted p{color:var(--muted);font-size:14px}
   .result .v{font-family:var(--display);font-size:26px;color:var(--accent2);font-weight:700}
@@ -31,7 +31,7 @@
   #state{padding:40px 0;text-align:center;color:var(--muted)}
 </style></head>
 <body>
-  <div class="box">
+  <main class="box">
     <div id="state" data-i18n="spec.loading">Chargement…</div>
     <div id="content" hidden>
       <div class="kicker" data-i18n="spec.kicker">Suivi de course</div>
@@ -53,10 +53,10 @@
       <div class="foot" data-i18n-html="spec.foot">Pas de suivi GPS en direct — juste les repères et le résultat. <br><a href="./index.html">sillance.app</a></div>
     </div>
     <div class="card muted" id="errCard" hidden>
-      <h2 data-i18n="spec.errTitle">Lien introuvable</h2>
+      <h1 data-i18n="spec.errTitle">Lien introuvable</h1>
       <p id="errTxt" data-i18n="spec.errDefault">Ce lien de suivi n'existe pas ou a expiré.</p>
     </div>
-  </div>
+  </main>
 <script src="./sillance-i18n.js"></script>
 <script src="./sillance-i18n-spectateur.js"></script>
 <script src="./sillance-spectateur.js"></script>

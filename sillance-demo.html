@@ -39,14 +39,14 @@
   .app p{margin:0;color:var(--muted);font-size:13.5px}
   .app .go{margin-top:14px;display:inline-block;background:var(--accent);color:#06222a;font-weight:700;
     padding:9px 16px;border-radius:9px;font-size:13.5px}
-  .sec-title{display:flex;align-items:center;gap:10px;margin:34px 0 4px;font-size:13px;letter-spacing:.16em;
+  .sec-title{display:flex;align-items:center;gap:10px;margin:34px 0 4px;font-size:13px;font-weight:400;letter-spacing:.16em;
     text-transform:uppercase;color:var(--accent)}
   .sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
   .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
   .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
   @media(max-width:760px){.cards{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 17px}
-  .card h4{margin:0 0 10px;font-size:14.5px}
+  .card h3{margin:0 0 10px;font-size:14.5px}
   .card ul{margin:0;padding-left:0;list-style:none;font-size:13px;color:var(--muted)}
   .card li{padding:3px 0;border-bottom:1px dashed #1c242c}
   .card li:last-child{border:0}
@@ -87,7 +87,7 @@
     <div><div class="n">Stripe</div><div class="l" data-i18n="demo.stat.stripe">abonnements + à la carte</div></div>
   </div>
 
-  <div class="sec-title" data-i18n="demo.frontTitle">Le produit (front)</div>
+  <h2 class="sec-title" data-i18n="demo.frontTitle">Le produit (front)</h2>
   <div class="grid apps">
     <a class="app" href="./sillance-calendrier.html">
       <h3 data-i18n="demo.appCard.title">App coach &amp; athlète</h3>
@@ -104,12 +104,12 @@
   <p class="sub" data-i18n-html="demo.tip">Astuce démo : badge <b>☁︎</b> en haut à droite → crée un compte (coach /
   athlète / club). Sans connexion, l'app tourne en <b>mode démo</b> avec des données d'exemple.</p>
 
-  <div class="sec-title" data-i18n="demo.backendTitle">L'infrastructure (back-end Supabase)</div>
+  <h2 class="sec-title" data-i18n="demo.backendTitle">L'infrastructure (back-end Supabase)</h2>
   <p class="sub" data-i18n="demo.backendText">Postgres + Auth + Storage + Edge Functions (Deno). Sécurité par Row-Level
   Security ; les abonnements ont pour source de vérité le webhook Stripe.</p>
   <div class="grid cards">
     <div class="card">
-      <h4 data-i18n="demo.data.title">📦 Données</h4>
+      <h3 data-i18n="demo.data.title">📦 Données</h3>
       <ul>
         <li><code>profiles</code> · <span data-i18n="demo.data.roles">rôles</span></li>
         <li><code>athlete_profiles</code> · <span data-i18n="demo.data.physio">refs physio</span></li>
@@ -121,7 +121,7 @@
       </ul>
     </div>
     <div class="card">
-      <h4 data-i18n="demo.functions.title">⚙️ Edge Functions</h4>
+      <h3 data-i18n="demo.functions.title">⚙️ Edge Functions</h3>
       <ul>
         <li>stripe-checkout / portal / webhook</li>
         <li>invite-athlete <span class="pill ok" data-i18n="demo.functions.email">email</span></li>
@@ -132,7 +132,7 @@
       </ul>
     </div>
     <div class="card">
-      <h4 data-i18n="demo.devices.title">⌚ Montres connectées</h4>
+      <h3 data-i18n="demo.devices.title">⌚ Montres connectées</h3>
       <ul>
         <li>Strava <span class="pill ok" data-i18n="demo.devices.ready">prêt</span></li>
         <li>Coros (OAuth2) <span class="pill pend" data-i18n="demo.devices.keys">clés</span></li>
@@ -144,7 +144,7 @@
     </div>
   </div>
 
-  <div class="sec-title" data-i18n="demo.flowTitle">Flux de synchronisation Strava (live)</div>
+  <h2 class="sec-title" data-i18n="demo.flowTitle">Flux de synchronisation Strava (live)</h2>
   <div class="flow" data-i18n-html="demo.flowText">
     <b>Athlète</b> <span class="arrow">→</span> « Se connecter avec Strava »
     <span class="arrow">→</span> autorisation OAuth Strava

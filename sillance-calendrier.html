@@ -86,13 +86,16 @@ body.light{
   --soft:#26314A;
   /* couleurs disciplines assombries pour rester lisibles comme texte sur blanc.
      --accent/--swim assombris #0E8FA8→#0C7B90 (03/08/2026) : contraste texte
-     petit sur blanc mesuré à 3.81:1 (échec AA), 4.94:1 après correction. */
-  --accent:#0C7B90;
-  --swim:#0C7B90;
+     petit sur blanc mesuré à 3.81:1 (échec AA), 4.94:1 après correction — mais
+     sur --panel-2 (#EDF1F8, légèrement plus sombre que blanc pur), retombait à
+     4.36:1 (échec). Réajusté →#0C778B (audit axe-core 04/08/2026) : 4.60:1 sur
+     --panel-2, la référence la plus sombre où ce texte apparaît. */
+  --accent:#0C778B;
+  --swim:#0C778B;
   --bike:#A56A12;
   --run:#C23350;
   --strength:#5E45B8;
-  --good:#0D8C5F;
+  --good:#0a6c49;
   --shadow-1:0 1px 2px rgba(20,30,60,.06);
   --shadow-2:0 12px 30px -14px rgba(20,30,60,.18);
   --shadow-3:0 24px 60px -22px rgba(20,30,60,.22);
@@ -101,6 +104,18 @@ body.light{ background-image:none; }
 /* mode jour : voile d'overlay clair (le voile sombre rendait tout le site noir) */
 body.light .overlay{background:rgba(36,48,76,.32)}
 body.light ::selection{background:rgba(14,143,168,.18)}
+/* Texte sur fond --accent (audit axe-core 04/08/2026) : ces 5 composants
+   utilisent un texte quasi-noir codé en dur, pensé pour l'accent clair du
+   thème sombre (#46C2D8, 9:1 avec du noir). En thème clair --accent est
+   assombri (#0C778B) pour rester lisible SUR BLANC ailleurs — mais ce fond
+   moyennement sombre ne peut plus atteindre 4.5:1 avec du texte noir (max
+   4.03:1 même en #000 pur). Le blanc y passe à 5.21:1. */
+body.light .btn:not(.cy-ghost):not(.btn-secondary):not(.adh-open-btn),
+body.light .vl-grid-toggle,
+body.light .csub-badge,
+body.light .sg-cta,
+body.light .create-btn{color:#fff}
+body.light .lib-note{color:#188156}
 body{
   background:var(--ink);
   color:var(--text);
@@ -536,7 +551,7 @@ body.grid-on .cal-guides{opacity:1}
 /* a11y/mobile (audit 03/08/2026) : suppression/note invisibles sans hover,
    introuvables au tactile — toujours visibles sur pointeur grossier. */
 @media(pointer:coarse){.session .del,.session .note-btn{opacity:1}}
-.session.done{opacity:.55}
+.session.done{opacity:.85}
 .session.done .t{text-decoration:line-through}
 .done-chip{
   position:absolute;top:7px;right:7px;font-size:var(--fs-sm);color:var(--good);
@@ -1358,8 +1373,7 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .cc-soon{font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-strong);border-radius:99px;padding:2px var(--space-2);margin-left:6px;vertical-align:middle}
 .coach-connect .cc-price{font-size:11.5px;color:var(--soft);margin-bottom:9px}
 .coach-connect .cc-price small{color:var(--muted)}
-.coach-connect .cc-price a{color:var(--accent);text-decoration:none}
-.coach-connect .cc-price a:hover{text-decoration:underline}
+.coach-connect .cc-price a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .coach-connect .cc-btn{width:100%;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:9px;padding:var(--space-2);font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
 .coach-connect .cc-btn:hover{background:rgba(70,194,216,.1)}
 .coach-sub{margin-top:14px;border:1px solid var(--line);background:var(--panel-2);border-radius:var(--radius);padding:14px 15px}
@@ -2242,7 +2256,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <section class="coach-band" id="coachBand" aria-label="Athlète suivi" data-i18n-attr="aria-label:athlete.trackedAria"></section>
 
   <!-- ===================== PLANNER ===================== -->
-  <div class="planner">
+  <div class="planner" role="main">
     <aside class="library" id="library" aria-label="Panneau latéral" data-i18n-attr="aria-label:sidebar.panelAria">
       <div id="sidebarContent"></div>
     </aside>

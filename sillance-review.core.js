@@ -839,7 +839,7 @@ function renderSidebar(){
              ${coachTiersHTML()}
              <button class="cc-btn" id="coachSubscribeBtn" style="margin-top:10px">${tr('sidebar.subscribe')} — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/${tr('sidebar.perMonth')}</button>`}
       </div>
-      <div class="coach-connect" style="margin-top:14px;opacity:.7">
+      <div class="coach-connect" style="margin-top:14px;opacity:.85">
         <div class="cc-t"><b><i class="ic ic-brain"></i> ${tr('sidebar.aiAssistant')}</b> <span class="cc-soon">${tr('sidebar.comingSoon')}</span></div>
         <div class="cc-s">${tr('sidebar.aiAssistantText')}</div>
       </div>
@@ -2515,10 +2515,15 @@ function revealAnalysis(){
 
 /* ---- RPE ---- */
 function rpeColor(n){
-  if(n<=3) return '#39E6A3';
-  if(n<=6) return '#2FD9FF';
-  if(n<=8) return '#FFB13D';
-  return '#FF5470';
+  // Variantes assombries en thème clair (audit a11y 04/08/2026) : les couleurs
+  // vives d'origine, pensées pour le fond sombre, tombaient à 1.5-2.9:1 de
+  // contraste utilisées comme texte sur fond clair — toutes remontées à 4.5:1+
+  // en conservant la teinte (même logique que --accent assombri le 03/08).
+  const light = document.body.classList.contains('light');
+  if(n<=3) return light ? '#0d6946' : '#39E6A3';
+  if(n<=6) return light ? '#006176' : '#2FD9FF';
+  if(n<=8) return light ? '#7a4900' : '#FFB13D';
+  return light ? '#c40020' : '#FF5470';
 }
 function openRpeModal(s){
   const D = DISC[s.disc];

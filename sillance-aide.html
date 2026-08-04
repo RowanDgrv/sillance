@@ -24,6 +24,9 @@
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--paper);color:var(--soft);font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65}
   a{color:var(--accent);text-decoration:none}
+  /* liens en plein texte (audit axe-core 04/08/2026, link-in-text-block) :
+     distingués UNIQUEMENT par la couleur sinon, ce que la WCAG interdit. */
+  .tip a, figcaption a{text-decoration:underline;text-underline-offset:2px}
   .top{position:sticky;top:0;z-index:10;background:rgba(11,17,32,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-strong)}
   .top .in{max-width:1080px;margin:0 auto;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
   .wm{font-family:'Oswald',sans-serif;font-weight:600;font-size:21px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
