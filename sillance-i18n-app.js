@@ -807,6 +807,25 @@
 
     "joinReq.r1": `Triathlète, j'aimerais préparer un half cette année`,
     "joinReq.r2": `Débutante cyclisme sur route, motivée !`,
+
+    "demoAct.tri1": `Sortie longue vallonnée`, "demoAct.tri2": `Nat. seuil 8×100m`,
+    "demoAct.tri3": `Brick run post-vélo`, "demoAct.tri4": `Footing récup`,
+    "demoAct.tri5": `Home-trainer Z2`, "demoAct.tri6": `Technique + pull-buoy`,
+    "demoAct.run1": `VO2max 10×400m piste`, "demoAct.run2": `Sortie longue 1h45`,
+    "demoAct.run3": `Footing matinal`, "demoAct.run4": `PPG + gainage`, "demoAct.run5": `Seuil 3×3000m`,
+    "demoAct.hx1": `Simu Hyrox 4 stations`, "demoAct.hx2": `Force max bas du corps`,
+    "demoAct.hx3": `Compromised running`, "demoAct.hx4": `Sled push/pull + wall balls`,
+    "demoAct.hx5": `Intervalles 8×1min`,
+    "demoAct.vel1": `Cols — 1800m D+`, "demoAct.vel2": `Seuil 3×12min`, "demoAct.vel3": `Récup café-ride`,
+    "demoAct.vel4": `Footing croisé`, "demoAct.vel5": `Home-trainer sweet spot`,
+
+    "month.may": `mai`, "month.apr": `avr.`,
+
+    "physio.vo2max": `VO2max estimé`, "physio.ftpWeight": `FTP / poids`, "physio.pmaWeight": `PMA / poids`,
+    "physio.runThreshold": `Seuil course`, "physio.vmaEst": `VMA estimée`, "physio.efficiency": `Efficacité (EF)`,
+    "physio.zRecup": `Récup`,
+
+    "month.jun": `juin`, "month.mar": `mars`, "month.feb": `fév.`, "month.jan": `janv.`, "month.dec": `déc.`,
   };
 
   var en = {
@@ -1613,6 +1632,25 @@
 
     "joinReq.r1": `Triathlete, I'd like to prepare for a half this year`,
     "joinReq.r2": `Road cycling beginner, motivated!`,
+
+    "demoAct.tri1": `Long hilly ride`, "demoAct.tri2": `Threshold swim 8×100m`,
+    "demoAct.tri3": `Brick run off the bike`, "demoAct.tri4": `Recovery jog`,
+    "demoAct.tri5": `Turbo trainer Z2`, "demoAct.tri6": `Technique + pull-buoy`,
+    "demoAct.run1": `VO2max 10×400m track`, "demoAct.run2": `Long run 1h45`,
+    "demoAct.run3": `Morning jog`, "demoAct.run4": `Strength & core`, "demoAct.run5": `Threshold 3×3000m`,
+    "demoAct.hx1": `Hyrox sim 4 stations`, "demoAct.hx2": `Lower body max strength`,
+    "demoAct.hx3": `Compromised running`, "demoAct.hx4": `Sled push/pull + wall balls`,
+    "demoAct.hx5": `Intervals 8×1min`,
+    "demoAct.vel1": `Climbs — 1800m D+`, "demoAct.vel2": `Threshold 3×12min`, "demoAct.vel3": `Coffee-ride recovery`,
+    "demoAct.vel4": `Cross-training jog`, "demoAct.vel5": `Turbo sweet spot`,
+
+    "month.may": `May`, "month.apr": `Apr`,
+
+    "physio.vo2max": `Estimated VO2max`, "physio.ftpWeight": `FTP / weight`, "physio.pmaWeight": `MAP / weight`,
+    "physio.runThreshold": `Running threshold`, "physio.vmaEst": `Estimated vVO2max`, "physio.efficiency": `Efficiency (EF)`,
+    "physio.zRecup": `Recovery`,
+
+    "month.jun": `Jun`, "month.mar": `Mar`, "month.feb": `Feb`, "month.jan": `Jan`, "month.dec": `Dec`,
   };
 
   var es = {
@@ -2419,6 +2457,25 @@
 
     "joinReq.r1": `Triatleta, me gustaría preparar un half este año`,
     "joinReq.r2": `Principiante en ciclismo en carretera, ¡motivada!`,
+
+    "demoAct.tri1": `Salida larga con desnivel`, "demoAct.tri2": `Nat. umbral 8×100m`,
+    "demoAct.tri3": `Brick carrera tras bici`, "demoAct.tri4": `Rodaje de recuperación`,
+    "demoAct.tri5": `Rodillo Z2`, "demoAct.tri6": `Técnica + pull-buoy`,
+    "demoAct.run1": `VO2max 10×400m pista`, "demoAct.run2": `Salida larga 1h45`,
+    "demoAct.run3": `Rodaje matutino`, "demoAct.run4": `Fuerza + core`, "demoAct.run5": `Umbral 3×3000m`,
+    "demoAct.hx1": `Simulacro Hyrox 4 estaciones`, "demoAct.hx2": `Fuerza máxima tren inferior`,
+    "demoAct.hx3": `Compromised running`, "demoAct.hx4": `Sled push/pull + wall balls`,
+    "demoAct.hx5": `Intervalos 8×1min`,
+    "demoAct.vel1": `Puertos — 1800m D+`, "demoAct.vel2": `Umbral 3×12min`, "demoAct.vel3": `Recuperación café-ride`,
+    "demoAct.vel4": `Rodaje cruzado`, "demoAct.vel5": `Rodillo sweet spot`,
+
+    "month.may": `mayo`, "month.apr": `abr.`,
+
+    "physio.vo2max": `VO2max estimado`, "physio.ftpWeight": `FTP / peso`, "physio.pmaWeight": `PAM / peso`,
+    "physio.runThreshold": `Umbral carrera`, "physio.vmaEst": `VAM estimada`, "physio.efficiency": `Eficiencia (EF)`,
+    "physio.zRecup": `Recup.`,
+
+    "month.jun": `jun.`, "month.mar": `mar.`, "month.feb": `feb.`, "month.jan": `ene.`, "month.dec": `dic.`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
