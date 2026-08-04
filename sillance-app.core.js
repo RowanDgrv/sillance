@@ -605,7 +605,7 @@ const fmt = new Intl.DateTimeFormat(localeStr(),{day:'numeric',month:'short'});
 const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null, cyclePhase:null, cycleDay:null };
 const RECORDS = [
   {d:'10 km', v:'31:45', isNew:true},
-  {d:'Semi', v:'1:08:52', isNew:true},
+  {get d(){return tr('recordSeed.halfMarathon')}, v:'1:08:52', isNew:true},
   {d:'FTP', v:'310 W', isNew:false},
   {d:'PMA', v:'415 W', isNew:false}
 ];
@@ -645,7 +645,7 @@ function debriefItemHTML(d){
 function debriefsBlockHTML(list, emptyTxt){
   if(!list || !list.length) return `<p class="club-hint">${emptyTxt}</p>`;
   const sorted = list.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  return `<div class="sn-block" style="margin-top:0"><div class="sn-head"><i class="ic ic-flag"></i> Débriefs de course</div>${sorted.map(debriefItemHTML).join('')}</div>`;
+  return `<div class="sn-block" style="margin-top:0"><div class="sn-head"><i class="ic ic-flag"></i> ${tr('race.debriefsHeading')}</div>${sorted.map(debriefItemHTML).join('')}</div>`;
 }
 
 /* ============================================================
@@ -1112,16 +1112,16 @@ async function submitCheckin(){
     } catch(e){
       console.warn('[PF] saveCheckin échoué :', e);
       if(btn) btn.disabled=false;
-      toast("Échec de l'envoi — vérifie ta connexion et réessaie", 'error');
+      toast(tr('checkin.sendFailed'), 'error');
       return;
     }
     if(btn) btn.disabled=false;
   }
   // confirmation visuelle athlète (affichée seulement après sauvegarde confirmée, ou en démo)
-  toast(dispo==='blesse' ? 'Check-in envoyé — ton coach est alerté de ta blessure'
-       : urgent ? 'Check-in envoyé — alerte prioritaire à ton coach'
-       : low ? 'Check-in envoyé — ton coach est prévenu'
-             : 'Check-in envoyé');
+  toast(dispo==='blesse' ? tr('checkin.sentInjuryAlert')
+       : urgent ? tr('checkin.sentPriorityAlert')
+       : low ? tr('checkin.sentCoachNotified')
+             : tr('checkin.sent'));
   if(low){
     const alert = {
       id:'al'+Date.now(),
@@ -6873,12 +6873,12 @@ hrChart();
   const cur=tsyncCursor(svg,P,H); TSYNC.register(i=>x(i)+bw/2, cur);
   weeks.forEach((w,i)=>{
     let yCur=H-P.b;
-    const stack=[['Course',distRun[i],'#FF5470'],['Vélo',distBike[i],'#FFB13D'],['Natation ×10',distSwim[i]*10,'#2FD9FF']];
+    const stack=[[tr('disc.run'),distRun[i],'#FF5470'],[tr('disc.bike'),distBike[i],'#FFB13D'],[tr('chart.swimTimesTen'),distSwim[i]*10,'#2FD9FF']];
     stack.forEach(([name,v,c],k)=>{
       const hh=h(v);
       const r=el('rect',{x:x(i),y:yCur-hh,width:bw,height:Math.max(2,hh-2),rx:4,fill:c,opacity:.9},svg);
       r.style.filter=`drop-shadow(0 0 6px ${c}44)`;
-      r.addEventListener('mousemove',e=>{ tipShow(e,`<b style="color:${c}">${name}</b> · ${name.includes('Natation')?(v/10).toFixed(1):v} km · ${w}`); TSYNC.hover(i); });
+      r.addEventListener('mousemove',e=>{ tipShow(e,`<b style="color:${c}">${name}</b> · ${k===2?(v/10).toFixed(1):v} km · ${w}`); TSYNC.hover(i); });
       r.addEventListener('mouseleave',tipHide);
       yCur-=hh;
     });
