@@ -327,6 +327,29 @@
     "session.addNoteForAthlete": `Ajouter une note pour l'athlète (pourquoi ce changement)`,
     "common.delete": `Supprimer`, "session.done": `Séance faite`, "session.markDone": `Marquer comme faite`,
     "session.notePrompt": `Note pour l'athlète sur cette séance (pourquoi ce changement, ce qu'il faut savoir) :`,
+
+    "rpe.wellDone": `Bien joué ! C'était comment ?`, "rpe.feelingHelps": `Ton ressenti aide ton coach à doser les prochaines séances — sois honnête, pas héroïque.`,
+    "rpe.cardioEffort": `Effort cardio / respiratoire`, "rpe.veryEasy": `Très facile`, "rpe.allOut": `À fond`,
+    "rpe.muscleEffort": `Effort musculaire (jambes)`, "rpe.optional": `facultatif`,
+    "rpe.freshLegs": `Jambes fraîches`, "rpe.destroyedLegs": `Jambes détruites`,
+    "rpe.notePlaceholder": `Un mot pour ton coach ? (sensations, douleurs, conditions…)`,
+    "rpe.validateSession": `Valider la séance`,
+    "rpe.kmAssigned": `+{dist} km attribués à tes {name} ({km}/{max} km) — modifiable dans Matériel`,
+
+    "zoneEd.zoneName": `Nom de la zone`, "zoneEd.from": `de`, "zoneEd.to": `à`, "zoneEd.upperBound": `Borne haute`,
+    "zoneEd.deleteZone": `Supprimer la zone`, "zoneEd.custom": `personnalisé`, "zoneEd.standard": `standard`,
+    "zoneEd.reset": `Réinitialiser`, "zoneEd.addZone": `Ajouter une zone`, "zoneEd.newZone": `Nouvelle zone`,
+    "zoneEd.criticalPower": `Puissance critique`, "zoneEd.criticalSpeed": `Vitesse critique`, "zoneEd.thresholdPace": `allure seuil`,
+    "zoneEd.customNote": `Crée tes propres zones de travail : nomme-les, choisis la référence (FTP, puissance critique, %VMA, CV, CSS, FC…) et l'intensité. Elles apparaissent dans le sélecteur de zone à la création de séance.`,
+    "zoneEd.noCustomZone": `Aucune zone perso — ajoute ta première ci-dessous.`, "zoneEd.addCustomZone": `Ajouter une zone perso`,
+    "zoneEd.thisAthlete": `cet athlète`, "zoneEd.workZones": `Zones de travail`,
+    "zoneEd.subtitle": `Adapte les zones de l'athlète (test lactate, ressenti terrain…). Elles servent à la création de séance et à l'analyse.`,
+    "zoneEd.byReference": `Par référence`, "zoneEd.customZones": `Zones perso`,
+    "zoneEd.lowBoundNote": `La borne basse d'une zone suit la borne haute de la précédente. Les zones en allure (natation CSS, allure seuil course) gardent le modèle standard.`,
+    "zoneEd.saveZones": `Enregistrer les zones`, "zoneEd.zone": `Zone`,
+
+    "session.coachNoteOnSession": `Note de ton coach sur cette séance`, "session.whyThisSession": `Pourquoi cette séance`,
+    "session.coachInstructionsPerInterval": `Consignes du coach par intervalle`,
   };
 
   var en = {
@@ -653,6 +676,29 @@
     "session.addNoteForAthlete": `Add a note for the athlete (why this change)`,
     "common.delete": `Delete`, "session.done": `Session done`, "session.markDone": `Mark as done`,
     "session.notePrompt": `Note for the athlete about this session (why this change, what they should know):`,
+
+    "rpe.wellDone": `Well done! How did it go?`, "rpe.feelingHelps": `Your feedback helps your coach calibrate upcoming sessions — be honest, not heroic.`,
+    "rpe.cardioEffort": `Cardio / breathing effort`, "rpe.veryEasy": `Very easy`, "rpe.allOut": `All out`,
+    "rpe.muscleEffort": `Muscular effort (legs)`, "rpe.optional": `optional`,
+    "rpe.freshLegs": `Fresh legs`, "rpe.destroyedLegs": `Destroyed legs`,
+    "rpe.notePlaceholder": `A word for your coach? (sensations, pain, conditions…)`,
+    "rpe.validateSession": `Confirm session`,
+    "rpe.kmAssigned": `+{dist} km assigned to your {name} ({km}/{max} km) — editable in Gear`,
+
+    "zoneEd.zoneName": `Zone name`, "zoneEd.from": `from`, "zoneEd.to": `to`, "zoneEd.upperBound": `Upper bound`,
+    "zoneEd.deleteZone": `Delete zone`, "zoneEd.custom": `custom`, "zoneEd.standard": `standard`,
+    "zoneEd.reset": `Reset`, "zoneEd.addZone": `Add a zone`, "zoneEd.newZone": `New zone`,
+    "zoneEd.criticalPower": `Critical power`, "zoneEd.criticalSpeed": `Critical speed`, "zoneEd.thresholdPace": `threshold pace`,
+    "zoneEd.customNote": `Create your own work zones: name them, choose the reference (FTP, critical power, %vVO2max, CV, CSS, HR…) and the intensity. They appear in the zone selector when creating a session.`,
+    "zoneEd.noCustomZone": `No custom zone — add your first one below.`, "zoneEd.addCustomZone": `Add a custom zone`,
+    "zoneEd.thisAthlete": `this athlete`, "zoneEd.workZones": `Work zones`,
+    "zoneEd.subtitle": `Adapt the athlete's zones (lactate test, field feel…). Used for session creation and analysis.`,
+    "zoneEd.byReference": `By reference`, "zoneEd.customZones": `Custom zones`,
+    "zoneEd.lowBoundNote": `A zone's lower bound follows the previous zone's upper bound. Pace-based zones (swim CSS, running threshold pace) keep the standard model.`,
+    "zoneEd.saveZones": `Save zones`, "zoneEd.zone": `Zone`,
+
+    "session.coachNoteOnSession": `Your coach's note on this session`, "session.whyThisSession": `Why this session`,
+    "session.coachInstructionsPerInterval": `Coach instructions per interval`,
   };
 
   var es = {
@@ -979,6 +1025,29 @@
     "session.addNoteForAthlete": `Añadir una nota para el atleta (por qué este cambio)`,
     "common.delete": `Eliminar`, "session.done": `Sesión hecha`, "session.markDone": `Marcar como hecha`,
     "session.notePrompt": `Nota para el atleta sobre esta sesión (por qué este cambio, qué debe saber):`,
+
+    "rpe.wellDone": `¡Bien hecho! ¿Cómo fue?`, "rpe.feelingHelps": `Tu sensación ayuda a tu coach a dosificar las próximas sesiones — sé honesto, no héroe.`,
+    "rpe.cardioEffort": `Esfuerzo cardio / respiratorio`, "rpe.veryEasy": `Muy fácil`, "rpe.allOut": `Al máximo`,
+    "rpe.muscleEffort": `Esfuerzo muscular (piernas)`, "rpe.optional": `opcional`,
+    "rpe.freshLegs": `Piernas frescas`, "rpe.destroyedLegs": `Piernas destrozadas`,
+    "rpe.notePlaceholder": `¿Algo para tu coach? (sensaciones, dolores, condiciones…)`,
+    "rpe.validateSession": `Validar la sesión`,
+    "rpe.kmAssigned": `+{dist} km asignados a tus {name} ({km}/{max} km) — modificable en Material`,
+
+    "zoneEd.zoneName": `Nombre de la zona`, "zoneEd.from": `de`, "zoneEd.to": `a`, "zoneEd.upperBound": `Límite superior`,
+    "zoneEd.deleteZone": `Eliminar la zona`, "zoneEd.custom": `personalizado`, "zoneEd.standard": `estándar`,
+    "zoneEd.reset": `Restablecer`, "zoneEd.addZone": `Añadir una zona`, "zoneEd.newZone": `Nueva zona`,
+    "zoneEd.criticalPower": `Potencia crítica`, "zoneEd.criticalSpeed": `Velocidad crítica`, "zoneEd.thresholdPace": `ritmo umbral`,
+    "zoneEd.customNote": `Crea tus propias zonas de trabajo: nómbralas, elige la referencia (FTP, potencia crítica, %VAM, VC, CSS, FC…) y la intensidad. Aparecen en el selector de zona al crear una sesión.`,
+    "zoneEd.noCustomZone": `Ninguna zona personalizada — añade la primera a continuación.`, "zoneEd.addCustomZone": `Añadir una zona personalizada`,
+    "zoneEd.thisAthlete": `este atleta`, "zoneEd.workZones": `Zonas de trabajo`,
+    "zoneEd.subtitle": `Adapta las zonas del atleta (test de lactato, sensación en el terreno…). Se usan para crear sesiones y en el análisis.`,
+    "zoneEd.byReference": `Por referencia`, "zoneEd.customZones": `Zonas personalizadas`,
+    "zoneEd.lowBoundNote": `El límite inferior de una zona sigue el límite superior de la anterior. Las zonas en ritmo (natación CSS, ritmo umbral carrera) mantienen el modelo estándar.`,
+    "zoneEd.saveZones": `Guardar las zonas`, "zoneEd.zone": `Zona`,
+
+    "session.coachNoteOnSession": `Nota de tu coach sobre esta sesión`, "session.whyThisSession": `Por qué esta sesión`,
+    "session.coachInstructionsPerInterval": `Indicaciones del coach por intervalo`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

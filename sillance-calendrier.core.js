@@ -2525,18 +2525,18 @@ function openRpeModal(s){
   let rpe = null, rpeMuscle = null;
   modal.style.setProperty('--c', D.color);
   modal.innerHTML = `
-    <button class="close" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <span class="badge">${discIcon(D)} ${D.label}</span>
-    <h3>Bien joué ! C'était comment ?</h3>
-    <p class="desc">Ton ressenti aide ton coach à doser les prochaines séances — sois honnête, pas héroïque.</p>
-    <div class="rpe-lbl"><i class="ic ic-zap"></i> Effort cardio / respiratoire</div>
+    <h3>${tr('rpe.wellDone')}</h3>
+    <p class="desc">${tr('rpe.feelingHelps')}</p>
+    <div class="rpe-lbl"><i class="ic ic-zap"></i> ${tr('rpe.cardioEffort')}</div>
     <div class="rpe-grid" id="rpeCardio">${Array.from({length:10},(_,i)=>`<button data-r="${i+1}" style="--rc:${rpeColor(i+1)}">${i+1}</button>`).join('')}</div>
-    <div class="rpe-scale"><span>Très facile</span><span>À fond</span></div>
-    <div class="rpe-lbl" style="margin-top:14px"><i class="ic ic-dumbbell"></i> Effort musculaire (jambes) <span class="rpe-opt">facultatif</span></div>
+    <div class="rpe-scale"><span>${tr('rpe.veryEasy')}</span><span>${tr('rpe.allOut')}</span></div>
+    <div class="rpe-lbl" style="margin-top:14px"><i class="ic ic-dumbbell"></i> ${tr('rpe.muscleEffort')} <span class="rpe-opt">${tr('rpe.optional')}</span></div>
     <div class="rpe-grid" id="rpeMuscle">${Array.from({length:10},(_,i)=>`<button data-m="${i+1}" style="--rc:${rpeColor(i+1)}">${i+1}</button>`).join('')}</div>
-    <div class="rpe-scale"><span>Jambes fraîches</span><span>Jambes détruites</span></div>
-    <textarea class="rpe-note" placeholder="Un mot pour ton coach ? (sensations, douleurs, conditions…)"></textarea>
-    <button class="btn" id="rpeSave" disabled style="opacity:.5">Valider la séance <i class="ic ic-check"></i></button>`;
+    <div class="rpe-scale"><span>${tr('rpe.freshLegs')}</span><span>${tr('rpe.destroyedLegs')}</span></div>
+    <textarea class="rpe-note" placeholder="${tr('rpe.notePlaceholder')}"></textarea>
+    <button class="btn" id="rpeSave" disabled style="opacity:.5">${tr('rpe.validateSession')} <i class="ic ic-check"></i></button>`;
   overlay.classList.add('open');
   const save = modal.querySelector('#rpeSave');
   modal.querySelectorAll('#rpeCardio button').forEach(b=>{
@@ -2570,7 +2570,7 @@ function openRpeModal(s){
       if(rec && rec.shoe){
         const dist = Math.round((s.km || (s.dur||60)/60*11) * 10)/10;
         addGearKm(rec.shoe, dist);
-        setTimeout(()=> toast(`+${dist} km attribués à tes ${rec.shoe.name} (${rec.shoe.km}/${rec.shoe.max} km) — modifiable dans Matériel`), 900);
+        setTimeout(()=> toast(tr('rpe.kmAssigned', {dist, name:rec.shoe.name, km:rec.shoe.km, max:rec.shoe.max})), 900);
       }
     }
   };
@@ -2616,20 +2616,20 @@ function zedModelHTML(key){
   const rows = zones.map((z,i)=>`
     <div class="zed-row" data-i="${i}">
       <span class="zed-dot" style="background:${zoneColorAt(i,total)}"></span>
-      <input class="zed-name" value="${dispoSafe(z[0])}" data-zf="name" aria-label="Nom de la zone">
-      <span class="zed-lo">de ${z[1]}%</span>
-      <span class="zed-hiwrap">→ <input class="zed-hi" type="number" min="1" max="150" value="${z[2]}" data-zf="hi" aria-label="Borne haute"><span>%</span></span>
-      <button class="zed-drow" data-zdel="${i}" aria-label="Supprimer la zone" ${total<=1?'disabled style=opacity:.3':''}><i class="ic ic-x"></i></button>
+      <input class="zed-name" value="${dispoSafe(z[0])}" data-zf="name" aria-label="${tr('zoneEd.zoneName')}">
+      <span class="zed-lo">${tr('zoneEd.from')} ${z[1]}%</span>
+      <span class="zed-hiwrap">→ <input class="zed-hi" type="number" min="1" max="150" value="${z[2]}" data-zf="hi" aria-label="${tr('zoneEd.upperBound')}"><span>%</span></span>
+      <button class="zed-drow" data-zdel="${i}" aria-label="${tr('zoneEd.deleteZone')}" ${total<=1?'disabled style=opacity:.3':''}><i class="ic ic-x"></i></button>
     </div>`).join('');
   return `<div class="zed-model" data-model="${key}">
     <div class="zed-mhead">
       <span class="zed-mname">${m.label}</span>
-      <span class="zed-mtag ${isCustom?'custom':''}">${isCustom?'personnalisé':'standard'}</span>
-      <button class="zed-reset" data-zreset="${key}">Réinitialiser</button>
+      <span class="zed-mtag ${isCustom?'custom':''}">${isCustom?tr('zoneEd.custom'):tr('zoneEd.standard')}</span>
+      <button class="zed-reset" data-zreset="${key}">${tr('zoneEd.reset')}</button>
     </div>
     <div class="zed-bar">${bar}</div>
     ${rows}
-    <button class="zed-add" data-zadd="${key}">+ Ajouter une zone</button>
+    <button class="zed-add" data-zadd="${key}">+ ${tr('zoneEd.addZone')}</button>
   </div>`;
 }
 function zedRenderModel(key, root){
@@ -2650,7 +2650,7 @@ function zedWireModel(key, root){
   });
   sec.querySelector('[data-zadd]').onclick=()=>{
     const last=zones[zones.length-1];
-    zones.push(['Nouvelle zone', last[2], Math.min(150,last[2]+10)]); zedNormalize(zones); zedRenderModel(key, root);
+    zones.push([tr('zoneEd.newZone'), last[2], Math.min(150,last[2]+10)]); zedNormalize(zones); zedRenderModel(key, root);
   };
   sec.querySelector('[data-zreset]').onclick=()=>{
     ZED.models[key]=JSON.parse(JSON.stringify(INTENSITY_MODELS[key].zones));
@@ -2660,9 +2660,9 @@ function zedWireModel(key, root){
 }
 /* toutes les références utilisables pour une zone perso (« tout ce qui existe ») */
 const ZONE_REFS = [
-  ['ftp','% FTP · vélo'], ['pma','% PMA · vélo'], ['cpBike','% Puissance critique · vélo'],
-  ['vma','% VMA · course'], ['cv','% Vitesse critique · course'], ['seuilRun','% allure seuil · course'],
-  ['css','% CSS · natation'], ['fc','% FC max']
+  ['ftp','% FTP · '+tr('disc.bike')], ['pma','% '+tr('refs.map')+' · '+tr('disc.bike')], ['cpBike','% '+tr('zoneEd.criticalPower')+' · '+tr('disc.bike')],
+  ['vma','% '+tr('refs.vVo2max')+' · '+tr('disc.run')], ['cv','% '+tr('zoneEd.criticalSpeed')+' · '+tr('disc.run')], ['seuilRun','% '+tr('zoneEd.thresholdPace')+' · '+tr('disc.run')],
+  ['css','% CSS · '+tr('disc.swim')], ['fc','% '+tr('refs.maxHr')]
 ];
 function customZones(aid){ aid=aid||zoneAthleteId(); return (CUSTOM_ZONES[aid] && CUSTOM_ZONES[aid]._custom) || []; }
 /* aperçu de cible pour une zone perso (ex. "230 → 260 W") */
@@ -2674,17 +2674,17 @@ function zcTargetHint(ref, lo, hi){
 function zcRowHTML(z,i){
   return `<div class="zc-row" data-i="${i}">
     <span class="zc-dot" style="background:${zoneColorAt(i, Math.max(1,ZED.custom.length))}"></span>
-    <input class="zc-name" value="${dispoSafe(z.name)}" data-zc="name" placeholder="Nom de la zone">
+    <input class="zc-name" value="${dispoSafe(z.name)}" data-zc="name" placeholder="${tr('zoneEd.zoneName')}">
     <select data-zc="ref">${ZONE_REFS.map(([k,l])=>`<option value="${k}" ${k===z.ref?'selected':''}>${l}</option>`).join('')}</select>
-    <span class="zc-range">de <input type="number" min="0" max="200" value="${z.lo}" data-zc="lo"> à <input type="number" min="0" max="200" value="${z.hi}" data-zc="hi"> %</span>
-    <button class="zed-drow" data-zcdel="${i}" aria-label="Supprimer"><i class="ic ic-x"></i></button>
+    <span class="zc-range">${tr('zoneEd.from')} <input type="number" min="0" max="200" value="${z.lo}" data-zc="lo"> ${tr('zoneEd.to')} <input type="number" min="0" max="200" value="${z.hi}" data-zc="hi"> %</span>
+    <button class="zed-drow" data-zcdel="${i}" aria-label="${tr('common.delete')}"><i class="ic ic-x"></i></button>
     <div class="zc-tgt">${zcTargetHint(z.ref,z.lo,z.hi)}</div>
   </div>`;
 }
 function zedRenderCustom(root){
-  root.innerHTML = `<p class="zed-note">Crée tes propres zones de travail : nomme-les, choisis la référence (FTP, puissance critique, %VMA, CV, CSS, FC…) et l'intensité. Elles apparaissent dans le sélecteur de zone à la création de séance.</p>`
-    + (ZED.custom.length ? ZED.custom.map(zcRowHTML).join('') : `<div class="zc-empty">Aucune zone perso — ajoute ta première ci-dessous.</div>`)
-    + `<button class="zed-add" id="zcAdd">+ Ajouter une zone perso</button>`;
+  root.innerHTML = `<p class="zed-note">${tr('zoneEd.customNote')}</p>`
+    + (ZED.custom.length ? ZED.custom.map(zcRowHTML).join('') : `<div class="zc-empty">${tr('zoneEd.noCustomZone')}</div>`)
+    + `<button class="zed-add" id="zcAdd">+ ${tr('zoneEd.addCustomZone')}</button>`;
   zedWireCustom(root);
 }
 function zedWireCustom(root){
@@ -2701,31 +2701,31 @@ function zedWireCustom(root){
     rowEl.querySelector('[data-zcdel]').onclick=()=>{ ZED.custom.splice(i,1); zedRenderCustom(root); };
   });
   const add=root.querySelector('#zcAdd');
-  if(add) add.onclick=()=>{ ZED.custom.push({name:'Nouvelle zone', ref:'ftp', lo:88, hi:95}); zedRenderCustom(root); };
+  if(add) add.onclick=()=>{ ZED.custom.push({name:tr('zoneEd.newZone'), ref:'ftp', lo:88, hi:95}); zedRenderCustom(root); };
 }
 
 function openZoneEditor(){
   const aid=zoneAthleteId();
   const name=(typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].name)
-    || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'cet athlète');
+    || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:tr('zoneEd.thisAthlete'));
   const models=editableZoneModels();
   ZED={ aid, name, models:{}, custom: JSON.parse(JSON.stringify(customZones(aid))) };
   models.forEach(k=> ZED.models[k]=JSON.parse(JSON.stringify(zonesFor(k, aid))));
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=`<div class="adh-modal zed-modal" role="dialog" aria-label="Zones de travail">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Zones de travail — ${dispoSafe(name)}</h3>
-    <p class="adh-sub">Adapte les zones de l'athlète (test lactate, ressenti terrain…). Elles servent à la création de séance et à l'analyse.</p>
+  el.innerHTML=`<div class="adh-modal zed-modal" role="dialog" aria-label="${tr('zoneEd.workZones')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('zoneEd.workZones')} — ${dispoSafe(name)}</h3>
+    <p class="adh-sub">${tr('zoneEd.subtitle')}</p>
     <div class="zed-tabs">
-      <button class="zed-tab on" data-ztab="ref">Par référence</button>
-      <button class="zed-tab" data-ztab="custom">Zones perso</button>
+      <button class="zed-tab on" data-ztab="ref">${tr('zoneEd.byReference')}</button>
+      <button class="zed-tab" data-ztab="custom">${tr('zoneEd.customZones')}</button>
     </div>
     <div class="zed-panel" id="zedPanelRef">
       <div id="zedModels">${models.map(zedModelHTML).join('')}</div>
-      <p class="zed-note">La borne basse d'une zone suit la borne haute de la précédente. Les zones en allure (natation CSS, allure seuil course) gardent le modèle standard.</p>
+      <p class="zed-note">${tr('zoneEd.lowBoundNote')}</p>
     </div>
     <div class="zed-panel" id="zedPanelCustom" hidden></div>
-    <button class="btn asg-go" id="zedSave" style="margin-top:16px">Enregistrer les zones</button>
+    <button class="btn asg-go" id="zedSave" style="margin-top:16px">${tr('zoneEd.saveZones')}</button>
   </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('open'));
@@ -2752,7 +2752,7 @@ function openZoneEditor(){
       else CUSTOM_ZONES[aid][k]=z;
     });
     // zones perso libres : nettoyées (nom + bornes cohérentes) puis stockées
-    const clean = ZED.custom.map(z=>({ name:(z.name||'Zone').trim()||'Zone', ref:z.ref||'ftp',
+    const clean = ZED.custom.map(z=>({ name:(z.name||tr('zoneEd.zone')).trim()||tr('zoneEd.zone'), ref:z.ref||'ftp',
       lo:Math.max(0,Math.min(200,+z.lo||0)), hi:Math.max(0,Math.min(200,+z.hi||0)) }))
       .map(z=> (z.hi<z.lo?{...z,lo:z.hi,hi:z.lo}:z));
     if(clean.length) CUSTOM_ZONES[aid]._custom = clean; else delete CUSTOM_ZONES[aid]._custom;
@@ -2792,12 +2792,12 @@ const OBJECTIF_META = {
    pédagogique générique (sessionWhyHTML). */
 function sessionCoachNoteHTML(s){
   if(!s.coachNote) return '';
-  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> Note de ton coach sur cette séance</div><div class="sn-item"><div class="sn-txt">${dispoSafe(s.coachNote)}</div></div></div>`;
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('session.coachNoteOnSession')}</div><div class="sn-item"><div class="sn-txt">${dispoSafe(s.coachNote)}</div></div></div>`;
 }
 function sessionWhyHTML(s){
   const type = (s.objectif&&s.objectif.type) || sessionType(s);
   const m = OBJECTIF_META[type]; if(!m) return '';
-  return `<div class="sn-block"><div class="sn-head"><i class="ic ${m.ic}"></i> Pourquoi cette séance</div><div class="sn-item"><div class="sn-txt">${m.why}</div></div></div>`;
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ${m.ic}"></i> ${tr('session.whyThisSession')}</div><div class="sn-item"><div class="sn-txt">${m.why}</div></div></div>`;
 }
 function sessionNotesHTML(s){
   if(!s.blocksV2 || !s.blocksV2.blocks) return '';
@@ -2812,7 +2812,7 @@ function sessionNotesHTML(s){
     });
   });
   if(!items.length) return '';
-  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> Consignes du coach par intervalle</div>${items.join('')}</div>`;
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('session.coachInstructionsPerInterval')}</div>${items.join('')}</div>`;
 }
 
 function openModal(s){
