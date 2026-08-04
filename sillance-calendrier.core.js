@@ -4993,9 +4993,9 @@ function exactDefault(disc){
 }
 /* options de type de cible exacte par sport */
 function exactKinds(disc){
-  if(disc==='bike') return [['power','Watts'],['pace','Allure /km'],['speed','km/h'],['rpe','RPE (sans capteur)']];
-  if(disc==='run')  return [['pace','Allure /km'],['speed','km/h'],['time','Temps total'],['rpe','RPE (sans capteur)']];
-  if(disc==='swim') return [['time100','Temps /100m'],['pace','Allure /100m'],['time','Temps total'],['rpe','RPE (sans capteur)']];
+  if(disc==='bike') return [['power',tr('exact.watts')],['pace',tr('exact.paceKm')],['speed','km/h'],['rpe',tr('exact.rpeNoSensor')]];
+  if(disc==='run')  return [['pace',tr('exact.paceKm')],['speed','km/h'],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
+  if(disc==='swim') return [['time100',tr('exact.time100')],['pace',tr('exact.pace100')],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
   return [['rpe','RPE']];
 }
 function defaultBlockNew(disc){
@@ -5036,9 +5036,9 @@ function openBuilder(dateKey, existing){
       title: existing?.title||'', disc,
       activeRefs: defaultActiveRefs(disc),
       blocks: [
-        {bid:'b'+(builderUid++), series:1, title:'Échauffement', lines:[defaultLine('warmup',disc)]},
+        {bid:'b'+(builderUid++), series:1, title:tr('builder.warmupTitle'), lines:[defaultLine('warmup',disc)]},
         {bid:'b'+(builderUid++), series:5, title:'', lines:[defaultLine('exo',disc), defaultLine('contre',disc)]},
-        {bid:'b'+(builderUid++), series:1, title:'Retour au calme', lines:[defaultLine('cooldown',disc)]}
+        {bid:'b'+(builderUid++), series:1, title:tr('builder.cooldownTitle'), lines:[defaultLine('cooldown',disc)]}
       ],
       targetDate: dateKey||null
     };
@@ -5048,7 +5048,7 @@ function openBuilder(dateKey, existing){
   if(builderState.objectif==null) builderState.objectif = (existing&&existing.objectif&&existing.objectif.type) ? existing.objectif.type+'|'+existing.objectif.zone : '';
   document.getElementById('bTitle').value = builderState.title||'';
   document.getElementById('bObjectif').value = builderState.objectif||'';
-  document.getElementById('builderBadge').textContent = existing ? 'Modifier la séance' : 'Nouvelle séance';
+  document.getElementById('builderBadge').textContent = existing ? tr('builder.editSession') : tr('builder.newSession');
   document.getElementById('bDiscPick').value = builderState.disc;
   renderRefs();
   renderBlocks();
@@ -5070,7 +5070,7 @@ function renderRefs(){
   const rpeOnly = builderState.activeRefs.length===1 && builderState.activeRefs[0]==='rpe';
   wrap.innerHTML = refsForDisc(builderState.disc).map(k=>
     `<span class="b-ref-chip ${builderState.activeRefs.includes(k)?'on':''}" data-ref="${k}">${REF_LABEL[k]}</span>`
-  ).join('') + `<span class="b-ref-chip nosensor ${rpeOnly?'on':''}" id="bNoSensor" title="Athlète sans montre GPS ni capteur : toutes les cibles passent en ressenti RPE 1-10">⌚ Sans capteur — tout en RPE</span>`;
+  ).join('') + `<span class="b-ref-chip nosensor ${rpeOnly?'on':''}" id="bNoSensor" title="${tr('builder.noSensorTitle')}">⌚ ${tr('builder.noSensorChip')}</span>`;
   wrap.querySelectorAll('.b-ref-chip').forEach(ch=>{
     ch.onclick=()=>{
       const k=ch.dataset.ref;
@@ -5109,25 +5109,25 @@ function renderBlocks(){
     return `<div class="bk" data-bid="${blk.bid}">
       <div class="bk-head">
         <div class="bk-move">
-          <button data-mv="up" ${bi===0?'disabled style=opacity:.3':''} aria-label="Monter">▲</button>
-          <button data-mv="down" ${bi===builderState.blocks.length-1?'disabled style=opacity:.3':''} aria-label="Descendre">▼</button>
+          <button data-mv="up" ${bi===0?'disabled style=opacity:.3':''} aria-label="${tr('builder.moveUp')}">▲</button>
+          <button data-mv="down" ${bi===builderState.blocks.length-1?'disabled style=opacity:.3':''} aria-label="${tr('builder.moveDown')}">▼</button>
         </div>
-        <div class="bk-series"><span class="x">×</span><input type="number" min="1" max="40" value="${blk.series}" data-f="series"><small>série${blk.series>1?'s':''}</small></div>
-        <input class="bk-title-in" placeholder="Titre du bloc (optionnel)" value="${blk.title||''}" data-f="btitle">
+        <div class="bk-series"><span class="x">×</span><input type="number" min="1" max="40" value="${blk.series}" data-f="series"><small>${tr(blk.series>1?'builder.seriesPlural':'builder.seriesSingular')}</small></div>
+        <input class="bk-title-in" placeholder="${tr('builder.blockTitlePlaceholder')}" value="${blk.title||''}" data-f="btitle">
         <div class="bk-tools">
-          <button data-act="dup" title="Dupliquer">⧉</button>
-          <button class="del" data-act="delblock" title="Supprimer"><i class="ic ic-x"></i></button>
+          <button data-act="dup" title="${tr('builder.duplicate')}">⧉</button>
+          <button class="del" data-act="delblock" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
         </div>
       </div>
       <div class="bk-lines">${lines}</div>
       <div class="bk-addline">
         ${builderState.disc==='hyrox'
-          ? `<button data-addstation="">+ Ajouter une station</button>` + HYROX_STATIONS.map(s=>`<button data-addstation="${s.key}">${s.name}</button>`).join('')
-          : `<button data-add="warmup">+ Échauffement</button>
-             <button data-add="exo">+ Exercice</button>
-             <button data-add="contre">+ Contre-effort</button>
-             <button data-add="recov">+ Récup</button>
-             <button data-add="cooldown">+ Retour</button>`}
+          ? `<button data-addstation="">+ ${tr('builder.addStation')}</button>` + HYROX_STATIONS.map(s=>`<button data-addstation="${s.key}">${s.name}</button>`).join('')
+          : `<button data-add="warmup">+ ${tr('lineType.warmup')}</button>
+             <button data-add="exo">+ ${tr('lineType.exo')}</button>
+             <button data-add="contre">+ ${tr('lineType.contre')}</button>
+             <button data-add="recov">+ ${tr('lineType.recov')}</button>
+             <button data-add="cooldown">+ ${tr('lineType.cooldown')}</button>`}
       </div>
     </div>`;
   }).join('');
@@ -5145,7 +5145,7 @@ function lnActionsHTML(ln, delLabel){
     </div>
     <div class="ln-note">
       <i class="ic ic-message-circle"></i>
-      <input type="text" class="ln-note-in" data-f="note" placeholder="Commentaire pour l'athlète (facultatif)…" value="${dispoSafe(ln.note||'')}">
+      <input type="text" class="ln-note-in" data-f="note" placeholder="${tr('builder.commentPlaceholder')}" value="${dispoSafe(ln.note||'')}">
     </div>`;
 }
 
@@ -5157,7 +5157,7 @@ function lineHTML(blk, ln){
     const stationSel = HYROX_STATIONS.map(s=>`<option value="${s.key}" ${s.key===ln.station?'selected':''}>${s.name}</option>`).join('');
     const weightField = st.weighted
       ? `<div class="hx-weight"><input type="number" min="0" max="300" step="0.5" value="${ln.weight||0}" data-hx="weight"><span>kg</span></div>`
-      : `<div class="hx-weight hx-noweight">— poids libre —</div>`;
+      : `<div class="hx-weight hx-noweight">${tr('builder.freeWeight')}</div>`;
     return `<div class="ln ln-hyrox" data-lid="${ln.lid}" style="--lc:${DISC.hyrox.color}">
       <span class="ln-grip">⠿</span>
       <select class="ln-type hx-station" data-hx="station">${stationSel}</select>
@@ -5165,7 +5165,7 @@ function lineHTML(blk, ln){
         <input type="number" min="0" max="5000" value="${ln.target||0}" data-hx="target"><span>${unitLbl}</span>
       </div>
       ${weightField}
-      ${lnActionsHTML(ln, 'Supprimer la station')}
+      ${lnActionsHTML(ln, tr('builder.deleteStation'))}
     </div>`;
   }
 
@@ -5191,15 +5191,15 @@ function lineHTML(blk, ln){
     // zones perso compatibles avec la discipline de la séance (index d'origine gardé)
     const custZ = customZones().map((z,ci)=>({z,ci}))
       .filter(({z})=>{ const m=INTENSITY_MODELS[z.ref]; return m && (m.disc===builderState.disc || m.disc==='all'); });
-    const zoneSel = `<select class="ln-zonesel" data-f="zonesel" style="--lz:${zCol}" title="Choisir la zone de travail">
+    const zoneSel = `<select class="ln-zonesel" data-f="zonesel" style="--lz:${zCol}" title="${tr('builder.chooseWorkZone')}">
         ${zList.map((z,i)=>`<option value="${i}" ${i===zIdx?'selected':''}>${dispoSafe(z[0])}</option>`).join('')}
         ${zIdx<0?`<option value="-1" selected>${zn||'—'}</option>`:''}
-        ${custZ.length?`<optgroup label="Zones perso">${custZ.map(({z,ci})=>`<option value="c${ci}">${dispoSafe(z.name)} · ${REF_LABEL[z.ref]||z.ref}</option>`).join('')}</optgroup>`:''}
+        ${custZ.length?`<optgroup label="${tr('zoneEd.customZones')}">${custZ.map(({z,ci})=>`<option value="c${ci}">${dispoSafe(z.name)} · ${REF_LABEL[z.ref]||z.ref}</option>`).join('')}</optgroup>`:''}
       </select>`;
     intHTML = `
       <div class="ln-zone-row">
-        <select class="ln-zone" data-f="model" title="Référence de calcul">${models.map(k=>`<option value="${k}" ${k===ln.model?'selected':''}>${REF_LABEL[k]}</option>`).join('')}</select>
-        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="Intensité en %"><span class="pv-unit">%</span></div>
+        <select class="ln-zone" data-f="model" title="${tr('builder.calcReference')}">${models.map(k=>`<option value="${k}" ${k===ln.model?'selected':''}>${REF_LABEL[k]}</option>`).join('')}</select>
+        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="${tr('builder.intensityPctAria')}"><span class="pv-unit">%</span></div>
       </div>
       <div class="ln-targets">${targets}${zoneSel}</div>`;
   } else {
@@ -5209,8 +5209,8 @@ function lineHTML(blk, ln){
   // champ durée OU distance selon la métrique de la ligne
   const metric = ln.metric || 'time';
   const durField = metric==='dist'
-    ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="Basculer temps / distance">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
-    : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="Basculer temps / distance">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
+    ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
+    : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
 
   return `<div class="ln" data-lid="${ln.lid}" style="--lc:${T.c}">
     <span class="ln-grip">⠿</span>
@@ -5218,12 +5218,12 @@ function lineHTML(blk, ln){
     ${durField}
     <div class="ln-int">
       <div class="ln-mode">
-        <button class="${ln.mode==='zone'?'on':''}" data-mode="zone">Zone %</button>
-        <button class="${ln.mode==='exact'?'on':''}" data-mode="exact">Exact</button>
+        <button class="${ln.mode==='zone'?'on':''}" data-mode="zone">${tr('builder.zonePct')}</button>
+        <button class="${ln.mode==='exact'?'on':''}" data-mode="exact">${tr('builder.exact')}</button>
       </div>
       ${intHTML}
     </div>
-    ${lnActionsHTML(ln, 'Supprimer la ligne')}
+    ${lnActionsHTML(ln, tr('builder.deleteLine'))}
   </div>`;
 }
 

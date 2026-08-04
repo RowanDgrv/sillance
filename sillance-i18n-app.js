@@ -563,6 +563,23 @@
     "video.placeholder": `Emplacement vidéo — branche l'URL dans <b>VIDEOS</b>`,
     "video.placeholderHint": `(mp4 hébergé, ou embed YouTube/Vimeo)`,
     "video.clickToOpen": `clic pour ouvrir en grand`,
+
+    "exact.watts": `Watts`, "exact.paceKm": `Allure /km`, "exact.rpeNoSensor": `RPE (sans capteur)`,
+    "exact.totalTime": `Temps total`, "exact.time100": `Temps /100m`, "exact.pace100": `Allure /100m`,
+
+    "builder.warmupTitle": `Échauffement`, "builder.cooldownTitle": `Retour au calme`,
+    "builder.editSession": `Modifier la séance`, "builder.newSession": `Nouvelle séance`,
+    "builder.noSensorTitle": `Athlète sans montre GPS ni capteur : toutes les cibles passent en ressenti RPE 1-10`,
+    "builder.noSensorChip": `Sans capteur — tout en RPE`,
+    "builder.moveUp": `Monter`, "builder.moveDown": `Descendre`,
+    "builder.seriesPlural": `séries`, "builder.seriesSingular": `série`,
+    "builder.blockTitlePlaceholder": `Titre du bloc (optionnel)`, "builder.duplicate": `Dupliquer`,
+    "builder.addStation": `Ajouter une station`,
+    "builder.commentPlaceholder": `Commentaire pour l'athlète (facultatif)…`,
+    "builder.freeWeight": `— poids libre —`, "builder.deleteStation": `Supprimer la station`,
+    "builder.chooseWorkZone": `Choisir la zone de travail`, "builder.calcReference": `Référence de calcul`,
+    "builder.intensityPctAria": `Intensité en %`, "builder.switchTimeDist": `Basculer temps / distance`,
+    "builder.zonePct": `Zone %`, "builder.exact": `Exact`, "builder.deleteLine": `Supprimer la ligne`,
   };
 
   var en = {
@@ -1125,6 +1142,23 @@
     "video.placeholder": `Video placeholder — plug the URL into <b>VIDEOS</b>`,
     "video.placeholderHint": `(hosted mp4, or YouTube/Vimeo embed)`,
     "video.clickToOpen": `click to open full screen`,
+
+    "exact.watts": `Watts`, "exact.paceKm": `Pace /km`, "exact.rpeNoSensor": `RPE (no sensor)`,
+    "exact.totalTime": `Total time`, "exact.time100": `Time /100m`, "exact.pace100": `Pace /100m`,
+
+    "builder.warmupTitle": `Warm-up`, "builder.cooldownTitle": `Cool-down`,
+    "builder.editSession": `Edit session`, "builder.newSession": `New session`,
+    "builder.noSensorTitle": `Athlete without a GPS watch or sensor: all targets switch to perceived RPE 1-10`,
+    "builder.noSensorChip": `No sensor — all in RPE`,
+    "builder.moveUp": `Move up`, "builder.moveDown": `Move down`,
+    "builder.seriesPlural": `sets`, "builder.seriesSingular": `set`,
+    "builder.blockTitlePlaceholder": `Block title (optional)`, "builder.duplicate": `Duplicate`,
+    "builder.addStation": `Add a station`,
+    "builder.commentPlaceholder": `Comment for the athlete (optional)…`,
+    "builder.freeWeight": `— free weight —`, "builder.deleteStation": `Delete station`,
+    "builder.chooseWorkZone": `Choose the work zone`, "builder.calcReference": `Calculation reference`,
+    "builder.intensityPctAria": `Intensity in %`, "builder.switchTimeDist": `Switch time / distance`,
+    "builder.zonePct": `Zone %`, "builder.exact": `Exact`, "builder.deleteLine": `Delete line`,
   };
 
   var es = {
@@ -1687,6 +1721,23 @@
     "video.placeholder": `Espacio de vídeo — conecta la URL en <b>VIDEOS</b>`,
     "video.placeholderHint": `(mp4 alojado, o embed de YouTube/Vimeo)`,
     "video.clickToOpen": `clic para abrir en grande`,
+
+    "exact.watts": `Vatios`, "exact.paceKm": `Ritmo /km`, "exact.rpeNoSensor": `RPE (sin sensor)`,
+    "exact.totalTime": `Tiempo total`, "exact.time100": `Tiempo /100m`, "exact.pace100": `Ritmo /100m`,
+
+    "builder.warmupTitle": `Calentamiento`, "builder.cooldownTitle": `Vuelta a la calma`,
+    "builder.editSession": `Modificar la sesión`, "builder.newSession": `Nueva sesión`,
+    "builder.noSensorTitle": `Atleta sin reloj GPS ni sensor: todos los objetivos pasan a percepción RPE 1-10`,
+    "builder.noSensorChip": `Sin sensor — todo en RPE`,
+    "builder.moveUp": `Subir`, "builder.moveDown": `Bajar`,
+    "builder.seriesPlural": `series`, "builder.seriesSingular": `serie`,
+    "builder.blockTitlePlaceholder": `Título del bloque (opcional)`, "builder.duplicate": `Duplicar`,
+    "builder.addStation": `Añadir una estación`,
+    "builder.commentPlaceholder": `Comentario para el atleta (opcional)…`,
+    "builder.freeWeight": `— peso libre —`, "builder.deleteStation": `Eliminar la estación`,
+    "builder.chooseWorkZone": `Elegir la zona de trabajo`, "builder.calcReference": `Referencia de cálculo`,
+    "builder.intensityPctAria": `Intensidad en %`, "builder.switchTimeDist": `Alternar tiempo / distancia`,
+    "builder.zonePct": `Zona %`, "builder.exact": `Exacto`, "builder.deleteLine": `Eliminar la línea`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
