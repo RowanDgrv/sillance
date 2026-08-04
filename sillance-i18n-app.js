@@ -495,6 +495,41 @@
     "creneau.registeredPricePay": `Inscrit ({price}€ — paiement à la séance)`, "creneau.registeredToSlot": `Inscrit au créneau`,
 
     "clubAth.calendarOf": `Calendrier de {name}`, "clubAth.demoTypicalPlan": ` — démo : plan type du club`,
+
+    "clubAthList.filteredNoGroup": `Filtré sur les athlètes <b>sans groupe</b>`, "clubAthList.showAll": `Tout afficher`,
+    "clubAthList.noGroup": `Sans groupe`,
+    "clubAthList.memberSince": `membre depuis {since}`,
+    "clubAthList.nSlotsPlural": `{n} créneaux`, "clubAthList.nSlotsSingular": `{n} créneau`,
+    "clubAthList.changeGroup": `Changer de groupe`, "clubAthList.clickToChangePlan": `Cliquer pour changer de formule`,
+    "clubAthList.videosSoonTitle": `Bientôt disponible — contenu vidéo en cours d'ajout`, "clubAthList.videos": `Vidéos`,
+    "clubAthList.openCalendarTitle": `Ouvrir le calendrier d'entraînement de cet athlète`, "clubAthList.calendar": `Calendrier`,
+    "clubAthList.noAthleteFound": `Aucun athlète trouvé.`,
+
+    "licence.toHandlePlural": `<b>{n}</b> licences à traiter (certificat manquant, à renouveler ou expiré)`,
+    "licence.toHandleSingular": `<b>{n}</b> licence à traiter (certificat manquant, à renouveler ou expiré)`,
+    "licence.see": `Voir →`,
+    "licence.upToDateTitle": `Licence {fed} à jour — cliquer pour voir/modifier`, "licence.upToDate": `à jour`,
+    "licence.toRenewTitle": `Certificat médical {fed} à renouveler bientôt — cliquer pour modifier`, "licence.toRenew": `à renouveler`,
+    "licence.expiredTitle": `Certificat médical {fed} expiré — cliquer pour modifier`, "licence.expired": `expiré`,
+    "licence.noneRegisteredTitle": `Aucune licence enregistrée — cliquer pour renseigner`, "licence.questionMark": `Licence ?`,
+    "licence.updatedFor": `Licence mise à jour pour {name}`,
+
+    "minor.consentCollectedTitle": `Autorisation parentale recueillie — cliquer pour voir/modifier`, "minor.consentOk": `Mineur · consentement OK`,
+    "minor.consentNeededTitle": `Athlète mineur : autorisation parentale à recueillir`, "minor.consentRequired": `Mineur · consentement requis`,
+    "minor.markAsMinorTitle": `Marquer comme mineur (déclenche le consentement parental)`, "minor.questionMark": `Mineur ?`,
+    "minor.consentSavedFor": `Consentement parental enregistré pour {name}`, "minor.markedAsMinor": `{name} marqué mineur`,
+    "minor.statusRemoved": `{name} : statut mineur retiré`,
+
+    "join.pendingPlural": `{n} demandes d'adhésion en attente`, "join.pendingSingular": `{n} demande d'adhésion en attente`,
+    "join.wantsToJoin": `Souhaite rejoindre le club`, "join.accept": `Accepter`, "join.reject": `Refuser`,
+    "join.acceptName": `Accepter {name}`, "join.addedToClub": `{name} ajouté au club dans « {group} »`,
+    "join.waJoinClub": `Rejoins le club Muret Goat Squad sur Sillance : {link}`,
+    "join.wantsToJoinViaLink": `Souhaite rejoindre le club via le lien`, "join.newRequestReceived": `Nouvelle demande reçue : {name}`,
+    "common.copied": `Copié`,
+
+    "presence.nPresent": `{n}/{cap} présents`, "presence.noOneYet": `Personne inscrit pour l'instant`,
+
+    "group.unassignedPlural": `<b>{n}</b> athlètes sans groupe`, "group.unassignedSingular": `<b>{n}</b> athlète sans groupe`,
   };
 
   var en = {
@@ -989,6 +1024,41 @@
     "creneau.registeredPricePay": `Registered (€{price} — payment at the session)`, "creneau.registeredToSlot": `Registered for the slot`,
 
     "clubAth.calendarOf": `{name}'s calendar`, "clubAth.demoTypicalPlan": ` — demo: club's typical plan`,
+
+    "clubAthList.filteredNoGroup": `Filtered to athletes <b>without a group</b>`, "clubAthList.showAll": `Show all`,
+    "clubAthList.noGroup": `No group`,
+    "clubAthList.memberSince": `member since {since}`,
+    "clubAthList.nSlotsPlural": `{n} slots`, "clubAthList.nSlotsSingular": `{n} slot`,
+    "clubAthList.changeGroup": `Change group`, "clubAthList.clickToChangePlan": `Click to change plan`,
+    "clubAthList.videosSoonTitle": `Coming soon — video content being added`, "clubAthList.videos": `Videos`,
+    "clubAthList.openCalendarTitle": `Open this athlete's training calendar`, "clubAthList.calendar": `Calendar`,
+    "clubAthList.noAthleteFound": `No athlete found.`,
+
+    "licence.toHandlePlural": `<b>{n}</b> licenses to handle (missing, expiring soon, or expired certificate)`,
+    "licence.toHandleSingular": `<b>{n}</b> license to handle (missing, expiring soon, or expired certificate)`,
+    "licence.see": `View →`,
+    "licence.upToDateTitle": `{fed} license up to date — click to view/edit`, "licence.upToDate": `up to date`,
+    "licence.toRenewTitle": `{fed} medical certificate to renew soon — click to edit`, "licence.toRenew": `to renew`,
+    "licence.expiredTitle": `{fed} medical certificate expired — click to edit`, "licence.expired": `expired`,
+    "licence.noneRegisteredTitle": `No license registered — click to fill in`, "licence.questionMark": `License?`,
+    "licence.updatedFor": `License updated for {name}`,
+
+    "minor.consentCollectedTitle": `Parental authorization collected — click to view/edit`, "minor.consentOk": `Minor · consent OK`,
+    "minor.consentNeededTitle": `Minor athlete: parental authorization to collect`, "minor.consentRequired": `Minor · consent required`,
+    "minor.markAsMinorTitle": `Mark as minor (triggers parental consent)`, "minor.questionMark": `Minor?`,
+    "minor.consentSavedFor": `Parental consent saved for {name}`, "minor.markedAsMinor": `{name} marked as minor`,
+    "minor.statusRemoved": `{name}: minor status removed`,
+
+    "join.pendingPlural": `{n} pending membership requests`, "join.pendingSingular": `{n} pending membership request`,
+    "join.wantsToJoin": `Wants to join the club`, "join.accept": `Accept`, "join.reject": `Decline`,
+    "join.acceptName": `Accept {name}`, "join.addedToClub": `{name} added to the club in "{group}"`,
+    "join.waJoinClub": `Join the Muret Goat Squad club on Sillance: {link}`,
+    "join.wantsToJoinViaLink": `Wants to join the club via the link`, "join.newRequestReceived": `New request received: {name}`,
+    "common.copied": `Copied`,
+
+    "presence.nPresent": `{n}/{cap} present`, "presence.noOneYet": `No one registered yet`,
+
+    "group.unassignedPlural": `<b>{n}</b> athletes without a group`, "group.unassignedSingular": `<b>{n}</b> athlete without a group`,
   };
 
   var es = {
@@ -1483,6 +1553,41 @@
     "creneau.registeredPricePay": `Inscrito ({price}€ — pago en la sesión)`, "creneau.registeredToSlot": `Inscrito en la franja`,
 
     "clubAth.calendarOf": `Calendario de {name}`, "clubAth.demoTypicalPlan": ` — demo: plan tipo del club`,
+
+    "clubAthList.filteredNoGroup": `Filtrado por atletas <b>sin grupo</b>`, "clubAthList.showAll": `Mostrar todo`,
+    "clubAthList.noGroup": `Sin grupo`,
+    "clubAthList.memberSince": `miembro desde {since}`,
+    "clubAthList.nSlotsPlural": `{n} franjas`, "clubAthList.nSlotsSingular": `{n} franja`,
+    "clubAthList.changeGroup": `Cambiar de grupo`, "clubAthList.clickToChangePlan": `Clic para cambiar de plan`,
+    "clubAthList.videosSoonTitle": `Próximamente — contenido de vídeo en proceso de añadir`, "clubAthList.videos": `Vídeos`,
+    "clubAthList.openCalendarTitle": `Abrir el calendario de entrenamiento de este atleta`, "clubAthList.calendar": `Calendario`,
+    "clubAthList.noAthleteFound": `Ningún atleta encontrado.`,
+
+    "licence.toHandlePlural": `<b>{n}</b> licencias por gestionar (certificado faltante, por renovar o caducado)`,
+    "licence.toHandleSingular": `<b>{n}</b> licencia por gestionar (certificado faltante, por renovar o caducado)`,
+    "licence.see": `Ver →`,
+    "licence.upToDateTitle": `Licencia {fed} al día — clic para ver/modificar`, "licence.upToDate": `al día`,
+    "licence.toRenewTitle": `Certificado médico {fed} a renovar pronto — clic para modificar`, "licence.toRenew": `a renovar`,
+    "licence.expiredTitle": `Certificado médico {fed} caducado — clic para modificar`, "licence.expired": `caducado`,
+    "licence.noneRegisteredTitle": `Ninguna licencia registrada — clic para indicar`, "licence.questionMark": `¿Licencia?`,
+    "licence.updatedFor": `Licencia actualizada para {name}`,
+
+    "minor.consentCollectedTitle": `Autorización parental recogida — clic para ver/modificar`, "minor.consentOk": `Menor · consentimiento OK`,
+    "minor.consentNeededTitle": `Atleta menor: autorización parental por recoger`, "minor.consentRequired": `Menor · consentimiento requerido`,
+    "minor.markAsMinorTitle": `Marcar como menor (activa el consentimiento parental)`, "minor.questionMark": `¿Menor?`,
+    "minor.consentSavedFor": `Consentimiento parental guardado para {name}`, "minor.markedAsMinor": `{name} marcado como menor`,
+    "minor.statusRemoved": `{name}: estado de menor eliminado`,
+
+    "join.pendingPlural": `{n} solicitudes de adhesión pendientes`, "join.pendingSingular": `{n} solicitud de adhesión pendiente`,
+    "join.wantsToJoin": `Desea unirse al club`, "join.accept": `Aceptar`, "join.reject": `Rechazar`,
+    "join.acceptName": `Aceptar a {name}`, "join.addedToClub": `{name} añadido al club en «{group}»`,
+    "join.waJoinClub": `Únete al club Muret Goat Squad en Sillance: {link}`,
+    "join.wantsToJoinViaLink": `Desea unirse al club a través del enlace`, "join.newRequestReceived": `Nueva solicitud recibida: {name}`,
+    "common.copied": `Copiado`,
+
+    "presence.nPresent": `{n}/{cap} presentes`, "presence.noOneYet": `Nadie inscrito por ahora`,
+
+    "group.unassignedPlural": `<b>{n}</b> atletas sin grupo`, "group.unassignedSingular": `<b>{n}</b> atleta sin grupo`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

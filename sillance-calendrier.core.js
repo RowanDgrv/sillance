@@ -4044,26 +4044,26 @@ function renderClubAthletes(filter){
   if(clubOnlyUnassigned) list=list.filter(a=>!a.group);
   if(clubLicenceOnly) list=list.filter(a=>licenceStatus(a)!=='ok');
   const banner = clubOnlyUnassigned
-    ? `<div class="grp-unassigned-banner" id="clubUnassignedClear"><span>Filtré sur les athlètes <b>sans groupe</b></span><span><i class="ic ic-x"></i> Tout afficher</span></div>` : '';
+    ? `<div class="grp-unassigned-banner" id="clubUnassignedClear"><span>${tr('clubAthList.filteredNoGroup')}</span><span><i class="ic ic-x"></i> ${tr('clubAthList.showAll')}</span></div>` : '';
   const rows = list.map(a=>{
     const nbInscr = CRENEAUX.filter(c=>c.attendees.includes(a.id)).length;
     const g = a.group ? clubGroup(a.group) : null;
-    const grpOptions = '<option value="">Sans groupe</option>' + CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${a.group===gr.id?'selected':''}>${gr.name}</option>`).join('');
+    const grpOptions = `<option value="">${tr('clubAthList.noGroup')}</option>` + CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${a.group===gr.id?'selected':''}>${gr.name}</option>`).join('');
     return `<div class="club-ath">
       <div class="club-ath-av">${initials(a.name)}</div>
       <div class="club-ath-i">
         <div class="club-ath-n">${a.name}</div>
-        <div class="club-ath-m">membre depuis ${a.since} · ${nbInscr} créneau${nbInscr>1?'x':''}</div>
-        <select class="club-ath-grp-sel ${g?'':'none'}" data-aid="${a.id}" style="${g?`--gc:${g.color}`:''}" title="Changer de groupe">${grpOptions}</select>
-        <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="Cliquer pour changer de formule">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
-        <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="Bientôt disponible — contenu vidéo en cours d'ajout"><i class="ic ic-film"></i> Vidéos <span class="cc-soon" style="margin-left:4px">Bientôt</span></span>
-        <span class="club-ath-cal" data-caid="${a.id}" title="Ouvrir le calendrier d'entraînement de cet athlète"><i class="ic ic-calendar"></i> Calendrier</span>
+        <div class="club-ath-m">${tr('clubAthList.memberSince', {since:a.since})} · ${tr(nbInscr>1?'clubAthList.nSlotsPlural':'clubAthList.nSlotsSingular', {n:nbInscr})}</div>
+        <select class="club-ath-grp-sel ${g?'':'none'}" data-aid="${a.id}" style="${g?`--gc:${g.color}`:''}" title="${tr('clubAthList.changeGroup')}">${grpOptions}</select>
+        <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="${tr('clubAthList.clickToChangePlan')}">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
+        <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="${tr('clubAthList.videosSoonTitle')}"><i class="ic ic-film"></i> ${tr('clubAthList.videos')} <span class="cc-soon" style="margin-left:4px">${tr('sidebar.comingSoon')}</span></span>
+        <span class="club-ath-cal" data-caid="${a.id}" title="${tr('clubAthList.openCalendarTitle')}"><i class="ic ic-calendar"></i> ${tr('clubAthList.calendar')}</span>
         ${minorChip(a)}
         ${licenceChip(a)}
       </div>
       <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||tr('clubDisc.tri')}</span>
     </div>`;
-  }).join('') || '<p class="club-hint">Aucun athlète trouvé.</p>';
+  }).join('') || `<p class="club-hint">${tr('clubAthList.noAthleteFound')}</p>`;
   box.innerHTML = banner + rows;
   const clearBtn = document.getElementById('clubUnassignedClear');
   if(clearBtn) clearBtn.onclick=()=>{ clubOnlyUnassigned=false; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
@@ -4072,7 +4072,7 @@ function renderClubAthletes(filter){
     a.group = sel.value || null;
     renderClubAthletes(filter);
     renderClubStats();
-    toast(`${a.name} → ${a.group?clubGroup(a.group).name:'Sans groupe'}`);
+    toast(`${a.name} → ${a.group?clubGroup(a.group).name:tr('clubAthList.noGroup')}`);
     if(window.PF?.user && window.__pf_clubId){
       PF.assignMemberGroup(a.id, a.group).catch(e=>console.warn('[PF] assignMemberGroup échoué :',e));
     }
@@ -4108,7 +4108,7 @@ function renderLicenceAlert(){
   const box=document.getElementById('licenceAlert'); if(!box) return;
   const n = CLUB_ATHLETES.filter(a=>licenceStatus(a)!=='ok').length;
   if(!n){ box.innerHTML=''; return; }
-  box.innerHTML = `<div class="grp-unassigned-banner" id="licenceAlertBanner"><span><b>${n}</b> licence${n>1?'s':''} à traiter (certificat manquant, à renouveler ou expiré)</span><span>${clubLicenceOnly?'<i class="ic ic-x"></i> Tout afficher':'Voir →'}</span></div>`;
+  box.innerHTML = `<div class="grp-unassigned-banner" id="licenceAlertBanner"><span>${tr(n>1?'licence.toHandlePlural':'licence.toHandleSingular', {n})}</span><span>${clubLicenceOnly?`<i class="ic ic-x"></i> ${tr('clubAthList.showAll')}`:tr('licence.see')}</span></div>`;
   const bn=document.getElementById('licenceAlertBanner');
   if(bn) bn.onclick=()=>{ clubLicenceOnly=!clubLicenceOnly; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
 }
@@ -4117,10 +4117,10 @@ function renderLicenceAlert(){
 function licenceChip(a){
   const st = licenceStatus(a);
   const fed = a.licence?.fed || '';
-  if(st==='ok') return `<span class="club-ath-licence ok" data-lid="${a.id}" title="Licence ${fed} à jour — cliquer pour voir/modifier"><i class="ic ic-check"></i> ${fed} · à jour</span>`;
-  if(st==='soon') return `<span class="club-ath-licence soon" data-lid="${a.id}" title="Certificat médical ${fed} à renouveler bientôt — cliquer pour modifier"><i class="ic ic-alert-triangle"></i> ${fed} · à renouveler</span>`;
-  if(st==='expired') return `<span class="club-ath-licence warn" data-lid="${a.id}" title="Certificat médical ${fed} expiré — cliquer pour modifier"><i class="ic ic-alert-triangle"></i> ${fed} · expiré</span>`;
-  return `<span class="club-ath-licence" data-lid="${a.id}" title="Aucune licence enregistrée — cliquer pour renseigner">Licence ?</span>`;
+  if(st==='ok') return `<span class="club-ath-licence ok" data-lid="${a.id}" title="${tr('licence.upToDateTitle', {fed})}"><i class="ic ic-check"></i> ${fed} · ${tr('licence.upToDate')}</span>`;
+  if(st==='soon') return `<span class="club-ath-licence soon" data-lid="${a.id}" title="${tr('licence.toRenewTitle', {fed})}"><i class="ic ic-alert-triangle"></i> ${fed} · ${tr('licence.toRenew')}</span>`;
+  if(st==='expired') return `<span class="club-ath-licence warn" data-lid="${a.id}" title="${tr('licence.expiredTitle', {fed})}"><i class="ic ic-alert-triangle"></i> ${fed} · ${tr('licence.expired')}</span>`;
+  return `<span class="club-ath-licence" data-lid="${a.id}" title="${tr('licence.noneRegisteredTitle')}">${tr('licence.questionMark')}</span>`;
 }
 
 /* ---- Modal licence & certificat médical ---- */
@@ -4143,7 +4143,7 @@ function saveLicence(){
   else { a.licence = {fed, num, medCertUntil: cert||null}; }
   document.getElementById('licenceOverlay').classList.remove('open');
   renderClubAthletes(licenceFilter);
-  toast(`Licence mise à jour pour ${a.name}`);
+  toast(tr('licence.updatedFor', {name:a.name}));
 }
 (function initLicence(){
   const ov=document.getElementById('licenceOverlay'); if(!ov) return;
@@ -4157,10 +4157,10 @@ function minorConsentOk(a){ return !!(a.consentAt || a.guardian_consent_at); }
 function minorChip(a){
   if(a.minor){
     return minorConsentOk(a)
-      ? `<span class="club-ath-minor ok" data-maid="${a.id}" title="Autorisation parentale recueillie — cliquer pour voir/modifier"><i class="ic ic-check"></i> Mineur · consentement OK</span>`
-      : `<span class="club-ath-minor warn" data-maid="${a.id}" title="Athlète mineur : autorisation parentale à recueillir"><i class="ic ic-alert-triangle"></i> Mineur · consentement requis</span>`;
+      ? `<span class="club-ath-minor ok" data-maid="${a.id}" title="${tr('minor.consentCollectedTitle')}"><i class="ic ic-check"></i> ${tr('minor.consentOk')}</span>`
+      : `<span class="club-ath-minor warn" data-maid="${a.id}" title="${tr('minor.consentNeededTitle')}"><i class="ic ic-alert-triangle"></i> ${tr('minor.consentRequired')}</span>`;
   }
-  return `<span class="club-ath-minor" data-maid="${a.id}" title="Marquer comme mineur (déclenche le consentement parental)">Mineur ?</span>`;
+  return `<span class="club-ath-minor" data-maid="${a.id}" title="${tr('minor.markAsMinorTitle')}">${tr('minor.questionMark')}</span>`;
 }
 
 /* ---- Modal de consentement parental ---- */
@@ -4201,7 +4201,7 @@ function saveConsent(){
   else { delete a.guardian; delete a.consentAt; }
   document.getElementById('consentOverlay').classList.remove('open');
   renderClubAthletes(consentFilter);
-  toast(on ? (attest?`Consentement parental enregistré pour ${a.name}`:`${a.name} marqué mineur`) : `${a.name} : statut mineur retiré`);
+  toast(on ? (attest?tr('minor.consentSavedFor', {name:a.name}):tr('minor.markedAsMinor', {name:a.name})) : tr('minor.statusRemoved', {name:a.name}));
   if(window.PF?.user){
     PF.setParentalConsent(a.id, {is_minor:on, guardian_name:gName, guardian_email:gMail, consent:attest})
       .catch(e=>{console.warn('consent',e); toast(tr('toast.enregistrementIndisponibleDemo'), 'error');});
@@ -4223,17 +4223,17 @@ function renderJoinRequests(){
   const box=document.getElementById('joinRequests'); if(!box) return;
   if(!JOIN_REQUESTS.length){ box.innerHTML=''; return; }
   box.innerHTML=`<div class="join-block">
-    <div class="join-head">⏳ ${JOIN_REQUESTS.length} demande${JOIN_REQUESTS.length>1?'s':''} d'adhésion en attente</div>
+    <div class="join-head">⏳ ${tr(JOIN_REQUESTS.length>1?'join.pendingPlural':'join.pendingSingular', {n:JOIN_REQUESTS.length})}</div>
     <div class="join-list">${JOIN_REQUESTS.map(r=>`
       <div class="join-req" data-id="${r.id}">
         <div class="join-av">${initials(r.name)}</div>
         <div class="join-i">
           <div class="join-n">${r.name} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||tr('clubDisc.tri')}</span></div>
-          <div class="join-m">${r.msg||'Souhaite rejoindre le club'}</div>
+          <div class="join-m">${r.msg||tr('join.wantsToJoin')}</div>
         </div>
         <div class="join-acts">
-          <button class="join-accept" data-act="accept">Accepter</button>
-          <button class="join-reject" data-act="reject">Refuser</button>
+          <button class="join-accept" data-act="accept">${tr('join.accept')}</button>
+          <button class="join-reject" data-act="reject">${tr('join.reject')}</button>
         </div>
       </div>`).join('')}</div>
   </div>`;
@@ -4252,7 +4252,7 @@ let acceptingReq=null, acceptGroupId=null;
 const acceptOverlay=document.getElementById('acceptOverlay');
 function openAcceptModal(r){
   acceptingReq=r; acceptGroupId=null;
-  document.getElementById('acceptName').textContent=`Accepter ${r.name}`;
+  document.getElementById('acceptName').textContent=tr('join.acceptName', {name:r.name});
   document.getElementById('acceptGroups').innerHTML=CLUB_GROUPS.map(g=>`
     <div class="accept-grp" data-g="${g.id}">
       <span class="agdot" style="background:${g.color}"></span>
@@ -4275,7 +4275,7 @@ document.getElementById('acceptSave').onclick=()=>{
   acceptOverlay.classList.remove('open');
   renderClubAthletes(); renderClubStats();
   const g=clubGroup(acceptGroupId);
-  toast(`${newA.name} ajouté au club dans « ${g.name} »`);
+  toast(tr('join.addedToClub', {name:newA.name, group:g.name}));
 };
 
 /* lien d'invitation : copier, partager, simuler une demande */
@@ -4283,20 +4283,20 @@ document.getElementById('inviteCopy').onclick=()=>{
   const inp=document.getElementById('inviteLink');
   inp.select();
   try{ navigator.clipboard.writeText(inp.value); }catch(e){ document.execCommand && document.execCommand('copy'); }
-  const btn=document.getElementById('inviteCopy'); btn.textContent='Copié'; btn.classList.add('done');
-  setTimeout(()=>{ btn.textContent='Copier'; btn.classList.remove('done'); }, 1600);
+  const btn=document.getElementById('inviteCopy'); btn.textContent=tr('common.copied'); btn.classList.add('done');
+  setTimeout(()=>{ btn.textContent=tr('invite.copyLinkBtn'); btn.classList.remove('done'); }, 1600);
   toast(tr('toast.lienCopiePartageAAthletes'));
 };
 document.getElementById('inviteWhatsapp').onclick=()=>{
   const link=document.getElementById('inviteLink').value;
-  const msg=`Rejoins le club Muret Goat Squad sur Sillance : ${link}`;
+  const msg=tr('join.waJoinClub', {link});
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 };
 document.getElementById('inviteSimulate').onclick=()=>{
   const name=DEMO_NAMES[demoNameIdx % DEMO_NAMES.length]; demoNameIdx++;
-  JOIN_REQUESTS.push({id:'r'+Date.now(), name, disc: Math.random()>0.5?'tri':'bike', msg:'Souhaite rejoindre le club via le lien'});
+  JOIN_REQUESTS.push({id:'r'+Date.now(), name, disc: Math.random()>0.5?'tri':'bike', msg:tr('join.wantsToJoinViaLink')});
   renderClubAthletes();
-  toast(`Nouvelle demande reçue : ${name}`);
+  toast(tr('join.newRequestReceived', {name}));
 };
 
 function renderPresence(){
@@ -4307,9 +4307,9 @@ function renderPresence(){
     return `<div class="pres-card">
       <div class="pres-head">
         <span class="pres-title">${discIcon(D)} ${c.title} <span style="color:var(--muted);font-weight:400">· ${CLUB_DAYS[c.day]} ${c.time}</span></span>
-        <span class="pres-count">${c.attendees.length}/${c.cap} présents</span>
+        <span class="pres-count">${tr('presence.nPresent', {n:c.attendees.length, cap:c.cap})}</span>
       </div>
-      <div class="pres-list">${chips||'<span class="pres-empty">Personne inscrit pour l\'instant</span>'}</div>
+      <div class="pres-list">${chips||`<span class="pres-empty">${tr('presence.noOneYet')}</span>`}</div>
     </div>`;
   }).join('');
 }
@@ -4339,7 +4339,7 @@ function renderGroups(){
   const box=document.getElementById('groupList');
   const unassigned = CLUB_ATHLETES.filter(a=>!a.group);
   const banner = unassigned.length
-    ? `<div class="grp-unassigned-banner" id="grpUnassignedBanner"><span><b>${unassigned.length}</b> athlète${unassigned.length>1?'s':''} sans groupe</span><span>Voir →</span></div>` : '';
+    ? `<div class="grp-unassigned-banner" id="grpUnassignedBanner"><span>${tr(unassigned.length>1?'group.unassignedPlural':'group.unassignedSingular', {n:unassigned.length})}</span><span>${tr('licence.see')}</span></div>` : '';
   const cards = CLUB_GROUPS.map(g=>{
     const members=CLUB_ATHLETES.filter(a=>a.group===g.id);
     const avs = members.slice(0,8).map(a=>`<div class="group-av" title="${a.name}">${initials(a.name)}</div>`).join('')
@@ -4347,7 +4347,7 @@ function renderGroups(){
     return `<div class="group-card" data-id="${g.id}" style="--gc:${g.color}">
       <div class="group-card-head">
         <span class="group-name"><span class="gdot"></span>${g.name}</span>
-        <button class="group-edit" data-act="editgroup">Modifier</button>
+        <button class="group-edit" data-act="editgroup">${tr('sidebar.edit')}</button>
       </div>
       ${g.desc?`<div class="group-desc">${g.desc}</div>`:''}
       <div class="group-count">${members.length} athlète${members.length>1?'s':''}</div>
