@@ -8088,11 +8088,11 @@ function pickShoe(e){
   shoeResultsEl.innerHTML=''; document.getElementById('gearSearch').value='';
   shoePickedEl.hidden=false;
   shoePickedEl.innerHTML = `<span class="gear-cat" style="--gc:${SHOE_CAT_COLOR[e.cat]}"><i class="ic ${SHOE_CAT_ICON[e.cat]}"></i>${SHOE_CAT_LABEL[e.cat]}</span>
-    Durée de vie du modèle : <b>${e.life} km</b> · <i class="ic ic-users"></i> retrait moyen communauté : <b>${e.comm} km</b>`;
+    ${tr('gear.modelLifespan')} : <b>${e.life} km</b> · <i class="ic ic-users"></i> ${tr('gear.communityAvgRetire')} : <b>${e.comm} km</b>`;
 }
 function renderShoeBrands(){
   const brands=[...new Set(SHOE_CATALOG.map(e=>e.b))];
-  shoeBrandsEl.innerHTML = `<span class="sb-hint">…ou parcours par marque :</span>` +
+  shoeBrandsEl.innerHTML = `<span class="sb-hint">${tr('gear.orBrowseByBrand')}</span>` +
     brands.map(b=>`<button class="brand-chip" data-b="${b}">${b}</button>`).join('');
   shoeBrandsEl.querySelectorAll('.brand-chip').forEach(ch=> ch.onclick=()=>{
     shoeBrandsEl.querySelectorAll('.brand-chip').forEach(x=>x.classList.toggle('sel', x===ch));
@@ -8109,7 +8109,7 @@ document.getElementById('gearSearch').addEventListener('input', e=>{
   pickedShoe=null; shoePickedEl.hidden=true;
   if(q.length<2){ shoeResultsEl.innerHTML=''; return; }
   const hits=SHOE_CATALOG.filter(x=>(x.b+' '+x.m).toLowerCase().includes(q)).slice(0,8);
-  shoeResultsEl.innerHTML = hits.map(shoeResultRow).join('') || '<div class="sr-cat">Aucun modèle — saisis-le librement ci-dessous</div>';
+  shoeResultsEl.innerHTML = hits.map(shoeResultRow).join('') || `<div class="sr-cat">${tr('gear.noModelFreeEntry')}</div>`;
   wireShoeRows();
 });
 document.getElementById('gearType').addEventListener('change', e=>{
@@ -8125,7 +8125,7 @@ document.getElementById('gearSave').onclick=()=>{
   const g={
     id:'g'+Date.now(),
     type,
-    name:dispoSafe(document.getElementById('gearName').value||'Équipement'),
+    name:dispoSafe(document.getElementById('gearName').value||tr('gear.equipment')),
     km:+document.getElementById('gearKm').value||0,
     max:+document.getElementById('gearMax').value||1000,
     price:+document.getElementById('gearPrice').value||null,
@@ -8161,9 +8161,9 @@ renderGear();
    Accessible à tous les athlètes (coachés comme autonomes).
    ============================================================ */
 const PREPA_MENTALE = [
-  { id:'eric', name:'Éric', role:'Préparateur mental',
+  { id:'eric', name:'Éric', get role(){return tr('mental.role')},
     calendly:'https://calendly.com/VOTRE-LIEN-ERIC/prepa-mentale',
-    blurb:'Gestion du stress de course, visualisation, routines pré-compétition.' },
+    get blurb(){return tr('mental.ericBlurb')} },
   // { id:'…', name:'…', role:'Préparateur mental', calendly:'https://calendly.com/…', blurb:'…' },
 ];
 
@@ -8184,16 +8184,16 @@ function showPmCalendar(pm){
   calendlyWrap.hidden = false;
   mentalFallback.hidden = false;
   mentalBack.hidden = PREPA_MENTALE.length < 2;     // pas de « changer » si un seul PM
-  mentalDesc.textContent = `Choisis ton créneau avec ${pm.name} (visio, 45 min).`;
+  mentalDesc.textContent = tr('mental.chooseSlotWith', {name:pm.name});
 }
 function showPmPicker(){
   calendlyWrap.hidden = true; mentalFallback.hidden = true; mentalBack.hidden = true;
-  mentalDesc.textContent = 'Choisis ton préparateur mental, puis ton créneau.';
+  mentalDesc.textContent = tr('mental.choosePrepThenSlot');
   mentalPicker.innerHTML = PREPA_MENTALE.map((pm,i)=>`
     <button class="pm-card" data-i="${i}" type="button">
       <span class="pm-av">${(pm.name||'?').slice(0,1)}</span>
-      <span class="pm-info"><span class="pm-name">${pm.name}</span><span class="pm-role">${pm.role||'Préparateur mental'}</span>${pm.blurb?`<span class="pm-blurb">${pm.blurb}</span>`:''}</span>
-      <span class="pm-go">Réserver →</span>
+      <span class="pm-info"><span class="pm-name">${pm.name}</span><span class="pm-role">${pm.role||tr('mental.role')}</span>${pm.blurb?`<span class="pm-blurb">${pm.blurb}</span>`:''}</span>
+      <span class="pm-go">${tr('mental.book')}</span>
     </button>`).join('');
   mentalPicker.querySelectorAll('.pm-card').forEach(c=> c.addEventListener('click', ()=> showPmCalendar(PREPA_MENTALE[+c.dataset.i])));
   mentalPicker.hidden = false;
@@ -8226,17 +8226,17 @@ document.getElementById('lactestSend').addEventListener('click', ()=>{
   const fb = document.getElementById('lactestFallback');
   if(!name || !email){
     fb.style.display='block'; fb.style.color='var(--run)';
-    fb.textContent='Merci de renseigner au moins ton nom et ton email.';
+    fb.textContent=tr('lactest.fillNameEmail');
     return;
   }
-  const subject = encodeURIComponent(`Demande de test lactate — ${name}`);
+  const subject = encodeURIComponent(tr('lactest.subject', {name}));
   const body = encodeURIComponent(
-    `Nom : ${name}\nEmail : ${email}\nType de test : ${type}\nPériode souhaitée : ${period||'—'}\n\nMessage :\n${msg||'—'}`
+    tr('lactest.body', {name, email, type, period:period||'—', msg:msg||'—'})
   );
   // ouvre le client mail pré-rempli. Backend : remplacer par un POST vers votre API.
   window.location.href = `mailto:${LACTEST_EMAIL}?subject=${subject}&body=${body}`;
   fb.style.display='block'; fb.style.color='var(--good)';
-  fb.innerHTML = `Ton client mail s'ouvre… s'il ne s'ouvre pas, écris-nous à <a href="mailto:${LACTEST_EMAIL}">${LACTEST_EMAIL}</a>.`;
+  fb.innerHTML = tr('lactest.mailOpening', {email:LACTEST_EMAIL});
 });
 
 /* ============================================================

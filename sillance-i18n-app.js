@@ -737,6 +737,22 @@
     "gear.notifySoon": `Tes {name} atteignent {km} km (85% de leur durée de vie). Pense à prévoir une nouvelle paire.`,
     "gear.notifyReplace": `Tes {name} ont dépassé leur durée de vie ({max} km). Remplace-les pour éviter les blessures.`,
     "gear.notifyGeneric": `{name} : {km} km atteints`,
+
+    "gear.modelLifespan": `Durée de vie du modèle`, "gear.communityAvgRetire": `retrait moyen communauté`,
+    "gear.orBrowseByBrand": `…ou parcours par marque :`,
+    "gear.noModelFreeEntry": `Aucun modèle — saisis-le librement ci-dessous`,
+    "gear.equipment": `Équipement`,
+
+    "mental.role": `Préparateur mental`,
+    "mental.ericBlurb": `Gestion du stress de course, visualisation, routines pré-compétition.`,
+    "mental.chooseSlotWith": `Choisis ton créneau avec {name} (visio, 45 min).`,
+    "mental.choosePrepThenSlot": `Choisis ton préparateur mental, puis ton créneau.`,
+    "mental.book": `Réserver →`,
+
+    "lactest.fillNameEmail": `Merci de renseigner au moins ton nom et ton email.`,
+    "lactest.subject": `Demande de test lactate — {name}`,
+    "lactest.body": `Nom : {name}\nEmail : {email}\nType de test : {type}\nPériode souhaitée : {period}\n\nMessage :\n{msg}`,
+    "lactest.mailOpening": `Ton client mail s'ouvre… s'il ne s'ouvre pas, écris-nous à <a href="mailto:{email}">{email}</a>.`,
   };
 
   var en = {
@@ -1473,6 +1489,22 @@
     "gear.notifySoon": `Your {name} reach {km} km (85% of their lifespan). Consider planning a new pair.`,
     "gear.notifyReplace": `Your {name} have exceeded their lifespan ({max} km). Replace them to avoid injury.`,
     "gear.notifyGeneric": `{name}: {km} km reached`,
+
+    "gear.modelLifespan": `Model lifespan`, "gear.communityAvgRetire": `average community retirement`,
+    "gear.orBrowseByBrand": `…or browse by brand:`,
+    "gear.noModelFreeEntry": `No model found — enter it freely below`,
+    "gear.equipment": `Gear`,
+
+    "mental.role": `Mental coach`,
+    "mental.ericBlurb": `Race-day stress management, visualization, pre-competition routines.`,
+    "mental.chooseSlotWith": `Choose your slot with {name} (video call, 45 min).`,
+    "mental.choosePrepThenSlot": `Choose your mental coach, then your slot.`,
+    "mental.book": `Book →`,
+
+    "lactest.fillNameEmail": `Please enter at least your name and email.`,
+    "lactest.subject": `Lactate test request — {name}`,
+    "lactest.body": `Name: {name}\nEmail: {email}\nTest type: {type}\nPreferred period: {period}\n\nMessage:\n{msg}`,
+    "lactest.mailOpening": `Your mail client is opening… if it doesn't, write to us at <a href="mailto:{email}">{email}</a>.`,
   };
 
   var es = {
@@ -2209,6 +2241,22 @@
     "gear.notifySoon": `Tus {name} alcanzan {km} km (85% de su vida útil). Piensa en prever un par nuevo.`,
     "gear.notifyReplace": `Tus {name} han superado su vida útil ({max} km). Reemplázalas para evitar lesiones.`,
     "gear.notifyGeneric": `{name}: {km} km alcanzados`,
+
+    "gear.modelLifespan": `Vida útil del modelo`, "gear.communityAvgRetire": `retirada media de la comunidad`,
+    "gear.orBrowseByBrand": `…o explora por marca:`,
+    "gear.noModelFreeEntry": `Ningún modelo — introdúcelo libremente abajo`,
+    "gear.equipment": `Material`,
+
+    "mental.role": `Preparador mental`,
+    "mental.ericBlurb": `Gestión del estrés de carrera, visualización, rutinas precompetición.`,
+    "mental.chooseSlotWith": `Elige tu franja con {name} (videollamada, 45 min).`,
+    "mental.choosePrepThenSlot": `Elige tu preparador mental, luego tu franja.`,
+    "mental.book": `Reservar →`,
+
+    "lactest.fillNameEmail": `Indica al menos tu nombre y tu email.`,
+    "lactest.subject": `Solicitud de test de lactato — {name}`,
+    "lactest.body": `Nombre: {name}\nEmail: {email}\nTipo de test: {type}\nPeríodo deseado: {period}\n\nMensaje:\n{msg}`,
+    "lactest.mailOpening": `Se abre tu cliente de correo… si no se abre, escríbenos a <a href="mailto:{email}">{email}</a>.`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
