@@ -578,7 +578,7 @@ body.grid-on .cal-guides{opacity:1}
 }
 .overlay.open{display:grid}
 .modal{
-  width:min(520px,100%);border-radius:18px;border:1px solid var(--line-strong);
+  width:min(520px,100%);min-width:0;border-radius:18px;border:1px solid var(--line-strong);
   background:linear-gradient(180deg,var(--panel-2),var(--panel));
   padding:26px;position:relative;animation:popIn .25s ease;
 }
@@ -1039,7 +1039,7 @@ body[data-athview="home"] .today-panel{display:block}
   color:var(--text);font-family:var(--font-ui);font-size:13.5px;padding:10px 13px}
 .vl-search input:focus{outline:2px solid var(--swim);outline-offset:1px}
 .vl-filters{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-5)}
-.vl-filter{padding:var(--space-2) 15px;border-radius:99px;border:1px solid var(--line-strong);background:var(--panel);
+.vl-filter{padding:var(--space-2) 15px;min-height:36px;display:inline-flex;align-items:center;border-radius:99px;border:1px solid var(--line-strong);background:var(--panel);
   color:var(--muted);font-weight:600;font-size:var(--fs-md);transition:.18s}
 .vl-filter:hover{border-color:var(--swim);color:var(--text)}
 .vl-filter.active{background:linear-gradient(120deg,rgba(47,217,255,.16),rgba(157,123,255,.16));color:var(--text);border-color:transparent}
@@ -1379,8 +1379,8 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .coach-sub .cs-price{font-family:var(--font-data);font-size:18px;font-weight:700;color:var(--accent)}
 .coach-sub .cs-price small{font-size:var(--fs-sm);color:var(--muted);font-weight:400}
 .coach-sub-btn{width:100%;margin-top:2px}
-.club-tabs{display:flex;gap:6px;padding:5px;background:var(--panel-2);border:1px solid var(--line);border-radius:13px;width:fit-content;margin-bottom:18px}
-.club-tab{border:none;background:transparent;color:var(--muted);font-weight:700;font-size:var(--fs-md);padding:9px var(--space-4);border-radius:9px;transition:.15s}
+.club-tabs{display:flex;gap:6px;padding:5px;background:var(--panel-2);border:1px solid var(--line);border-radius:13px;width:fit-content;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:18px}
+.club-tab{border:none;background:transparent;color:var(--muted);font-weight:700;font-size:var(--fs-md);padding:9px var(--space-4);border-radius:9px;transition:.15s;flex-shrink:0}
 .club-tab:hover{color:var(--text)}
 .club-tab.active{background:linear-gradient(120deg,rgba(157,123,255,.2),rgba(47,217,255,.14));color:var(--text)}
 .club-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:var(--space-4)}
