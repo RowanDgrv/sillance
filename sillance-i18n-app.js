@@ -350,6 +350,53 @@
 
     "session.coachNoteOnSession": `Note de ton coach sur cette séance`, "session.whyThisSession": `Pourquoi cette séance`,
     "session.coachInstructionsPerInterval": `Consignes du coach par intervalle`,
+
+    "mode.notAvailable": `Cette vue n'est pas disponible pour ton compte — contacte le support pour changer de rôle.`,
+    "mode.reservedOther": `Réservé à un autre type de compte — contacte le support pour changer de rôle`,
+    "athPicker.trackedAthlete": `Athlète suivi`,
+
+    "adherence.upToDate": `À jour`, "adherence.toWatch": `À surveiller`, "adherence.fallingBehind": `Décroche`,
+    "adherence.noAthleteYet": `Aucun athlète pour l'instant. Invite un athlète pour suivre son adhérence au plan ici.`,
+    "adherence.subtitle": `Adhérence au plan (séances réalisées vs prévues), forme et disponibilité du jour, pour repérer d'un coup d'œil qui décroche ou qui est blessé.`,
+    "adherence.athlete": `Athlète`, "adherence.form": `Forme`, "adherence.avail": `Dispo`,
+    "adherence.adherence": `Adhérence`, "adherence.nextRace": `Prochaine course`, "adherence.status": `Statut`,
+
+    "invoices.noneYet": `Aucune facture pour l'instant. Dès qu'un athlète paie son suivi, la facture Stripe apparaît ici automatiquement.`,
+    "invoices.myInvoices": `Mes factures`,
+    "invoices.subtitle": `Factures générées automatiquement par Stripe à chaque paiement de tes athlètes — montant encaissé, part Sillance (frais de service et facturation), lien PDF.`,
+    "invoices.date": `Date`, "invoices.offer": `Offre`, "invoices.amount": `Montant`,
+    "invoices.sillanceShare": `Part Sillance`, "invoices.invoice": `Facture`, "common.loading": `Chargement…`,
+    "invoices.unavailable": `Factures indisponibles pour l'instant.`,
+
+    "invite.subtitle": `Entre son e-mail : Sillance lui envoie un lien (par e-mail si possible, sinon tu le partages toi-même par WhatsApp, SMS…). Il crée son compte ou se connecte, et vous êtes reliés automatiquement.`,
+    "invite.send": `Envoyer l'invitation`,
+    "invite.emailSentTo": `Email envoyé à {email}. Garde ce lien de secours au cas où :`,
+    "invite.copyLink": `Copie ce lien et envoie-le toi-même (WhatsApp, SMS…) :`,
+    "invite.copyLinkBtn": `Copier le lien`,
+    "invite.afterJoinNote": `Une fois qu'il aura rejoint, retrouve « Fiche athlète » dans son bandeau pour renseigner VO2max, records, blessures et habitudes.`,
+    "invite.waMessage": `Rejoins-moi sur Sillance pour ton suivi d'entraînement : {url}`,
+
+    "modal.duration": `Durée`, "modal.load": `Charge`, "modal.intensity": `Intensité`,
+    "modal.plannedSession": `Séance planifiée.`, "modal.beforeSession": `Avant la séance`, "modal.during": `Pendant :`,
+    "modal.athleteFeedback": `Feedback athlète`, "modal.cardio": `Cardio`, "modal.muscular": `Musculaire`,
+    "modal.afterSession": `Après la séance · récupération`, "modal.detailedAnalysis": `Analyse détaillée de la séance`,
+    "modal.gotItCoach": `C'est noté, coach`,
+
+    "bilan.athlete": `Athlète`, "bilan.record": `RECORD`, "bilan.noRecord": `Aucun record enregistré`,
+    "bilan.session": `Séance`, "bilan.done": `fait`, "bilan.upcoming": `à venir`,
+    "bilan.noSessionPeriod": `Aucune séance sur la période.`,
+    "bilan.title": `Bilan d'entraînement`, "bilan.goal": `Objectif`, "bilan.training": `Suivi d'entraînement`,
+    "bilan.form": `Forme (TSB)`, "bilan.fitness": `Fitness (CTL)`, "bilan.fatigue": `Fatigue (ATL)`, "bilan.doneWeek": `Réalisé (semaine)`,
+    "bilan.currentWeek": `Semaine en cours : {done}/{tot} séances réalisées · {wtss} TSS planifiés.`,
+    "bilan.notEntered": `Non renseignées`, "bilan.recentSessions": `Séances récentes`, "bilan.gearWear": `Matériel — usure`,
+    "bilan.generatedBy": `Généré par Sillance`,
+    "bilan.thisAthlete": `Cet athlète`, "bilan.yourCoach": `Ton coach Sillance`,
+    "bilan.quotePrompt": `Un mot sur ce cycle avec {name} (optionnel, apparaît sur la fiche) :`,
+    "bilan.progressTitle": `Fiche de progression`, "bilan.coachingBy": `Coaching par {coachName}`,
+    "bilan.loadAbsorbed12w": `de charge d'entraînement absorbée en 12 semaines`,
+    "bilan.recordsImprovedPlural": `Records améliorés`, "bilan.recordsImprovedSingular": `Record amélioré`,
+    "bilan.planAdherence": `Adhérence au plan`, "bilan.currentFitness": `Fitness (CTL) actuelle`,
+    "bilan.recordsBeaten": `Records battus sur la période`,
   };
 
   var en = {
@@ -699,6 +746,53 @@
 
     "session.coachNoteOnSession": `Your coach's note on this session`, "session.whyThisSession": `Why this session`,
     "session.coachInstructionsPerInterval": `Coach instructions per interval`,
+
+    "mode.notAvailable": `This view isn't available for your account — contact support to change your role.`,
+    "mode.reservedOther": `Reserved for another account type — contact support to change your role`,
+    "athPicker.trackedAthlete": `Tracked athlete`,
+
+    "adherence.upToDate": `Up to date`, "adherence.toWatch": `To watch`, "adherence.fallingBehind": `Falling behind`,
+    "adherence.noAthleteYet": `No athletes yet. Invite an athlete to track their plan adherence here.`,
+    "adherence.subtitle": `Plan adherence (sessions done vs planned), today's form and availability, to spot at a glance who's falling behind or injured.`,
+    "adherence.athlete": `Athlete`, "adherence.form": `Form`, "adherence.avail": `Availability`,
+    "adherence.adherence": `Adherence`, "adherence.nextRace": `Next race`, "adherence.status": `Status`,
+
+    "invoices.noneYet": `No invoices yet. As soon as an athlete pays for coaching, the Stripe invoice appears here automatically.`,
+    "invoices.myInvoices": `My invoices`,
+    "invoices.subtitle": `Invoices generated automatically by Stripe on each athlete payment — amount collected, Sillance's share (service and billing fees), PDF link.`,
+    "invoices.date": `Date`, "invoices.offer": `Offer`, "invoices.amount": `Amount`,
+    "invoices.sillanceShare": `Sillance's share`, "invoices.invoice": `Invoice`, "common.loading": `Loading…`,
+    "invoices.unavailable": `Invoices unavailable for now.`,
+
+    "invite.subtitle": `Enter their email: Sillance sends them a link (by email if possible, otherwise you share it yourself via WhatsApp, SMS…). They create their account or sign in, and you're linked automatically.`,
+    "invite.send": `Send invitation`,
+    "invite.emailSentTo": `Email sent to {email}. Keep this backup link just in case:`,
+    "invite.copyLink": `Copy this link and send it yourself (WhatsApp, SMS…):`,
+    "invite.copyLinkBtn": `Copy link`,
+    "invite.afterJoinNote": `Once they join, find "Athlete profile" in their band to fill in VO2max, records, injuries and habits.`,
+    "invite.waMessage": `Join me on Sillance for your training tracking: {url}`,
+
+    "modal.duration": `Duration`, "modal.load": `Load`, "modal.intensity": `Intensity`,
+    "modal.plannedSession": `Planned session.`, "modal.beforeSession": `Before the session`, "modal.during": `During:`,
+    "modal.athleteFeedback": `Athlete feedback`, "modal.cardio": `Cardio`, "modal.muscular": `Muscular`,
+    "modal.afterSession": `After the session · recovery`, "modal.detailedAnalysis": `Detailed session analysis`,
+    "modal.gotItCoach": `Got it, coach`,
+
+    "bilan.athlete": `Athlete`, "bilan.record": `RECORD`, "bilan.noRecord": `No recorded PR`,
+    "bilan.session": `Session`, "bilan.done": `done`, "bilan.upcoming": `upcoming`,
+    "bilan.noSessionPeriod": `No sessions over this period.`,
+    "bilan.title": `Training summary`, "bilan.goal": `Goal`, "bilan.training": `Training tracking`,
+    "bilan.form": `Form (TSB)`, "bilan.fitness": `Fitness (CTL)`, "bilan.fatigue": `Fatigue (ATL)`, "bilan.doneWeek": `Done (week)`,
+    "bilan.currentWeek": `Current week: {done}/{tot} sessions done · {wtss} TSS planned.`,
+    "bilan.notEntered": `Not entered`, "bilan.recentSessions": `Recent sessions`, "bilan.gearWear": `Gear — wear`,
+    "bilan.generatedBy": `Generated by Sillance`,
+    "bilan.thisAthlete": `This athlete`, "bilan.yourCoach": `Your Sillance coach`,
+    "bilan.quotePrompt": `A word on this cycle with {name} (optional, appears on the sheet):`,
+    "bilan.progressTitle": `Progress report`, "bilan.coachingBy": `Coaching by {coachName}`,
+    "bilan.loadAbsorbed12w": `of training load absorbed over 12 weeks`,
+    "bilan.recordsImprovedPlural": `Records improved`, "bilan.recordsImprovedSingular": `Record improved`,
+    "bilan.planAdherence": `Plan adherence`, "bilan.currentFitness": `Current fitness (CTL)`,
+    "bilan.recordsBeaten": `Records beaten over the period`,
   };
 
   var es = {
@@ -1048,6 +1142,53 @@
 
     "session.coachNoteOnSession": `Nota de tu coach sobre esta sesión`, "session.whyThisSession": `Por qué esta sesión`,
     "session.coachInstructionsPerInterval": `Indicaciones del coach por intervalo`,
+
+    "mode.notAvailable": `Esta vista no está disponible para tu cuenta — contacta con soporte para cambiar de rol.`,
+    "mode.reservedOther": `Reservado para otro tipo de cuenta — contacta con soporte para cambiar de rol`,
+    "athPicker.trackedAthlete": `Atleta seguido`,
+
+    "adherence.upToDate": `Al día`, "adherence.toWatch": `A vigilar`, "adherence.fallingBehind": `Se descuelga`,
+    "adherence.noAthleteYet": `Ningún atleta por ahora. Invita a un atleta para seguir aquí su cumplimiento del plan.`,
+    "adherence.subtitle": `Cumplimiento del plan (sesiones realizadas vs previstas), forma y disponibilidad del día, para detectar de un vistazo quién se descuelga o está lesionado.`,
+    "adherence.athlete": `Atleta`, "adherence.form": `Forma`, "adherence.avail": `Disponibilidad`,
+    "adherence.adherence": `Cumplimiento`, "adherence.nextRace": `Próxima carrera`, "adherence.status": `Estado`,
+
+    "invoices.noneYet": `Ninguna factura por ahora. En cuanto un atleta pague su seguimiento, la factura Stripe aparecerá aquí automáticamente.`,
+    "invoices.myInvoices": `Mis facturas`,
+    "invoices.subtitle": `Facturas generadas automáticamente por Stripe en cada pago de tus atletas — importe cobrado, parte de Sillance (gastos de servicio y facturación), enlace PDF.`,
+    "invoices.date": `Fecha`, "invoices.offer": `Oferta`, "invoices.amount": `Importe`,
+    "invoices.sillanceShare": `Parte de Sillance`, "invoices.invoice": `Factura`, "common.loading": `Cargando…`,
+    "invoices.unavailable": `Facturas no disponibles por ahora.`,
+
+    "invite.subtitle": `Introduce su email: Sillance le envía un enlace (por email si es posible, o si no lo compartes tú mismo por WhatsApp, SMS…). Crea su cuenta o inicia sesión, y quedáis vinculados automáticamente.`,
+    "invite.send": `Enviar la invitación`,
+    "invite.emailSentTo": `Email enviado a {email}. Guarda este enlace de repuesto por si acaso:`,
+    "invite.copyLink": `Copia este enlace y envíaselo tú mismo (WhatsApp, SMS…):`,
+    "invite.copyLinkBtn": `Copiar el enlace`,
+    "invite.afterJoinNote": `Una vez que se una, encuentra «Ficha del atleta» en su banda para indicar VO2max, récords, lesiones y hábitos.`,
+    "invite.waMessage": `Únete a mí en Sillance para tu seguimiento de entrenamiento: {url}`,
+
+    "modal.duration": `Duración`, "modal.load": `Carga`, "modal.intensity": `Intensidad`,
+    "modal.plannedSession": `Sesión planificada.`, "modal.beforeSession": `Antes de la sesión`, "modal.during": `Durante:`,
+    "modal.athleteFeedback": `Feedback del atleta`, "modal.cardio": `Cardio`, "modal.muscular": `Muscular`,
+    "modal.afterSession": `Después de la sesión · recuperación`, "modal.detailedAnalysis": `Análisis detallado de la sesión`,
+    "modal.gotItCoach": `Entendido, coach`,
+
+    "bilan.athlete": `Atleta`, "bilan.record": `RÉCORD`, "bilan.noRecord": `Ningún récord registrado`,
+    "bilan.session": `Sesión`, "bilan.done": `hecho`, "bilan.upcoming": `próximo`,
+    "bilan.noSessionPeriod": `Ninguna sesión en el período.`,
+    "bilan.title": `Balance de entrenamiento`, "bilan.goal": `Objetivo`, "bilan.training": `Seguimiento de entrenamiento`,
+    "bilan.form": `Forma (TSB)`, "bilan.fitness": `Fitness (CTL)`, "bilan.fatigue": `Fatiga (ATL)`, "bilan.doneWeek": `Realizado (semana)`,
+    "bilan.currentWeek": `Semana en curso: {done}/{tot} sesiones realizadas · {wtss} TSS planificados.`,
+    "bilan.notEntered": `No indicadas`, "bilan.recentSessions": `Sesiones recientes`, "bilan.gearWear": `Material — desgaste`,
+    "bilan.generatedBy": `Generado por Sillance`,
+    "bilan.thisAthlete": `Este atleta`, "bilan.yourCoach": `Tu coach Sillance`,
+    "bilan.quotePrompt": `Una palabra sobre este ciclo con {name} (opcional, aparece en la ficha):`,
+    "bilan.progressTitle": `Ficha de progresión`, "bilan.coachingBy": `Coaching por {coachName}`,
+    "bilan.loadAbsorbed12w": `de carga de entrenamiento absorbida en 12 semanas`,
+    "bilan.recordsImprovedPlural": `Récords mejorados`, "bilan.recordsImprovedSingular": `Récord mejorado`,
+    "bilan.planAdherence": `Cumplimiento del plan`, "bilan.currentFitness": `Fitness (CTL) actual`,
+    "bilan.recordsBeaten": `Récords batidos en el período`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

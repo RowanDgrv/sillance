@@ -2819,32 +2819,32 @@ function openModal(s){
   const D = DISC[s.disc];
   modal.style.setProperty('--c', D.color);
   modal.innerHTML = `
-    <button class="close" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <button class="close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <span class="badge">${discIcon(D)} ${D.label}</span>
     <h3>${s.title}</h3>
     <div class="grid">
-      <div class="cell"><div class="k">Durée</div><div class="v">${s.dur}'</div></div>
-      <div class="cell"><div class="k">Charge</div><div class="v">${s.tss} TSS</div></div>
-      <div class="cell"><div class="k">Intensité</div><div class="v">${s.zone}</div></div>
+      <div class="cell"><div class="k">${tr('modal.duration')}</div><div class="v">${s.dur}'</div></div>
+      <div class="cell"><div class="k">${tr('modal.load')}</div><div class="v">${s.tss} TSS</div></div>
+      <div class="cell"><div class="k">${tr('modal.intensity')}</div><div class="v">${s.zone}</div></div>
     </div>
-    <p class="desc">${s.desc||'Séance planifiée.'}</p>
+    <p class="desc">${s.desc||tr('modal.plannedSession')}</p>
     ${sessionCoachNoteHTML(s)}
     ${sessionWhyHTML(s)}
     ${sessionNotesHTML(s)}
     ${(()=>{ const n=nutritionForSession(s); return `
       <div class="nutri-block nutri-pre">
-        <div class="nutri-head"><i class="ic ic-utensils"></i> Avant la séance</div>
+        <div class="nutri-head"><i class="ic ic-utensils"></i> ${tr('modal.beforeSession')}</div>
         <div class="nutri-txt">${n.pre}</div>
-        ${n.during?`<div class="nutri-during">⏱ Pendant : ${n.during}</div>`:''}
+        ${n.during?`<div class="nutri-during">⏱ ${tr('modal.during')} ${n.during}</div>`:''}
       </div>`; })()}
-    ${s.done&&s.rpe?`<div class="fb-block"><div class="k">Feedback athlète</div>Cardio <b style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}/10</b>${s.rpeMuscle?` · Musculaire <b style="color:${rpeColor(s.rpeMuscle)}">${s.rpeMuscle}/10</b>`:''}${s.note?` — «&nbsp;${s.note}&nbsp;»`:''}</div>`:''}
+    ${s.done&&s.rpe?`<div class="fb-block"><div class="k">${tr('modal.athleteFeedback')}</div>${tr('modal.cardio')} <b style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}/10</b>${s.rpeMuscle?` · ${tr('modal.muscular')} <b style="color:${rpeColor(s.rpeMuscle)}">${s.rpeMuscle}/10</b>`:''}${s.note?` — «&nbsp;${s.note}&nbsp;»`:''}</div>`:''}
     ${(()=>{ const n=nutritionForSession(s); return `
       <div class="nutri-block nutri-post">
-        <div class="nutri-head"><i class="ic ic-utensils"></i> Après la séance · récupération</div>
+        <div class="nutri-head"><i class="ic ic-utensils"></i> ${tr('modal.afterSession')}</div>
         <div class="nutri-txt">${n.post}</div>
       </div>`; })()}
-    ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> Analyse détaillée de la séance</button>`:''}
-    <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?'Fermer':"C'est noté, coach"}</button>`;
+    ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> ${tr('modal.detailedAnalysis')}</button>`:''}
+    <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?tr('common.close'):tr('modal.gotItCoach')}</button>`;
   overlay.classList.add('open');
   modal.querySelector('.close').onclick = closeModal;
   modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis') btn.onclick = closeModal; });
@@ -2869,7 +2869,7 @@ function realRoleMode(){
 function guardModeSwitch(target){
   const real = realRoleMode();
   if(real && real!==target){
-    toast("Cette vue n'est pas disponible pour ton compte — contacte le support pour changer de rôle.");
+    toast(tr('mode.notAvailable'));
     return false;
   }
   return true;
@@ -2879,7 +2879,7 @@ window.__pf_lockModes = function(realMode){
   Object.entries(map).forEach(([k,btn])=>{
     const locked = k!==realMode;
     btn.classList.toggle('mode-locked', locked);
-    btn.title = locked ? "Réservé à un autre type de compte — contacte le support pour changer de rôle" : '';
+    btn.title = locked ? tr('mode.reservedOther') : '';
   });
   const target = map[realMode];
   if(target && !target.classList.contains('active')) target.click();
@@ -2915,7 +2915,7 @@ function mulberry(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let
 
 function apRowHtml(a, i){
   const forme = athForme(a), fc = athFormeColor(forme);
-  const sub = a.race ? `${a.race.name} · J–${a.race.days}` : 'Athlète suivi';
+  const sub = a.race ? `${a.race.name} · J–${a.race.days}` : tr('athPicker.trackedAthlete');
   const dk = athDispo(a);
   const dchip = dk && dk!=='ok' ? `<span class="ap-dispo" style="--fc:${DISPO_META[dk].c}"><i class="ic ${DISPO_META[dk].ic}"></i>${DISPO_META[dk].l}</span>` : '';
   return `<button class="ap-row ${i===selectedAthleteIdx?'sel':''}" data-idx="${i}" role="option" aria-selected="${i===selectedAthleteIdx}">
@@ -2932,7 +2932,7 @@ function openAdherence(){
     const forme=athForme(a);
     const comp = (a.comp!=null ? Math.round(a.comp*100) : null);
     const cc = comp==null?'var(--muted)': comp>=85?'var(--good)': comp>=60?'var(--bike)':'var(--run)';
-    const status = comp==null?'—': comp>=85?'À jour': comp>=60?'À surveiller':'Décroche';
+    const status = comp==null?'—': comp>=85?tr('adherence.upToDate'): comp>=60?tr('adherence.toWatch'):tr('adherence.fallingBehind');
     const race = a.race ? `${a.race.name} · J–${a.race.days}` : '—';
     const dk = athDispo(a); const dm = dk ? DISPO_META[dk] : null;
     const dcell = dm ? `<span class="adh-pill" style="color:${dm.c};border-color:${dm.c}" ${a.checkin.dispoNote?`title="${dispoSafe(a.checkin.dispoNote)}"`:''}>${dm.l}</span>${dk!=='ok'&&a.checkin.dispoNote?`<div style="font-size:10px;color:var(--muted);margin-top:3px;max-width:150px">${dispoSafe(a.checkin.dispoNote)}</div>`:''}` : '—';
@@ -2944,14 +2944,14 @@ function openAdherence(){
       <td>${race}</td>
       <td><span class="adh-pill" style="color:${cc};border-color:${cc}">${status}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Aucun athlète pour l'instant. Invite un athlète pour suivre son adhérence au plan ici.</td></tr>`;
+  }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('adherence.noAthleteYet')}</td></tr>`;
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=`<div class="adh-modal" role="dialog" aria-label="Suivi de mes athlètes">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Suivi de mes athlètes</h3>
-    <p class="adh-sub">Adhérence au plan (séances réalisées vs prévues), forme et disponibilité du jour, pour repérer d'un coup d'œil qui décroche ou qui est blessé.</p>
+  el.innerHTML=`<div class="adh-modal" role="dialog" aria-label="${tr('sidebar.myAthletesTracking')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('sidebar.myAthletesTracking')}</h3>
+    <p class="adh-sub">${tr('adherence.subtitle')}</p>
     <div class="adh-scroll"><table class="adh-tbl">
-      <thead><tr><th>Athlète</th><th>Forme</th><th>Dispo</th><th>Adhérence</th><th>Prochaine course</th><th>Statut</th></tr></thead>
+      <thead><tr><th>${tr('adherence.athlete')}</th><th>${tr('adherence.form')}</th><th>${tr('adherence.avail')}</th><th>${tr('adherence.adherence')}</th><th>${tr('adherence.nextRace')}</th><th>${tr('adherence.status')}</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
   </div>`;
@@ -2973,18 +2973,18 @@ function openCoachInvoices(){
       <td>${inv.amount_paid.toFixed(2)} €</td>
       <td style="color:var(--muted)">${inv.fee_amount!=null ? inv.fee_amount.toFixed(2)+' €' : '~'+(inv.amount_paid*inv.fee_percent/100).toFixed(2)+' €'} <small>(${inv.fee_percent}%)</small></td>
       <td>${inv.invoice_pdf ? `<a href="${inv.invoice_pdf}" target="_blank" rel="noopener">PDF</a>` : '—'}</td>
-    </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Aucune facture pour l'instant. Dès qu'un athlète paie son suivi, la facture Stripe apparaît ici automatiquement.</td></tr>`;
-  const shell=(rowsHtml)=>`<div class="adh-modal" role="dialog" aria-label="Mes factures">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Mes factures</h3>
-    <p class="adh-sub">Factures générées automatiquement par Stripe à chaque paiement de tes athlètes — montant encaissé, part Sillance (frais de service et facturation), lien PDF.</p>
+    </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('invoices.noneYet')}</td></tr>`;
+  const shell=(rowsHtml)=>`<div class="adh-modal" role="dialog" aria-label="${tr('invoices.myInvoices')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('invoices.myInvoices')}</h3>
+    <p class="adh-sub">${tr('invoices.subtitle')}</p>
     <div class="adh-scroll"><table class="adh-tbl">
-      <thead><tr><th>Date</th><th>Athlète</th><th>Offre</th><th>Montant</th><th>Part Sillance</th><th>Facture</th></tr></thead>
+      <thead><tr><th>${tr('invoices.date')}</th><th>${tr('adherence.athlete')}</th><th>${tr('invoices.offer')}</th><th>${tr('invoices.amount')}</th><th>${tr('invoices.sillanceShare')}</th><th>${tr('invoices.invoice')}</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table></div>
   </div>`;
   const el=document.createElement('div'); el.className='adh-overlay';
-  el.innerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Chargement…</td></tr>`);
+  el.innerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('common.loading')}</td></tr>`);
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('open'));
   const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
@@ -2998,7 +2998,7 @@ function openCoachInvoices(){
     PF.getCoachInvoices().then(({invoices})=>{
       el.querySelector('.adh-modal').outerHTML=shell(renderRows(invoices||[]));
       wire();
-    }).catch(e=>{ console.warn('[PF] coach-invoices:',e); el.querySelector('.adh-modal').outerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Factures indisponibles pour l'instant.</td></tr>`); wire(); });
+    }).catch(e=>{ console.warn('[PF] coach-invoices:',e); el.querySelector('.adh-modal').outerHTML=shell(`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">${tr('invoices.unavailable')}</td></tr>`); wire(); });
   } else {
     const demo=[0,1,2].map(i=>({
       created:new Date(Date.now()-i*30*86400000).toISOString(),
@@ -3017,13 +3017,13 @@ function openCoachInvoices(){
    Backend déjà en place (invite-athlete + accept-invite, token dans l'URL
    ?invite=...) — ceci est l'UI qui le déclenche, elle manquait totalement. */
 function openInviteAthlete(){
-  const formHTML=()=>`<div class="adh-modal" role="dialog" aria-label="Inviter un athlète">
-    <button class="adh-close" aria-label="Fermer"><i class="ic ic-x"></i></button>
-    <h3>Inviter un athlète</h3>
-    <p class="adh-sub">Entre son e-mail : Sillance lui envoie un lien (par e-mail si possible, sinon tu le partages toi-même par WhatsApp, SMS…). Il crée son compte ou se connecte, et vous êtes reliés automatiquement.</p>
+  const formHTML=()=>`<div class="adh-modal" role="dialog" aria-label="${tr('sidebar.inviteAthlete')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('sidebar.inviteAthlete')}</h3>
+    <p class="adh-sub">${tr('invite.subtitle')}</p>
     <div class="invite-linkrow">
       <input type="email" id="invAthEmail" placeholder="email@athlete.fr" autocomplete="email">
-      <button class="cc-btn" id="invAthSend">Envoyer l'invitation</button>
+      <button class="cc-btn" id="invAthSend">${tr('invite.send')}</button>
     </div>
     <div id="invAthResult"></div>
   </div>`;
@@ -3040,22 +3040,22 @@ function openInviteAthlete(){
   wireClose();
   const showResult=(inviteUrl, emailed, email)=>{
     const msg = emailed
-      ? `<div class="cc-s" style="color:#39e6a3;margin-bottom:8px"><i class="ic ic-check"></i> Email envoyé à ${email}. Garde ce lien de secours au cas où :</div>`
-      : `<div class="cc-s" style="margin-bottom:8px">Copie ce lien et envoie-le toi-même (WhatsApp, SMS…) :</div>`;
+      ? `<div class="cc-s" style="color:#39e6a3;margin-bottom:8px"><i class="ic ic-check"></i> ${tr('invite.emailSentTo', {email})}</div>`
+      : `<div class="cc-s" style="margin-bottom:8px">${tr('invite.copyLink')}</div>`;
     document.getElementById('invAthResult').innerHTML = `${msg}
       <div class="invite-linkrow"><input type="text" id="invAthLink" readonly value="${inviteUrl}"></div>
       <div class="invite-share">
-        <button class="invite-copy cc-btn" id="invAthCopy">Copier le lien</button>
+        <button class="invite-copy cc-btn" id="invAthCopy">${tr('invite.copyLinkBtn')}</button>
         <button class="invite-wa" id="invAthWa">WhatsApp</button>
       </div>
-      <p class="cr-note" style="margin-top:10px">Une fois qu'il aura rejoint, retrouve « Fiche athlète » dans son bandeau pour renseigner VO2max, records, blessures et habitudes.</p>`;
+      <p class="cr-note" style="margin-top:10px">${tr('invite.afterJoinNote')}</p>`;
     document.getElementById('invAthCopy').onclick=()=>{
       const inp=document.getElementById('invAthLink'); inp.select();
       try{ navigator.clipboard.writeText(inp.value); }catch(e){ document.execCommand && document.execCommand('copy'); }
       toast(tr('toast.lienCopie'));
     };
     document.getElementById('invAthWa').onclick=()=>{
-      const msgWa=`Rejoins-moi sur Sillance pour ton suivi d'entraînement : ${inviteUrl}`;
+      const msgWa=tr('invite.waMessage', {url:inviteUrl});
       window.open(`https://wa.me/?text=${encodeURIComponent(msgWa)}`, '_blank');
     };
   };
@@ -3153,7 +3153,7 @@ function applyDemoAthlete(i){
    récentes et matériel dans un document A4 clair et brandé. */
 function exportBilan(name){
   try{
-    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'Athlète');
+    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:tr('bilan.athlete'));
     const ref = (typeof ATHLETE_REF!=='undefined')?ATHLETE_REF:{};
     const recs = (typeof RECORDS!=='undefined')?RECORDS:[];
     let gear=[]; try{ gear=(GEAR||[]).filter(g=>g.type==='shoe'); }catch(e){}
@@ -3167,17 +3167,18 @@ function exportBilan(name){
     const comp = tot?Math.round(done/tot*100):null;
     recent = recent.slice(-10);
     let race=null; try{ race=UPCOMING_RACES&&UPCOMING_RACES[0]; }catch(e){}
-    const REFL={ftp:['FTP','W'],pma:['PMA','W'],cpBike:['CP vélo','W'],vma:['VMA','km/h'],cv:['VC','km/h'],seuilRun:['Seuil','s/km'],css:['CSS','s/100m'],fcMax:['FC max','bpm'],fcRepos:['FC repos','bpm']};
+    const REFL={ftp:['FTP','W'],pma:[tr('refs.map'),'W'],cpBike:[tr('refs.bikeCp'),'W'],vma:[tr('refs.vVo2max'),'km/h'],cv:['CV','km/h'],seuilRun:[tr('refs.threshold'),'s/km'],css:['CSS','s/100m'],fcMax:[tr('refs.maxHr'),'bpm'],fcRepos:[tr('refs.restHr'),'bpm']};
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const dfmt=d=>{ try{ return new Date(d).toLocaleDateString(localeStr(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } };
     const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const tsbCls = tsb==null?'':tsb>=5?'good':tsb>-15?'warn':'bad';
     const compCls = comp==null?'':comp>=85?'good':comp>=60?'warn':'bad';
     const refRows = Object.keys(REFL).filter(k=>ref[k]!=null&&ref[k]!=='').map(k=>`<div class="row"><span class="l">${REFL[k][0]}</span><span class="v">${esc(ref[k])} <em>${REFL[k][1]}</em></span></div>`).join('');
-    const recRows = recs.length?recs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v">${esc(r.v)}${r.isNew?' <span class="tag" style="background:#e6f7ef;color:#0a9b6a">RECORD</span>':''}</span></div>`).join(''):'<div class="row"><span class="l">Aucun record enregistré</span></div>';
-    const sessRows = recent.length?recent.map(({date,s})=>`<tr><td>${dfmt(date)}</td><td>${esc(s.title||s.disc||'Séance')}</td><td>${s.tss?esc(s.tss)+' TSS':'—'}</td><td>${s.done?(s.rpe?'RPE '+esc(s.rpe):'<i class="ic ic-check"></i> fait'):'à venir'}</td></tr>`).join(''):'<tr><td colspan="4">Aucune séance sur la période.</td></tr>';
+    const recRows = recs.length?recs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v">${esc(r.v)}${r.isNew?` <span class="tag" style="background:#e6f7ef;color:#0a9b6a">${tr('bilan.record')}</span>`:''}</span></div>`).join(''):`<div class="row"><span class="l">${tr('bilan.noRecord')}</span></div>`;
+    const sessRows = recent.length?recent.map(({date,s})=>`<tr><td>${dfmt(date)}</td><td>${esc(s.title||s.disc||tr('bilan.session'))}</td><td>${s.tss?esc(s.tss)+' TSS':'—'}</td><td>${s.done?(s.rpe?'RPE '+esc(s.rpe):`<i class="ic ic-check"></i> ${tr('bilan.done')}`):tr('bilan.upcoming')}</td></tr>`).join(''):`<tr><td colspan="4">${tr('bilan.noSessionPeriod')}</td></tr>`;
     const gearRows = gear.length?gear.map(g=>{const p=g.max?Math.round(g.km/g.max*100):0;const c=p>=100?'bad':p>=85?'warn':'good';return `<div class="row"><span class="l">${esc(g.name)}</span><span class="v ${c}">${esc(g.km)} / ${esc(g.max||'?')} km · ${p}%</span></div>`;}).join(''):'';
-    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bilan — ${esc(name)}</title><style>
+    const lg=(window.SilI18n?SilI18n.getLang():'fr');
+    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.title')} — ${esc(name)}</title><style>
 @page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
 .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
@@ -3195,24 +3196,24 @@ table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{text-align:left
 .foot{margin-top:20px;border-top:1px solid #d8dfec;padding-top:9px;font-size:10px;color:#8593ad;display:flex;justify-content:space-between}
 .note{font-size:10px;color:#8593ad;margin-top:3px}
 </style></head><body>
-<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">Bilan d'entraînement<br>${today}</div></div>
+<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">${tr('bilan.title')}<br>${today}</div></div>
 <h1>${esc(name)}</h1>
-<div class="sub">${race?('Objectif : '+esc(race.name)+' · J–'+esc(race.inDays!=null?race.inDays:race.days)):'Suivi d\'entraînement'}</div>
+<div class="sub">${race?(tr('bilan.goal')+' : '+esc(race.name)+' · J–'+esc(race.inDays!=null?race.inDays:race.days)):tr('bilan.training')}</div>
 <div class="kpis">
-  <div class="kpi"><div class="v ${tsbCls}">${tsb==null?'—':(tsb>0?'+':'')+tsb}</div><div class="k">Forme (TSB)</div></div>
-  <div class="kpi"><div class="v">${ctl==null?'—':ctl}</div><div class="k">Fitness (CTL)</div></div>
-  <div class="kpi"><div class="v">${atl==null?'—':atl}</div><div class="k">Fatigue (ATL)</div></div>
-  <div class="kpi"><div class="v ${compCls}">${comp==null?'—':comp+'%'}</div><div class="k">Réalisé (semaine)</div></div>
+  <div class="kpi"><div class="v ${tsbCls}">${tsb==null?'—':(tsb>0?'+':'')+tsb}</div><div class="k">${tr('bilan.form')}</div></div>
+  <div class="kpi"><div class="v">${ctl==null?'—':ctl}</div><div class="k">${tr('bilan.fitness')}</div></div>
+  <div class="kpi"><div class="v">${atl==null?'—':atl}</div><div class="k">${tr('bilan.fatigue')}</div></div>
+  <div class="kpi"><div class="v ${compCls}">${comp==null?'—':comp+'%'}</div><div class="k">${tr('bilan.doneWeek')}</div></div>
 </div>
-<div class="note">Semaine en cours : ${done}/${tot} séance${tot>1?'s':''} réalisée${done>1?'s':''} · ${wtss} TSS planifiés.</div>
+<div class="note">${tr('bilan.currentWeek', {done, tot, wtss})}</div>
 <div class="cols">
-  <div><h2>Records personnels</h2>${recRows}</div>
-  <div><h2>Références physio</h2><div>${refRows||'<div class="row"><span class="l">Non renseignées</span></div>'}</div></div>
+  <div><h2>${tr('records.title')}</h2>${recRows}</div>
+  <div><h2>${tr('refs.title')}</h2><div>${refRows||`<div class="row"><span class="l">${tr('bilan.notEntered')}</span></div>`}</div></div>
 </div>
-<h2>Séances récentes</h2>
-<table><thead><tr><th>Date</th><th>Séance</th><th>Charge</th><th>Statut</th></tr></thead><tbody>${sessRows}</tbody></table>
-${gearRows?('<h2>Matériel — usure</h2>'+gearRows):''}
-<div class="foot"><span>Généré par Sillance — ${today}</span><span>sillance.app</span></div>
+<h2>${tr('bilan.recentSessions')}</h2>
+<table><thead><tr><th>${tr('invoices.date')}</th><th>${tr('bilan.session')}</th><th>${tr('modal.load')}</th><th>${tr('adherence.status')}</th></tr></thead><tbody>${sessRows}</tbody></table>
+${gearRows?(`<h2>${tr('bilan.gearWear')}</h2>`+gearRows):''}
+<div class="foot"><span>${tr('bilan.generatedBy')} — ${today}</span><span>sillance.app</span></div>
 </body></html>`;
     const w=window.open('','_blank');
     if(!w){ if(typeof toast==='function') toast(tr('toast.autorisePopUpsPourExporter')); return; }
@@ -3230,8 +3231,8 @@ ${gearRows?('<h2>Matériel — usure</h2>'+gearRows):''}
    adhérence, + une citation courte que le coach écrit lui-même. */
 function exportCaseStudy(name){
   try{
-    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:'Cet athlète');
-    const coachName = (window.PF?.profile?.full_name) || 'Ton coach Sillance';
+    name = name || (typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:tr('bilan.thisAthlete'));
+    const coachName = (window.PF?.profile?.full_name) || tr('bilan.yourCoach');
     const recs = (typeof RECORDS!=='undefined')?RECORDS:[];
     const newRecs = recs.filter(r=>r.isNew);
     const weeks = (typeof buildLoadWeeks==='function') ? buildLoadWeeks() : [];
@@ -3241,11 +3242,12 @@ function exportCaseStudy(name){
     let done=0, tot=0;
     for(let i=0;i<84;i++){ const d=iso(addDays(new Date(),-i)); (planning[d]||[]).forEach(s=>{ tot++; if(s.done) done++; }); }
     const adherence = tot ? Math.round(done/tot*100) : null;
-    const quote = (prompt("Un mot sur ce cycle avec "+name+" (optionnel, apparaît sur la fiche) :", "") || '').trim();
+    const quote = (prompt(tr('bilan.quotePrompt', {name}), "") || '').trim();
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const recRows = newRecs.length ? newRecs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v acc">${esc(r.v)}</span></div>`).join('') : '';
-    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Progression — ${esc(name)}</title><style>
+    const lg=(window.SilI18n?SilI18n.getLang():'fr');
+    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.progressTitle')} — ${esc(name)}</title><style>
 @page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
 .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
@@ -3263,18 +3265,18 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#0B1120;bo
 .quote{font-size:14px;font-style:italic;color:#0B1120;border-left:3px solid #0F9FBF;padding:4px 0 4px 14px;margin-top:16px}
 .foot{margin-top:22px;border-top:1px solid #d8dfec;padding-top:9px;font-size:10px;color:#8593ad;display:flex;justify-content:space-between}
 </style></head><body>
-<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">Fiche de progression<br>${today}</div></div>
-<div class="kicker">Coaching par ${esc(coachName)}</div>
+<div class="hd"><span class="wm">SILL<b>ANCE</b></span><div class="r">${tr('bilan.progressTitle')}<br>${today}</div></div>
+<div class="kicker">${tr('bilan.coachingBy', {coachName:esc(coachName)})}</div>
 <h1>${esc(name)}</h1>
-${ctlDeltaPct!=null ? `<div class="hero"><div class="v">${ctlDeltaPct>0?'+':''}${ctlDeltaPct}%</div><div class="k">de charge d'entraînement absorbée en 12 semaines</div></div>` : ''}
+${ctlDeltaPct!=null ? `<div class="hero"><div class="v">${ctlDeltaPct>0?'+':''}${ctlDeltaPct}%</div><div class="k">${tr('bilan.loadAbsorbed12w')}</div></div>` : ''}
 <div class="kpis">
-  <div class="kpi"><div class="v acc">${newRecs.length}</div><div class="k">Record${newRecs.length>1?'s':''} amélioré${newRecs.length>1?'s':''}</div></div>
-  <div class="kpi"><div class="v">${adherence==null?'—':adherence+'%'}</div><div class="k">Adhérence au plan</div></div>
-  <div class="kpi"><div class="v">${now?now.ctl:'—'}</div><div class="k">Fitness (CTL) actuelle</div></div>
+  <div class="kpi"><div class="v acc">${newRecs.length}</div><div class="k">${tr(newRecs.length>1?'bilan.recordsImprovedPlural':'bilan.recordsImprovedSingular', {n:newRecs.length})}</div></div>
+  <div class="kpi"><div class="v">${adherence==null?'—':adherence+'%'}</div><div class="k">${tr('bilan.planAdherence')}</div></div>
+  <div class="kpi"><div class="v">${now?now.ctl:'—'}</div><div class="k">${tr('bilan.currentFitness')}</div></div>
 </div>
-${recRows?(`<h2>Records battus sur la période</h2>${recRows}`):''}
+${recRows?(`<h2>${tr('bilan.recordsBeaten')}</h2>${recRows}`):''}
 ${quote?(`<div class="quote">« ${esc(quote)} »<br><span style="font-style:normal;font-size:11px;color:#5a6a86">— ${esc(coachName)}</span></div>`):''}
-<div class="foot"><span>Généré par Sillance — ${today}</span><span>sillance.app</span></div>
+<div class="foot"><span>${tr('bilan.generatedBy')} — ${today}</span><span>sillance.app</span></div>
 </body></html>`;
     const w=window.open('','_blank');
     if(!w){ if(typeof toast==='function') toast(tr('toast.autorisePopUpsPourExporter2')); return; }
