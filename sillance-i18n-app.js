@@ -547,6 +547,22 @@
     "crd.groupReserved": `Groupe (contenu réservé)`, "crd.price": `Tarif (€)`, "crd.sessionContent": `Contenu de la séance`,
     "crd.saveSettings": `Enregistrer les paramètres`,
     "crd.groupSlot": `Créneau collectif`, "crd.tbd": `À définir`, "crd.coach": `Coach`,
+
+    "chat.q.restToday": `Repose-toi aujourd'hui`, "chat.q.lightenToday": `Allège la séance du jour`,
+    "chat.q.wellDone": `Bravo pour la séance !`, "chat.q.shiftTomorrow": `On décale à demain ?`, "chat.q.hydrate": `Hydrate-toi bien`,
+    "chat.q.recoveredWell": `Bien récupéré`, "chat.q.tiredLegs": `Jambes fatiguées aujourd'hui`,
+    "chat.q.sessionDone": `Séance validée`, "chat.q.questionAboutSession": `Une question sur la séance ?`,
+    "chat.macrosPrompt": `Tes réponses rapides (une par ligne) :`, "chat.today": `Aujourd'hui`,
+    "chat.customizeQuickReplies": `Personnaliser tes réponses rapides`, "chat.manage": `Gérer`,
+    "chat.autoReply": `Bien reçu, merci coach !`,
+    "chat.waDraft": `Salut ! Vu ton check-in de ce matin : je te conseille du repos aujourd'hui. On en parle ?`,
+
+    "zonesTbl.zone": `Zone`, "zonesTbl.hr": `FC`, "zonesTbl.runPace": `Allure course`, "zonesTbl.bikePower": `Puissance vélo`,
+
+    "video.all": `Toutes`, "video.noMatch": `Aucune vidéo ne correspond. Essaie un autre mot-clé.`,
+    "video.placeholder": `Emplacement vidéo — branche l'URL dans <b>VIDEOS</b>`,
+    "video.placeholderHint": `(mp4 hébergé, ou embed YouTube/Vimeo)`,
+    "video.clickToOpen": `clic pour ouvrir en grand`,
   };
 
   var en = {
@@ -1093,6 +1109,22 @@
     "crd.groupReserved": `Group (reserved content)`, "crd.price": `Price (€)`, "crd.sessionContent": `Session content`,
     "crd.saveSettings": `Save settings`,
     "crd.groupSlot": `Group slot`, "crd.tbd": `TBD`, "crd.coach": `Coach`,
+
+    "chat.q.restToday": `Rest today`, "chat.q.lightenToday": `Lighten today's session`,
+    "chat.q.wellDone": `Well done on the session!`, "chat.q.shiftTomorrow": `Shall we move it to tomorrow?`, "chat.q.hydrate": `Stay well hydrated`,
+    "chat.q.recoveredWell": `Recovered well`, "chat.q.tiredLegs": `Tired legs today`,
+    "chat.q.sessionDone": `Session confirmed`, "chat.q.questionAboutSession": `A question about the session?`,
+    "chat.macrosPrompt": `Your quick replies (one per line):`, "chat.today": `Today`,
+    "chat.customizeQuickReplies": `Customize your quick replies`, "chat.manage": `Manage`,
+    "chat.autoReply": `Got it, thanks coach!`,
+    "chat.waDraft": `Hi! I saw your check-in this morning: I'd suggest resting today. Shall we talk about it?`,
+
+    "zonesTbl.zone": `Zone`, "zonesTbl.hr": `HR`, "zonesTbl.runPace": `Running pace`, "zonesTbl.bikePower": `Bike power`,
+
+    "video.all": `All`, "video.noMatch": `No video matches. Try another keyword.`,
+    "video.placeholder": `Video placeholder — plug the URL into <b>VIDEOS</b>`,
+    "video.placeholderHint": `(hosted mp4, or YouTube/Vimeo embed)`,
+    "video.clickToOpen": `click to open full screen`,
   };
 
   var es = {
@@ -1639,6 +1671,22 @@
     "crd.groupReserved": `Grupo (contenido reservado)`, "crd.price": `Tarifa (€)`, "crd.sessionContent": `Contenido de la sesión`,
     "crd.saveSettings": `Guardar los ajustes`,
     "crd.groupSlot": `Franja colectiva`, "crd.tbd": `Por definir`, "crd.coach": `Coach`,
+
+    "chat.q.restToday": `Descansa hoy`, "chat.q.lightenToday": `Aligera la sesión de hoy`,
+    "chat.q.wellDone": `¡Bien hecho con la sesión!`, "chat.q.shiftTomorrow": `¿La movemos a mañana?`, "chat.q.hydrate": `Hidrátate bien`,
+    "chat.q.recoveredWell": `Bien recuperado`, "chat.q.tiredLegs": `Piernas cansadas hoy`,
+    "chat.q.sessionDone": `Sesión validada`, "chat.q.questionAboutSession": `¿Alguna pregunta sobre la sesión?`,
+    "chat.macrosPrompt": `Tus respuestas rápidas (una por línea):`, "chat.today": `Hoy`,
+    "chat.customizeQuickReplies": `Personalizar tus respuestas rápidas`, "chat.manage": `Gestionar`,
+    "chat.autoReply": `¡Recibido, gracias coach!`,
+    "chat.waDraft": `¡Hola! Vi tu check-in de esta mañana: te aconsejo descansar hoy. ¿Hablamos?`,
+
+    "zonesTbl.zone": `Zona`, "zonesTbl.hr": `FC`, "zonesTbl.runPace": `Ritmo carrera`, "zonesTbl.bikePower": `Potencia ciclismo`,
+
+    "video.all": `Todas`, "video.noMatch": `Ningún vídeo coincide. Prueba otra palabra clave.`,
+    "video.placeholder": `Espacio de vídeo — conecta la URL en <b>VIDEOS</b>`,
+    "video.placeholderHint": `(mp4 alojado, o embed de YouTube/Vimeo)`,
+    "video.clickToOpen": `clic para abrir en grande`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

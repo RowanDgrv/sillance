@@ -4659,15 +4659,15 @@ let CHAT_MSGS = [
   {from:'them', text:'Salut coach ! Prêt pour la semaine', t:'08:12'},
   {from:'me',   text:'Yes ! Belle séance de seuil prévue demain.', t:'08:15'}
 ];
-const QUICK_COACH_DEFAULT = ['Repose-toi aujourd\'hui','Allège la séance du jour','Bravo pour la séance !','On décale à demain ?','Hydrate-toi bien'];
-const QUICK_ATHLETE = ['Bien récupéré','Jambes fatiguées aujourd\'hui','Séance validée','Une question sur la séance ?'];
+const QUICK_COACH_DEFAULT = [tr('chat.q.restToday'),tr('chat.q.lightenToday'),tr('chat.q.wellDone'),tr('chat.q.shiftTomorrow'),tr('chat.q.hydrate')];
+const QUICK_ATHLETE = [tr('chat.q.recoveredWell'),tr('chat.q.tiredLegs'),tr('chat.q.sessionDone'),tr('chat.q.questionAboutSession')];
 /* Réponses rapides du coach — personnalisables, persistées en local.
    Le chip "Gérer" ouvre un éditeur texte simple (une réponse par ligne)
    plutôt qu'une UI dédiée : rapide à livrer, suffisant pour un coach qui
    gère 20-30 athlètes au clavier. */
 let CHAT_MACROS = (()=>{ try{ const s=JSON.parse(localStorage.getItem('sil_chat_macros')||'null'); return (Array.isArray(s)&&s.length) ? s : QUICK_COACH_DEFAULT.slice(); }catch(e){ return QUICK_COACH_DEFAULT.slice(); } })();
 function manageChatMacros(){
-  const next = prompt('Tes réponses rapides (une par ligne) :', CHAT_MACROS.join('\n'));
+  const next = prompt(tr('chat.macrosPrompt'), CHAT_MACROS.join('\n'));
   if(next==null) return;
   // Échappé à la saisie : rendu ensuite en boutons via innerHTML sans
   // ré-échapper (`<button>${x}</button>`).
@@ -4680,14 +4680,14 @@ const chatPanel=document.getElementById('chatPanel');
 const chatBody=document.getElementById('chatBody');
 function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function renderChat(){
-  chatBody.innerHTML = `<div class="chat-day">Aujourd'hui</div>` + CHAT_MSGS.map(m=>
+  chatBody.innerHTML = `<div class="chat-day">${tr('chat.today')}</div>` + CHAT_MSGS.map(m=>
     `<div class="chat-msg ${m.from}">${m.text}<span class="time">${m.t}</span></div>`).join('');
   chatBody.scrollTop = chatBody.scrollHeight;
   const quick = (mode==='coach') ? CHAT_MACROS : QUICK_ATHLETE;
   const q=document.getElementById('chatQuick');
-  q.innerHTML = quick.map(x=>`<button>${x}</button>`).join('') + (mode==='coach' ? `<button id="chatMacroManage" title="Personnaliser tes réponses rapides"><i class="ic ic-edit"></i> Gérer</button>` : '');
+  q.innerHTML = quick.map(x=>`<button>${x}</button>`).join('') + (mode==='coach' ? `<button id="chatMacroManage" title="${tr('chat.customizeQuickReplies')}"><i class="ic ic-edit"></i> ${tr('chat.manage')}</button>` : '');
   q.querySelectorAll('button').forEach((b,i)=>{ if(b.id==='chatMacroManage') b.onclick=manageChatMacros; else b.onclick=()=> sendChat(quick[i]); });
-  document.getElementById('chatPeerName').textContent = (mode==='coach')?'Romain D.':'Coach';
+  document.getElementById('chatPeerName').textContent = (mode==='coach')?'Romain D.':tr('crd.coach');
   document.getElementById('chatAvatar').textContent = (mode==='coach')?'RD':'CO';
 }
 function sendChat(text){
@@ -4696,7 +4696,7 @@ function sendChat(text){
   // innerHTML, sans ré-échapper (écriture optimiste locale, chat 100% front).
   CHAT_MSGS.push({from:'me', text:dispoSafe(text), t:nowHM()});
   document.getElementById('chatText').value=''; renderChat();
-  setTimeout(()=>{ CHAT_MSGS.push({from:'them', text:'Bien reçu, merci coach !', t:nowHM()}); renderChat(); }, 1400);
+  setTimeout(()=>{ CHAT_MSGS.push({from:'them', text:tr('chat.autoReply'), t:nowHM()}); renderChat(); }, 1400);
 }
 function openChat(prefill){
   chatPanel.classList.add('open'); renderChat();
@@ -4709,7 +4709,7 @@ document.getElementById('chatSend').onclick=()=> sendChat(document.getElementByI
 document.getElementById('chatText').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(e.target.value); });
 document.getElementById('chatWhatsapp').onclick=()=>{
   const draft = document.getElementById('chatText').value.trim()
-    || 'Salut ! Vu ton check-in de ce matin : je te conseille du repos aujourd\'hui. On en parle ?';
+    || tr('chat.waDraft');
   window.open(`https://wa.me/${ATHLETE_PHONE}?text=${encodeURIComponent(draft)}`, '_blank');
 };
 
@@ -4774,7 +4774,7 @@ const ZONES = [
 (function zonesTable(){
   const g = document.getElementById('zonesGrid');
   if(!g) return;
-  g.innerHTML = `<div class="zh">Zone</div><div class="zh">FC</div><div class="zh">Allure course</div><div class="zh">Puissance vélo</div>` +
+  g.innerHTML = `<div class="zh">${tr('zonesTbl.zone')}</div><div class="zh">${tr('zonesTbl.hr')}</div><div class="zh">${tr('zonesTbl.runPace')}</div><div class="zh">${tr('zonesTbl.bikePower')}</div>` +
     ZONES.map(z=>`
       <div class="zn"><i style="background:${z.c}"></i>${z.z}</div>
       <div class="zv">${z.fc}</div><div class="zv">${z.run}</div><div class="zv">${z.bike}</div>`).join('');
@@ -4796,14 +4796,14 @@ function renderVideoGrid(){
   // numéral (data set large) : nombre de vidéos du sport filtré
   const cEl=document.getElementById('vlCount'), dEl=document.getElementById('vlCountDisc');
   if(cEl) cEl.textContent=String(list.length).padStart(2,'0');
-  if(dEl) dEl.textContent=(DISC[vlFilter]&&DISC[vlFilter].label)||'Toutes';
+  if(dEl) dEl.textContent=(DISC[vlFilter]&&DISC[vlFilter].label)||tr('video.all');
   if(window.__pf_vlOptical) window.__pf_vlOptical();
-  if(!list.length){ grid.innerHTML=`<div class="vl-empty">Aucune vidéo ne correspond. Essaie un autre mot-clé.</div>`; return; }
+  if(!list.length){ grid.innerHTML=`<div class="vl-empty">${tr('video.noMatch')}</div>`; return; }
   grid.innerHTML=list.map(v=>{
     const D=DISC[v.disc];
     const locked = v.premium && !window.__pf_subscribed;
     return `<div class="vcard${locked?' vlocked':''}" data-id="${v.id}" style="--c:${D.color}">
-      <div class="thumb"><span class="disc">${discIcon(D)}</span><span class="play"></span><span class="dur">${v.dur}</span>${locked?'<span class="vlock"><i class="ic ic-lock"></i> Premium</span>':''}</div>
+      <div class="thumb"><span class="disc">${discIcon(D)}</span><span class="play"></span><span class="dur">${v.dur}</span>${locked?`<span class="vlock"><i class="ic ic-lock"></i> Premium</span>`:''}</div>
       <div class="vbody">
         <div class="vt">${v.title}</div>
         <div class="vmeta"><span class="lvl">${v.level}</span><span>${D.label}</span></div>
@@ -4884,7 +4884,7 @@ function openVideo(v){
     // vidéo réelle (mp4 direct). Pour un embed YouTube/Vimeo, remplacer par une <iframe>.
     frame.innerHTML=`<video src="${v.src}" controls autoplay playsinline></video>`;
   } else {
-    frame.innerHTML=`<div class="ph"><div class="pico"><i class="ic ic-film"></i></div>Emplacement vidéo — branche l'URL dans <b>VIDEOS</b><br><small>(mp4 hébergé, ou embed YouTube/Vimeo)</small></div>`;
+    frame.innerHTML=`<div class="ph"><div class="pico"><i class="ic ic-film"></i></div>${tr('video.placeholder')}<br><small>${tr('video.placeholderHint')}</small></div>`;
   }
   videoOverlay.classList.add('open');
 }
@@ -4905,7 +4905,7 @@ function showVidPopover(e, v){
   vpop.style.setProperty('--vpc', D.color);
   document.getElementById('vpThumb').style.setProperty('--vpc', D.color);
   document.getElementById('vpTitle').textContent=v.title;
-  document.getElementById('vpHint').textContent=`${v.dur} · clic pour ouvrir en grand`;
+  document.getElementById('vpHint').textContent=`${v.dur} · ${tr('video.clickToOpen')}`;
   vpop.classList.add('show'); vpop.setAttribute('aria-hidden','false');
   positionVidPopover(e);
 }
