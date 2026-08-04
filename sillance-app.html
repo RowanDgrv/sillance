@@ -33,10 +33,10 @@
 <!-- Perf (audit 03/08/2026) : preconnect gstatic manquant + feuille en
      render-blocking avant un <style> de ~2100 lignes. media="print" + swap
      au onload = ne bloque plus le premier rendu ; fallback <noscript>. -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" id="asyncFonts" media="print">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=optional">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=optional" rel="stylesheet" id="asyncFonts" media="print">
 <script src="./sillance-fonts-async.js" defer></script>
-<noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=optional" rel="stylesheet"></noscript>
 <style>
 /* ============================================================
    Sillance — système de design
@@ -338,6 +338,13 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
   border:1px solid var(--line);border-radius:var(--radius);
   background:var(--panel);padding:var(--space-4);position:sticky;top:16px;
 }
+/* :empty (pas min-height fixe) : #sidebarContent est très variable (guide +
+   radar + boutons + bibliothèque de séances selon le roster) — on ne réserve
+   que pendant la fenêtre où le script n'a pas encore injecté de contenu (même
+   saut CLS que .cal-grid/.vl-grid/.coach-band, découvert en large desktop où
+   cette colonne pilote la hauteur totale de .planner). Dès qu'il y a du
+   contenu, la règle ne matche plus — jamais de sur-réservation permanente. */
+#sidebarContent:empty{min-height:900px}
 .library h2{font-size:var(--fs-base);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:var(--space-1)}
 .library p.hint{font-size:var(--fs-base);color:var(--muted);margin-bottom:14px}
 .tpl{
