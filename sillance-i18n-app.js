@@ -670,6 +670,13 @@
     "lapCol.notEnoughLaps": `Pas assez de laps pour un visuel.`,
     "lapCol.paceSpeedLap": `Allure/vitesse — lap {n}`, "lapCol.avgHrLap": `FC moyenne — lap {n}`,
     "lapCol.perSet": `par série`, "lapCol.autoSplits": `splits automatiques`, "lapCol.chooseColumns": `colonnes au choix`,
+
+    "runTile.strideLen": `Longueur de foulée`, "runTile.strideLenDetail": `à {cad} pas/min`,
+    "runTile.runPower": `Puissance de course`, "runTile.runPowerDetail": `si capteur type Stryd`,
+    "runSym.power": `Puissance`, "runSym.balanced": `équilibré`, "runSym.slightImbalance": `léger déséquilibre`,
+    "runSym.toWatch": `à surveiller`, "runSym.left": `G`, "runSym.right": `D`,
+    "chart.all": `Tout`, "chart.none": `Aucun`,
+    "chart.fitness": `Fitness`, "chart.fatigue": `Fatigue`,
   };
 
   var en = {
@@ -1339,6 +1346,13 @@
     "lapCol.notEnoughLaps": `Not enough laps for a visual.`,
     "lapCol.paceSpeedLap": `Pace/speed — lap {n}`, "lapCol.avgHrLap": `Average HR — lap {n}`,
     "lapCol.perSet": `per set`, "lapCol.autoSplits": `automatic splits`, "lapCol.chooseColumns": `choose columns`,
+
+    "runTile.strideLen": `Stride length`, "runTile.strideLenDetail": `at {cad} steps/min`,
+    "runTile.runPower": `Running power`, "runTile.runPowerDetail": `if using a Stryd-type sensor`,
+    "runSym.power": `Power`, "runSym.balanced": `balanced`, "runSym.slightImbalance": `slight imbalance`,
+    "runSym.toWatch": `to watch`, "runSym.left": `L`, "runSym.right": `R`,
+    "chart.all": `All`, "chart.none": `None`,
+    "chart.fitness": `Fitness`, "chart.fatigue": `Fatigue`,
   };
 
   var es = {
@@ -2008,6 +2022,13 @@
     "lapCol.notEnoughLaps": `No hay suficientes laps para un visual.`,
     "lapCol.paceSpeedLap": `Ritmo/velocidad — lap {n}`, "lapCol.avgHrLap": `FC media — lap {n}`,
     "lapCol.perSet": `por serie`, "lapCol.autoSplits": `splits automáticos`, "lapCol.chooseColumns": `columnas a elegir`,
+
+    "runTile.strideLen": `Longitud de zancada`, "runTile.strideLenDetail": `a {cad} pasos/min`,
+    "runTile.runPower": `Potencia de carrera`, "runTile.runPowerDetail": `si usas un sensor tipo Stryd`,
+    "runSym.power": `Potencia`, "runSym.balanced": `equilibrado`, "runSym.slightImbalance": `ligero desequilibrio`,
+    "runSym.toWatch": `a vigilar`, "runSym.left": `I`, "runSym.right": `D`,
+    "chart.all": `Todo`, "chart.none": `Ninguno`,
+    "chart.fitness": `Fitness`, "chart.fatigue": `Fatiga`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

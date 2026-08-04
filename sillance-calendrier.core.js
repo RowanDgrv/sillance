@@ -6916,18 +6916,18 @@ function renderRunDynamics(){
 }
 function renderRunTiles(){
   const box=document.getElementById('runTilesBody'); if(!box) return;
-  const tiles=[['Longueur de foulée','strideLen','m','à '+RUN_DYN.cadence+' pas/min'],
-    ['Puissance de course','runPower','W','si capteur type Stryd']];
+  const tiles=[[tr('runTile.strideLen'),'strideLen','m',tr('runTile.strideLenDetail', {cad:RUN_DYN.cadence})],
+    [tr('runTile.runPower'),'runPower','W',tr('runTile.runPowerDetail')]];
   box.innerHTML=tiles.map(([k,key,u,d])=>`<div class="rd-tile"><div class="k">${k}</div><div class="v">${RUN_DYN[key]}<small> ${u}</small></div><div class="d">${d}</div></div>`).join('');
 }
 function renderRunSymmetry(){
   const box=document.getElementById('runSymBody'); if(!box) return;
-  const rows=[['Temps de contact au sol',RUN_DYN.gctBalanceL],['Longueur de foulée',RUN_DYN.strideBalanceL],['Puissance',RUN_DYN.powerBalanceL]];
+  const rows=[[tr('runDyn.gct'),RUN_DYN.gctBalanceL],[tr('runTile.strideLen'),RUN_DYN.strideBalanceL],[tr('runSym.power'),RUN_DYN.powerBalanceL]];
   box.innerHTML=rows.map(([name,l])=>{ const r=100-l, dev=Math.abs(50-l);
-    const st=dev<0.8?['équilibré','var(--good)']:dev<1.8?['léger déséquilibre','var(--bike)']:['à surveiller','var(--run)'];
+    const st=dev<0.8?[tr('runSym.balanced'),'var(--good)']:dev<1.8?[tr('runSym.slightImbalance'),'var(--bike)']:[tr('runSym.toWatch'),'var(--run)'];
     return `<div class="rd-sym"><div class="lbl"><span>${name}</span><span style="color:${st[1]}">${st[0]}</span></div>
       <div class="rd-symbar"><span class="l" style="width:${l}%"></span><span class="r" style="width:${r}%"></span><span class="mid"></span></div>
-      <div class="rd-symlbl"><span>G ${l.toFixed(1)}%</span><span>${r.toFixed(1)}% D</span></div></div>`;
+      <div class="rd-symlbl"><span>${tr('runSym.left')} ${l.toFixed(1)}%</span><span>${r.toFixed(1)}% ${tr('runSym.right')}</span></div></div>`;
   }).join('');
 }
 renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
@@ -6982,7 +6982,7 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     return `<div class="cf-cat"><span class="cf-cat-lbl">${cl}</span>`+
       items.map(r=>`<button type="button" class="cf-chip" data-key="${r.key}" aria-pressed="false"><span class="cf-box"><i class="ic ic-check"></i></span>${r.label}</button>`).join('')+
       `</div>`;
-  }).join('') + `<div class="cf-actions"><button type="button" class="cf-all" id="cfAll">Tout</button><button type="button" class="cf-all" id="cfNone">Aucun</button></div>`;
+  }).join('') + `<div class="cf-actions"><button type="button" class="cf-all" id="cfAll">${tr('chart.all')}</button><button type="button" class="cf-all" id="cfNone">${tr('chart.none')}</button></div>`;
   box.querySelectorAll('.cf-chip').forEach(ch=> ch.onclick=()=>{ const k=ch.dataset.key; sel.has(k)?sel.delete(k):sel.add(k); apply(); save(); });
   box.querySelector('#cfAll').onclick=()=>{ REG.forEach(r=>{ if(cards[r.key]) sel.add(r.key); }); apply(); save(); };
   box.querySelector('#cfNone').onclick=()=>{ sel.clear(); apply(); save(); };
@@ -7002,8 +7002,8 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     el('path',{d:smoothPath(pts),fill:'none',stroke:color,'stroke-width':2.2},svg);
     pts.forEach((p,i)=>{ const c=el('circle',{cx:p[0],cy:p[1],r:3,fill:'#0D121E',stroke:color,'stroke-width':2},svg);
       c.addEventListener('mousemove',e=>tipShow(e,`<b style="color:${color}">${name} ${data[i]} ${unit}</b> · ${weeks[i]}`)); c.addEventListener('mouseleave',tipHide); }); };
-  draw(cad,yC,'#2FD9FF','Cadence','pas/min');
-  draw(gct,yG,'#DD5C72','Contact au sol','ms');
+  draw(cad,yC,'#2FD9FF',tr('lapCol.cadence'),tr('analysis.stepsPerMin'));
+  draw(gct,yG,'#DD5C72',tr('runDyn.gct'),'ms');
 })();
 
 /* ---- 4. Charge & forme — double courbe + bande optimale ---- */
@@ -7036,7 +7036,7 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     el('path',{d:smoothPath(pts),class:'glow-line draw',stroke:color,filter:'url(#glowL)'},svg);
     pts.forEach((p,i)=>{
       const c=el('circle',{cx:p[0],cy:p[1],r:3.5,fill:'#0D121E',stroke:color,'stroke-width':2,class:'dot'},svg);
-      c.addEventListener('mousemove',e=>{ tipShow(e,`<b style="color:${color}">${data===ctl?'Fitness':'Fatigue'} ${data[i]}</b> · ${weeks[i]} · TSB ${ctl[i]-atl[i]>=0?'+':''}${ctl[i]-atl[i]}`); TSYNC.hover(i); });
+      c.addEventListener('mousemove',e=>{ tipShow(e,`<b style="color:${color}">${data===ctl?tr('chart.fitness'):tr('chart.fatigue')} ${data[i]}</b> · ${weeks[i]} · TSB ${ctl[i]-atl[i]>=0?'+':''}${ctl[i]-atl[i]}`); TSYNC.hover(i); });
       c.addEventListener('mouseleave',tipHide);
     });
   };
