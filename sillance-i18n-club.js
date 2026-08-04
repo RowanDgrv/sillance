@@ -49,6 +49,7 @@
     "club.sub.slots": `Crée et tarifie tes créneaux. 0 € = inclus, &gt; 0 € = à la carte.`,
     "club.title.dash": `Tableau de bord`,
     "club.titleSuffixBookingSpace": ` — espace réservations`,
+    "club.pageTitle": `Espace salle — gestion créneaux, adhérents & facturation`,
     "club.toAssign": `à affecter`,
 
     "club.poweredBy": `Espace salle — propulsé&nbsp;Sillance`,
@@ -128,6 +129,7 @@
     "club.sub.slots": `Create and price your slots. €0 = included, &gt; €0 = à la carte.`,
     "club.title.dash": `Dashboard`,
     "club.titleSuffixBookingSpace": ` — booking space`,
+    "club.pageTitle": `Gym space — manage time slots, members & billing`,
     "club.toAssign": `to assign`,
 
     "club.poweredBy": `Gym space — powered&nbsp;by&nbsp;Sillance`,
@@ -207,6 +209,7 @@
     "club.sub.slots": `Crea y tarifica tus franjas. 0 € = incluido, &gt; 0 € = a la carta.`,
     "club.title.dash": `Panel`,
     "club.titleSuffixBookingSpace": ` — espacio de reservas`,
+    "club.pageTitle": `Espacio del gimnasio — gestión de horarios, socios y facturación`,
     "club.toAssign": `por asignar`,
 
     "club.poweredBy": `Espacio gimnasio — con la tecnología de&nbsp;Sillance`,

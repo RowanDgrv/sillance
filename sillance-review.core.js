@@ -721,7 +721,7 @@ function saveCoCoachInvite(){
   const aid = coCoachTargetAthleteId;
   coPendingFor(aid).unshift({id:'ccr'+Date.now(), coachEmail:email, roleLabel:role||null, requestedByRole:coCoachViewerRole});
   if(window.PF?.user){
-    PF.requestCoCoach(aid, email, role||null).catch(e=>{ console.warn('[PF] requestCoCoach', e); toast("Demande indisponible pour l'instant", 'error'); });
+    PF.requestCoCoach(aid, email, role||null).catch(e=>{ console.warn('[PF] requestCoCoach', e); toast(tr('toast.requestUnavailableForNow'), 'error'); });
   }
   document.getElementById('coCoachOverlay').classList.remove('open');
   toast(tr('toast.demandeEnvoyeeEnAttenteValidation'));

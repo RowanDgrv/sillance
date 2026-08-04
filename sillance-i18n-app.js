@@ -268,6 +268,7 @@
     "assign.sessionAssignedPlural": `Séance « {title} » attribuée à {n} athlètes`,
     "assign.sessionAssignedSingular": `Séance « {title} » attribuée à {n} athlète`,
     "assign.dialogAria": `Attribuer à plusieurs athlètes`, "common.close": `Fermer`, "common.hide": `Masquer`,
+    "toast.requestUnavailableForNow": `Demande indisponible pour l'instant`,
 
     "need.injured": `Blessé`, "need.sick": `Malade`, "need.tired": `Fatigué`,
     "need.lowForm": `Forme basse ({pct}%)`, "need.lowHrv": `HRV basse`,
@@ -281,6 +282,7 @@
     "guide.cta": `Créer ma première séance`,
 
     "invite.emailPh": `email@athlete.fr`,
+    "meta.appTitle": `Sillance — Coaching triathlon`,
     "assign.title": `Attribuer « {name} »`,
     "assign.subCycle": `Pose ce cycle ({weeks} semaines, {n} séances) sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`,
     "assign.subSession": `Pose cette séance sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`,
@@ -1425,6 +1427,7 @@
     "assign.sessionAssignedPlural": `Session "{title}" assigned to {n} athletes`,
     "assign.sessionAssignedSingular": `Session "{title}" assigned to {n} athlete`,
     "assign.dialogAria": `Assign to multiple athletes`, "common.close": `Close`, "common.hide": `Hide`,
+    "toast.requestUnavailableForNow": `Request unavailable right now`,
 
     "need.injured": `Injured`, "need.sick": `Sick`, "need.tired": `Tired`,
     "need.lowForm": `Low form ({pct}%)`, "need.lowHrv": `Low HRV`,
@@ -1438,6 +1441,7 @@
     "guide.cta": `Create my first session`,
 
     "invite.emailPh": `email@athlete.com`,
+    "meta.appTitle": `Sillance — Triathlon coaching`,
     "assign.title": `Assign "{name}"`,
     "assign.subCycle": `Apply this cycle ({weeks} weeks, {n} sessions) to multiple athletes' calendars at once. Targets in % of references adapt to each athlete's level.`,
     "assign.subSession": `Apply this session to multiple athletes' calendars at once. Targets in % of references adapt to each athlete's level.`,
@@ -2582,6 +2586,7 @@
     "assign.sessionAssignedPlural": `Sesión «{title}» asignada a {n} atletas`,
     "assign.sessionAssignedSingular": `Sesión «{title}» asignada a {n} atleta`,
     "assign.dialogAria": `Asignar a varios atletas`, "common.close": `Cerrar`, "common.hide": `Ocultar`,
+    "toast.requestUnavailableForNow": `Solicitud no disponible por ahora`,
 
     "need.injured": `Lesionado`, "need.sick": `Enfermo`, "need.tired": `Cansado`,
     "need.lowForm": `Forma baja ({pct}%)`, "need.lowHrv": `VFC baja`,
@@ -2595,6 +2600,7 @@
     "guide.cta": `Crear mi primera sesión`,
 
     "invite.emailPh": `email@atleta.com`,
+    "meta.appTitle": `Sillance — Coaching de triatlón`,
     "assign.title": `Asignar «{name}»`,
     "assign.subCycle": `Aplica este ciclo ({weeks} semanas, {n} sesiones) al calendario de varios atletas de una vez. Los objetivos en % de las referencias se adaptan al nivel de cada uno.`,
     "assign.subSession": `Aplica esta sesión al calendario de varios atletas de una vez. Los objetivos en % de las referencias se adaptan al nivel de cada uno.`,
