@@ -7166,12 +7166,12 @@ function drawLoadStack(){
     hit.style.cursor='crosshair';
     hit.addEventListener('mousemove',e=>{
       cursor.setAttribute('x1',cx); cursor.setAttribute('x2',cx); cursor.style.opacity=1;
-      const risk=w.acwr>1.5?'<span style="color:#FF5470">élevé</span>':w.acwr<0.8?'<span style="color:#FFB13D">sous-charge</span>':'<span style="color:#39E6A3">maîtrisé</span>';
+      const risk=w.acwr>1.5?`<span style="color:#FF5470">${tr('loadStack.high')}</span>`:w.acwr<0.8?`<span style="color:#FFB13D">${tr('loadStack.underload')}</span>`:`<span style="color:#39E6A3">${tr('loadStack.controlled')}</span>`;
       const dd=w.mon;
-      const periodLbl = loadStackPeriod==='week' ? `Sem. ${dd.getDate()}/${dd.getMonth()+1}`
-        : loadStackPeriod==='month' ? `Mois de ${dd.toLocaleDateString(localeStr(),{month:'long',year:'numeric'})}`
-        : `Année ${dd.getFullYear()}`;
-      tipShow(e,`<b>${periodLbl}</b> · charge <b>${w.total}</b> · <b>${w.hours.toFixed(1)} h</b><br>Nat ${w.load.swim} · Vélo ${w.load.bike} · Course ${w.load.run} · Renfo ${w.load.strength}<br>Fatigue ${w.atl} · Risque ACWR <b>${w.acwr.toFixed(2)}</b> (${risk}) · Forme ${w.tsb>=0?'+':''}${w.tsb}`);
+      const periodLbl = loadStackPeriod==='week' ? tr('loadStack.week', {d:dd.getDate(), m:dd.getMonth()+1})
+        : loadStackPeriod==='month' ? tr('loadStack.monthOf', {month:dd.toLocaleDateString(localeStr(),{month:'long',year:'numeric'})})
+        : tr('loadStack.year', {y:dd.getFullYear()});
+      tipShow(e,`<b>${periodLbl}</b> · ${tr('modal.load')} <b>${w.total}</b> · <b>${w.hours.toFixed(1)} h</b><br>${tr('disc.swim')} ${w.load.swim} · ${tr('disc.bike')} ${w.load.bike} · ${tr('disc.run')} ${w.load.run} · ${tr('disc.strength')} ${w.load.strength}<br>${tr('chart.fatigue')} ${w.atl} · ${tr('loadStack.riskAcwr')} <b>${w.acwr.toFixed(2)}</b> (${risk}) · ${tr('loadStack.formLabel')} ${w.tsb>=0?'+':''}${w.tsb}`);
     });
     hit.addEventListener('mouseleave',()=>{ cursor.style.opacity=0; tipHide(); });
   });
@@ -7180,7 +7180,7 @@ function drawLoadStack(){
 /* barre de séries cochables + rendu initial (défile en fin d'année) */
 (function initLoadStack(){
   const box=document.getElementById('loadStackToggles'); if(!box) return;
-  const items=[['charge','Charge',LOAD_COLS.bike],['fatigue','Fatigue (ATL)','#FF5470'],['risque','Risque (ACWR)',LOAD_COLS.bike],['forme','Forme (TSB)','#39E6A3']];
+  const items=[['charge',tr('modal.load'),LOAD_COLS.bike],['fatigue',tr('bilan.fatigue'),'#FF5470'],['risque',tr('loadStack.riskAcwrLabel'),LOAD_COLS.bike],['forme',tr('bilan.form'),'#39E6A3']];
   box.innerHTML=items.map(([k,l,c])=>`<button class="ls-tog ${loadStackShow[k]?'on':''}" data-ls="${k}" style="--ls-c:${c}"><span class="sw"></span>${l}</button>`).join('');
   box.querySelectorAll('[data-ls]').forEach(b=> b.onclick=()=>{ const k=b.dataset.ls; loadStackShow[k]=!loadStackShow[k]; b.classList.toggle('on',loadStackShow[k]); drawLoadStack(); });
 
@@ -7188,7 +7188,7 @@ function drawLoadStack(){
   const pbox=document.getElementById('loadStackPeriodTog');
   if(pbox){
     try{ const saved=localStorage.getItem('sil_loadstack_period'); if(saved) loadStackPeriod=saved; }catch(e){}
-    const periods=[['week','Semaine'],['month','Mois'],['year','Année']];
+    const periods=[['week',tr('loadStack.weekOpt')],['month',tr('loadStack.monthOpt')],['year',tr('loadStack.yearOpt')]];
     const renderPeriodTog=()=>{ pbox.innerHTML=periods.map(([k,l])=>`<button class="${loadStackPeriod===k?'on':''}" data-lsp="${k}">${l}</button>`).join('');
       pbox.querySelectorAll('[data-lsp]').forEach(b=> b.onclick=()=>{
         loadStackPeriod=b.dataset.lsp;
@@ -7259,8 +7259,8 @@ function drawLactate(svgId, thId, data, lineColor){
   // cartouches seuils
   const th=document.getElementById(thId);
   if(th) th.innerHTML=`
-    <div class="lt-th" style="--tc:#39E6A3"><div class="k">Seuil aérobie · LT1 (SV1)</div><div class="v">${data.sv1lbl}</div><div class="s">≈ 2 mmol/L</div></div>
-    <div class="lt-th" style="--tc:#FFB13D"><div class="k">Seuil anaérobie · LT2 (SV2)</div><div class="v">${data.sv2lbl}</div><div class="s">≈ 4 mmol/L</div></div>`;
+    <div class="lt-th" style="--tc:#39E6A3"><div class="k">${tr('lactate.aerobicThreshold')}</div><div class="v">${data.sv1lbl}</div><div class="s">≈ 2 mmol/L</div></div>
+    <div class="lt-th" style="--tc:#FFB13D"><div class="k">${tr('lactate.anaerobicThreshold')}</div><div class="v">${data.sv2lbl}</div><div class="s">≈ 4 mmol/L</div></div>`;
 }
 function lactateCharts(){
   const runC = getComputedStyle(document.body).getPropertyValue('--run').trim() || '#FF5470';

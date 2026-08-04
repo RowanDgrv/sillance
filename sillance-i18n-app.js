@@ -677,6 +677,14 @@
     "runSym.toWatch": `à surveiller`, "runSym.left": `G`, "runSym.right": `D`,
     "chart.all": `Tout`, "chart.none": `Aucun`,
     "chart.fitness": `Fitness`, "chart.fatigue": `Fatigue`,
+
+    "loadStack.high": `élevé`, "loadStack.underload": `sous-charge`, "loadStack.controlled": `maîtrisé`,
+    "loadStack.week": `Sem. {d}/{m}`, "loadStack.monthOf": `Mois de {month}`, "loadStack.year": `Année {y}`,
+    "loadStack.riskAcwr": `Risque ACWR`, "loadStack.formLabel": `Forme`,
+    "loadStack.riskAcwrLabel": `Risque (ACWR)`,
+    "loadStack.weekOpt": `Semaine`, "loadStack.monthOpt": `Mois`, "loadStack.yearOpt": `Année`,
+
+    "lactate.aerobicThreshold": `Seuil aérobie · LT1 (SV1)`, "lactate.anaerobicThreshold": `Seuil anaérobie · LT2 (SV2)`,
   };
 
   var en = {
@@ -1353,6 +1361,14 @@
     "runSym.toWatch": `to watch`, "runSym.left": `L`, "runSym.right": `R`,
     "chart.all": `All`, "chart.none": `None`,
     "chart.fitness": `Fitness`, "chart.fatigue": `Fatigue`,
+
+    "loadStack.high": `high`, "loadStack.underload": `underload`, "loadStack.controlled": `controlled`,
+    "loadStack.week": `Wk {d}/{m}`, "loadStack.monthOf": `Month of {month}`, "loadStack.year": `Year {y}`,
+    "loadStack.riskAcwr": `ACWR risk`, "loadStack.formLabel": `Form`,
+    "loadStack.riskAcwrLabel": `Risk (ACWR)`,
+    "loadStack.weekOpt": `Week`, "loadStack.monthOpt": `Month`, "loadStack.yearOpt": `Year`,
+
+    "lactate.aerobicThreshold": `Aerobic threshold · LT1 (SV1)`, "lactate.anaerobicThreshold": `Anaerobic threshold · LT2 (SV2)`,
   };
 
   var es = {
@@ -2029,6 +2045,14 @@
     "runSym.toWatch": `a vigilar`, "runSym.left": `I`, "runSym.right": `D`,
     "chart.all": `Todo`, "chart.none": `Ninguno`,
     "chart.fitness": `Fitness`, "chart.fatigue": `Fatiga`,
+
+    "loadStack.high": `alto`, "loadStack.underload": `carga baja`, "loadStack.controlled": `controlado`,
+    "loadStack.week": `Sem. {d}/{m}`, "loadStack.monthOf": `Mes de {month}`, "loadStack.year": `Año {y}`,
+    "loadStack.riskAcwr": `Riesgo ACWR`, "loadStack.formLabel": `Forma`,
+    "loadStack.riskAcwrLabel": `Riesgo (ACWR)`,
+    "loadStack.weekOpt": `Semana`, "loadStack.monthOpt": `Mes`, "loadStack.yearOpt": `Año`,
+
+    "lactate.aerobicThreshold": `Umbral aeróbico · LT1 (SV1)`, "lactate.anaerobicThreshold": `Umbral anaeróbico · LT2 (SV2)`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
