@@ -7934,10 +7934,10 @@ function raceGearForecast(){
       const projected = g.km + (cat==='daily'? kmUntil*0.65 : cat==='tempo'? kmUntil*0.25 : kmUntil*0.10);
       if(cat===r.needCat && projected >= g.max*0.95){
         out.push({race:r, gear:g, projected:Math.round(projected),
-          msg:`<b>${r.name}</b> dans ${r.inDays} j : tes <b>${g.name}</b> seront à environ ${Math.round(projected)} km (durée de vie ${g.max} km). Prévois une nouvelle paire de compétition et rode-la avant la course.`});
+          msg:tr('gear.forecastRaceCat', {race:r.name, days:r.inDays, name:g.name, proj:Math.round(projected), max:g.max})});
       } else if(cat!==r.needCat && projected >= g.max*0.90){
         out.push({race:r, gear:g, projected:Math.round(projected),
-          msg:`D'ici <b>${r.name}</b> (${r.inDays} j), tes <b>${g.name}</b> dépasseront leur durée de vie (environ ${Math.round(projected)}/${g.max} km). Anticipe le remplacement pour t'entraîner sur un amorti sain.`});
+          msg:tr('gear.forecastOtherCat', {race:r.name, days:r.inDays, name:g.name, proj:Math.round(projected), max:g.max})});
       }
     });
   });
@@ -7954,12 +7954,12 @@ function shoeMilestones(g){
 }
 
 function gearAlert(g){
-  if(g.type!=='shoe') return {cls:'ok', ic:'ic-check', txt:`${g.km} km au compteur. Entretien régulier recommandé.`};
+  if(g.type!=='shoe') return {cls:'ok', ic:'ic-check', txt:tr('gear.kmOnClock', {km:g.km})};
   const p = g.km/g.max*100;
-  if(p>=100) return {cls:'danger', ic:'ic-alert-triangle', txt:`Durée de vie dépassée (${g.max} km pour ce modèle) : remplacement fortement conseillé, l'amorti est dégradé.`};
-  if(p>=85) return {cls:'danger', ic:'ic-alert-triangle', txt:`${Math.round(p)}% de la durée de vie : pense à les remplacer bientôt, le risque de blessure augmente.`};
-  if(p>=60) return {cls:'warn', ic:'ic-bell', txt:`${Math.round(p)}% de la durée de vie de ce modèle : surveille l'usure de la semelle et les sensations.`};
-  return {cls:'ok', ic:'ic-check', txt:`Encore environ ${Math.round(g.max*0.6-g.km)} km avant le premier palier de surveillance de ce modèle.`};
+  if(p>=100) return {cls:'danger', ic:'ic-alert-triangle', txt:tr('gear.lifeExceeded', {max:g.max})};
+  if(p>=85) return {cls:'danger', ic:'ic-alert-triangle', txt:tr('gear.life85', {pct:Math.round(p)})};
+  if(p>=60) return {cls:'warn', ic:'ic-bell', txt:tr('gear.life60', {pct:Math.round(p)})};
+  return {cls:'ok', ic:'ic-check', txt:tr('gear.beforeFirstMilestone', {km:Math.round(g.max*0.6-g.km)})};
 }
 
 function renderGear(){
@@ -7983,45 +7983,44 @@ function renderGear(){
     const al=gearAlert(g);
     const catBadge = cat ? `<span class="gear-cat" style="--gc:${SHOE_CAT_COLOR[cat]}"><i class="ic ${SHOE_CAT_ICON[cat]}"></i>${SHOE_CAT_LABEL[cat]}</span>` : '';
     const costKm = (g.price && g.km>0) ? `<span class="gear-cost">${(g.price/g.km).toFixed(2)} €/km</span>` : (g.price?`<span class="gear-cost">${g.price} € neuve</span>`:'');
-    const commHtml = (g.type==='shoe' && comm) ? `<div class="gear-comm"><i class="ic ic-users"></i> Les athlètes Sillance retirent ce modèle à <b>${comm} km</b> en moyenne</div>` : '';
+    const commHtml = (g.type==='shoe' && comm) ? `<div class="gear-comm"><i class="ic ic-users"></i> ${tr('gear.communityAvg', {km:comm})}</div>` : '';
     return `<div class="gear-card" data-id="${g.id}">
       <div class="gear-card-h">
         <span class="gear-ico"><i class="ic ${g.type==='shoe'?'ic-shoe':'ic-bike'}"></i></span>
         <div class="gear-i">
           <div class="gear-name">${g.name}</div>
-          <div class="gear-type">${g.type==='shoe'?'Chaussures de course':'Vélo'} ${catBadge}</div>
+          <div class="gear-type">${g.type==='shoe'?tr('gear.runningShoes'):tr('gear.bike')} ${catBadge}</div>
         </div>
-        <button class="gear-del" data-act="del">Retirer</button>
+        <button class="gear-del" data-act="del">${tr('gear.remove')}</button>
       </div>
       <div class="gear-km">${g.km.toLocaleString(localeStr())}<small> / ${g.max.toLocaleString(localeStr())} km</small> ${costKm}</div>
-      <div class="gear-sub">${Math.round(pct)}% de la durée de vie du modèle</div>
+      <div class="gear-sub">${tr('gear.pctLifespan', {pct:Math.round(pct)})}</div>
       <div class="gear-bar">${marks}<i style="width:${pct}%;background:${barColor}"></i></div>
       ${milestones}
       ${commHtml}
       <div class="gear-alert ${al.cls}"><i class="ic ${al.ic}"></i><span>${al.txt}</span></div>
       <div style="margin-top:10px;display:flex;gap:7px">
-        <button class="gear-del" data-act="add10" style="border-color:var(--line-strong)">+ Simuler 50 km</button>
+        <button class="gear-del" data-act="add10" style="border-color:var(--line-strong)">+ ${tr('gear.simulate50km')}</button>
       </div>
     </div>`;
   }).join('') || `<p class="club-hint">${mode==='coach'
-    ? 'Cet athlète n\'a renseigné aucun équipement dans son espace.'
-    : 'Aucun équipement. Ajoute tes chaussures pour suivre leur usure.'}</p>`;
+    ? tr('gear.coachNoGear')
+    : tr('gear.athleteNoGear')}</p>`;
 
   // — bandeau conseil du jour + garde-fou courses à venir —
   const advisor=document.getElementById('gearAdvisor');
   if(advisor){
     // séance course du jour, sinon la prochaine course planifiée
-    let target = todaySession(); let when='ta séance du jour';
+    let target = todaySession(); let when=tr('gear.yourTodaySession');
     if(!target || target.disc!=='run'){
       const todayK = iso(new Date());
       const keys = Object.keys(planning).filter(k=>k>=todayK).sort();
-      for(const k of keys){ const f=(planning[k]||[]).find(x=>x.disc==='run' && !x.done); if(f){ target=f; when=`ta prochaine séance course (« ${f.title} »)`; break; } }
+      for(const k of keys){ const f=(planning[k]||[]).find(x=>x.disc==='run' && !x.done); if(f){ target=f; when=tr('gear.yourNextRunSession', {title:f.title}); break; } }
     }
     const rec = recommendShoe(target);
     const recHtml = rec ? `<div class="gear-advice">
       <i class="ic ic-sparkles ga-ico"></i>
-      <div><b>Paire conseillée pour ${when}</b> — profil ${SHOE_CAT_LABEL[rec.want]} recommandé :
-      porte tes <b>${rec.shoe.name}</b> (${rec.shoe.km}/${rec.shoe.max} km).</div></div>` : '';
+      <div>${tr('gear.recommendedPairFor', {when, profile:SHOE_CAT_LABEL[rec.want], name:rec.shoe.name, km:rec.shoe.km, max:rec.shoe.max})}</div></div>` : '';
     const forecasts = raceGearForecast();
     const fcHtml = forecasts.map(f=>`<div class="gear-advice warn"><i class="ic ic-flag ga-ico"></i><div>${f.msg}</div></div>`).join('');
     advisor.innerHTML = recHtml + fcHtml;
@@ -8051,11 +8050,11 @@ function addGearKm(g, km){
 
 function notifyShoe(g, m){
   const msgs={
-    watch:`Tes ${g.name} passent ${m.km} km (60% de leur durée de vie). Surveille l'usure de la semelle et les sensations.`,
-    soon:`Tes ${g.name} atteignent ${m.km} km (85% de leur durée de vie). Pense à prévoir une nouvelle paire.`,
-    replace:`Tes ${g.name} ont dépassé leur durée de vie (${g.max} km). Remplace-les pour éviter les blessures.`
+    watch:tr('gear.notifyWatch', {name:g.name, km:m.km}),
+    soon:tr('gear.notifySoon', {name:g.name, km:m.km}),
+    replace:tr('gear.notifyReplace', {name:g.name, max:g.max})
   };
-  toast(msgs[m.lvl]||`${g.name} : ${m.km} km atteints`);
+  toast(msgs[m.lvl]||tr('gear.notifyGeneric', {name:g.name, km:m.km}));
 }
 
 /* modal d'ajout */
