@@ -275,6 +275,58 @@
     "assign.noAthlete": `Aucun athlète lié — invite ton premier athlète pour lui attribuer des séances.`,
     "assign.selectAll": `Tout sélectionner`, "assign.assign": `Attribuer`,
     "assign.assignToNPlural": `Attribuer à {n} athlètes`, "assign.assignToNSingular": `Attribuer à {n} athlète`,
+
+    "cycleBuilder.edit": `Modifier le cycle`, "cycleBuilder.new": `Nouveau cycle`, "cycleBuilder.week": `Semaine`,
+    "cycleBuilder.clickToRemove": `Cliquer pour retirer`, "cycleBuilder.addSessionThisDay": `Ajouter une séance ce jour`,
+    "cycleBuilder.unnamed": `Cycle sans nom`,
+
+    "settings.structureSub": `Abonnement Structure`, "settings.structureSubText": `La formule Sillance de ta structure — échéances, facturation et gestion.`,
+    "settings.planName": `Sillance Coach — Mensuel`, "settings.active": `Actif`, "settings.inactive": `Inactif`,
+    "settings.createdOn": `Créé le`, "settings.validUntil": `Valide jusqu'au`, "settings.nextPayment": `Prochain paiement`,
+    "settings.renewalOn": `Renouvellement le {date}`, "settings.lastPaymentStatus": `Statut du dernier paiement`, "settings.paid": `Payé`,
+    "settings.issueDate": `Date d'émission`, "settings.paymentMethod": `Moyen de paiement`, "settings.expires": `expire`,
+    "settings.detailsManage": `Détails et gestion`, "settings.subscribe29": `S'abonner — 29 €/mois`,
+    "settings.upgradeToPro": `Passe ta structure en COACH PRO`,
+    "settings.upgradeToProText": `Active les fonctionnalités PRO pour tous les coachs de ta structure et l'Assistant IA pour tes athlètes.`,
+    "settings.discover": `Découvrir`,
+    "settings.coachAiSub": `Abonnement coach — Assistant IA`,
+    "settings.coachAiSubText": `L'add-on d'analyse automatique des séances réalisées : respect du plan, dérive cardiaque, découplage FC, temps en zone.`,
+    "settings.aiAssistantAddon": `Assistant IA (add-on coach)`, "settings.trial14d": `essai 14 j`,
+    "settings.trialDaysLeft": `Essai — {days} j restants`, "settings.status": `Statut`,
+    "settings.trialInProgressPlural": `Essai en cours — {days} jours restants`, "settings.trialInProgressSingular": `Essai en cours — {days} jour restant`,
+    "settings.subActive2": `Abonnement actif`, "settings.nextCharge": `Prochain débit`,
+    "settings.chargeOn": `{price} € le {date} — sauf révocation`, "settings.chargeAtNextDeadline": `{price} € à la prochaine échéance`,
+    "settings.revokeAiAccess": `Révoquer l'accès à l'assistant IA`,
+    "settings.revokeNote": `Aucun débit n'a lieu si tu révoques avant la fin de l'essai. Connecté, la révocation passe par le portail Stripe (accès conservé jusqu'à l'échéance).`,
+    "settings.start14dTrial": `Commencer l'essai 14 jours`,
+    "settings.trialNote": `Carte enregistrée à l'activation. Débit automatique de {price} €/mois à la fin de l'essai, sauf révocation depuis cette page.`,
+
+    "week.taperStart": `Début affûtage`, "week.createSessionThisDay": `Créer une séance ce jour`,
+    "week.nSessionsPlural": `{n} séances`, "week.nSessionsSingular": `{n} séance`,
+
+    "taper.yourAthlete": `ton athlète`, "taper.you": `toi`, "taper.forYourAthlete": `pour ton athlète`,
+    "taper.title": `Affûtage — {name}, J–{days}.`,
+    "taper.body": `Fenêtre recommandée : {taperDays} j. Réduis le volume d'environ {volCut}%{forClause} en gardant des rappels d'intensité courts (VMA/seuil brefs) et la fréquence des séances — c'est le volume qu'on coupe, pas la vivacité.`,
+
+    "risk.stacksHighIntensity": `cumule {n} séances à forte intensité ({discs}).`,
+    "risk.twoDaysInARow": `deux jours d'affilée à forte intensité, peu de récup entre les deux.`,
+    "risk.checkDistribution": `Répartition à vérifier cette semaine.`,
+
+    "pulse.weekReview": `Bilan de la semaine`, "pulse.athleteFeeling": `Ressenti de l'athlète`,
+    "pulse.athNotePlaceholder": `Comment s'est passée ta semaine…`, "pulse.saveMyReview": `Enregistrer mon bilan`,
+    "pulse.noAthleteReviewYet": `Pas encore de bilan de l'athlète pour cette semaine.`,
+    "pulse.coachNote": `Note du coach`, "pulse.coachNotePlaceholder": `Ta lecture de la semaine pour cet athlète…`,
+    "pulse.saveMyNote": `Enregistrer ma note`, "pulse.noCoachNoteYet": `Ton coach n'a pas encore laissé de note pour cette semaine.`,
+
+    "weekInt.alertHard": `RPE moyen {avg} — la semaine est plus éprouvante que prévu : pense à alléger les prochaines séances.`,
+    "weekInt.alertEasy": `RPE moyen {avg} — la semaine passe mieux que prévu : la charge peut être maintenue, voire montée.`,
+    "weekInt.title": `Intensités de la semaine`, "weekInt.subtitle": `prévu vs réalisé — pour adapter la charge`,
+    "weekInt.planned": `Prévu`, "weekInt.done": `Réalisé`,
+
+    "session.muscleEffort": `Effort musculaire`, "session.noteForAthlete": `Note pour l'athlète`,
+    "session.addNoteForAthlete": `Ajouter une note pour l'athlète (pourquoi ce changement)`,
+    "common.delete": `Supprimer`, "session.done": `Séance faite`, "session.markDone": `Marquer comme faite`,
+    "session.notePrompt": `Note pour l'athlète sur cette séance (pourquoi ce changement, ce qu'il faut savoir) :`,
   };
 
   var en = {
@@ -549,6 +601,58 @@
     "assign.noAthlete": `No linked athlete — invite your first athlete to assign them sessions.`,
     "assign.selectAll": `Select all`, "assign.assign": `Assign`,
     "assign.assignToNPlural": `Assign to {n} athletes`, "assign.assignToNSingular": `Assign to {n} athlete`,
+
+    "cycleBuilder.edit": `Edit cycle`, "cycleBuilder.new": `New cycle`, "cycleBuilder.week": `Week`,
+    "cycleBuilder.clickToRemove": `Click to remove`, "cycleBuilder.addSessionThisDay": `Add a session this day`,
+    "cycleBuilder.unnamed": `Untitled cycle`,
+
+    "settings.structureSub": `Structure subscription`, "settings.structureSubText": `Your structure's Sillance plan — deadlines, billing and management.`,
+    "settings.planName": `Sillance Coach — Monthly`, "settings.active": `Active`, "settings.inactive": `Inactive`,
+    "settings.createdOn": `Created on`, "settings.validUntil": `Valid until`, "settings.nextPayment": `Next payment`,
+    "settings.renewalOn": `Renews on {date}`, "settings.lastPaymentStatus": `Last payment status`, "settings.paid": `Paid`,
+    "settings.issueDate": `Issue date`, "settings.paymentMethod": `Payment method`, "settings.expires": `expires`,
+    "settings.detailsManage": `Details and management`, "settings.subscribe29": `Subscribe — €29/month`,
+    "settings.upgradeToPro": `Upgrade your structure to COACH PRO`,
+    "settings.upgradeToProText": `Unlock PRO features for all your structure's coaches and the AI Assistant for your athletes.`,
+    "settings.discover": `Learn more`,
+    "settings.coachAiSub": `Coach subscription — AI Assistant`,
+    "settings.coachAiSubText": `The automatic analysis add-on for completed sessions: plan adherence, cardiac drift, HR decoupling, time in zone.`,
+    "settings.aiAssistantAddon": `AI Assistant (coach add-on)`, "settings.trial14d": `14-day trial`,
+    "settings.trialDaysLeft": `Trial — {days} days left`, "settings.status": `Status`,
+    "settings.trialInProgressPlural": `Trial in progress — {days} days left`, "settings.trialInProgressSingular": `Trial in progress — {days} day left`,
+    "settings.subActive2": `Active subscription`, "settings.nextCharge": `Next charge`,
+    "settings.chargeOn": `€{price} on {date} — unless revoked`, "settings.chargeAtNextDeadline": `€{price} at the next deadline`,
+    "settings.revokeAiAccess": `Revoke AI assistant access`,
+    "settings.revokeNote": `No charge if you revoke before the trial ends. Once connected, revocation goes through the Stripe portal (access kept until the deadline).`,
+    "settings.start14dTrial": `Start the 14-day trial`,
+    "settings.trialNote": `Card saved on activation. Automatic €{price}/month charge at the end of the trial, unless revoked from this page.`,
+
+    "week.taperStart": `Taper start`, "week.createSessionThisDay": `Create a session this day`,
+    "week.nSessionsPlural": `{n} sessions`, "week.nSessionsSingular": `{n} session`,
+
+    "taper.yourAthlete": `your athlete`, "taper.you": `you`, "taper.forYourAthlete": `for your athlete`,
+    "taper.title": `Taper — {name}, D–{days}.`,
+    "taper.body": `Recommended window: {taperDays} days. Reduce volume by about {volCut}%{forClause} while keeping short intensity reminders (brief vVO2max/threshold) and session frequency — it's volume that gets cut, not sharpness.`,
+
+    "risk.stacksHighIntensity": `stacks {n} high-intensity sessions ({discs}).`,
+    "risk.twoDaysInARow": `two high-intensity days in a row, little recovery between them.`,
+    "risk.checkDistribution": `Distribution to review this week.`,
+
+    "pulse.weekReview": `Week review`, "pulse.athleteFeeling": `Athlete's feeling`,
+    "pulse.athNotePlaceholder": `How was your week…`, "pulse.saveMyReview": `Save my review`,
+    "pulse.noAthleteReviewYet": `No athlete review yet for this week.`,
+    "pulse.coachNote": `Coach note`, "pulse.coachNotePlaceholder": `Your read on this athlete's week…`,
+    "pulse.saveMyNote": `Save my note`, "pulse.noCoachNoteYet": `Your coach hasn't left a note for this week yet.`,
+
+    "weekInt.alertHard": `Average RPE {avg} — the week is more taxing than planned: consider lightening upcoming sessions.`,
+    "weekInt.alertEasy": `Average RPE {avg} — the week is going better than planned: load can be maintained, or even increased.`,
+    "weekInt.title": `Week intensities`, "weekInt.subtitle": `planned vs done — to adjust load`,
+    "weekInt.planned": `Planned`, "weekInt.done": `Done`,
+
+    "session.muscleEffort": `Muscular effort`, "session.noteForAthlete": `Note for the athlete`,
+    "session.addNoteForAthlete": `Add a note for the athlete (why this change)`,
+    "common.delete": `Delete`, "session.done": `Session done`, "session.markDone": `Mark as done`,
+    "session.notePrompt": `Note for the athlete about this session (why this change, what they should know):`,
   };
 
   var es = {
@@ -823,6 +927,58 @@
     "assign.noAthlete": `Ningún atleta vinculado — invita a tu primer atleta para asignarle sesiones.`,
     "assign.selectAll": `Seleccionar todo`, "assign.assign": `Asignar`,
     "assign.assignToNPlural": `Asignar a {n} atletas`, "assign.assignToNSingular": `Asignar a {n} atleta`,
+
+    "cycleBuilder.edit": `Editar el ciclo`, "cycleBuilder.new": `Nuevo ciclo`, "cycleBuilder.week": `Semana`,
+    "cycleBuilder.clickToRemove": `Clic para quitar`, "cycleBuilder.addSessionThisDay": `Añadir una sesión este día`,
+    "cycleBuilder.unnamed": `Ciclo sin nombre`,
+
+    "settings.structureSub": `Suscripción Estructura`, "settings.structureSubText": `El plan Sillance de tu estructura — vencimientos, facturación y gestión.`,
+    "settings.planName": `Sillance Coach — Mensual`, "settings.active": `Activo`, "settings.inactive": `Inactivo`,
+    "settings.createdOn": `Creado el`, "settings.validUntil": `Válido hasta`, "settings.nextPayment": `Próximo pago`,
+    "settings.renewalOn": `Renovación el {date}`, "settings.lastPaymentStatus": `Estado del último pago`, "settings.paid": `Pagado`,
+    "settings.issueDate": `Fecha de emisión`, "settings.paymentMethod": `Método de pago`, "settings.expires": `expira`,
+    "settings.detailsManage": `Detalles y gestión`, "settings.subscribe29": `Suscribirse — 29 €/mes`,
+    "settings.upgradeToPro": `Pasa tu estructura a COACH PRO`,
+    "settings.upgradeToProText": `Activa las funciones PRO para todos los coaches de tu estructura y el Asistente IA para tus atletas.`,
+    "settings.discover": `Descubrir`,
+    "settings.coachAiSub": `Suscripción coach — Asistente IA`,
+    "settings.coachAiSubText": `El add-on de análisis automático de las sesiones realizadas: cumplimiento del plan, deriva cardiaca, desacoplamiento de FC, tiempo en zona.`,
+    "settings.aiAssistantAddon": `Asistente IA (add-on coach)`, "settings.trial14d": `prueba de 14 días`,
+    "settings.trialDaysLeft": `Prueba — {days} días restantes`, "settings.status": `Estado`,
+    "settings.trialInProgressPlural": `Prueba en curso — {days} días restantes`, "settings.trialInProgressSingular": `Prueba en curso — {days} día restante`,
+    "settings.subActive2": `Suscripción activa`, "settings.nextCharge": `Próximo cobro`,
+    "settings.chargeOn": `{price} € el {date} — salvo revocación`, "settings.chargeAtNextDeadline": `{price} € en el próximo vencimiento`,
+    "settings.revokeAiAccess": `Revocar el acceso al asistente IA`,
+    "settings.revokeNote": `No hay cobro si revocas antes de que termine la prueba. Una vez conectado, la revocación pasa por el portal Stripe (acceso conservado hasta el vencimiento).`,
+    "settings.start14dTrial": `Comenzar la prueba de 14 días`,
+    "settings.trialNote": `Tarjeta guardada al activar. Cobro automático de {price} €/mes al final de la prueba, salvo revocación desde esta página.`,
+
+    "week.taperStart": `Inicio del afinado`, "week.createSessionThisDay": `Crear una sesión este día`,
+    "week.nSessionsPlural": `{n} sesiones`, "week.nSessionsSingular": `{n} sesión`,
+
+    "taper.yourAthlete": `tu atleta`, "taper.you": `tú`, "taper.forYourAthlete": `para tu atleta`,
+    "taper.title": `Afinado — {name}, D–{days}.`,
+    "taper.body": `Ventana recomendada: {taperDays} días. Reduce el volumen en un {volCut}% aproximadamente{forClause} manteniendo recordatorios de intensidad breves (VAM/umbral cortos) y la frecuencia de las sesiones — es el volumen lo que se recorta, no la viveza.`,
+
+    "risk.stacksHighIntensity": `acumula {n} sesiones de alta intensidad ({discs}).`,
+    "risk.twoDaysInARow": `dos días seguidos de alta intensidad, poca recuperación entre ambos.`,
+    "risk.checkDistribution": `Distribución a revisar esta semana.`,
+
+    "pulse.weekReview": `Balance de la semana`, "pulse.athleteFeeling": `Sensación del atleta`,
+    "pulse.athNotePlaceholder": `¿Cómo fue tu semana…`, "pulse.saveMyReview": `Guardar mi balance`,
+    "pulse.noAthleteReviewYet": `Aún no hay balance del atleta para esta semana.`,
+    "pulse.coachNote": `Nota del coach`, "pulse.coachNotePlaceholder": `Tu lectura de la semana para este atleta…`,
+    "pulse.saveMyNote": `Guardar mi nota`, "pulse.noCoachNoteYet": `Tu coach aún no ha dejado una nota para esta semana.`,
+
+    "weekInt.alertHard": `RPE medio {avg} — la semana está siendo más exigente de lo previsto: considera aligerar las próximas sesiones.`,
+    "weekInt.alertEasy": `RPE medio {avg} — la semana va mejor de lo previsto: la carga puede mantenerse, o incluso subirse.`,
+    "weekInt.title": `Intensidades de la semana`, "weekInt.subtitle": `previsto vs realizado — para adaptar la carga`,
+    "weekInt.planned": `Previsto`, "weekInt.done": `Realizado`,
+
+    "session.muscleEffort": `Esfuerzo muscular`, "session.noteForAthlete": `Nota para el atleta`,
+    "session.addNoteForAthlete": `Añadir una nota para el atleta (por qué este cambio)`,
+    "common.delete": `Eliminar`, "session.done": `Sesión hecha`, "session.markDone": `Marcar como hecha`,
+    "session.notePrompt": `Nota para el atleta sobre esta sesión (por qué este cambio, qué debe saber):`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

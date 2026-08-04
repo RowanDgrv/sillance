@@ -1845,7 +1845,7 @@ function openCycleBuilder(existing){
                         : {id:'c'+(cycleUid++), name:'', weeks:4, plan:{}};
   document.getElementById('cyName').value = cycleState.name||'';
   document.getElementById('cyWeeks').value = String(cycleState.weeks);
-  document.getElementById('cycleBadge').textContent = existing ? 'Modifier le cycle' : 'Nouveau cycle';
+  document.getElementById('cycleBadge').textContent = existing ? tr('cycleBuilder.edit') : tr('cycleBuilder.new');
   document.getElementById('cyStart').value = iso(nextMonday());
   renderCycleGrid();
   document.getElementById('cycleOverlay').classList.add('open');
@@ -1857,13 +1857,13 @@ function renderCycleGrid(){
     const wk = Array.from({length:7},(_,d)=> (cycleState.plan[w+'-'+d]||[]));
     const wkTss = wk.flat().reduce((a,tid)=>{ const t=TEMPLATES.find(x=>x.id===tid); return a+(t?t.tss:0); },0);
     html += `<div class="cy-week">
-      <div class="cy-week-t">Semaine ${w+1} <em>${wkTss} TSS</em></div>
+      <div class="cy-week-t">${tr('cycleBuilder.week')} ${w+1} <em>${wkTss} TSS</em></div>
       <div class="cy-days">${wk.map((cell,d)=>`
         <div class="cy-day" data-w="${w}" data-d="${d}">
           <span class="d">${DAYS[d]}</span>
           ${cell.map((tid,i)=>{ const t=TEMPLATES.find(x=>x.id===tid); if(!t) return '';
-            return `<span class="cy-chip" style="--c:${DISC[t.disc].color}" data-i="${i}" title="Cliquer pour retirer">${t.title}</span>`; }).join('')}
-          <button class="cy-add-btn" aria-label="Ajouter une séance ce jour">+</button>
+            return `<span class="cy-chip" style="--c:${DISC[t.disc].color}" data-i="${i}" title="${tr('cycleBuilder.clickToRemove')}">${t.title}</span>`; }).join('')}
+          <button class="cy-add-btn" aria-label="${tr('cycleBuilder.addSessionThisDay')}">+</button>
         </div>`).join('')}
       </div>
     </div>`;
@@ -1902,7 +1902,7 @@ function openCyPicker(e, w, d){
   }), 0);
 }
 function saveCycleFromModal(){
-  cycleState.name = document.getElementById('cyName').value.trim() || 'Cycle sans nom';
+  cycleState.name = document.getElementById('cyName').value.trim() || tr('cycleBuilder.unnamed');
   cycleState.weeks = +document.getElementById('cyWeeks').value;
   const clean = {id:cycleState.id, name:cycleState.name, weeks:cycleState.weeks, plan:cycleState.plan};
   const i=CYCLES.findIndex(x=>x.id===clean.id);
@@ -1946,65 +1946,65 @@ function aiTrialDaysLeft(){
 function settingsStructureHtml(){
   const sub = window.__pf_subscribed===true || !window.PF?.user; // démo : montré actif
   return `
-    <div class="set-h">Abonnement Structure</div>
-    <div class="set-sub">La formule Sillance de ta structure — échéances, facturation et gestion.</div>
+    <div class="set-h">${tr('settings.structureSub')}</div>
+    <div class="set-sub">${tr('settings.structureSubText')}</div>
     <div class="set-plan">
       <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
         <div style="flex:1">
-          <div class="p-name">Sillance Coach — Mensuel</div>
-          <div class="p-price">29€<small> /mois</small></div>
+          <div class="p-name">${tr('settings.planName')}</div>
+          <div class="p-price">29€<small> /${tr('sidebar.perMonth')}</small></div>
         </div>
-        <span class="set-status ${sub?'on':'off'}">${sub?'Actif':'Inactif'}</span>
+        <span class="set-status ${sub?'on':'off'}">${sub?tr('settings.active'):tr('settings.inactive')}</span>
       </div>
       <div class="set-rows">
-        <div><div class="k">Créé le</div><div class="v">14/04/2026</div></div>
-        <div><div class="k">Valide jusqu'au</div><div class="v">09/08/2026</div></div>
-        <div><div class="k">Prochain paiement</div><div class="v">Renouvellement le 09/08/2026</div></div>
-        <div><div class="k">Statut du dernier paiement</div><div class="v" style="color:var(--good)">Payé</div></div>
-        <div><div class="k">Date d'émission</div><div class="v">09/07/2026</div></div>
-        <div><div class="k">Moyen de paiement</div><div class="v">Visa •••• 4242 — expire 11/2029</div></div>
+        <div><div class="k">${tr('settings.createdOn')}</div><div class="v">14/04/2026</div></div>
+        <div><div class="k">${tr('settings.validUntil')}</div><div class="v">09/08/2026</div></div>
+        <div><div class="k">${tr('settings.nextPayment')}</div><div class="v">${tr('settings.renewalOn', {date:'09/08/2026'})}</div></div>
+        <div><div class="k">${tr('settings.lastPaymentStatus')}</div><div class="v" style="color:var(--good)">${tr('settings.paid')}</div></div>
+        <div><div class="k">${tr('settings.issueDate')}</div><div class="v">09/07/2026</div></div>
+        <div><div class="k">${tr('settings.paymentMethod')}</div><div class="v">Visa •••• 4242 — ${tr('settings.expires')} 11/2029</div></div>
       </div>
       <div class="set-actions">
-        <button class="btn cy-ghost" id="setPortalBtn"><i class="ic ic-credit-card"></i> Détails et gestion</button>
-        ${sub?'':`<button class="btn" id="setSubscribeBtn">S'abonner — 29 €/mois</button>`}
+        <button class="btn cy-ghost" id="setPortalBtn"><i class="ic ic-credit-card"></i> ${tr('settings.detailsManage')}</button>
+        ${sub?'':`<button class="btn" id="setSubscribeBtn">${tr('settings.subscribe29')}</button>`}
       </div>
     </div>
     <div class="set-upsell">
-      <b>⭐ Passe ta structure en COACH PRO</b>
-      <p>Active les fonctionnalités PRO pour tous les coachs de ta structure et l'Assistant IA pour tes athlètes.</p>
-      <button class="btn btn-secondary" id="setProBtn">Découvrir</button>
+      <b>⭐ ${tr('settings.upgradeToPro')}</b>
+      <p>${tr('settings.upgradeToProText')}</p>
+      <button class="btn btn-secondary" id="setProBtn">${tr('settings.discover')}</button>
     </div>`;
 }
 function settingsCoachHtml(){
   const on = aiUnlocked();
   const days = aiTrialDaysLeft();
-  const chip = on ? (days!=null?`<span class="set-status trial">Essai — ${days} j restants</span>`:'<span class="set-status on">Actif</span>')
-                  : '<span class="set-status off">Inactif</span>';
+  const chip = on ? (days!=null?`<span class="set-status trial">${tr('settings.trialDaysLeft', {days})}</span>`:`<span class="set-status on">${tr('settings.active')}</span>`)
+                  : `<span class="set-status off">${tr('settings.inactive')}</span>`;
   return `
-    <div class="set-h">Abonnement coach — Assistant IA</div>
-    <div class="set-sub">L'add-on d'analyse automatique des séances réalisées : respect du plan, dérive cardiaque, découplage FC, temps en zone.</div>
+    <div class="set-h">${tr('settings.coachAiSub')}</div>
+    <div class="set-sub">${tr('settings.coachAiSubText')}</div>
     <div class="set-plan">
       <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
         <div style="flex:1">
-          <div class="p-name">Assistant IA (add-on coach)</div>
-          <div class="p-price">${AI_ADDON_PRICE}€<small> /mois · essai 14 j</small></div>
+          <div class="p-name">${tr('settings.aiAssistantAddon')}</div>
+          <div class="p-price">${AI_ADDON_PRICE}€<small> /${tr('sidebar.perMonth')} · ${tr('settings.trial14d')}</small></div>
         </div>
         ${chip}
       </div>
       ${on ? `
       <div class="set-rows">
-        <div><div class="k">Statut</div><div class="v">${days!=null?`Essai en cours — ${days} jour${days>1?'s':''} restant${days>1?'s':''}`:'Abonnement actif'}</div></div>
-        <div><div class="k">Prochain débit</div><div class="v">${days!=null?`${AI_ADDON_PRICE} € le ${fmtDateFr(addDays(new Date(window.__pf_aiDemoStart||Date.now()),14))} — sauf révocation`:`${AI_ADDON_PRICE} € à la prochaine échéance`}</div></div>
+        <div><div class="k">${tr('settings.status')}</div><div class="v">${days!=null?tr(days>1?'settings.trialInProgressPlural':'settings.trialInProgressSingular', {days}):tr('settings.subActive2')}</div></div>
+        <div><div class="k">${tr('settings.nextCharge')}</div><div class="v">${days!=null?tr('settings.chargeOn', {price:AI_ADDON_PRICE, date:fmtDateFr(addDays(new Date(window.__pf_aiDemoStart||Date.now()),14))}):tr('settings.chargeAtNextDeadline', {price:AI_ADDON_PRICE})}</div></div>
       </div>
       <div class="set-actions">
-        <button class="btn cy-ghost set-danger" id="setAiRevoke"><i class="ic ic-x"></i> Révoquer l'accès à l'assistant IA</button>
+        <button class="btn cy-ghost set-danger" id="setAiRevoke"><i class="ic ic-x"></i> ${tr('settings.revokeAiAccess')}</button>
       </div>
-      <div class="set-note">Aucun débit n'a lieu si tu révoques avant la fin de l'essai. Connecté, la révocation passe par le portail Stripe (accès conservé jusqu'à l'échéance).</div>`
+      <div class="set-note">${tr('settings.revokeNote')}</div>`
       : `
       <div class="set-actions" style="margin-top:12px">
-        <button class="btn" id="setAiStart">Commencer l'essai 14 jours</button>
+        <button class="btn" id="setAiStart">${tr('settings.start14dTrial')}</button>
       </div>
-      <div class="set-note">Carte enregistrée à l'activation. Débit automatique de ${AI_ADDON_PRICE} €/mois à la fin de l'essai, sauf révocation depuis cette page.</div>`}
+      <div class="set-note">${tr('settings.trialNote', {price:AI_ADDON_PRICE})}</div>`}
     </div>`;
 }
 let settingsTab='structure';
@@ -2115,8 +2115,8 @@ function render(){
         <span class="dnum">${date.getDate()}</span>
       </div>
       ${isRace?`<div class="day-race-pill"><i class="ic ic-flag"></i>${race.name}</div>`:''}
-      ${isTaperStart?`<div class="day-taper-tag"><i class="ic ic-gradient"></i>Début affûtage</div>`:''}
-      ${mode==='coach'?`<button class="day-add" data-key="${key}" aria-label="Créer une séance ce jour">+</button>`:''}
+      ${isTaperStart?`<div class="day-taper-tag"><i class="ic ic-gradient"></i>${tr('week.taperStart')}</div>`:''}
+      ${mode==='coach'?`<button class="day-add" data-key="${key}" aria-label="${tr('week.createSessionThisDay')}">+</button>`:''}
       <div class="day-body"></div>
       <div class="day-load">
         ${sessions.map(s=>`<div class="bar" style="background:${DISC[s.disc].color};height:${Math.max(8, s.tss/maxDayTss*30)}px"></div>`).join('')||'<div class="bar" style="background:var(--line);height:3px"></div>'}
@@ -2153,8 +2153,8 @@ function render(){
 
   /* stats */
   document.getElementById('weekTss').innerHTML = `${totalTss}<em>TSS</em>`;
-  document.getElementById('weekHours').innerHTML = `${(totalMin/60).toFixed(1).replace('.',',')}<em>h</em>`;
-  document.getElementById('weekCount').textContent = `${count} séances`;
+  document.getElementById('weekHours').innerHTML = `${(totalMin/60).toLocaleString(localeStr(),{minimumFractionDigits:1,maximumFractionDigits:1})}<em>h</em>`;
+  document.getElementById('weekCount').textContent = tr(count>1?'week.nSessionsPlural':'week.nSessionsSingular', {n:count});
   document.getElementById('compliance').innerHTML = `${count?Math.round(doneCount/count*100):0}<em>%</em>`;
   renderWeekIntensity(mon);
   renderTaperHint(race, mon);
@@ -2172,13 +2172,11 @@ function renderTaperHint(race, mon){
   const overlaps = weekDays.some(k=> k>=race.taperStart && k<=race.date);
   if(!overlaps){ el.hidden=true; return; }
   const isCoach = (typeof mode!=='undefined' && mode==='coach');
-  const who = isCoach ? 'ton athlète' : 'toi';
+  const forClause = isCoach ? ' '+tr('taper.forYourAthlete') : '';
   el.hidden=false;
   el.innerHTML = `<i class="ic ic-gradient"></i><div class="th-txt">
-    <b>Affûtage — ${dispoSafe(race.name)}, J–${race.days}.</b>
-    Fenêtre recommandée : <span class="k">${race.taperDays} j</span>. Réduis le volume d'environ
-    <span class="k">${race.volCut}%</span> ${isCoach?'pour '+who:''} en gardant des <b>rappels d'intensité courts</b>
-    (VMA/seuil brefs) et la fréquence des séances — c'est le volume qu'on coupe, pas la vivacité.</div>`;
+    <b>${tr('taper.title', {name:dispoSafe(race.name), days:race.days})}</b>
+    ${tr('taper.body', {taperDays:race.taperDays, volCut:race.volCut, forClause})}</div>`;
 }
 /* Optimiseur de répartition hebdo : signale au coach les combinaisons à
    risque dans la semaine affichée (charge forte cumulée le même jour, ou
@@ -2192,12 +2190,12 @@ function weekRiskFindings(mon){
   days.forEach(d=>{
     if(d.high.length>=2){
       const discs=[...new Set(d.high.map(s=>DISC[s.disc].label))];
-      findings.push(`<b>${DAYS[d.i]}</b> cumule ${d.high.length} séances à forte intensité (${discs.join(' + ')}).`);
+      findings.push(`<b>${DAYS[d.i]}</b> ${tr('risk.stacksHighIntensity', {n:d.high.length, discs:discs.join(' + ')})}`);
     }
   });
   for(let i=0;i<6;i++){
     if(days[i].high.length && days[i+1].high.length){
-      findings.push(`<b>${DAYS[i]} → ${DAYS[i+1]}</b> deux jours d'affilée à forte intensité, peu de récup entre les deux.`);
+      findings.push(`<b>${DAYS[i]} → ${DAYS[i+1]}</b> ${tr('risk.twoDaysInARow')}`);
     }
   }
   return findings;
@@ -2208,7 +2206,7 @@ function renderWeekRiskHint(mon){
   const findings = weekRiskFindings(mon);
   if(!findings.length){ el.hidden=true; return; }
   el.hidden=false;
-  el.innerHTML = `<i class="ic ic-alert-triangle"></i><div class="th-txt"><b>Répartition à vérifier cette semaine.</b> ${findings.slice(0,3).join(' ')}</div>`;
+  el.innerHTML = `<i class="ic ic-alert-triangle"></i><div class="th-txt"><b>${tr('risk.checkDistribution')}</b> ${findings.slice(0,3).join(' ')}</div>`;
 }
 
 /* ============================================================
@@ -2240,24 +2238,24 @@ function renderWeekPulse(mon){
   const p = WEEK_PULSES[ck] || {};
   el.hidden = false;
   el.innerHTML = `
-    <div class="sn-head"><i class="ic ic-message-circle"></i> Bilan de la semaine</div>
+    <div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('pulse.weekReview')}</div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div>
-        <div class="sn-when" style="margin-bottom:6px">Ressenti de l'athlète</div>
+        <div class="sn-when" style="margin-bottom:6px">${tr('pulse.athleteFeeling')}</div>
         ${mode==='athlete' ? `
           <div class="wp-feel-seg ck-dispo-seg" id="wpFeelSeg">${Object.entries(WEEK_FEELS).map(([k,f])=>`<button type="button" data-feel="${k}" class="${p.athleteFeel===k?'sel':''}" style="--dc:${f.c}">${f.l}</button>`).join('')}</div>
-          <textarea id="wpAthNote" rows="2" placeholder="Comment s'est passée ta semaine…" style="width:100%;box-sizing:border-box;margin-top:6px">${p.athleteNote?dispoSafe(p.athleteNote):''}</textarea>
-          <button class="btn" id="wpAthSave" style="margin-top:6px">Enregistrer mon bilan</button>
+          <textarea id="wpAthNote" rows="2" placeholder="${tr('pulse.athNotePlaceholder')}" style="width:100%;box-sizing:border-box;margin-top:6px">${p.athleteNote?dispoSafe(p.athleteNote):''}</textarea>
+          <button class="btn" id="wpAthSave" style="margin-top:6px">${tr('pulse.saveMyReview')}</button>
         ` : (p.athleteFeel||p.athleteNote) ? `
           <div class="sn-txt">${p.athleteFeel&&WEEK_FEELS[p.athleteFeel]?`<b style="color:${WEEK_FEELS[p.athleteFeel].c}">${WEEK_FEELS[p.athleteFeel].l}</b>${p.athleteNote?' — ':''}`:''}${p.athleteNote?dispoSafe(p.athleteNote):''}</div>
-        ` : `<p class="club-hint">Pas encore de bilan de l'athlète pour cette semaine.</p>`}
+        ` : `<p class="club-hint">${tr('pulse.noAthleteReviewYet')}</p>`}
       </div>
       <div>
-        <div class="sn-when" style="margin-bottom:6px">Note du coach</div>
+        <div class="sn-when" style="margin-bottom:6px">${tr('pulse.coachNote')}</div>
         ${mode==='coach' ? `
-          <textarea id="wpCoachNote" rows="2" placeholder="Ta lecture de la semaine pour cet athlète…" style="width:100%;box-sizing:border-box">${p.coachNote?dispoSafe(p.coachNote):''}</textarea>
-          <button class="btn" id="wpCoachSave" style="margin-top:6px">Enregistrer ma note</button>
-        ` : p.coachNote ? `<div class="sn-txt">${dispoSafe(p.coachNote)}</div>` : `<p class="club-hint">Ton coach n'a pas encore laissé de note pour cette semaine.</p>`}
+          <textarea id="wpCoachNote" rows="2" placeholder="${tr('pulse.coachNotePlaceholder')}" style="width:100%;box-sizing:border-box">${p.coachNote?dispoSafe(p.coachNote):''}</textarea>
+          <button class="btn" id="wpCoachSave" style="margin-top:6px">${tr('pulse.saveMyNote')}</button>
+        ` : p.coachNote ? `<div class="sn-txt">${dispoSafe(p.coachNote)}</div>` : `<p class="club-hint">${tr('pulse.noCoachNoteYet')}</p>`}
       </div>
     </div>`;
   const fs = document.getElementById('wpFeelSeg');
@@ -2435,13 +2433,13 @@ function renderWeekIntensity(mon){
   let alert='';
   if(rpeN>=2){
     const d=(rpeSum-rpeExpSum)/rpeN, avg=(rpeSum/rpeN).toFixed(1);
-    if(d>=1.5) alert=`<div class="wk-alert hard"><i class="ic ic-alert-triangle"></i> RPE moyen ${avg} — la semaine est plus éprouvante que prévu : pense à alléger les prochaines séances.</div>`;
-    else if(d<=-1.5) alert=`<div class="wk-alert easy"><i class="ic ic-check"></i> RPE moyen ${avg} — la semaine passe mieux que prévu : la charge peut être maintenue, voire montée.</div>`;
+    if(d>=1.5) alert=`<div class="wk-alert hard"><i class="ic ic-alert-triangle"></i> ${tr('weekInt.alertHard', {avg})}</div>`;
+    else if(d<=-1.5) alert=`<div class="wk-alert easy"><i class="ic ic-check"></i> ${tr('weekInt.alertEasy', {avg})}</div>`;
   }
   el.innerHTML=`
-    <div class="wk-int-head">Intensités de la semaine <span>prévu vs réalisé — pour adapter la charge</span></div>
-    <div class="wk-row"><span class="wk-lbl">Prévu</span><div class="wk-bar">${bar(plan)}</div><span class="wk-tot">${fmtDur(Math.round(planMin))} · ${planTss} TSS</span></div>
-    <div class="wk-row"><span class="wk-lbl">Réalisé</span><div class="wk-bar">${realMin?bar(real):''}</div><span class="wk-tot">${realMin?`${fmtDur(Math.round(realMin))} · ${realTss} TSS (${planTss?Math.round(realTss/planTss*100):0}%)`:'—'}</span></div>
+    <div class="wk-int-head">${tr('weekInt.title')} <span>${tr('weekInt.subtitle')}</span></div>
+    <div class="wk-row"><span class="wk-lbl">${tr('weekInt.planned')}</span><div class="wk-bar">${bar(plan)}</div><span class="wk-tot">${fmtDur(Math.round(planMin))} · ${planTss} TSS</span></div>
+    <div class="wk-row"><span class="wk-lbl">${tr('weekInt.done')}</span><div class="wk-bar">${realMin?bar(real):''}</div><span class="wk-tot">${realMin?`${fmtDur(Math.round(realMin))} · ${realTss} TSS (${planTss?Math.round(realTss/planTss*100):0}%)`:'—'}</span></div>
     <div class="wk-legend">${Z.map(z=>`<span><i style="background:${ZONE_COLORS[z]}"></i>${z}</span>`).join('')}</div>
     ${alert}`;
 }
@@ -2457,13 +2455,13 @@ function sessionCard(s, dateKey){
   el.draggable = (mode==='coach');
   el.innerHTML = `
     <div class="t">${s.title}</div>
-    <div class="m"><span>${fmtDur(s.dur)}</span>${s.dist?`<span>${s.dist} km</span>`:''}<span>${s.tss} TSS</span><span>${s.zone}</span>${s.done&&s.rpe?`<span class="rpe-chip" style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}</span>`:''}${s.done&&s.rpeMuscle?`<span class="mus-chip" style="color:${rpeColor(s.rpeMuscle)}" title="Effort musculaire"><i class="ic ic-dumbbell" style="width:10px;height:10px;vertical-align:-1px"></i>${s.rpeMuscle}</span>`:''}</div>
+    <div class="m"><span>${fmtDur(s.dur)}</span>${s.dist?`<span>${s.dist} km</span>`:''}<span>${s.tss} TSS</span><span>${s.zone}</span>${s.done&&s.rpe?`<span class="rpe-chip" style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}</span>`:''}${s.done&&s.rpeMuscle?`<span class="mus-chip" style="color:${rpeColor(s.rpeMuscle)}" title="${tr('session.muscleEffort')}"><i class="ic ic-dumbbell" style="width:10px;height:10px;vertical-align:-1px"></i>${s.rpeMuscle}</span>`:''}</div>
     ${sessionProfileHTML(s)}
     ${vid?`<span class="video-chip">${vid.title}</span>`:''}
     ${s.done?'<span class="done-chip"><i class="ic ic-check"></i></span>':''}
-    ${mode==='coach'?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="Note pour l'athlète" title="${s.coachNote?dispoSafe(s.coachNote):`Ajouter une note pour l'athlète (pourquoi ce changement)`}"><i class="ic ic-message-circle"></i></button>`:''}
-    ${mode==='coach'?'<button class="del" aria-label="Supprimer"><i class="ic ic-x"></i></button>':''}
-    ${mode==='athlete'?`<button class="check-btn">${s.done?'<i class="ic ic-check"></i> Séance faite':'Marquer comme faite'}</button>`:''}
+    ${mode==='coach'?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="${tr('session.noteForAthlete')}" title="${s.coachNote?dispoSafe(s.coachNote):tr('session.addNoteForAthlete')}"><i class="ic ic-message-circle"></i></button>`:''}
+    ${mode==='coach'?`<button class="del" aria-label="${tr('common.delete')}"><i class="ic ic-x"></i></button>`:''}
+    ${mode==='athlete'?`<button class="check-btn">${s.done?'<i class="ic ic-check"></i> '+tr('session.done'):tr('session.markDone')}</button>`:''}
   `;
   el.addEventListener('dragstart', e=>{
     if(mode!=='coach') return;
@@ -2473,7 +2471,7 @@ function sessionCard(s, dateKey){
   el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
   el.addEventListener('click', e=>{
     if(e.target.closest('.note-btn')){
-      const next = prompt("Note pour l'athlète sur cette séance (pourquoi ce changement, ce qu'il faut savoir) :", s.coachNote||'');
+      const next = prompt(tr('session.notePrompt'), s.coachNote||'');
       if(next!=null){
         s.coachNote = next.trim() || null;
         if(window.PF?.user && s.id){ PF.setCoachNote(s.id, s.coachNote).catch(err=>console.warn('[PF] setCoachNote', err)); }
