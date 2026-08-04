@@ -68,6 +68,11 @@
   .btn.primary:hover{filter:brightness(1.07)}
   .btn.sm{padding:6px 10px;font-size:12px}
   .btn.ghost{background:transparent}
+  .lang-switch{display:flex;gap:2px;background:var(--card);border:1px solid var(--line-strong);border-radius:8px;padding:2px}
+  .lang-switch button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;padding:6px 9px;
+    border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:.15s;line-height:1}
+  .lang-switch button:hover{color:var(--ink)}
+  .lang-switch button.active{background:var(--accent);color:#062028}
 
   .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:22px}
   @media(max-width:880px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -159,53 +164,58 @@
       </div>
     </div>
     <nav id="nav">
-      <div class="nav active" data-v="dash"><span class="ico">🏟️</span> Tableau de bord</div>
-      <div class="nav" data-v="slots"><span class="ico">📅</span> Créneaux</div>
-      <div class="nav" data-v="pres"><span class="ico">✅</span> Présences <span class="badge" id="presBadge">live</span></div>
-      <div class="nav" data-v="bill"><span class="ico">💶</span> Facturation</div>
-      <div class="nav" data-v="members"><span class="ico">👥</span> Adhérents</div>
-      <div class="nav" data-v="offers"><span class="ico">🎟️</span> Offres &amp; tarifs</div>
+      <div class="nav active" data-v="dash"><span class="ico">🏟️</span> <span data-i18n="club.nav.dash">Tableau de bord</span></div>
+      <div class="nav" data-v="slots"><span class="ico">📅</span> <span data-i18n="club.nav.slots">Créneaux</span></div>
+      <div class="nav" data-v="pres"><span class="ico">✅</span> <span data-i18n="club.nav.pres">Présences</span> <span class="badge" id="presBadge">live</span></div>
+      <div class="nav" data-v="bill"><span class="ico">💶</span> <span data-i18n="club.nav.bill">Facturation</span></div>
+      <div class="nav" data-v="members"><span class="ico">👥</span> <span data-i18n="club.nav.members">Adhérents</span></div>
+      <div class="nav" data-v="offers"><span class="ico">🎟️</span> <span data-i18n="club.nav.offers">Offres &amp; tarifs</span></div>
     </nav>
     <div class="side-foot">
-      <div class="pp"><span class="pmark">S</span> <span>Espace salle — propulsé&nbsp;Sillance</span></div>
-      <div style="margin-top:8px">Aucune courbe, aucune analyse ici. La data est réservée aux <b style="color:var(--ink)">coachs</b> des adhérents « Coaching&nbsp;+ ».</div>
+      <div class="pp"><span class="pmark">S</span> <span data-i18n="club.poweredBy">Espace salle — propulsé&nbsp;Sillance</span></div>
+      <div style="margin-top:8px" data-i18n-html="club.sidebarNote">Aucune courbe, aucune analyse ici. La data est réservée aux <b style="color:var(--ink)">coachs</b> des adhérents « Coaching&nbsp;+ ».</div>
     </div>
   </aside>
 
   <!-- ============ MAIN ============ -->
   <main>
     <div id="prospectRibbon" hidden style="display:flex;align-items:center;gap:12px;justify-content:space-between;background:linear-gradient(90deg,rgba(255,120,71,.16),rgba(70,194,216,.10));border:1px solid var(--line);border-radius:12px;padding:11px 15px;margin-bottom:16px;font-size:13px">
-      <div>🎁 Espace de démonstration préparé pour <b id="ribBox">votre salle</b> — explore librement, tout est personnalisable (créneaux, tarifs, nom).</div>
-      <button class="btn sm" style="white-space:nowrap" data-action="closeRibbon">Compris ✕</button>
+      <div data-i18n-html="club.ribbon.text">🎁 Espace de démonstration préparé pour <b id="ribBox">votre salle</b> — explore librement, tout est personnalisable (créneaux, tarifs, nom).</div>
+      <button class="btn sm" style="white-space:nowrap" data-action="closeRibbon" data-i18n="club.ribbon.close">Compris ✕</button>
     </div>
     <div class="topbar">
       <div>
-        <h1 id="viewTitle">Tableau de bord <span class="demoflag">démo</span></h1>
-        <div class="sub" id="viewSub">Vue d'ensemble de la salle — aujourd'hui, jeudi.</div>
+        <h1 id="viewTitle"><span data-i18n="club.title.dash">Tableau de bord</span> <span class="demoflag" data-i18n="club.demoFlag">démo</span></h1>
+        <div class="sub" id="viewSub" data-i18n="club.sub.dash">Vue d'ensemble de la salle — aujourd'hui, jeudi.</div>
       </div>
       <div class="row">
-        <button class="btn ghost sm" id="renameBtn">✎ Renommer la salle</button>
-        <button class="btn primary" id="primaryAction">+ Nouveau créneau</button>
+        <div class="lang-switch" role="group" aria-label="Language / Langue / Idioma">
+          <button type="button" data-lang-btn="fr">FR</button>
+          <button type="button" data-lang-btn="en">EN</button>
+          <button type="button" data-lang-btn="es">ES</button>
+        </div>
+        <button class="btn ghost sm" id="renameBtn" data-i18n="club.renameBtn">✎ Renommer la salle</button>
+        <button class="btn primary" id="primaryAction" data-i18n="club.action.dash">+ Nouveau créneau</button>
       </div>
     </div>
 
     <!-- DASH -->
     <section data-view="dash">
       <div class="kpis">
-        <div class="kpi"><div class="v acc" id="kFill">—</div><div class="k">Remplissage moyen</div><div class="d muted">7 derniers jours</div></div>
-        <div class="kpi"><div class="v" id="kPres">—</div><div class="k">Inscrits aujourd'hui</div><div class="d good" id="kPresD">—</div></div>
-        <div class="kpi"><div class="v good" id="kRev">—</div><div class="k">CA du mois</div><div class="d muted" id="kRevD">abos + à la carte</div></div>
-        <div class="kpi"><div class="v warn" id="kMem">—</div><div class="k">Adhérents actifs</div><div class="d muted" id="kMemD">—</div></div>
+        <div class="kpi"><div class="v acc" id="kFill">—</div><div class="k" data-i18n="club.kpi.avgFill">Remplissage moyen</div><div class="d muted" data-i18n="club.kpi.last7d">7 derniers jours</div></div>
+        <div class="kpi"><div class="v" id="kPres">—</div><div class="k" data-i18n="club.kpi.regToday">Inscrits aujourd'hui</div><div class="d good" id="kPresD">—</div></div>
+        <div class="kpi"><div class="v good" id="kRev">—</div><div class="k" data-i18n="club.kpi.monthRev">CA du mois</div><div class="d muted" id="kRevD" data-i18n="club.kpi.subsCarte">abos + à la carte</div></div>
+        <div class="kpi"><div class="v warn" id="kMem">—</div><div class="k" data-i18n="club.kpi.activeMembers">Adhérents actifs</div><div class="d muted" id="kMemD">—</div></div>
       </div>
       <div class="cols">
         <div class="card">
-          <h2>Créneaux d'aujourd'hui</h2>
-          <p class="hint">Remplissage en direct. Clique « Présences » pour pointer.</p>
+          <h2 data-i18n="club.dash.todaySlots">Créneaux d'aujourd'hui</h2>
+          <p class="hint" data-i18n="club.dash.todaySlotsHint">Remplissage en direct. Clique « Présences » pour pointer.</p>
           <div id="todaySlots"></div>
         </div>
         <div class="card">
-          <h2>Répartition des adhérents</h2>
-          <p class="hint">Par formule souscrite — c'est ton mix de revenu.</p>
+          <h2 data-i18n="club.dash.memberMix">Répartition des adhérents</h2>
+          <p class="hint" data-i18n="club.dash.memberMixHint">Par formule souscrite — c'est ton mix de revenu.</p>
           <div id="mixWrap"></div>
         </div>
       </div>
@@ -214,8 +224,8 @@
     <!-- SLOTS -->
     <section data-view="slots" class="hide">
       <div class="card">
-        <h2>Créneaux de la semaine</h2>
-        <p class="hint">Tarif <b style="color:var(--good)">0&nbsp;€&nbsp;= inclus</b> dans l'abonnement · tarif <b style="color:var(--hyrox)">&gt;&nbsp;0&nbsp;€&nbsp;= à la carte</b> (l'adhérent paie en réservant — idéal drop-in Hyrox).</p>
+        <h2 data-i18n="club.slots.title">Créneaux de la semaine</h2>
+        <p class="hint" data-i18n-html="club.slots.hint">Tarif <b style="color:var(--good)">0&nbsp;€&nbsp;= inclus</b> dans l'abonnement · tarif <b style="color:var(--hyrox)">&gt;&nbsp;0&nbsp;€&nbsp;= à la carte</b> (l'adhérent paie en réservant — idéal drop-in Hyrox).</p>
         <div id="allSlots"></div>
       </div>
     </section>
@@ -223,8 +233,8 @@
     <!-- PRESENCE -->
     <section data-view="pres" class="hide">
       <div class="card">
-        <h2>Présences</h2>
-        <p class="hint">Choisis un créneau, puis pointe. Les adhérents se sont inscrits eux-mêmes.</p>
+        <h2 data-i18n="club.nav.pres">Présences</h2>
+        <p class="hint" data-i18n="club.pres.hint">Choisis un créneau, puis pointe. Les adhérents se sont inscrits eux-mêmes.</p>
         <div class="selpill" id="presPicker" style="margin-bottom:16px"></div>
         <div id="presList"></div>
       </div>
@@ -233,14 +243,14 @@
     <!-- BILLING -->
     <section data-view="bill" class="hide">
       <div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-        <div class="kpi"><div class="v good" id="bTot">—</div><div class="k">Encaissé ce mois</div></div>
-        <div class="kpi"><div class="v warn" id="bWait">—</div><div class="k">En attente</div></div>
-        <div class="kpi"><div class="v acc" id="bRec">—</div><div class="k">Abonnements actifs</div></div>
+        <div class="kpi"><div class="v good" id="bTot">—</div><div class="k" data-i18n="clubBill.collectedThisMonth">Encaissé ce mois</div></div>
+        <div class="kpi"><div class="v warn" id="bWait">—</div><div class="k" data-i18n="clubBill.pending">En attente</div></div>
+        <div class="kpi"><div class="v acc" id="bRec">—</div><div class="k" data-i18n="clubBill.activeSubs">Abonnements actifs</div></div>
       </div>
       <div class="card">
-        <h2>Paiements</h2>
-        <p class="hint">Abonnements mensuels + réservations à la carte. Paiement par Stripe, encaissé directement par la salle.</p>
-        <table><thead><tr><th>Adhérent</th><th>Motif</th><th>Type</th><th>Montant</th><th>Statut</th></tr></thead>
+        <h2 data-i18n="club.bill.title">Paiements</h2>
+        <p class="hint" data-i18n="club.bill.hint">Abonnements mensuels + réservations à la carte. Paiement par Stripe, encaissé directement par la salle.</p>
+        <table><thead><tr><th data-i18n="clubBill.member">Adhérent</th><th data-i18n="clubBill.reason">Motif</th><th data-i18n="clubBill.type">Type</th><th data-i18n="invoices.amount">Montant</th><th data-i18n="adherence.status">Statut</th></tr></thead>
         <tbody id="billBody"></tbody></table>
       </div>
     </section>
@@ -248,9 +258,9 @@
     <!-- MEMBERS -->
     <section data-view="members" class="hide">
       <div class="card">
-        <h2>Adhérents</h2>
-        <p class="hint">Change la formule d'un adhérent d'un clic. Les « Coaching&nbsp;+ » sont suivis par un coach (data &amp; adaptation des séances).</p>
-        <table><thead><tr><th>Adhérent</th><th>Formule</th><th>Coach</th><th>Présences (30j)</th><th></th></tr></thead>
+        <h2 data-i18n="club.nav.members">Adhérents</h2>
+        <p class="hint" data-i18n-html="club.members.hint">Change la formule d'un adhérent d'un clic. Les « Coaching&nbsp;+ » sont suivis par un coach (data &amp; adaptation des séances).</p>
+        <table><thead><tr><th data-i18n="clubBill.member">Adhérent</th><th data-i18n="club.members.plan">Formule</th><th data-i18n="crd.coach">Coach</th><th data-i18n="club.members.att30">Présences (30j)</th><th></th></tr></thead>
         <tbody id="memBody"></tbody></table>
       </div>
     </section>
@@ -258,8 +268,8 @@
     <!-- OFFERS -->
     <section data-view="offers" class="hide">
       <div class="card">
-        <h2>Les 3 formules de la salle</h2>
-        <p class="hint">Une échelle de valeur : on monte → on paie plus → plus de suivi et de data. Clique un prix pour l'ajuster.</p>
+        <h2 data-i18n="club.offers.title">Les 3 formules de la salle</h2>
+        <p class="hint" data-i18n="club.offers.hint">Une échelle de valeur : on monte → on paie plus → plus de suivi et de data. Clique un prix pour l'ajuster.</p>
         <div class="cols" id="offersWrap" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
       </div>
     </section>
@@ -267,6 +277,8 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="./sillance-i18n.js"></script>
+<script src="./sillance-i18n-club.js"></script>
 <script src="./sillance-club.core.js"></script>
 </body>
 </html>

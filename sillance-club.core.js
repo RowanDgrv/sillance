@@ -2,24 +2,25 @@
    ESPACE SALLE — données démo crédibles (box Hyrox)
    Aucune analyse ici : ops + présences + facturation + offres.
    ============================================================ */
-const DAYS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+function tr(key, vars){ return window.SilI18n ? SilI18n.t(key, vars) : key; }
+let DAYS = [tr('day.sunShort'),tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort')];
 const DCOL = {hyrox:'var(--hyrox)', run:'var(--run)', strength:'var(--strength)', swim:'var(--swim)'};
-const DLAB = {hyrox:'Hyrox', run:'Course', strength:'Renfo / Force', swim:'Natation'};
+const DLAB = {hyrox:'Hyrox', get run(){return tr('disc.run')}, get strength(){return tr('club.strengthForce')}, get swim(){return tr('disc.swim')}};
 const today = 4; // Jeudi
 
 const OFFERS = [
-  {id:'dropin', name:'À la séance', price:15, unit:'/ séance', feature:false,
-   pitch:'Il réserve, il fait la séance, il repart.',
-   inc:['Réservation + paiement en ligne','Accès au créneau choisi','Aucun engagement'],
-   who:'Curieux, occasionnels, événementiel Hyrox.'},
-  {id:'sub', name:'Abonnement club', price:59, unit:'/ mois', feature:false,
-   pitch:'Toutes les séances collectives incluses.',
-   inc:['Créneaux collectifs illimités','Réservation prioritaire','Suivi des présences'],
-   who:'Le cœur de la salle — le volume.'},
-  {id:'coach', name:'Coaching +', price:119, unit:'/ mois', feature:true,
-   pitch:'Abonnement + un coach qui lit tes données et adapte tes séances.',
-   inc:['Tout l\'abonnement club','Un coach dédié + plan perso','Check-in du matin → séance ajustée à ta forme','Analyse montre (Garmin / Coros / .FIT)'],
-   who:'Athlètes engagés, prépa course / Hyrox compétition.'}
+  {id:'dropin', get name(){return tr('club.offer.dropin.name')}, price:15, unit:'/ séance', feature:false,
+   get pitch(){return tr('club.offer.dropin.pitch')},
+   get inc(){return [tr('club.offer.dropin.inc1'),tr('club.offer.dropin.inc2'),tr('club.offer.dropin.inc3')]},
+   get who(){return tr('club.offer.dropin.who')}},
+  {id:'sub', get name(){return tr('clubOffer.sub.name')}, price:59, unit:'/ mois', feature:false,
+   get pitch(){return tr('clubOffer.sub.pitch')},
+   get inc(){return [tr('clubOffer.sub.inc1'),tr('clubOffer.sub.inc2'),tr('clubOffer.sub.inc3')]},
+   get who(){return tr('club.offer.sub.who')}},
+  {id:'coach', get name(){return tr('clubOffer.coach.name')}, price:119, unit:'/ mois', feature:true,
+   get pitch(){return tr('clubOffer.coach.pitch')},
+   get inc(){return [tr('clubOffer.coach.inc1'),tr('club.offer.coach.inc2'),tr('club.offer.coach.inc3'),tr('clubOffer.coach.inc4')]},
+   get who(){return tr('club.offer.coach.who')}}
 ];
 const OFFER = id => OFFERS.find(o=>o.id===id);
 
@@ -72,7 +73,7 @@ const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&l
 function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),1900); }
 function fillPct(s){ return Math.round(100*s.att/s.cap); }
 function discDot(d){ return `<span class="disc" style="background:${DCOL[d]}"></span>`; }
-function priceTag(s){ return s.price>0 ? `<span class="tag paid">${s.price} € · à la carte</span>` : `<span class="tag free">inclus</span>`; }
+function priceTag(s){ return s.price>0 ? `<span class="tag paid">${s.price} € · ${tr('club.aLaCarte')}</span>` : `<span class="tag free">${tr('clubDash.included')}</span>`; }
 
 /* ---------- TODAY slots (dash) ---------- */
 function slotRow(s, withBtn){
@@ -81,15 +82,15 @@ function slotRow(s, withBtn){
     <div class="when"><div class="d os">${s.time.split(':')[0]}<small style="font-size:11px">h${s.time.split(':')[1]}</small></div><div class="t">${DAYS[s.day]}</div></div>
     <div>
       <div class="ti">${discDot(s.disc)}${s.title}</div>
-      <div class="me">${DLAB[s.disc]} · coach ${s.coach} · ${s.dur} min · ${s.att}/${s.cap} inscrits</div>
+      <div class="me">${DLAB[s.disc]} · coach ${s.coach} · ${s.dur} min · ${tr('clubDash.nRegistered', {n:s.att, cap:s.cap})}</div>
       <div class="fillbar ${pct>=85?'hot':''}"><i style="width:${pct}%"></i></div>
     </div>
-    <div style="text-align:right">${priceTag(s)}${withBtn?`<div style="margin-top:9px"><button class="btn sm" data-action="goPres" data-id="${s.id}">Présences →</button></div>`:''}</div>
+    <div style="text-align:right">${priceTag(s)}${withBtn?`<div style="margin-top:9px"><button class="btn sm" data-action="goPres" data-id="${s.id}">${tr('club.nav.pres')} →</button></div>`:''}</div>
   </div>`;
 }
 function renderToday(){
   const list = SLOTS.filter(s=>s.day===today).sort((a,b)=>a.time.localeCompare(b.time));
-  $('#todaySlots').innerHTML = list.length ? list.map(s=>slotRow(s,true)).join('') : `<div class="empty">Aucun créneau aujourd'hui.</div>`;
+  $('#todaySlots').innerHTML = list.length ? list.map(s=>slotRow(s,true)).join('') : `<div class="empty">${tr('club.noSlotToday')}</div>`;
 }
 function renderAllSlots(){
   const list = [...SLOTS].sort((a,b)=> a.day-b.day || a.time.localeCompare(b.time));
@@ -104,10 +105,10 @@ function renderMix(){
     const pct = Math.round(100*n/tot);
     const col = o.id==='coach'?'var(--hyrox)':o.id==='sub'?'var(--accent)':'var(--good)';
     return `<div style="margin-bottom:13px">
-      <div class="row" style="justify-content:space-between;font-size:13px"><span><b>${o.name}</b> · ${o.price}€${o.unit.includes('mois')?'/mois':''}</span><span class="muted">${n} adhérent${n>1?'s':''} · ${pct}%</span></div>
+      <div class="row" style="justify-content:space-between;font-size:13px"><span><b>${o.name}</b> · ${o.price}€${o.unit.includes('mois')?'/mois':''}</span><span class="muted">${tr(n>1?'club.nMembersPlural':'club.nMembersSingular', {n})} · ${pct}%</span></div>
       <div class="fillbar" style="width:100%;margin-top:6px"><i style="width:${pct}%;background:${col}"></i></div>
     </div>`;
-  }).join('') + `<div class="muted" style="font-size:11.5px;margin-top:4px">Le mix « Coaching + » est ta marge : suivi premium facturé plus cher.</div>`;
+  }).join('') + `<div class="muted" style="font-size:11.5px;margin-top:4px">${tr('clubDash.coachPlusMarginNote')}</div>`;
 }
 
 /* ---------- presence ---------- */
@@ -120,7 +121,7 @@ function renderPresPicker(){
 function renderPres(){
   renderPresPicker();
   const s = SLOTS.find(x=>x.id===curPres);
-  if(!s){ $('#presList').innerHTML = `<div class="empty">Aucun créneau aujourd'hui.</div>`; return; }
+  if(!s){ $('#presList').innerHTML = `<div class="empty">${tr('club.noSlotToday')}</div>`; return; }
   const present = s.inscrits.filter(id=>presState[s.id+':'+id]==='ok').length;
   const rows = s.inscrits.map(id=>{
     const m = MEM(id); if(!m) return '';
@@ -128,16 +129,16 @@ function renderPres(){
     return `<tr>
       <td><span class="avatar">${m.name[0]}</span> &nbsp;${m.name} <span class="tag ${m.offer==='coach'?'sub':m.offer==='sub'?'free':'paid'}" style="margin-left:6px">${OFFER(m.offer).name}</span></td>
       <td style="text-align:right">
-        <button class="pres-btn ${st==='ok'?'ok':''}" data-action="mark" data-sid="${s.id}" data-mid="${id}" data-val="ok">Présent</button>
-        <button class="pres-btn ${st==='no'?'no':''}" data-action="mark" data-sid="${s.id}" data-mid="${id}" data-val="no" style="margin-left:6px">Absent</button>
+        <button class="pres-btn ${st==='ok'?'ok':''}" data-action="mark" data-sid="${s.id}" data-mid="${id}" data-val="ok">${tr('crd.present')}</button>
+        <button class="pres-btn ${st==='no'?'no':''}" data-action="mark" data-sid="${s.id}" data-mid="${id}" data-val="no" style="margin-left:6px">${tr('club.absent')}</button>
       </td></tr>`;
   }).join('');
   $('#presList').innerHTML = `
     <div class="row" style="justify-content:space-between;margin-bottom:10px">
       <div><b>${s.title}</b> · ${s.time}</div>
-      <div class="muted">${present}/${s.inscrits.length} présents · ${s.cap-s.att} places libres</div>
+      <div class="muted">${tr('club.nPresent', {n:present, tot:s.inscrits.length})} · ${tr('club.spotsFree', {n:s.cap-s.att})}</div>
     </div>
-    <table><tbody>${rows||`<tr><td class="empty">Personne d'inscrit pour l'instant.</td></tr>`}</tbody></table>`;
+    <table><tbody>${rows||`<tr><td class="empty">${tr('club.noOneRegisteredYet')}</td></tr>`}</tbody></table>`;
 }
 function mark(sid,mid,v){ presState[sid+':'+mid]=v; renderPres(); }
 function goPres(id){ curPres=id; switchView('pres'); }
@@ -153,9 +154,9 @@ function renderBill(){
     return `<tr>
       <td><span class="avatar">${m?m.name[0]:'?'}</span> &nbsp;${m?m.name:'—'}</td>
       <td>${b.why}</td>
-      <td>${b.type==='sub'?'Abonnement':'À la carte'}</td>
+      <td>${b.type==='sub'?tr('sidebar.subscribe'):tr('club.aLaCarte')}</td>
       <td><b>${b.amt} €</b></td>
-      <td>${b.ok?'<span class="pay ok">payé</span>':'<span class="pay wait">en attente</span>'}</td>
+      <td>${b.ok?`<span class="pay ok">${tr('clubBill.paid')}</span>`:`<span class="pay wait">${tr('clubBill.waiting')}</span>`}</td>
     </tr>`;
   }).join('');
 }
@@ -167,8 +168,8 @@ function renderMembers(){
     return `<tr>
       <td><span class="avatar">${m.name[0]}</span> &nbsp;${m.name}</td>
       <td><div class="selpill">${OFFERS.map(of=>`<button class="${of.id===m.offer?'on':''}" data-action="setOffer" data-mid="${m.id}" data-oid="${of.id}">${of.name}</button>`).join('')}</div></td>
-      <td>${m.offer==='coach'?(m.coach==='—'?'<span class="muted">à affecter</span>':m.coach):'<span class="muted">—</span>'}</td>
-      <td>${m.att30} séance${m.att30>1?'s':''}</td>
+      <td>${m.offer==='coach'?(m.coach==='—'?`<span class="muted">${tr('club.toAssign')}</span>`:m.coach):'<span class="muted">—</span>'}</td>
+      <td>${tr(m.att30>1?'club.nSessionsPlural':'club.nSessionsSingular', {n:m.att30})}</td>
       <td style="text-align:right"><button class="btn sm ghost" data-action="toastMsg" data-name="${esc(m.name)}">✉︎</button></td>
     </tr>`;
   }).join('');
@@ -180,16 +181,16 @@ function setOffer(mid,oid){ const m=MEM(mid); m.offer=oid; if(oid!=='coach') m.c
 function renderOffers(){
   $('#offersWrap').innerHTML = OFFERS.map(o=>`
     <div class="offer ${o.feature?'feature':''}">
-      ${o.feature?'<span class="ribbon">★ Marge premium</span>':''}
+      ${o.feature?`<span class="ribbon">★ ${tr('clubOffres.premiumMargin')}</span>`:''}
       <h3>${o.name}</h3>
       <div class="muted" style="font-size:12.5px">${o.pitch}</div>
       <div class="price">${o.price} €<small> ${o.unit}</small></div>
-      <button class="btn sm ghost" data-action="editPrice" data-id="${o.id}">✎ Modifier le tarif</button>
+      <button class="btn sm ghost" data-action="editPrice" data-id="${o.id}">✎ ${tr('clubOffres.editPrice')}</button>
       <ul>${o.inc.map(i=>`<li>${i}</li>`).join('')}</ul>
       <div class="who">${o.who}</div>
     </div>`).join('');
 }
-function editPrice(id){ const o=OFFER(id); const v=prompt(`Tarif de « ${o.name} » (€) :`, o.price); if(v!==null && !isNaN(+v)){ o.price=+v; renderOffers(); renderMix(); toast('Tarif mis à jour'); } }
+function editPrice(id){ const o=OFFER(id); const v=prompt(tr('clubOffres.pricePrompt', {name:o.name}), o.price); if(v!==null && !isNaN(+v)){ o.price=+v; renderOffers(); renderMix(); toast(tr('club.priceUpdated')); } }
 
 /* ---------- KPIs ---------- */
 function refreshKpis(){
@@ -200,36 +201,47 @@ function refreshKpis(){
   const rev = BILLS.filter(b=>b.ok).reduce((a,b)=>a+b.amt,0);
   const coachN = MEMBERS.filter(m=>m.offer==='coach').length;
   $('#kFill').textContent = avgFill+'%';
-  $('#kPres').textContent = todayIns; $('#kPresD').textContent = todayList.length+' créneaux aujourd\'hui';
+  $('#kPres').textContent = todayIns; $('#kPresD').textContent = tr(todayList.length>1?'club.nSlotsTodayPlural':'club.nSlotsTodaySingular', {n:todayList.length});
   $('#kRev').textContent = rev+' €';
-  $('#kMem').textContent = MEMBERS.length; $('#kMemD').textContent = coachN+' en « Coaching + »';
+  $('#kMem').textContent = MEMBERS.length; $('#kMemD').textContent = tr('clubDash.nInCoachPlus', {n:coachN});
 }
 
 /* ---------- navigation ---------- */
 const TITLES = {
-  dash:['Tableau de bord','Vue d\'ensemble de la salle — aujourd\'hui, jeudi.','+ Nouveau créneau'],
-  slots:['Créneaux','Crée et tarifie tes créneaux. 0 € = inclus, > 0 € = à la carte.','+ Nouveau créneau'],
-  pres:['Présences','Pointe en direct — les adhérents se sont inscrits eux-mêmes.','+ Nouveau créneau'],
-  bill:['Facturation','Abonnements + à la carte, encaissés par Stripe.','Exporter (CSV)'],
-  members:['Adhérents','Gère les formules et les coachs.','+ Inviter un adhérent'],
-  offers:['Offres & tarifs','Ton échelle de valeur en 3 formules.','+ Nouvelle formule'],
+  get dash(){return [tr('club.title.dash'),tr('club.sub.dash'),tr('club.action.dash')]},
+  get slots(){return [tr('club.nav.slots'),tr('club.sub.slots'),tr('club.action.dash')]},
+  get pres(){return [tr('club.nav.pres'),tr('club.pres.hint'),tr('club.action.dash')]},
+  get bill(){return [tr('club.nav.bill'),tr('club.sub.bill'),tr('club.action.bill')]},
+  get members(){return [tr('club.nav.members'),tr('club.sub.members'),tr('club.action.members')]},
+  get offers(){return [tr('club.nav.offers'),tr('club.sub.offers'),tr('club.action.offers')]},
 };
-function switchView(v){
-  $$('#nav .nav').forEach(n=>n.classList.toggle('active', n.dataset.v===v));
-  $$('section[data-view]').forEach(s=>s.classList.toggle('hide', s.dataset.view!==v));
-  const [t,sub,act] = TITLES[v];
-  $('#viewTitle').innerHTML = t + ' <span class="demoflag">démo</span>';
+let curView = 'dash';
+function renderCurrentView(){
+  const [t,sub,act] = TITLES[curView];
+  $('#viewTitle').innerHTML = t + ` <span class="demoflag">${tr('club.demoFlag')}</span>`;
   $('#viewSub').textContent = sub;
   $('#primaryAction').textContent = act;
-  if(v==='pres') renderPres();
-  if(v==='bill') renderBill();
-  if(v==='members') renderMembers();
-  if(v==='offers') renderOffers();
-  if(v==='slots') renderAllSlots();
+  if(curView==='dash'){ renderToday(); renderMix(); }
+  if(curView==='pres') renderPres();
+  if(curView==='bill') renderBill();
+  if(curView==='members') renderMembers();
+  if(curView==='offers') renderOffers();
+  if(curView==='slots') renderAllSlots();
+}
+function switchView(v){
+  curView = v;
+  $$('#nav .nav').forEach(n=>n.classList.toggle('active', n.dataset.v===v));
+  $$('section[data-view]').forEach(s=>s.classList.toggle('hide', s.dataset.view!==v));
+  renderCurrentView();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $$('#nav .nav').forEach(n=> n.onclick = ()=>switchView(n.dataset.v));
-$('#primaryAction').onclick = ()=> toast('Création de créneau / invitation — branché au back-end dans l\'app réelle (démo).');
+document.addEventListener('sil:langchange', ()=>{
+  DAYS = [tr('day.sunShort'),tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort')];
+  refreshKpis();
+  renderCurrentView();
+});
+$('#primaryAction').onclick = ()=> toast(tr('club.primaryActionToast'));
 $('#renameBtn').onclick = ()=>{ $('#bname').focus(); document.execCommand && document.getSelection().selectAllChildren($('#bname')); };
 
 /* branding live : nom de salle -> initiale du logo (utile pour la prospection) */
@@ -245,7 +257,7 @@ $('#bname').addEventListener('input', ()=>{
   if(box){
     $('#bname').textContent=box;
     $('#blogo').textContent=(box.trim()[0]||'B').toUpperCase();
-    document.title=box+' — espace réservations';
+    document.title=box+tr('club.titleSuffixBookingSpace');
     const r=document.getElementById('prospectRibbon'); if(r){ r.hidden=false; const rb=document.getElementById('ribBox'); if(rb) rb.textContent=box; }
   }
   if(ville) $('#bcity').textContent=ville;
@@ -261,7 +273,7 @@ document.addEventListener('click', function(e){
   else if(a==='setPres'){ curPres = el.dataset.id; renderPres(); }
   else if(a==='mark') mark(el.dataset.sid, el.dataset.mid, el.dataset.val);
   else if(a==='setOffer') setOffer(el.dataset.mid, el.dataset.oid);
-  else if(a==='toastMsg') toast('Message envoyé à '+el.dataset.name+' (démo)');
+  else if(a==='toastMsg') toast(tr('club.messageSentTo', {name:el.dataset.name}));
   else if(a==='editPrice') editPrice(el.dataset.id);
 });
 
