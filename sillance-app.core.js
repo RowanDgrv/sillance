@@ -2528,11 +2528,15 @@ function rpeColor(n){
   // vives d'origine, pensées pour le fond sombre, tombaient à 1.5-2.9:1 de
   // contraste utilisées comme texte sur fond clair — toutes remontées à 4.5:1+
   // en conservant la teinte (même logique que --accent assombri le 03/08).
+  // Rouge thème sombre rééclairci (audit a11y suite, même jour) : #FF5470
+  // passait bien seul, mais retombait à 4.25:1 une fois recomposé avec
+  // l'opacity:.85 de .session.done — #FF6C84 remonte à 4.84:1 dans ce cas,
+  // sans impact ailleurs (contexte pleine opacité, déjà large marge).
   const light = document.body.classList.contains('light');
   if(n<=3) return light ? '#0d6946' : '#39E6A3';
   if(n<=6) return light ? '#006176' : '#2FD9FF';
   if(n<=8) return light ? '#7a4900' : '#FFB13D';
-  return light ? '#c40020' : '#FF5470';
+  return light ? '#c40020' : '#FF6C84';
 }
 function openRpeModal(s){
   const D = DISC[s.disc];

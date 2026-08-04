@@ -387,7 +387,16 @@ function setCloudBadge(connected) {
   if (!b) {
     b = document.createElement("div");
     b.id = "pf-cloud-badge";
-    document.body.appendChild(b);
+    b.setAttribute("role", "button");
+    b.setAttribute("tabindex", "0");
+    // Rattaché au <header> plutôt qu'au body (audit a11y 04/08/2026, axe
+    // "region" : tout le contenu doit être dans un landmark) — sans impact
+    // visuel puisque le badge est en position:fixed (placé par rapport au
+    // viewport, pas à son parent DOM).
+    (document.querySelector("header") || document.body).appendChild(b);
+    b.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); b.click(); }
+    });
     b.addEventListener("click", () => {
       if (PF.user) { if (confirm(tr("auth.confirmLogOut"))) PF.signOut().then(() => location.reload()); }
       else openAuth();
