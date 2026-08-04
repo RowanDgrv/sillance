@@ -6137,8 +6137,8 @@ function drawDecouple(data, disc, dc){
   const mx=xs(midI), endX=xs(pts.length-1);
   svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${mx}" y1="${P.t}" y2="${H-P.b}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3" opacity=".6"/>`);
   // segments moyens de chaque moitié
-  if(dc.r1>=vMin&&dc.r1<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${warmX}" x2="${mx}" y1="${y(dc.r1)}" y2="${y(dc.r1)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${warmX+4}" y="${y(dc.r1)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)">1ʳᵉ ½</text>`);
-  if(dc.r2>=vMin&&dc.r2<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${endX}" y1="${y(dc.r2)}" y2="${y(dc.r2)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${endX-4}" y="${y(dc.r2)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)" text-anchor="end">2ᵉ ½</text>`);
+  if(dc.r1>=vMin&&dc.r1<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${warmX}" x2="${mx}" y1="${y(dc.r1)}" y2="${y(dc.r1)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${warmX+4}" y="${y(dc.r1)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)">${tr('decouple.half1')}</text>`);
+  if(dc.r2>=vMin&&dc.r2<=vMax) svg.insertAdjacentHTML('beforeend',`<line x1="${mx}" x2="${endX}" y1="${y(dc.r2)}" y2="${y(dc.r2)}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity=".85"/><text x="${endX-4}" y="${y(dc.r2)-4}" fill="var(--accent)" font-size="8.5" font-family="var(--font-data)" text-anchor="end">${tr('decouple.half2')}</text>`);
   // courbe lissée
   let path='';
   pts.forEach((p,i)=>{ const x=xs(i),yy=y(p._dr); path+=(i?'L':'M')+x+' '+yy; });
@@ -6152,11 +6152,11 @@ function drawDecouple(data, disc, dc){
 function renderDecoupleTrend(disc, type, curPct){
   const box=document.getElementById('anDecoupleTrend'); if(!box) return;
   const hist=SESSION_HISTORY.filter(h=>h.disc===disc&&h.type===type&&h.dec!=null).slice(0,3).reverse();
-  const all=[...hist.map(h=>({date:h.date,dec:h.dec,cur:false})),{date:'Cette séance',dec:curPct,cur:true}];
+  const all=[...hist.map(h=>({date:h.date,dec:h.dec,cur:false})),{date:tr('simType.thisSession'),dec:curPct,cur:true}];
   if(all.length<2){ box.style.display='none'; return; }
   box.style.display='';
   const maxV=Math.max(...all.map(a=>Math.abs(a.dec)),6);
-  box.innerHTML=`<span class="an-dc-tlabel">Tendance</span>`+all.map(a=>{
+  box.innerHTML=`<span class="an-dc-tlabel">${tr('decouple.trend')}</span>`+all.map(a=>{
     const v=decoupleVerdict(a.dec), h=Math.max(6,Math.abs(a.dec)/maxV*52);
     return `<div class="an-dc-bar ${a.cur?'cur':''}"><b style="color:${v.c}">${a.dec.toFixed(1)}%</b><i style="height:${h}px;--bc:${v.c}"></i><span>${a.date}</span></div>`;
   }).join('');
@@ -6174,7 +6174,7 @@ function renderDecouple(s, data){
   kpi.innerHTML=`<span class="an-dc-big">${dc.pct>=0?'':'−'}${Math.abs(dc.pct).toFixed(1)}%</span>`+
     `<span class="an-dc-pill"><span class="dot"></span>${v.lbl}</span>`+
     `<span class="an-dc-txt">${decoupleInterp(type, dc.pct, s.disc)}</span>`;
-  document.getElementById('anDecoupleHint').textContent = s.disc==='bike'?'Puissance / FC (Pw:Hr)':'Allure corrigée / FC (Pa:Hr)';
+  document.getElementById('anDecoupleHint').textContent = s.disc==='bike'?tr('decouple.hintBike'):tr('decouple.hintRun');
   drawDecouple(data, s.disc, dc);
   renderDecoupleTrend(s.disc, type, dc.pct);
 }
@@ -6224,46 +6224,46 @@ function aiSummary(s, b){
   // conformité au plan : la séance réalisée correspond-elle à la séance prévue ?
   if(b.plannedDur){
     const ecart=Math.round((b.dur-b.plannedDur)/b.plannedDur*100);
-    bullets.push({s:Math.abs(ecart)<=15?'ok':'warn', t:`Prévu ${fmtDur(b.plannedDur)} — réalisé ${fmtDur(b.dur)} (${ecart>=0?'+':''}${ecart}%)`});
-    if(ecart<-15) recos.push('Séance écourtée par rapport au plan : vérifier fatigue ou contrainte horaire, replanifier le volume manquant si besoin.');
-    if(ecart>15) recos.push('Séance nettement rallongée : attention au volume non prévu qui alourdit la charge de la semaine.');
+    bullets.push({s:Math.abs(ecart)<=15?'ok':'warn', t:tr('ai.plannedVsDone', {planned:fmtDur(b.plannedDur), done:fmtDur(b.dur), sign:ecart>=0?'+':'', pct:ecart})});
+    if(ecart<-15) recos.push(tr('ai.recoShortened'));
+    if(ecart>15) recos.push(tr('ai.recoLengthened'));
   }
   if(b.hrDrift!=null) bullets.push({s:b.hrDrift<5?'ok':(b.hrDrift<8?'warn':'bad'),
-    t:`Dérive cardiaque : ${b.hrDrift>=0?'+':''}${b.hrDrift} bpm entre la 1ʳᵉ et la 2ᵉ moitié`});
+    t:tr('ai.hrDrift', {sign:b.hrDrift>=0?'+':'', bpm:b.hrDrift})});
   if(b.type==='endurance'){
     const okDec=b.decouple!=null && b.decouple<5, okZone=b.timeInTarget>=60;
-    bullets.push({s:okZone?'ok':'warn', t:`${b.timeInTarget}% du temps en ${b.target} (objectif : rester en zone aérobie)`});
-    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:`Découplage ${b.decouple}% ${okDec?'— le cœur ne dérive pas, séance bien aérobie':'— dérive cardiaque, allure trop haute'}`});
-    bullets.push({s:b.pctFcMax<88?'ok':'warn', t:`Pic FC à ${b.pctFcMax}% FCmax`});
-    if(okZone&&okDec){ tenu='oui'; headline='Objectif tenu : la séance est bien restée en zone aérobie.'; }
-    else { tenu=(okZone||okDec)?'partiel':'non'; headline='Zone aérobie partiellement tenue.';
-      if(!okDec) recos.push('Ralentir d’environ 10–15 s/km (ou ~5 bpm) pour contenir la dérive et rester franchement en Z2.');
-      if(!okZone) recos.push(`Trop de temps hors Z2 (${100-b.timeInTarget}%). Brider l’intensité, surtout dans les bosses.`); }
+    bullets.push({s:okZone?'ok':'warn', t:tr('ai.pctTimeInZone', {pct:b.timeInTarget, zone:b.target})});
+    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:tr('ai.decouplePct', {pct:b.decouple, verdict:okDec?tr('ai.decoupleOkEnd'):tr('ai.decoupleBadEnd')})});
+    bullets.push({s:b.pctFcMax<88?'ok':'warn', t:tr('ai.hrPeak', {pct:b.pctFcMax})});
+    if(okZone&&okDec){ tenu='oui'; headline=tr('ai.headlineEndOk'); }
+    else { tenu=(okZone||okDec)?'partiel':'non'; headline=tr('ai.headlineEndPartial');
+      if(!okDec) recos.push(tr('ai.recoSlowDown'));
+      if(!okZone) recos.push(tr('ai.recoTooMuchOutZone', {pct:100-b.timeInTarget})); }
   }
   else if(b.type==='vo2'){
     const peaks=b.hardReps.map(r=>r.peakPct), maxPeak=peaks.length?Math.max(...peaks):b.pctFcMax, reach=maxPeak>=90;
-    bullets.push({s:reach?'ok':'bad', t:`Pic FC sur les séries : ${maxPeak}% FCmax (cible ≥ 90–95%)`});
+    bullets.push({s:reach?'ok':'bad', t:tr('ai.hrPeakIntervals', {pct:maxPeak})});
     if(b.hardReps.length){ const f=b.hardReps[0], l=b.hardReps[b.hardReps.length-1], drift=l.paceSec-f.paceSec;
-      bullets.push({s:Math.abs(drift)<8?'ok':'warn', t:`Allure des séries : ${fmtPace(f.paceSec)} → ${fmtPace(l.paceSec)}/km ${drift>8?'(dégradation)':drift<-8?'(négatif split)':'(stable)'}`}); }
-    if(reach){ tenu='oui'; headline='Objectif atteint : les zones hautes sont bien touchées.'; }
-    else { tenu='non'; headline='Zone cible VO2max pas atteinte sur cette séance.';
-      recos.push(`Pics à ${maxPeak}% FCmax seulement : rallonger les intervalles (+30 à 60 s) ou raccourcir la récup pour faire monter le cœur dans la zone VO2max.`); }
+      bullets.push({s:Math.abs(drift)<8?'ok':'warn', t:tr('ai.intervalPace', {p1:fmtPace(f.paceSec), p2:fmtPace(l.paceSec), verdict:drift>8?tr('ai.degraded'):drift<-8?tr('ai.negativeSplit'):tr('ai.stable')})}); }
+    if(reach){ tenu='oui'; headline=tr('ai.headlineVo2Ok'); }
+    else { tenu='non'; headline=tr('ai.headlineVo2Missed');
+      recos.push(tr('ai.recoPeaksLow', {pct:maxPeak})); }
     if(b.hardReps.length){ const f=b.hardReps[0], l=b.hardReps[b.hardReps.length-1];
-      if(l.paceSec-f.paceSec>10) recos.push('Forte dégradation d’allure sur les dernières séries : retirer 1–2 répétitions pour tenir la cible sur l’ensemble.'); }
+      if(l.paceSec-f.paceSec>10) recos.push(tr('ai.recoStrongDegradation')); }
   }
   else if(b.type==='seuil'){
     const okDec=b.decouple==null||b.decouple<8;
-    bullets.push({s:b.timeInTarget>=40?'ok':'warn', t:`${b.timeInTarget}% du temps en ${b.target}`});
-    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:`Découplage ${b.decouple}% ${okDec?'— effort soutenable, bonne zone de seuil':'— dérive trop forte, au-dessus du seuil'}`});
-    bullets.push({s:'ok', t:`FC moyenne à ${b.avgPctFcMax}% FCmax`});
-    if(okDec){ tenu='oui'; headline='Séance de seuil bien calibrée.'; }
-    else { tenu='non'; headline='Intensité au-dessus du seuil aérobie.';
-      recos.push('Découplage élevé : l’allure dépassait le seuil. Recaler la zone cible un cran plus bas (≈ −10 s/km ou −10 W).'); }
+    bullets.push({s:b.timeInTarget>=40?'ok':'warn', t:tr('ai.pctTimeInZone', {pct:b.timeInTarget, zone:b.target})});
+    if(b.decouple!=null) bullets.push({s:okDec?'ok':'bad', t:tr('ai.decouplePct', {pct:b.decouple, verdict:okDec?tr('ai.decoupleOkThr'):tr('ai.decoupleBadThr')})});
+    bullets.push({s:'ok', t:tr('ai.avgHrPct', {pct:b.avgPctFcMax})});
+    if(okDec){ tenu='oui'; headline=tr('ai.headlineThrOk'); }
+    else { tenu='non'; headline=tr('ai.headlineThrMissed');
+      recos.push(tr('ai.recoHighDecouple')); }
   }
   else {
-    bullets.push({s:'ok', t:`${b.dur} min · FC moyenne ${b.avgHr} bpm (${b.avgPctFcMax}% FCmax)`});
-    bullets.push({s:'ok', t:`Répartition FC : Z2 ${b.zonePct.Z2}% · Z3 ${b.zonePct.Z3}% · Z4 ${b.zonePct.Z4}% · Z5 ${b.zonePct.Z5}%`});
-    tenu='oui'; headline='Séance enregistrée — synthèse des zones ci-dessous.';
+    bullets.push({s:'ok', t:tr('ai.durAvgHr', {dur:b.dur, hr:b.avgHr, pct:b.avgPctFcMax})});
+    bullets.push({s:'ok', t:tr('ai.zoneBreakdown', {z2:b.zonePct.Z2, z3:b.zonePct.Z3, z4:b.zonePct.Z4, z5:b.zonePct.Z5})});
+    tenu='oui'; headline=tr('ai.headlineGeneric');
   }
   return {headline, tenu, bullets, recos};
 }
@@ -6301,29 +6301,29 @@ function injectAiCss(){
 }
 function aiPaywallHtml(){
   return `<div class="ai-pay">
-    <h5><i class="ic ic-brain"></i> Assistant IA — résumé & recommandations par séance</h5>
-    <div class="ai-sub">Add-on coach · analyse automatique de chaque activité</div>
+    <h5><i class="ic ic-brain"></i> ${tr('ai.paywallTitle')}</h5>
+    <div class="ai-sub">${tr('ai.paywallSub')}</div>
     <div class="ai-feat">
-      <div><span class="ck"><i class="ic ic-check"></i></span><span>Résumé clair de chaque séance : zones FC, allure/puissance, découplage.</span></div>
-      <div><span class="ck"><i class="ic ic-check"></i></span><span>Verdict par rapport à l’objectif (Z2 tenu ? zone VO2max atteinte ?).</span></div>
-      <div><span class="ck"><i class="ic ic-check"></i></span><span>Recommandations actionnables (rallonger les intervalles, recaler la zone…).</span></div>
+      <div><span class="ck"><i class="ic ic-check"></i></span><span>${tr('ai.feat1')}</span></div>
+      <div><span class="ck"><i class="ic ic-check"></i></span><span>${tr('ai.feat2')}</span></div>
+      <div><span class="ck"><i class="ic ic-check"></i></span><span>${tr('ai.feat3')}</span></div>
     </div>
-    <div class="ai-trial">Essai gratuit 14 jours</div>
-    <div class="ai-price">0€<small> pendant 14 jours, puis ${AI_ADDON_PRICE} €/mois</small></div>
-    <button class="ai-cta" id="aiActivate">Commencer l’essai 14 jours</button>
-    <div class="ai-legal">Carte enregistrée à l’activation. Débit automatique de ${AI_ADDON_PRICE} €/mois à la fin de l’essai, sauf révocation de l’accès avant — résiliable à tout moment depuis « Gérer / révoquer l’accès ».</div>
+    <div class="ai-trial">${tr('ai.freeTrial14d')}</div>
+    <div class="ai-price">0€<small> ${tr('ai.priceDetail', {price:AI_ADDON_PRICE})}</small></div>
+    <button class="ai-cta" id="aiActivate">${tr('settings.start14dTrial')}</button>
+    <div class="ai-legal">${tr('ai.legalNote', {price:AI_ADDON_PRICE})}</div>
   </div>`;
 }
 function aiResultHtml(s, b, r, isDemo){
   const v=aiVerdictMeta(r.tenu);
   const ico=st=>st==='ok'?'<span style="color:var(--good)"><i class="ic ic-check"></i></span>':st==='warn'?'<span style="color:var(--bike)"><i class="ic ic-alert-triangle"></i></span>':'<span style="color:var(--run)"><i class="ic ic-x"></i></span>';
   const bul=r.bullets.map(x=>`<div><span class="ai-ico">${ico(x.s)}</span><span>${x.t}</span></div>`).join('');
-  const recos=r.recos.length?`<div class="ai-recobox"><h6>Recommandations</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
+  const recos=r.recos.length?`<div class="ai-recobox"><h6>${tr('ai.recommendations')}</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
   const foot=isDemo
-    ? 'Généré à partir des données réelles de la séance (zones FC, découplage, pics). En production : rédigé par Claude via l’add-on IA.'
-    : 'Rédigé par Claude à partir du bilan chiffré de la séance (zones FC, découplage, pics) — aucune donnée inventée.';
+    ? tr('ai.footDemo')
+    : tr('ai.footReal');
   return `<div class="ai-result" style="--av:${v.c}">
-    <div class="ai-verdict">${v.l} ${isDemo?'<span class="ai-badge-demo">démo</span>':''}</div>
+    <div class="ai-verdict">${v.l} ${isDemo?`<span class="ai-badge-demo">${tr('ai.demoBadge')}</span>`:''}</div>
     <div class="ai-headline">${r.headline}</div>
     <div class="ai-bul">${bul}</div>
     ${recos}
@@ -6345,7 +6345,7 @@ function renderAi(s, data){
     };
     return;
   }
-  body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> Analyse de la séance en cours…</div>`;
+  body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> ${tr('ai.analyzingInProgress')}</div>`;
   const b=computeSessionBilan(s, data);
   // Connecté + add-on réel (pas juste le déverrouillage démo) → vrai résumé Claude.
   if(window.PF?.user && window.__pf_aiAddon===true && typeof PF.summarizeSession==='function'){
