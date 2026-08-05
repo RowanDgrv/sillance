@@ -1222,7 +1222,10 @@ body[data-clubview] .ath-tabs{display:none}
 .cmix{margin-bottom:11px}
 .cmix-h{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
 .cdash-note{font-size:11.5px;color:var(--muted);margin:var(--space-2) 0 0}
-table.cbill{width:100%;border-collapse:collapse;font-size:var(--fs-md);margin-top:var(--space-1)}
+/* débordement mobile (audit interaction 05/08/2026) : 5 colonnes ne
+   rentrent pas sous ~360px — même traitement que les tableaux de legal.html. */
+.cbill-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:var(--space-1)}
+table.cbill{width:100%;border-collapse:collapse;font-size:var(--fs-md);min-width:480px}
 table.cbill th{text-align:left;color:var(--muted);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:var(--space-2) 9px;border-bottom:1px solid var(--line)}
 table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .cbav{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;background:var(--panel);color:var(--accent);font-weight:700;font-size:var(--fs-sm);font-family:var(--font-display);margin-right:7px;vertical-align:middle}

@@ -3854,9 +3854,9 @@ function renderClubBill(){
       <div class="cdash-kpi"><div class="v acc">${rec}</div><div class="k">${tr('clubBill.activeSubs')}</div></div>
     </div>
     <p class="club-hint" style="margin:4px 0 12px">${tr('clubBill.stripeNote')}</p>
-    <table class="cbill"><thead><tr><th>${tr('clubBill.member')}</th><th>${tr('clubBill.reason')}</th><th>${tr('clubBill.type')}</th><th>${tr('invoices.amount')}</th><th>${tr('adherence.status')}</th></tr></thead><tbody>
+    <div class="cbill-wrap"><table class="cbill"><thead><tr><th>${tr('clubBill.member')}</th><th>${tr('clubBill.reason')}</th><th>${tr('clubBill.type')}</th><th>${tr('invoices.amount')}</th><th>${tr('adherence.status')}</th></tr></thead><tbody>
     ${bills.map(b=>{const a=CLUB_ATHLETES.find(x=>x.id===b.m);return `<tr><td><span class="cbav">${a?initials(a.name):'?'}</span>${a?a.name:'—'}</td><td>${b.why}</td><td>${b.type==='sub'?tr('sidebar.subscribe'):tr('club.aLaCarte')}</td><td><b>${b.amt} €</b></td><td>${b.ok?`<span class="cpay ok">${tr('clubBill.paid')}</span>`:`<span class="cpay wait">${tr('clubBill.waiting')}</span>`}</td></tr>`;}).join('')}
-    </tbody></table>`;
+    </tbody></table></div>`;
   wireClubSillance();
 }
 
