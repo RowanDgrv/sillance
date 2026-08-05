@@ -390,7 +390,12 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .cycle-card .cy-del:hover{color:var(--run)}
 .cycle-card .cy-apply{margin-top:7px;width:100%;padding:5px;border-radius:7px;font-size:var(--fs-sm);font-weight:600;border:1px solid var(--line-strong);background:transparent;color:var(--muted);transition:.2s}
 .cycle-card .cy-apply:hover{border-color:var(--accent);color:var(--accent)}
-.cycle-modal{width:min(1080px,100%)}
+/* .modal (spécificité identique) au-dessous dans ce fichier gagnait par ordre
+   de source et écrasait ceci à 520px — invisible tant que le contenu de ces
+   deux modales restait étroit, révélé par le débordement du picker de
+   paliers coach signalé le 05/08/2026. Spécificité doublée pour ne plus
+   dépendre de l'ordre du fichier (audit 05/08/2026). */
+.modal.cycle-modal{width:min(1080px,100%)}
 .cy-meta{display:flex;gap:10px;margin-bottom:10px}
 .cy-meta input{flex:1}
 .cy-hint{font-size:var(--fs-base);color:var(--muted);margin-bottom:14px;display:flex;gap:6px;align-items:center}
@@ -426,7 +431,8 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 @media(max-width:760px){.cy-days{grid-template-columns:repeat(2,1fr)}.cy-actions{margin-left:0}}
 
 /* ---------- Paramètres (page abonnements & compte) ---------- */
-.settings-modal{width:min(880px,100%)}
+/* même bug de spécificité que .cycle-modal ci-dessus, corrigé pareil */
+.modal.settings-modal{width:min(880px,100%)}
 .set-layout{display:grid;grid-template-columns:215px 1fr;gap:18px;margin-top:var(--space-2)}
 @media(max-width:760px){.set-layout{grid-template-columns:1fr}}
 .set-nav{display:flex;flex-direction:column;gap:5px}
