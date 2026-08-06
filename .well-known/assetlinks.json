@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.sillance.mobile",
+    "sha256_cert_fingerprints": [
+      "02:8F:BE:CB:86:5D:65:A6:5C:17:87:53:B7:6A:68:7A:D5:72:42:CF:E3:0C:62:B0:74:BF:91:07:7D:05:0C:BC"
+    ]
+  }
+}]
