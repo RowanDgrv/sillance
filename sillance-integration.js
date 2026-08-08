@@ -516,8 +516,8 @@ function injectGateStyles() {
     border-radius:99px;padding:5px 13px;font:700 12px 'Archivo',system-ui;cursor:pointer}
   #pf-trial-banner button:hover{filter:brightness(1.06)}
   #pf-lock-overlay{position:fixed;inset:0;z-index:9995;background:rgba(6,8,11,.9);
-    display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
-  #pf-lock-overlay .card{max-width:420px;width:92%;background:#0f151b;border:1px solid #223;
+    display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:20px}
+  #pf-lock-overlay .card{max-width:560px;width:100%;max-height:92vh;overflow-y:auto;background:#0f151b;border:1px solid #223;
     border-radius:16px;padding:30px 28px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.7)}
   #pf-lock-overlay h2{font:800 22px/1.15 'Oswald','Archivo',system-ui;color:#eaf6f9;margin:0 0 8px;letter-spacing:.2px}
   #pf-lock-overlay p{font:400 14px/1.5 'Archivo',system-ui;color:#9fb0bb;margin:0 0 20px}
@@ -526,8 +526,25 @@ function injectGateStyles() {
   #pf-lock-overlay .go{width:100%;border:0;background:#46C2D8;color:#06222a;border-radius:11px;
     padding:13px;font:800 15px 'Archivo',system-ui;cursor:pointer;margin-top:16px}
   #pf-lock-overlay .go:hover{filter:brightness(1.06)}
+  #pf-lock-overlay .go:disabled{opacity:.5;cursor:not-allowed;filter:none}
   #pf-lock-overlay .out{display:inline-block;margin-top:14px;color:#7d8d98;font:500 12.5px 'Archivo';
     background:none;border:0;cursor:pointer;text-decoration:underline}
+  #pf-lock-overlay .tier-lbl{font:700 11px 'Archivo',system-ui;letter-spacing:.09em;text-transform:uppercase;
+    color:#7d8d98;text-align:left;margin:22px 0 10px}
+  #pf-lock-overlay .tier-picks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  #pf-lock-overlay .tierpick{border:1.5px solid #223;background:#141c24;border-radius:12px;
+    padding:14px 8px;cursor:pointer;text-align:center;font-family:'Archivo',system-ui;
+    display:flex;flex-direction:column;gap:4px;transition:border-color .12s,background .12s}
+  #pf-lock-overlay .tierpick:hover{border-color:#3a5560}
+  #pf-lock-overlay .tierpick:disabled{opacity:.55;cursor:wait}
+  #pf-lock-overlay .tierpick .tp-price{font:800 19px 'Oswald',system-ui;color:#eaf6f9}
+  #pf-lock-overlay .tierpick .tp-price small{font:600 10.5px 'Archivo';color:#7d8d98}
+  #pf-lock-overlay .tierpick .tp-cap{font:500 11px/1.3 'Archivo';color:#8ea0aa}
+  #pf-lock-overlay .tier-included{list-style:none;margin:16px 0 0;padding:0;text-align:left;
+    display:flex;flex-direction:column;gap:7px}
+  #pf-lock-overlay .tier-included li{font:400 12.5px/1.4 'Archivo',system-ui;color:#aebcc4;
+    display:flex;gap:8px;align-items:baseline}
+  #pf-lock-overlay .tier-included li::before{content:"✓";color:#46C2D8;font-weight:700;flex:none}
   #videolib.pf-vlocked > :not(h2):not(#pf-video-teaser){display:none!important}
   #pf-video-teaser{border:1px dashed #2a3b44;border-radius:12px;padding:26px 20px;margin-top:14px;
     text-align:center;background:rgba(70,194,216,.04)}
@@ -549,19 +566,46 @@ function renderCoachGate({ subscribed, role, trialDaysLeft, locked }) {
   if (subscribed || role !== "coach") return;   // abonné ou pas coach → rien
 
   if (locked) {
+    const TIERS = [
+      { n: 1, price: 19, cap: tr("gate.tier1.cap") },
+      { n: 2, price: 29, cap: tr("gate.tier2.cap") },
+      { n: 3, price: 49, cap: tr("gate.tier3.cap") },
+    ];
     const o = document.createElement("div");
     o.id = "pf-lock-overlay";
     o.innerHTML = `
       <div class="card">
         <h2>${tr("gate.trialOverHeading")}</h2>
-        <p>${tr("gate.trialOverText")}</p>
-        <div class="price">29 €<small> ${tr("gate.perMonth")}</small></div>
-        <button class="go" id="pf-lock-go">${tr("gate.subscribeToSillance")}</button>
+        <p>${tr("gate.trialOverText2")}</p>
+        <div class="tier-lbl">${tr("gate.pickTier")}</div>
+        <div class="tier-picks">
+          ${TIERS.map((t) => `
+            <button class="tierpick" data-tier="${t.n}">
+              <span class="tp-price">${t.price}&nbsp;€<small> ${tr("gate.perMonth")}</small></span>
+              <span class="tp-cap">${t.cap}</span>
+            </button>`).join("")}
+        </div>
+        <div class="tier-lbl">${tr("gate.includedTitle")}</div>
+        <ul class="tier-included">
+          <li>${tr("gate.included.f1")}</li>
+          <li>${tr("gate.included.f2")}</li>
+          <li>${tr("gate.included.f3")}</li>
+          <li>${tr("gate.included.f4")}</li>
+          <li>${tr("gate.included.f5")}</li>
+        </ul>
         <button class="out" id="pf-lock-out">${tr("auth.logOut")}</button>
       </div>`;
     document.body.appendChild(o);
-    o.querySelector("#pf-lock-go").onclick = () =>
-      PF.startCheckout("coach").catch((e) => console.warn("[PF] checkout:", e));
+    o.querySelectorAll(".tierpick").forEach((btn) => {
+      btn.onclick = () => {
+        o.querySelectorAll(".tierpick").forEach((b) => (b.disabled = true));
+        btn.querySelector(".tp-price").textContent = tr("gate.selecting");
+        PF.startCheckout("coach", Number(btn.dataset.tier)).catch((e) => {
+          console.warn("[PF] checkout:", e);
+          o.querySelectorAll(".tierpick").forEach((b) => (b.disabled = false));
+        });
+      };
+    });
     o.querySelector("#pf-lock-out").onclick = async () => {
       try { await PF.signOut(); } catch (_) {} location.reload();
     };
