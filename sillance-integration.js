@@ -266,6 +266,7 @@ async function hydrate() {
     // Gate premium : masque/déverrouille le contenu payant selon l'abonnement.
     section("premium", async () => {
       const admin = isAdminUser();
+      window.__pf_isAdmin = admin;
       const ok = admin || await PF.isSubscribed();
       document.body.classList.toggle("pf-subscribed", ok);
       window.__pf_subscribed = ok;

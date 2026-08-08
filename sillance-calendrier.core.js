@@ -1949,6 +1949,25 @@ function settingsStructureHtml(){
   // quand la sidebar affichait « non abonné » juste à côté — incohérent une
   // fois les deux écrans reliés par le bouton « Voir les formules ».
   const sub = window.__pf_subscribed===true;
+  // Compte modérateur (bypass sillance-integration.js) : jamais de vrai
+  // abonnement Stripe ni de bouton de paiement, quel que soit l'état de
+  // `sub` — incident 08/2026, un clic sur "S'abonner" a réellement débité
+  // 29€ un compte interne. On coupe court avant même d'atteindre le rendu
+  // "abonné"/"s'abonner" habituel, qui garde un chemin vers un vrai checkout.
+  if (window.__pf_isAdmin===true) {
+    return `
+    <div class="set-h">${tr('settings.structureSub')}</div>
+    <div class="set-sub">${tr('settings.structureSubText')}</div>
+    <div class="set-plan">
+      <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div class="p-name">${tr('settings.adminTitle')}</div>
+          <p class="set-sub" style="margin:2px 0 0">${tr('settings.adminText')}</p>
+        </div>
+        <span class="set-status on">${tr('settings.active')}</span>
+      </div>
+    </div>`;
+  }
   return `
     <div class="set-h">${tr('settings.structureSub')}</div>
     <div class="set-sub">${tr('settings.structureSubText')}</div>
@@ -2027,6 +2046,7 @@ function renderSettings(){
   if(portal) portal.onclick=()=>{ if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast(tr('toast.portailIndisponible'), 'error')); } else toast(tr('toast.portailStripeDemo')); };
   const subB=document.getElementById('setSubscribeBtn');
   if(subB) subB.onclick=()=>{
+    if(window.__pf_isAdmin===true) return; // garde défensive, cf. settingsStructureHtml
     if(window.PF?.user){ toast(tr('toast.redirectionVersPaiement')); PF.startCheckout('coach', selectedCoachTier).catch(e=>{console.warn(e);toast(tr('toast.paiementIndisponible'), 'error');}); }
     else toast(tr('toast.connecteEspaceCoachPourT'));
   };
