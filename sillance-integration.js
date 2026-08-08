@@ -21,6 +21,12 @@ function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : k
 const A = () => window.__pf_app;   // raccourci vers le hook de l'app
 const TRIAL_DAYS = 14;             // durée de l'essai gratuit coach (jours)
 
+// Comptes modérateurs Sillance : jamais de paywall/essai limité, quel que
+// soit le rôle. Volontairement une liste en dur (front only, pas de colonne
+// admin en base) — usage interne, à étendre ici si besoin d'un 2e compte.
+const ADMIN_EMAILS = ["rowandegraeve@gmail.com"];
+const isAdminUser = () => ADMIN_EMAILS.includes((PF.user?.email || "").toLowerCase());
+
 /* -------- mur de connexion (site officiel) --------
    La démo (sillance-app.html sans paramètre) ne change pas : connexion via
    le badge ☁︎, optionnelle, dismissible. Depuis la landing, le bouton
@@ -259,10 +265,12 @@ async function hydrate() {
 
     // Gate premium : masque/déverrouille le contenu payant selon l'abonnement.
     section("premium", async () => {
-      const ok = await PF.isSubscribed();
+      const admin = isAdminUser();
+      const ok = admin || await PF.isSubscribed();
       document.body.classList.toggle("pf-subscribed", ok);
       window.__pf_subscribed = ok;
       // Essai gratuit + paywall du coach (l'abo 29€ est le produit Phase 1).
+      // Compte modérateur : jamais de compte à rebours, jamais bloqué.
       const role = PF.profile?.role;
       let trialDaysLeft = null, locked = false;
       if (role === "coach" && !ok) {
@@ -276,13 +284,13 @@ async function hydrate() {
       window.__pf_trial_days = trialDaysLeft;
       renderCoachGate({ subscribed: ok, role, trialDaysLeft, locked });
       // Vidéos : réservées aux athlètes que leur coach a activés (et payés).
-      const videosOk = role === "athlete" ? await PF.athleteHasVideos() : true;
+      const videosOk = admin || (role === "athlete" ? await PF.athleteHasVideos() : true);
       window.__pf_videos_ok = videosOk;
       renderVideoGate({ role, videosOk });
     }),
 
     section("aiAddon", async () => {
-      window.__pf_aiAddon = await PF.hasAiAddon();
+      window.__pf_aiAddon = isAdminUser() || await PF.hasAiAddon();
     }),
   ]);
 
