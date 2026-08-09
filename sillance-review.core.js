@@ -2813,7 +2813,9 @@ function lineLabel(ln){
   if(ln.type==='station'){ const st=hyroxStation(ln.station)||HYROX_STATIONS[0]; return st.name; }
   const T=LINE_TYPES[ln.type];
   const amt = (ln.metric==='dist') ? `${ln.dist||0} m` : `${(ln.dur&&ln.dur.m)||0}'`;
-  return `${T?T.l:tr('lineType.interval')} · ${amt}`;
+  const nage = (ln.nage && NAGE_LABEL[ln.nage]) ? ` ${NAGE_LABEL[ln.nage]}` : '';
+  const dep = (ln.sendoff && (ln.sendoff.m||ln.sendoff.s)) ? ` ${tr('builder.sendoffAbbr')} ${fmtMS(ln.sendoff)}` : '';
+  return `${T?T.l:tr('lineType.interval')} · ${amt}${nage}${dep}`;
 }
 /* section "Consignes du coach par intervalle" : liste les intervalles porteurs
    d'une note. Additif — n'apparaît que si au moins un commentaire existe. */
@@ -4689,6 +4691,18 @@ window.__pf_app = {
   },
 };
 
+/* écran d'accueil testeur */
+(function welcomeInit(){
+  const ov=document.getElementById('welcomeOverlay');
+  const start=document.getElementById('welcomeStart');
+  const cv=document.getElementById('welcomeFlow');
+  let flow=null;
+  if(cv && window.SillanceFlow) flow=SillanceFlow.attach(cv,{src:[0.52,0.0],dim:[0,0]});
+  const hide=()=>{ ov.style.display='none'; if(flow) flow.freeze(18); }; // fige le fond une fois masqué (GPU)
+  if(start) start.addEventListener('click', hide);
+  if(ov) ov.addEventListener('click', e=>{ if(e.target===ov) hide(); });
+})();
+
 /* ============================================================
    MESSAGERIE coach ↔ athlète + lien WhatsApp
    ------------------------------------------------------------
@@ -4990,9 +5004,24 @@ const LINE_TYPES = {
   warmup:   {get l(){return tr('lineType.warmup')}, c:'#39E6A3'},
   exo:      {get l(){return tr('lineType.exo')},     c:'#FF5470'},
   contre:   {get l(){return tr('lineType.contre')},c:'#FFB13D'},
+  educatif: {get l(){return tr('lineType.educatif')}, c:'#2FD9FF'},
   recov:    {get l(){return tr('lineType.recov')},  c:'#2FD9FF'},
   cooldown: {get l(){return tr('lineType.cooldown')}, c:'#9D7BFF'}
 };
+// Nage (natation uniquement) : affichée/éditable sur une ligne quand
+// builderState.disc==='swim'. Stockée sur ln.nage, absente = "libre"/mixte
+// (pas de mention dans le libellé, comportement historique inchangé).
+const NAGE_LIST = ['crawl','dos','brasse','papillon','4n'];
+const NAGE_LABEL = {
+  get crawl(){return tr('nage.crawl')}, get dos(){return tr('nage.dos')},
+  get brasse(){return tr('nage.brasse')}, get papillon(){return tr('nage.papillon')},
+  get '4n'(){return tr('nage.4n')},
+};
+// "Départ toutes les" (send-off, natation) : ln.sendoff={m,s} — intervalle
+// entre 2 départs d'un même effort répété (ex. 10×100 départ 1'40). Le repos
+// réel = intervalle − temps de nage, affiché en aide mais jamais stocké
+// séparément (calculé à la volée depuis la cible de temps de la ligne).
+function fmtMS(t){ if(!t) return ''; const m=t.m||0, s=t.s||0; return `${m}'${String(s).padStart(2,'0')}"`; }
 
 /* références activables par sport (le coach coche celles qu'il veut voir) */
 function refsForDisc(disc){
@@ -5256,16 +5285,33 @@ function lineHTML(blk, ln){
     ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
     : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
 
+  // Natation uniquement : nage (tous types de ligne) + départ toutes les X
+  // (uniquement pertinent en distance — un "départ" chronomètre le prochain
+  // effort depuis le précédent, ça n'a pas de sens sur une ligne en durée).
+  const swimExtra = (builderState.disc==='swim') ? `
+    <select class="ln-nage" data-f="nage" title="${tr('builder.strokeType')}">
+      <option value="" ${!ln.nage?'selected':''}>${tr('nage.libre')}</option>
+      ${NAGE_LIST.map(k=>`<option value="${k}" ${ln.nage===k?'selected':''}>${NAGE_LABEL[k]}</option>`).join('')}
+    </select>
+    ${metric==='dist' ? `<div class="ln-sendoff" title="${tr('builder.sendoffHint')}">
+      <span class="so-lbl">${tr('builder.sendoff')}</span>
+      <input type="number" class="ex-n2" min="0" max="20" value="${(ln.sendoff&&ln.sendoff.m)||0}" data-f="sendoffm"><span>'</span>
+      <input type="number" class="ex-n2" min="0" max="59" value="${(ln.sendoff&&ln.sendoff.s)||0}" data-f="sendoffs"><span>"</span>
+    </div>` : ''}` : '';
+
   return `<div class="ln" data-lid="${ln.lid}" style="--lc:${T.c}">
     <span class="ln-grip">⠿</span>
     <select class="ln-type" data-f="type">${Object.entries(LINE_TYPES).map(([k,v])=>`<option value="${k}" ${k===ln.type?'selected':''}>${v.l}</option>`).join('')}</select>
     ${durField}
-    <div class="ln-int">
-      <div class="ln-mode">
-        <button class="${ln.mode==='zone'?'on':''}" data-mode="zone">${tr('builder.zonePct')}</button>
-        <button class="${ln.mode==='exact'?'on':''}" data-mode="exact">${tr('builder.exact')}</button>
+    <div class="ln-mid">
+      ${swimExtra}
+      <div class="ln-int">
+        <div class="ln-mode">
+          <button class="${ln.mode==='zone'?'on':''}" data-mode="zone">${tr('builder.zonePct')}</button>
+          <button class="${ln.mode==='exact'?'on':''}" data-mode="exact">${tr('builder.exact')}</button>
+        </div>
+        ${intHTML}
       </div>
-      ${intHTML}
     </div>
     ${lnActionsHTML(ln, tr('builder.deleteLine'))}
   </div>`;
@@ -5366,6 +5412,9 @@ function wireBlocks(){
           }
           else if(f==='durm'){ ln.dur.m=+inp.value; updateBuilderSummary(); }
           else if(f==='dist'){ ln.dist=+inp.value||0; updateBuilderSummary(); }
+          else if(f==='nage'){ ln.nage=inp.value||null; }
+          else if(f==='sendoffm'){ if(!ln.sendoff) ln.sendoff={m:0,s:0}; ln.sendoff.m=+inp.value||0; }
+          else if(f==='sendoffs'){ if(!ln.sendoff) ln.sendoff={m:0,s:0}; ln.sendoff.s=+inp.value||0; }
           else if(f==='zonesel'){
             const v=inp.value;
             if(v && v[0]==='c'){   // zone perso : change la référence + place le %
@@ -5489,7 +5538,9 @@ function builderToText(){
         ? exactToText(ln.exact)
         : builderState.activeRefs.map(r=> r==='rpe'?`RPE ${ln.rpe}`:computeTarget(r,ln.pct)).filter(Boolean).join(' · ');
       const amount = (ln.metric==='dist') ? `${ln.dist} m` : `${ln.dur.m}'`;
-      return `${T.l} ${amount} → ${tgts}`;
+      const nage = (ln.nage && NAGE_LABEL[ln.nage]) ? ` ${NAGE_LABEL[ln.nage]}` : '';
+      const dep = (ln.sendoff && (ln.sendoff.m||ln.sendoff.s)) ? ` (${tr('builder.sendoff')} ${fmtMS(ln.sendoff)})` : '';
+      return `${T.l}${nage} ${amount}${dep} → ${tgts}`;
     }).join(builderState.disc==='hyrox' ? ' + ' : ' + ');
     return head + lines;
   }).join('\n');
@@ -5573,8 +5624,17 @@ document.getElementById('bDiscPick').addEventListener('change', e=>{
           if(!refsForDisc(builderState.disc).includes(ln.model)) ln.model=def;
           const validKinds = exactKinds(builderState.disc).map(k=>k[0]);
           if(ln.exact && !validKinds.includes(ln.exact.kind)) ln.exact=exactDefault(builderState.disc);
-          // métrique par défaut selon le sport (sauf si modifiée manuellement)
-          if(!ln._metricTouched){ ln.metric = (builderState.disc==='swim') ? 'dist' : 'time'; }
+          // métrique par défaut selon le sport (sauf si modifiée manuellement).
+          // Si le sport bascule et fait changer la métrique elle-même (ex. vélo
+          // en temps → natation en distance), la distance héritée de l'AUTRE
+          // sport (1000m) n'a pas de sens en natation (100m) et vice-versa —
+          // on la réinitialise dans ce cas précis, jamais si l'utilisateur a
+          // déjà construit la ligne dans la bonne métrique.
+          if(!ln._metricTouched){
+            const wasDist = ln.metric==='dist';
+            ln.metric = (builderState.disc==='swim') ? 'dist' : 'time';
+            if(!wasDist) ln.dist = (builderState.disc==='swim') ? 100 : 1000;
+          }
           if(ln.dist===undefined) ln.dist = (builderState.disc==='swim') ? 100 : 1000;
         });
       });
