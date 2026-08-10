@@ -1885,6 +1885,14 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .ln-metric{gap:5px}
 .ln-int{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
 .ln-mid{display:flex;align-items:flex-start;gap:var(--space-2);flex-wrap:wrap;min-width:0;flex:1}
+.b-profile-wrap{margin-bottom:var(--space-3)}
+.b-profile-lbl{font-family:var(--font-ui);font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.prof-bar{display:flex;align-items:flex-end;gap:1.5px;height:56px;padding:5px 5px 0;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.prof-seg{flex:none;min-width:2px;border-radius:2px 2px 0 0}
+.modal-profile-wrap{margin:14px 0}
+.modal-profile-wrap .prof-bar{height:64px}
 .ln-nage{border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
   font-family:var(--font-ui);font-size:11.5px;font-weight:600;padding:6px 7px;flex:none;align-self:center}
 .ln-sendoff{display:flex;align-items:center;gap:4px;flex:none;white-space:nowrap}
@@ -3100,6 +3108,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     </div>
 
     <div class="builder-body">
+      <div class="b-profile-wrap" id="bProfileWrap" style="display:none"><div class="b-profile-lbl" data-i18n="builder.profileLabel">Profil de la séance</div><div class="prof-bar" id="bProfile"></div></div>
       <div class="b-blocks" id="bBlocks"></div>
       <button class="b-add-block" id="bAddBlock">+ Ajouter un bloc</button>
 

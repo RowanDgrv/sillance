@@ -2872,6 +2872,7 @@ function openModal(s){
       <div class="cell"><div class="k">${tr('modal.load')}</div><div class="v">${s.tss} TSS</div></div>
       <div class="cell"><div class="k">${tr('modal.intensity')}</div><div class="v">${s.zone}</div></div>
     </div>
+    ${sessionProfileHTML(s)}
     <p class="desc">${s.desc||tr('modal.plannedSession')}</p>
     ${sessionCoachNoteHTML(s)}
     ${sessionWhyHTML(s)}
@@ -5206,6 +5207,82 @@ function renderBlocks(){
   }).join('');
   wireBlocks();
   updateBuilderSummary();
+  renderProfileBar(document.getElementById('bProfile'), builderState.blocks, builderState.disc);
+  const pw = document.getElementById('bProfileWrap');
+  if(pw) pw.style.display = builderState.blocks.some(b=>b.lines.length) ? '' : 'none';
+}
+
+/* ===========================================================================
+ *  PROFIL VISUEL DE LA SÉANCE — graphique en barres (intensité × durée),
+ *  affiché au coach PENDANT qu'il construit (builder) et à l'athlète sur sa
+ *  fiche séance (openModal). Même logique dans les 2 contextes pour que ce
+ *  que le coach voit en construisant soit exactement ce que l'athlète voit
+ *  ensuite. Standard du secteur (TrainingPeaks/TrainerRoad) : une "forme" de
+ *  la séance lisible d'un coup d'œil, avant même de lire le détail texte.
+ * ========================================================================= */
+// Vitesse estimée (km/h) d'une ligne pour convertir distance→durée, SANS
+// dépendre de builderState (utilisable aussi depuis une séance déjà
+// enregistrée, hors du builder — donc disc passé en paramètre explicite).
+function estimateLineSpeedFor(ln, disc){
+  if(ln.mode==='exact' && ln.exact){
+    const ex=ln.exact;
+    if(ex.kind==='speed') return ex.kmh||0;
+    if(ex.kind==='pace'){ const sPerKm=(ex.m||0)*60+(ex.s||0); return sPerKm? 3600/sPerKm : 0; }
+    if(ex.kind==='time100'){ const s=(ex.m||0)*60+(ex.s||0); return s? (0.1/(s/3600)) : 0; }
+    if(ex.kind==='power') return disc==='bike' && ATHLETE_REF.vma ? 30 : 28;
+  }
+  if(disc==='swim'){ const cvKmh = ATHLETE_REF.cv? (0.1/(ATHLETE_REF.cv/3600)) : 4.5; return cvKmh*((ln.pct||70)/100); }
+  if(disc==='run'){ return (ATHLETE_REF.vma||16)*((ln.pct||70)/100); }
+  if(disc==='bike'){ return 32*((ln.pct||70)/100); }
+  return 12*((ln.pct||70)/100);
+}
+function lineMinutesFor(ln, disc){
+  if(ln.type==='station') return 1; // Hyrox : largeur symbolique, pas chronométrée par ligne
+  if(ln.metric==='dist'){
+    const m = ln.dist||0;
+    let kmh = estimateLineSpeedFor(ln, disc);
+    if(!kmh || kmh<=0) kmh = 10;
+    return (m/1000) / kmh * 60;
+  }
+  return (ln.dur&&ln.dur.h||0)*60 + (ln.dur&&ln.dur.m||0) + (ln.dur&&ln.dur.s||0)/60;
+}
+// Aplati blocs×séries en segments {min, pct} pour le graphique.
+function computeSessionProfile(blocks, disc){
+  const segs=[];
+  (blocks||[]).forEach(blk=>{
+    const n = Math.max(1, blk.series||1);
+    for(let i=0;i<n;i++){
+      (blk.lines||[]).forEach(ln=>{
+        const pct = profLinePct(ln);
+        const min = Math.max(0.2, lineMinutesFor(ln, disc));
+        segs.push({min, pct});
+      });
+    }
+  });
+  return segs;
+}
+function profileBarSegHTML(segs){
+  const total = segs.reduce((a,s)=>a+s.min,0) || 1;
+  return segs.map(s=>{
+    const w = Math.max(0.6, s.min/total*100);
+    const h = Math.max(14, Math.min(100, Math.round((s.pct/125)*100)));
+    const color = zoneColorAt(zoneFromPct(s.pct)-1, 5);
+    return `<div class="prof-seg" style="width:${w.toFixed(2)}%;height:${h}%;background:${color}"></div>`;
+  }).join('');
+}
+// wrap : élément conteneur (ou null si absent du DOM courant, cf. review sans builder)
+function renderProfileBar(wrap, blocks, disc){
+  if(!wrap) return;
+  const segs = computeSessionProfile(blocks, disc);
+  wrap.innerHTML = segs.length ? profileBarSegHTML(segs) : '';
+}
+// Même profil, côté fiche séance de l'athlète (openModal) — à partir de la
+// séance déjà enregistrée (s.blocksV2), pas du builder en cours d'édition.
+function sessionProfileHTML(s){
+  if(!s.blocksV2 || !s.blocksV2.blocks || !s.blocksV2.blocks.length) return '';
+  const segs = computeSessionProfile(s.blocksV2.blocks, s.disc);
+  if(!segs.length) return '';
+  return `<div class="modal-profile-wrap"><div class="prof-bar">${profileBarSegHTML(segs)}</div></div>`;
 }
 
 /* bouton commentaire + suppression, et la rangée de note repliable (coach).
