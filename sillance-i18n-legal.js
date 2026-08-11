@@ -11,14 +11,14 @@
     "legal.h1": `Informations légales`,
     "legal.updated": `Version provisoire — Sillance est en phase de pré-lancement.`,
     "legal.langNote": `En cas de divergence entre les versions, la version française fait foi.`,
-    "legal.provisional": `<b>Service en cours de mise en place.</b> La structure juridique éditrice est en cours d'immatriculation ; les informations d'identification (statut, SIRET, adresse) et le médiateur de la consommation seront complétés à l'ouverture officielle du service. Aucun paiement réel n'est encore encaissé à ce stade.`,
+    "legal.provisional": `<b>Service en phase de pré-lancement.</b> Aucun paiement réel n'est encore encaissé à ce stade ; le médiateur de la consommation sera désigné à l'ouverture officielle du service.`,
 
     "legal.mentions.title": `Mentions légales`,
     "legal.mentions.editorTitle": `Éditeur du site`,
     "legal.mentions.editorIntro": `Le site et l'application Sillance (ci-après « le Service ») sont édités par :`,
-    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — micro-entreprise <span class="todo">(immatriculation en cours)</span>`,
-    "legal.mentions.li2": `SIRET : <span class="todo">en cours d'immatriculation</span>`,
-    "legal.mentions.li3": `Adresse : <span class="todo">communiquée à l'ouverture du service</span>`,
+    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — micro-entreprise`,
+    "legal.mentions.li2": `SIRET : 108 626 847 00017`,
+    "legal.mentions.li3": `Adresse : 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane`,
     "legal.mentions.li4": `Contact : <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
     "legal.mentions.li5": `Directeur de la publication : Rowan Degraeve`,
     "legal.mentions.li6": `TVA non applicable, article 293 B du CGI (franchise en base de TVA)`,
@@ -113,7 +113,7 @@ avant toute action judiciaire ; les consommateurs peuvent recourir gratuitement 
 <span class="todo">(un médiateur de la consommation sera désigné à l'ouverture du service)</span>. À défaut, les tribunaux français sont compétents.`,
 
     "legal.priv.title": `Politique de confidentialité (RGPD)`,
-    "legal.priv.controller": `<strong>Responsable de traitement :</strong> Rowan Degraeve, micro-entreprise (immatriculation en cours) —
+    "legal.priv.controller": `<strong>Responsable de traitement :</strong> Rowan Degraeve, micro-entreprise (SIRET 108 626 847 00017) —
 contact : <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
     "legal.priv.t1": `3.1 Données collectées et finalités`,
     "legal.priv.th1": `Données`,
@@ -176,7 +176,7 @@ des éléments strictement nécessaires : jeton de session (authentification Sup
 rôle appliqué au niveau de la base de données (Row Level Security) ; paiements traités exclusivement par Stripe
 (certifié PCI-DSS). En cas de violation de données susceptible d'engendrer un risque pour vos droits, vous et la
 CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
-    "legal.footer": `Sillance — structure en cours d'immatriculation · <a href="index.html">Retour au site</a>`,
+    "legal.footer": `Sillance — micro-entreprise · <a href="index.html">Retour au site</a>`,
   };
 
   var en = {
@@ -187,14 +187,14 @@ CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
     "legal.h1": `Legal information`,
     "legal.updated": `Provisional version — Sillance is in pre-launch.`,
     "legal.langNote": `In case of discrepancy between versions, the French version prevails.`,
-    "legal.provisional": `<b>Service being finalized.</b> The publishing legal entity is currently being registered; identification details (legal status, business registration number, address) and the consumer mediator will be completed when the service officially launches. No real payments are collected at this stage.`,
+    "legal.provisional": `<b>Service in pre-launch phase.</b> No real payments are collected at this stage; the consumer mediator will be designated when the service officially launches.`,
 
     "legal.mentions.title": `Legal notice`,
     "legal.mentions.editorTitle": `Site publisher`,
     "legal.mentions.editorIntro": `The Sillance site and application (hereafter "the Service") are published by:`,
-    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — sole proprietorship (French "micro-entreprise") <span class="todo">(registration in progress)</span>`,
-    "legal.mentions.li2": `Business registration number (SIRET): <span class="todo">registration in progress</span>`,
-    "legal.mentions.li3": `Address: <span class="todo">to be provided when the service launches</span>`,
+    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — sole proprietorship (French "micro-entreprise")`,
+    "legal.mentions.li2": `Business registration number (SIRET): 108 626 847 00017`,
+    "legal.mentions.li3": `Address: 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane, France`,
     "legal.mentions.li4": `Contact: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
     "legal.mentions.li5": `Publication director: Rowan Degraeve`,
     "legal.mentions.li6": `VAT not applicable, article 293 B of the French Tax Code (VAT exemption for small businesses)`,
@@ -289,7 +289,7 @@ before any legal action; consumers may use a consumer mediator free of charge
 <span class="todo">(a consumer mediator will be appointed when the service launches)</span>. Failing that, the French courts have jurisdiction.`,
 
     "legal.priv.title": `Privacy policy (GDPR)`,
-    "legal.priv.controller": `<strong>Data controller:</strong> Rowan Degraeve, sole proprietorship (registration in progress) —
+    "legal.priv.controller": `<strong>Data controller:</strong> Rowan Degraeve, sole proprietorship (SIRET 108 626 847 00017) —
 contact: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
     "legal.priv.t1": `3.1 Data collected and purposes`,
     "legal.priv.th1": `Data`,
@@ -352,7 +352,7 @@ strictly necessary items: a session token (Supabase authentication) and display 
 role at the database level (Row Level Security); payments are processed exclusively by Stripe
 (PCI-DSS certified). In the event of a data breach likely to create a risk to your rights, you and the
 CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
-    "legal.footer": `Sillance — legal entity currently being registered · <a href="index.html">Back to site</a>`,
+    "legal.footer": `Sillance — sole proprietorship · <a href="index.html">Back to site</a>`,
   };
 
   var es = {
@@ -363,14 +363,14 @@ CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
     "legal.h1": `Información legal`,
     "legal.updated": `Versión provisional — Sillance está en fase de prelanzamiento.`,
     "legal.langNote": `En caso de discrepancia entre las versiones, prevalece la versión francesa.`,
-    "legal.provisional": `<b>Servicio en proceso de implementación.</b> La estructura jurídica editora está en proceso de registro; los datos identificativos (estatus, número de registro, dirección) y el mediador de consumo se completarán en la apertura oficial del servicio. Todavía no se cobra ningún pago real en esta etapa.`,
+    "legal.provisional": `<b>Servicio en fase de prelanzamiento.</b> Todavía no se cobra ningún pago real en esta etapa; el mediador de consumo se designará en la apertura oficial del servicio.`,
 
     "legal.mentions.title": `Aviso legal`,
     "legal.mentions.editorTitle": `Editor del sitio`,
     "legal.mentions.editorIntro": `El sitio y la aplicación Sillance (en adelante «el Servicio») son editados por:`,
-    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — micro-empresa (autónomo francés) <span class="todo">(registro en curso)</span>`,
-    "legal.mentions.li2": `Número de registro (SIRET): <span class="todo">registro en curso</span>`,
-    "legal.mentions.li3": `Dirección: <span class="todo">se comunicará en la apertura del servicio</span>`,
+    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — micro-empresa (autónomo francés)`,
+    "legal.mentions.li2": `Número de registro (SIRET): 108 626 847 00017`,
+    "legal.mentions.li3": `Dirección: 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane, Francia`,
     "legal.mentions.li4": `Contacto: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
     "legal.mentions.li5": `Director de publicación: Rowan Degraeve`,
     "legal.mentions.li6": `IVA no aplicable, artículo 293 B del Código General de Impuestos francés (franquicia de IVA)`,
@@ -465,7 +465,7 @@ antes de cualquier acción judicial; los consumidores pueden recurrir gratuitame
 <span class="todo">(se designará un mediador de consumo en la apertura del servicio)</span>. En su defecto, los tribunales franceses son competentes.`,
 
     "legal.priv.title": `Política de privacidad (RGPD)`,
-    "legal.priv.controller": `<strong>Responsable del tratamiento:</strong> Rowan Degraeve, micro-empresa (registro en curso) —
+    "legal.priv.controller": `<strong>Responsable del tratamiento:</strong> Rowan Degraeve, micro-empresa (SIRET 108 626 847 00017) —
 contacto: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
     "legal.priv.t1": `3.1 Datos recopilados y finalidades`,
     "legal.priv.th1": `Datos`,
@@ -528,7 +528,7 @@ elementos estrictamente necesarios: un token de sesión (autenticación Supabase
 rol aplicada a nivel de base de datos (Row Level Security); pagos procesados exclusivamente por Stripe
 (certificado PCI-DSS). En caso de violación de datos que pueda suponer un riesgo para tus derechos, tú y la
 CNIL seréis notificados conforme a los artículos 33 y 34 del RGPD.`,
-    "legal.footer": `Sillance — estructura en proceso de registro · <a href="index.html">Volver al sitio</a>`,
+    "legal.footer": `Sillance — micro-empresa · <a href="index.html">Volver al sitio</a>`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
