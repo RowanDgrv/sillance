@@ -648,7 +648,7 @@
     "video.placeholderHint": `(mp4 hébergé, ou embed YouTube/Vimeo)`,
     "video.clickToOpen": `clic pour ouvrir en grand`,
 
-    "exact.watts": `Watts`, "exact.paceKm": `Allure /km`, "exact.rpeNoSensor": `RPE (sans capteur)`,
+    "exact.watts": `Watts`, "exact.paceKm": `Allure /km`, "exact.cadence": `Cadence (rpm)`, "exact.rpeNoSensor": `RPE (sans capteur)`,
     "exact.totalTime": `Temps total`, "exact.time100": `Temps /100m`, "exact.pace100": `Allure /100m`,
 
     "builder.warmupTitle": `Échauffement`, "builder.cooldownTitle": `Retour au calme`,
@@ -1878,7 +1878,7 @@
     "video.placeholderHint": `(hosted mp4, or YouTube/Vimeo embed)`,
     "video.clickToOpen": `click to open full screen`,
 
-    "exact.watts": `Watts`, "exact.paceKm": `Pace /km`, "exact.rpeNoSensor": `RPE (no sensor)`,
+    "exact.watts": `Watts`, "exact.paceKm": `Pace /km`, "exact.cadence": `Cadence (rpm)`, "exact.rpeNoSensor": `RPE (no sensor)`,
     "exact.totalTime": `Total time`, "exact.time100": `Time /100m`, "exact.pace100": `Pace /100m`,
 
     "builder.warmupTitle": `Warm-up`, "builder.cooldownTitle": `Cool-down`,
@@ -3108,7 +3108,7 @@
     "video.placeholderHint": `(mp4 alojado, o embed de YouTube/Vimeo)`,
     "video.clickToOpen": `clic para abrir en grande`,
 
-    "exact.watts": `Vatios`, "exact.paceKm": `Ritmo /km`, "exact.rpeNoSensor": `RPE (sin sensor)`,
+    "exact.watts": `Vatios`, "exact.paceKm": `Ritmo /km`, "exact.cadence": `Cadencia (rpm)`, "exact.rpeNoSensor": `RPE (sin sensor)`,
     "exact.totalTime": `Tiempo total`, "exact.time100": `Tiempo /100m`, "exact.pace100": `Ritmo /100m`,
 
     "builder.warmupTitle": `Calentamiento`, "builder.cooldownTitle": `Vuelta a la calma`,

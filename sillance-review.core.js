@@ -5074,7 +5074,7 @@ function exactDefault(disc){
 }
 /* options de type de cible exacte par sport */
 function exactKinds(disc){
-  if(disc==='bike') return [['power',tr('exact.watts')],['pace',tr('exact.paceKm')],['speed','km/h'],['rpe',tr('exact.rpeNoSensor')]];
+  if(disc==='bike') return [['power',tr('exact.watts')],['pace',tr('exact.paceKm')],['speed','km/h'],['cadence',tr('exact.cadence')],['rpe',tr('exact.rpeNoSensor')]];
   if(disc==='run')  return [['pace',tr('exact.paceKm')],['speed','km/h'],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
   if(disc==='swim') return [['time100',tr('exact.time100')],['pace',tr('exact.pace100')],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
   return [['rpe','RPE']];
@@ -5088,6 +5088,7 @@ function rpeFromPct(p){ return Math.max(1,Math.min(10, Math.round(p/12))); }
 function tolUnit(kind){
   if(kind==='power') return 'W';
   if(kind==='speed') return 'km/h';
+  if(kind==='cadence') return 'rpm';
   if(kind==='rpe') return 'pt';
   return 's'; // pace, time100, time : tolérance en secondes
 }
@@ -5099,6 +5100,7 @@ function exactToText(ex){
   switch(ex.kind){
     case 'power':{ const c=ex.w||0; return tol? `${c-tol}–${c+tol} W` : c+' W'; }
     case 'speed':{ const c=ex.kmh||0; const t=(tol||0); return t? `${(c-t).toFixed(1)}–${(c+t).toFixed(1)} km/h` : c+' km/h'; }
+    case 'cadence':{ const c=ex.rpm||0; return tol? `${c-tol}–${c+tol} rpm` : c+' rpm'; }
     case 'pace':{ const c=(ex.m||0)*60+(ex.s||0); const suf=(ex.per100?'/100m':'/km'); return tol? `${fmtPace(c-tol)}–${fmtPace(c+tol)}${suf}` : fmtPace(c)+suf; }
     case 'time100':{ const c=(ex.m||0)*60+(ex.s||0); return tol? `${fmtPace(c-tol)}–${fmtPace(c+tol)}/100m` : fmtPace(c)+'/100m'; }
     case 'time':{ const c=(ex.h||0)*3600+(ex.m||0)*60+(ex.s||0); const f=(s)=>{ s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600); const r=s%3600; return (h?h+'h':'')+Math.floor(r/60)+"'"+String(r%60).padStart(2,'0')+'"'; }; return tol? `${f(c-tol)}–${f(c+tol)}` : f(c); }
@@ -5432,6 +5434,7 @@ function exactInputsHTML(ex){
   let fields='';
   if(ex.kind==='power')   fields=`<input class="ex-n" type="number" min="0" max="600" value="${ex.w||0}" data-x="w"><span>W</span>`;
   else if(ex.kind==='speed') fields=`<input class="ex-n" type="number" min="0" max="60" step="0.1" value="${ex.kmh||0}" data-x="kmh"><span>km/h</span>`;
+  else if(ex.kind==='cadence') fields=`<input class="ex-n" type="number" min="30" max="140" value="${ex.rpm||0}" data-x="rpm"><span>rpm</span>`;
   else if(ex.kind==='pace')  fields=`<input class="ex-n2" type="number" min="0" max="20" value="${ex.m||0}" data-x="m"><span>'</span><input class="ex-n2" type="number" min="0" max="59" value="${ex.s||0}" data-x="s"><span>"${builderState.disc==='swim'?'/100m':'/km'}</span>`;
   else if(ex.kind==='time100') fields=`<input class="ex-n2" type="number" min="0" max="20" value="${ex.m||0}" data-x="m"><span>'</span><input class="ex-n2" type="number" min="0" max="59" value="${ex.s||0}" data-x="s"><span>"/100m</span>`;
   else if(ex.kind==='time')  fields=`<input class="ex-n2" type="number" min="0" max="9" value="${ex.h||0}" data-x="h"><span>h</span><input class="ex-n2" type="number" min="0" max="59" value="${ex.m||0}" data-x="m"><span>'</span><input class="ex-n2" type="number" min="0" max="59" value="${ex.s||0}" data-x="s"><span>"</span>`;
@@ -5570,6 +5573,7 @@ function resetExact(kind){
   switch(kind){
     case 'power': return {kind, w:250, tol:10};
     case 'speed': return {kind, kmh:18, tol:0.5};
+    case 'cadence': return {kind, rpm:90, tol:5};
     case 'pace': return {kind, m:4, s:30, tol:5};
     case 'time100': return {kind, m:1, s:30, tol:3};
     case 'time': return {kind, h:0, m:30, s:0, tol:0};
