@@ -145,6 +145,8 @@
     "builder.strokeType": `Nage`, "builder.sendoff": `Départ toutes les`, "builder.sendoffAbbr": `départ`,
     "builder.sendoffHint": `Intervalle entre 2 départs du même effort (ex. 10×100 départ 1'40) — laisse à 0 si non pertinent.`,
     "builder.profileLabel": `Profil de la séance`,
+    "builder.exercisePlaceholder": `Nom de l'exercice (squat, développé couché…)`,
+    "builder.repsUnit": `reps`, "builder.switchRepsTime": `Basculer répétitions ⇄ temps (ex. repos chronométré, gainage tenu)`,
 
     "runDyn.cadence": `Cadence`, "runDyn.vertOsc": `Oscillation verticale`, "runDyn.vertRatio": `Ratio vertical`, "runDyn.gct": `Temps de contact au sol`,
     "runDyn.lowerBetter": `↓ = mieux`, "runDyn.higherBetter": `↑ = mieux`,
@@ -1373,6 +1375,8 @@
     "builder.strokeType": `Stroke`, "builder.sendoff": `Send-off every`, "builder.sendoffAbbr": `send-off`,
     "builder.sendoffHint": `Interval between 2 starts of the same effort (e.g. 10×100 send-off 1'40) — leave at 0 if not relevant.`,
     "builder.profileLabel": `Session profile`,
+    "builder.exercisePlaceholder": `Exercise name (squat, bench press…)`,
+    "builder.repsUnit": `reps`, "builder.switchRepsTime": `Switch reps ⇄ time (e.g. timed rest, held plank)`,
 
     "runDyn.cadence": `Cadence`, "runDyn.vertOsc": `Vertical oscillation`, "runDyn.vertRatio": `Vertical ratio`, "runDyn.gct": `Ground contact time`,
     "runDyn.lowerBetter": `↓ = better`, "runDyn.higherBetter": `↑ = better`,
@@ -2601,6 +2605,8 @@
     "builder.strokeType": `Estilo`, "builder.sendoff": `Salida cada`, "builder.sendoffAbbr": `salida`,
     "builder.sendoffHint": `Intervalo entre 2 salidas del mismo esfuerzo (ej. 10×100 salida 1'40) — deja en 0 si no aplica.`,
     "builder.profileLabel": `Perfil de la sesión`,
+    "builder.exercisePlaceholder": `Nombre del ejercicio (sentadilla, press banca…)`,
+    "builder.repsUnit": `reps`, "builder.switchRepsTime": `Cambiar repeticiones ⇄ tiempo (ej. descanso cronometrado, plancha mantenida)`,
 
     "runDyn.cadence": `Cadencia`, "runDyn.vertOsc": `Oscilación vertical`, "runDyn.vertRatio": `Ratio vertical`, "runDyn.gct": `Tiempo de contacto con el suelo`,
     "runDyn.lowerBetter": `↓ = mejor`, "runDyn.higherBetter": `↑ = mejor`,

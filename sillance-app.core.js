@@ -2355,6 +2355,7 @@ function profLineMin(ln, disc){
 }
 function profLinePct(ln){
   if(ln.type==='station') return 96;
+  if(ln.metric==='reps') return Math.min(130, (ln.rpe||7)*12);
   if(ln.mode==='exact' && ln.exact){
     const ex=ln.exact;
     if(ex.kind==='power')   return ATHLETE_REF.ftp ? ex.w/ATHLETE_REF.ftp*100 : 90;
@@ -5043,14 +5044,20 @@ function defaultLine(type, disc){
   }
   const def = {bike:'ftp', run:'vma', swim:'css', strength:'fc'}[disc] || 'fc';
   const pct = {warmup:60, exo:95, contre:50, recov:50, cooldown:55}[type] ?? 70;
-  // métrique par défaut : la natation se planifie en distance, les autres en temps
-  const metric = (disc==='swim') ? 'dist' : 'time';
+  // métrique par défaut : la natation se planifie en distance, le renfo en
+  // répétitions pour ses lignes de travail (exo/contre-effort — le vrai
+  // fondamental d'une séance de muscu : séries × répétitions × charge),
+  // les autres en temps.
+  const metric = (disc==='swim') ? 'dist'
+    : (disc==='strength' && (type==='exo'||type==='contre')) ? 'reps' : 'time';
   const dist = (disc==='swim') ? (type==='warmup'?400:(type==='cooldown'?200:100)) : 1000;
-  return {lid:'l'+(builderUid++), type, dur:{h:0,m:type==='warmup'?15:(type==='cooldown'?10:5),s:0},
+  const base = {lid:'l'+(builderUid++), type, dur:{h:0,m:type==='warmup'?15:(type==='cooldown'?10:5),s:0},
           metric, dist,
           model:def, pct, rpe:rpeFromPct(pct),
           mode:'zone',          // 'zone' (% de référence) ou 'exact' (valeur absolue)
           exact:exactDefault(disc)};
+  if(metric==='reps'){ base.exercise=''; base.reps=8; base.weight=20; base.rpe=(type==='contre'?6:8); }
+  return base;
 }
 /* ligne Hyrox d'une station précise */
 function hyroxLine(stationKey){
@@ -5238,6 +5245,7 @@ function estimateLineSpeedFor(ln, disc){
 }
 function lineMinutesFor(ln, disc){
   if(ln.type==='station') return 1; // Hyrox : largeur symbolique, pas chronométrée par ligne
+  if(ln.metric==='reps') return Math.max(0.2, (ln.reps||0)*3/60); // ~3s/rep, hors repos (ligne dédiée)
   if(ln.metric==='dist'){
     const m = ln.dist||0;
     let kmh = estimateLineSpeedFor(ln, disc);
@@ -5320,6 +5328,28 @@ function lineHTML(blk, ln){
   }
 
   const T=LINE_TYPES[ln.type];
+
+  // ----- ligne RENFORCEMENT (séries × répétitions × charge) -----
+  // Le fondamental du renfo n'est ni une durée ni un %FTP/VMA : c'est un
+  // nombre de répétitions à une charge donnée. Le nombre de séries vient du
+  // champ "séries" du bloc (déjà existant, réutilisé tel quel — un bloc à
+  // 4 séries contenant une ligne "8 reps @ 60kg" EST "4×8 squats à 60kg").
+  // ⇄ bascule vers une ligne chronométrée (repos, gainage tenu en temps…).
+  if(builderState.disc==='strength' && ln.metric==='reps'){
+    return `<div class="ln ln-strength" data-lid="${ln.lid}" style="--lc:${T.c}">
+      <span class="ln-grip">⠿</span>
+      <select class="ln-type" data-f="type">${Object.entries(LINE_TYPES).map(([k,v])=>`<option value="${k}" ${k===ln.type?'selected':''}>${v.l}</option>`).join('')}</select>
+      <div class="ln-exwrap">
+        <button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchRepsTime')}">⇄</button>
+        <input type="text" class="ln-exercise" placeholder="${tr('builder.exercisePlaceholder')}" value="${dispoSafe(ln.exercise||'')}" data-f="exercise">
+      </div>
+      <div class="hx-target"><input type="number" min="1" max="100" value="${ln.reps||1}" data-f="reps"><span>${tr('builder.repsUnit')}</span></div>
+      <div class="hx-weight"><input type="number" min="0" max="500" step="0.5" value="${ln.weight||0}" data-f="weight"><span>kg</span></div>
+      <div class="ln-rpe"><input type="number" min="1" max="10" value="${ln.rpe||7}" data-f="rpe"><span>RPE</span></div>
+      ${lnActionsHTML(ln, tr('builder.deleteLine'))}
+    </div>`;
+  }
+
   const models = refsForDisc(builderState.disc).filter(k=>k!=='rpe');
   if(!ln.mode) ln.mode='zone';
   if(!ln.exact) ln.exact=exactDefault(builderState.disc);
@@ -5358,9 +5388,10 @@ function lineHTML(blk, ln){
 
   // champ durée OU distance selon la métrique de la ligne
   const metric = ln.metric || 'time';
+  const swTitle = (builderState.disc==='strength') ? tr('builder.switchRepsTime') : tr('builder.switchTimeDist');
   const durField = metric==='dist'
-    ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
-    : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchTimeDist')}">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
+    ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${swTitle}">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
+    : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${swTitle}">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
 
   // Natation uniquement : nage (tous types de ligne) + départ toutes les X
   // (uniquement pertinent en distance — un "départ" chronomètre le prochain
@@ -5443,9 +5474,14 @@ function wireBlocks(){
       };
       const nta=lnEl.querySelector('[data-f="note"]');
       if(nta) nta.addEventListener('input', ()=>{ ln.note=nta.value; });
-      // bascule temps ⇄ distance
+      // bascule temps ⇄ distance (temps ⇄ répétitions en renfo)
       const msw=lnEl.querySelector('[data-act="metricswitch"]');
-      if(msw) msw.onclick=()=>{ ln.metric = (ln.metric==='dist')?'time':'dist'; ln._metricTouched=true; renderBlocks(); };
+      if(msw) msw.onclick=()=>{
+        ln.metric = (builderState.disc==='strength')
+          ? ((ln.metric==='reps')?'time':'reps')
+          : ((ln.metric==='dist')?'time':'dist');
+        ln._metricTouched=true; renderBlocks();
+      };
       // champs Hyrox (station / cible / poids)
       lnEl.querySelectorAll('[data-hx]').forEach(inp=>{
         const f=inp.dataset.hx;
@@ -5474,6 +5510,10 @@ function wireBlocks(){
         const ev = (inp.tagName==='SELECT')?'change':'input';
         inp.addEventListener(ev,()=>{
           if(f==='type'){ ln.type=inp.value; renderBlocks(); }
+          else if(f==='exercise'){ ln.exercise=inp.value; }
+          else if(f==='reps'){ ln.reps=Math.max(1,+inp.value||1); updateBuilderSummary(); }
+          else if(f==='weight'){ ln.weight=parseFloat(inp.value)||0; }
+          else if(f==='rpe'){ ln.rpe=Math.max(1,Math.min(10,+inp.value||1)); updateBuilderSummary(); }
           else if(f==='model'){ ln.model=inp.value; renderBlocks(); }
           else if(f==='pct'){
             // maj EN PLACE pendant le drag — re-render seulement au relâchement,
@@ -5545,6 +5585,7 @@ function zoneForPct(modelKey, pct){
   return pct>110?'au-dessus':'';
 }
 function lineMinutes(ln){
+  if(ln.metric==='reps') return Math.max(0.2, (ln.reps||0)*3/60); // ~3s/rep, hors repos (ligne dédiée)
   // ligne en distance : on estime la durée à partir de l'allure/vitesse cible
   if(ln.metric==='dist'){
     const m = ln.dist||0;
@@ -5571,6 +5612,11 @@ function estimateLineSpeed(ln){
   return 12*(ln.pct/100);
 }
 function estimateLineTss(ln, disc){
+  if(ln.metric==='reps'){
+    const pct = Math.min(130, (ln.rpe||7)*12);
+    const ir = Math.min(1.4, pct/100);
+    return lineMinutes(ln)/60*ir*ir*100;
+  }
   let pct = ln.pct;
   if(ln.mode==='exact' && ln.exact){
     // déduit une intensité relative approchée depuis la valeur absolue
@@ -5609,6 +5655,12 @@ function builderToText(){
         const tgt = st.unit==='m' ? `${ln.target} m` : `${ln.target} reps`;
         const w = (st.weighted && ln.weight) ? ` @ ${ln.weight} kg` : '';
         return `${st.name} — ${tgt}${w}`;
+      }
+      if(builderState.disc==='strength' && ln.metric==='reps'){
+        const T=LINE_TYPES[ln.type];
+        const ex = ln.exercise ? `${ln.exercise} — ` : '';
+        const w = ln.weight ? ` @ ${ln.weight} kg` : '';
+        return `${T.l} ${ex}${ln.reps} reps${w} → RPE ${ln.rpe}`;
       }
       const T=LINE_TYPES[ln.type];
       const tgts = (ln.mode==='exact')
@@ -5709,10 +5761,16 @@ document.getElementById('bDiscPick').addEventListener('change', e=>{
           // déjà construit la ligne dans la bonne métrique.
           if(!ln._metricTouched){
             const wasDist = ln.metric==='dist';
-            ln.metric = (builderState.disc==='swim') ? 'dist' : 'time';
+            ln.metric = (builderState.disc==='swim') ? 'dist'
+              : (builderState.disc==='strength' && (ln.type==='exo'||ln.type==='contre')) ? 'reps' : 'time';
             if(!wasDist) ln.dist = (builderState.disc==='swim') ? 100 : 1000;
           }
           if(ln.dist===undefined) ln.dist = (builderState.disc==='swim') ? 100 : 1000;
+          if(ln.metric==='reps'){
+            if(ln.reps===undefined) ln.reps=8;
+            if(ln.weight===undefined) ln.weight=20;
+            if(ln.exercise===undefined) ln.exercise='';
+          }
         });
       });
     }

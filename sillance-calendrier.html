@@ -1948,6 +1948,17 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 /* lignes Hyrox */
 .ln-hyrox{grid-template-columns:18px 1.4fr 90px 110px auto !important}
 @media (max-width:640px){.ln-hyrox{grid-template-columns:18px 1fr 1fr !important}}
+/* lignes Renforcement (reps × charge) — réutilise .hx-target/.hx-weight (Hyrox) */
+.ln-strength{grid-template-columns:18px 108px 1.2fr 66px 76px 60px auto !important}
+@media (max-width:640px){.ln-strength{grid-template-columns:18px 1fr 1fr !important}}
+.ln-exwrap{display:flex;align-items:center;gap:6px;min-width:0}
+.ln-exercise{flex:1;min-width:0;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
+  font-family:var(--font-ui);font-size:12.5px;font-weight:600;padding:7px var(--space-2)}
+.ln-exercise::placeholder{color:var(--muted);font-weight:400}
+.ln-rpe{display:flex;align-items:center;gap:5px}
+.ln-rpe input{width:38px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
+  font-family:var(--font-data);font-size:12.5px;text-align:center;padding:6px 4px}
+.ln-rpe span{font-size:var(--fs-sm);color:var(--muted);font-weight:700}
 /* commentaire du coach par intervalle */
 .ln-actions{display:flex;gap:5px;align-items:center;justify-content:flex-end}
 .ln-cmt{width:26px;height:26px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;flex:none}
