@@ -597,7 +597,14 @@ function mondayOf(offset){
   return d;
 }
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
-function iso(d){return d.toISOString().slice(0,10)}
+// Date LOCALE en "YYYY-MM-DD" — jamais toISOString() ici : elle convertit en
+// UTC, donc pour tout fuseau à l'est de Greenwich (France UTC+1/+2 incluse)
+// un minuit local se retrouve la veille en UTC → toutes les clés de date
+// (planning, séances, cycles…) tombaient un jour trop tôt. Bug silencieux
+// car auto-cohérent (mêmes clés utilisées en lecture/écriture partout) —
+// découvert le 12/08/2026 via le toast d'ajout au calendrier affichant
+// "dimanche 9 août" pour une séance posée sur lundi 10.
+function iso(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 const DAYS = [tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort'),tr('day.sunShort')];
 const fmt = new Intl.DateTimeFormat(localeStr(),{day:'numeric',month:'short'});
 
@@ -5811,7 +5818,12 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
       .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
   }
   closeBuilder(); render();
-  toast(tr('toast.seanceAjouteeCalendrier'));
+  // Précise le jour cible dans le toast : quand la séance est créée depuis le
+  // bouton générique (pas via le "+" d'un jour précis), elle atterrit sur le
+  // lundi de la semaine affichée sans que le coach l'ait choisi — sans ce
+  // repère, il peut chercher sa séance sur le mauvais jour.
+  const targetDayLabel = new Date(key+'T00:00:00').toLocaleDateString(localeStr(), {weekday:'long', day:'numeric', month:'long'});
+  toast(tr('toast.seanceAjouteeCalendrier')+' — '+targetDayLabel);
 });
 
 /* ============================================================
