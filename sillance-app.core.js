@@ -2874,7 +2874,7 @@ function openModal(s){
       <div class="cell"><div class="k">${tr('modal.intensity')}</div><div class="v">${s.zone}</div></div>
     </div>
     ${sessionProfileHTML(s)}
-    <p class="desc">${s.desc||tr('modal.plannedSession')}</p>
+    <p class="desc">${(s.desc||tr('modal.plannedSession')).replace(/\n/g,'<br>')}</p>
     ${sessionCoachNoteHTML(s)}
     ${sessionWhyHTML(s)}
     ${sessionNotesHTML(s)}
@@ -5657,7 +5657,7 @@ function updateBuilderSummary(){
 
 function builderToText(){
   return builderState.blocks.map(blk=>{
-    const head = (blk.series>1?`${blk.series}× `:'') + (blk.title?blk.title+' : ':'');
+    const head = (blk.series>1?`${blk.series}× `:'') + (blk.title?dispoSafe(blk.title)+' : ':'');
     const lines = blk.lines.map(ln=>{
       if(ln.type==='station'){
         const st=hyroxStation(ln.station)||HYROX_STATIONS[0];
@@ -5667,7 +5667,7 @@ function builderToText(){
       }
       if(builderState.disc==='strength' && ln.metric==='reps'){
         const T=LINE_TYPES[ln.type];
-        const ex = ln.exercise ? `${ln.exercise} — ` : '';
+        const ex = ln.exercise ? `${dispoSafe(ln.exercise)} — ` : '';
         const w = ln.weight ? ` @ ${ln.weight} kg` : '';
         return `${T.l} ${ex}${ln.reps} reps${w} → RPE ${ln.rpe}`;
       }
