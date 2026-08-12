@@ -3755,17 +3755,22 @@ function wireCoachTiers(root, onSelect){
 
 /* Abonnement Sillance du CLUB (ce que le club paie à la plateforme).
    Assiette = « athlètes activés » = adhérents placés dans un groupe.
-   Facturation à la saison, par virement (pas de carte) → cette carte est
-   informative + retient la formule ; l'encaissement réel se fait hors app. */
+   Abonnement MENSUEL (engagement minimum 3 mois, essai 14 jours comme le
+   coach), par virement ou carte → cette carte est informative + retient la
+   formule ; l'encaissement réel se fait hors app. Prix fondateurs donnés en
+   dur (pas de division à la volée) pour éviter tout arrondi sur le palier
+   Grand club (112,50 € / 2 = 56,25 €, non entier). */
 const CLUB_TIERS = [
-  {id:'club',  get name(){return tr('clubTier.club.name')},          get cap(){return tr('clubTier.club.cap')},  max:50,       price:600,  perM:'0,99 €'},
-  {id:'grand', get name(){return tr('clubTier.grand.name')},    get cap(){return tr('clubTier.grand.cap')}, max:150,      price:1350, perM:'0,75 €'},
-  {id:'illim', get name(){return tr('clubTier.illim.name')}, get cap(){return tr('clubTier.illim.cap')},   max:Infinity, price:1800, perM:'0,50 €'}
+  {id:'club',  get name(){return tr('clubTier.club.name')},          get cap(){return tr('clubTier.club.cap')},  max:50,       price:50,    priceFounder:25,    perM:'0,99 €'},
+  {id:'grand', get name(){return tr('clubTier.grand.name')},    get cap(){return tr('clubTier.grand.cap')}, max:150,      price:112.5, priceFounder:56.25, perM:'0,75 €'},
+  {id:'illim', get name(){return tr('clubTier.illim.name')}, get cap(){return tr('clubTier.illim.cap')},   max:Infinity, price:150,   priceFounder:75,    perM:'0,50 €'}
 ];
 let clubFounder = true; // démo : on présente le tarif « club fondateur » (−50 %)
 function clubActivated(){ return CLUB_ATHLETES.filter(a=>a.group).length; }
 function clubTierFor(n){ return CLUB_TIERS.find(t=>n<=t.max) || CLUB_TIERS[CLUB_TIERS.length-1]; }
-function clubTierPrice(t){ return clubFounder ? Math.round(t.price/2) : t.price; }
+function clubTierPrice(t){ return clubFounder ? t.priceFounder : t.price; }
+/* formate un montant club (peut être décimal, ex. 56.25 → "56,25") */
+function fmtEuroClub(n){ return Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.',','); }
 
 function clubSillanceCardHTML(){
   const n=clubActivated(), tier=clubTierFor(n);
@@ -3785,12 +3790,12 @@ function clubSillanceCardHTML(){
       </div>
       <div class="csub-tiers">
         ${CLUB_TIERS.map(t=>{
-          const cur=t.id===tier.id, fnd=Math.round(t.price/2);
+          const cur=t.id===tier.id;
           return `<div class="csub-tier ${cur?'cur':''}">
             ${cur?`<span class="csub-badge">${tr('clubSub.yourPlan')}</span>`:''}
             <div class="csub-name">${t.name}</div>
             <div class="csub-cap">${t.cap}</div>
-            <div class="csub-price">${clubFounder?`<s>${t.price} €</s> ${fnd} €`:`${t.price} €`}<small>/${tr('clubSub.perSeason')}</small></div>
+            <div class="csub-price">${clubFounder?`<s>${fmtEuroClub(t.price)} €</s> ${fmtEuroClub(t.priceFounder)} €`:`${fmtEuroClub(t.price)} €`}<small>/${tr('sidebar.perMonth')}</small></div>
             <div class="csub-per">${t.perM} /${tr('sidebar.perMonth')}/${tr('adherence.athlete').toLowerCase()}</div>
           </div>`;
         }).join('')}
@@ -3807,7 +3812,7 @@ function wireClubSillance(){
   if(tgl) tgl.onchange=()=>{ clubFounder=tgl.checked; renderClubBill(); };
   const btn=document.getElementById('clubChooseBtn');
   if(btn) btn.onclick=()=>{
-    const t=clubTierFor(clubActivated()), p=clubTierPrice(t);
+    const t=clubTierFor(clubActivated()), p=fmtEuroClub(clubTierPrice(t));
     toast(tr('clubSub.planChosenToast', {name:t.name, p, founder: clubFounder?tr('clubSub.founderSuffix'):''}));
     if(window.PF?.user && window.__pf_clubId && PF.saveClubPlan) PF.saveClubPlan(window.__pf_clubId, t.id, clubFounder).catch(e=>console.warn('saveClubPlan',e));
   };

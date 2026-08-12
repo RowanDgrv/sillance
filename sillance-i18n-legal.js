@@ -55,8 +55,8 @@ dans l'application pour les membres mineurs des clubs.`,
     "legal.cgu.row4.b": `2 % du montant de l'abonnement`,
     "legal.cgu.row4.c": `Lorsqu'un athlète règle son suivi de coaching directement à son coach via le Service (paiement récurrent facilité par Sillance), une commission de 2 % est prélevée sur ce montant pour couvrir le service de facturation et de gestion des paiements. Le solde est reversé au coach.`,
     "legal.cgu.row5.a": `Offre Club`,
-    "legal.cgu.row5.b": `600 €/saison (≤ 50 athlètes activés) · 1 350 €/saison (≤ 150) · 1 800 €/saison (illimité)`,
-    "legal.cgu.row5.c": `Facturation annuelle par saison sportive (1<sup>er</sup> septembre – 31 août), payable par virement ou carte. Au-delà d'un palier : +12 €/athlète et par saison, avec bascule automatique au palier supérieur dès qu'il est plus avantageux. L'effectif « activé » (athlètes placés dans un groupe d'entraînement) est constaté à la date de facturation. Des remises commerciales (notamment « clubs fondateurs ») peuvent s'appliquer ; le tarif remisé figure sur la facture.`,
+    "legal.cgu.row5.b": `50 €/mois (≤ 50 athlètes activés) · 112,50 €/mois (≤ 150) · 150 €/mois (illimité)`,
+    "legal.cgu.row5.c": `Essai gratuit de 14 jours, puis abonnement mensuel avec engagement minimum de 3 mois, payable par virement ou carte. Résiliable à tout moment à l'issue de cet engagement. Au-delà d'un palier : +1 €/athlète et par mois, avec bascule automatique au palier supérieur dès qu'il est plus avantageux. L'effectif « activé » (athlètes placés dans un groupe d'entraînement) est constaté à la date de facturation. Des remises commerciales (notamment « clubs fondateurs ») peuvent s'appliquer ; le tarif remisé figure sur la facture.`,
     "legal.cgu.p3": `Les prix sont exprimés en euros. Sillance se réserve le droit de
 modifier ses tarifs ; toute modification est notifiée au moins 30 jours avant son application et ne s'applique
 pas à la période déjà payée.`,
@@ -78,8 +78,9 @@ droit lors de la souscription. Les périodes d'essai gratuit permettent en tout 
 avant tout débit.`,
     "legal.cgu.t6": `2.6 Résiliation`,
     "legal.cgu.p6": `Vous pouvez résilier à tout moment depuis le portail de facturation accessible dans l'application (« Gérer mon
-abonnement ») : l'abonnement reste actif jusqu'à la fin de la période payée, puis s'arrête sans frais. Les offres
-club ne sont pas reconduites tacitement au-delà de la saison sans accord du club. Sillance peut suspendre ou résilier
+abonnement ») : l'abonnement reste actif jusqu'à la fin de la période payée, puis s'arrête sans frais. L'offre Club
+est soumise à un engagement minimum de 3 mois à compter du premier prélèvement ; la résiliation prend effet à
+l'issue de cet engagement. Sillance peut suspendre ou résilier
 un compte en cas de violation des présentes conditions, d'usage frauduleux ou de non-paiement.`,
     "legal.cgu.t7": `2.7 Utilisation du Service`,
     "legal.cgu.p7": `Vous vous engagez à ne pas : tenter d'accéder aux données d'autres utilisateurs, perturber le fonctionnement du
@@ -231,8 +232,8 @@ in the application for minor club members.`,
     "legal.cgu.row4.b": `2% of the subscription amount`,
     "legal.cgu.row4.c": `When an athlete pays for their coaching directly to their coach through the Service (recurring payment facilitated by Sillance), a 2% commission is deducted from that amount to cover the billing and payment management service. The remainder is paid out to the coach.`,
     "legal.cgu.row5.a": `Club plan`,
-    "legal.cgu.row5.b": `€600/season (≤ 50 active athletes) · €1,350/season (≤ 150) · €1,800/season (unlimited)`,
-    "legal.cgu.row5.c": `Annual billing per sports season (September 1<sup>st</sup> – August 31<sup>st</sup>), payable by bank transfer or card. Beyond a tier: +€12/athlete per season, with automatic upgrade to the next tier once it becomes more advantageous. The "active" headcount (athletes placed in a training group) is assessed on the billing date. Commercial discounts (notably "founding clubs") may apply; the discounted rate appears on the invoice.`,
+    "legal.cgu.row5.b": `€50/month (≤ 50 active athletes) · €112.50/month (≤ 150) · €150/month (unlimited)`,
+    "legal.cgu.row5.c": `14-day free trial, then a monthly subscription with a 3-month minimum commitment, payable by bank transfer or card. Cancellable at any time once that commitment ends. Beyond a tier: +€1/athlete per month, with automatic upgrade to the next tier once it becomes more advantageous. The "active" headcount (athletes placed in a training group) is assessed on the billing date. Commercial discounts (notably "founding clubs") may apply; the discounted rate appears on the invoice.`,
     "legal.cgu.p3": `Prices are in euros. Sillance reserves the right to
 change its pricing; any change is notified at least 30 days before it takes effect and does not apply
 to the period already paid for.`,
@@ -254,8 +255,9 @@ right when subscribing. Free trial periods in any case let you cancel at no cost
 before any charge.`,
     "legal.cgu.t6": `2.6 Cancellation`,
     "legal.cgu.p6": `You can cancel at any time from the billing portal available in the application ("Manage my
-subscription"): the subscription stays active until the end of the paid period, then stops at no cost. Club plans
-do not automatically renew beyond the season without the club's agreement. Sillance may suspend or cancel
+subscription"): the subscription stays active until the end of the paid period, then stops at no cost. The Club
+plan requires a 3-month minimum commitment from the first payment; cancellation takes effect once that
+commitment ends. Sillance may suspend or cancel
 an account in the event of a breach of these terms, fraudulent use, or non-payment.`,
     "legal.cgu.t7": `2.7 Use of the Service`,
     "legal.cgu.p7": `You agree not to: attempt to access other users' data, disrupt the operation of the
@@ -407,8 +409,8 @@ en la aplicación para los miembros menores de los clubes.`,
     "legal.cgu.row4.b": `2 % del importe de la suscripción`,
     "legal.cgu.row4.c": `Cuando un atleta paga su seguimiento de coaching directamente a su entrenador a través del Servicio (pago recurrente facilitado por Sillance), se retiene una comisión del 2 % sobre ese importe para cubrir el servicio de facturación y gestión de pagos. El resto se abona al entrenador.`,
     "legal.cgu.row5.a": `Plan Club`,
-    "legal.cgu.row5.b": `600 €/temporada (≤ 50 atletas activados) · 1350 €/temporada (≤ 150) · 1800 €/temporada (ilimitado)`,
-    "legal.cgu.row5.c": `Facturación anual por temporada deportiva (1 de septiembre – 31 de agosto), pagadera por transferencia o tarjeta. Por encima de un nivel: +12 €/atleta y por temporada, con cambio automático al nivel superior en cuanto resulte más ventajoso. El número de atletas «activados» (colocados en un grupo de entrenamiento) se constata en la fecha de facturación. Pueden aplicarse descuentos comerciales (en particular «clubes fundadores»); la tarifa con descuento figura en la factura.`,
+    "legal.cgu.row5.b": `50 €/mes (≤ 50 atletas activados) · 112,50 €/mes (≤ 150) · 150 €/mes (ilimitado)`,
+    "legal.cgu.row5.c": `Prueba gratuita de 14 días, luego suscripción mensual con un compromiso mínimo de 3 meses, pagadera por transferencia o tarjeta. Cancelable en cualquier momento tras ese compromiso. Por encima de un nivel: +1 €/atleta y por mes, con cambio automático al nivel superior en cuanto resulte más ventajoso. El número de atletas «activados» (colocados en un grupo de entrenamiento) se constata en la fecha de facturación. Pueden aplicarse descuentos comerciales (en particular «clubes fundadores»); la tarifa con descuento figura en la factura.`,
     "legal.cgu.p3": `Los precios se expresan en euros. Sillance se reserva el derecho de
 modificar sus tarifas; toda modificación se notifica al menos 30 días antes de su aplicación y no se aplica
 al período ya pagado.`,
@@ -430,8 +432,9 @@ derecho al suscribirte. Los períodos de prueba gratuita permiten en cualquier c
 antes de cualquier cobro.`,
     "legal.cgu.t6": `2.6 Cancelación`,
     "legal.cgu.p6": `Puedes cancelar en cualquier momento desde el portal de facturación accesible en la aplicación («Gestionar mi
-suscripción»): la suscripción permanece activa hasta el final del período pagado, y luego se detiene sin coste. Los planes
-club no se renuevan tácitamente más allá de la temporada sin el acuerdo del club. Sillance puede suspender o cancelar
+suscripción»): la suscripción permanece activa hasta el final del período pagado, y luego se detiene sin coste. El plan
+Club requiere un compromiso mínimo de 3 meses desde el primer cobro; la cancelación surte efecto al finalizar
+ese compromiso. Sillance puede suspender o cancelar
 una cuenta en caso de incumplimiento de estas condiciones, uso fraudulento o impago.`,
     "legal.cgu.t7": `2.7 Uso del Servicio`,
     "legal.cgu.p7": `Te comprometes a no: intentar acceder a datos de otros usuarios, perturbar el funcionamiento del
