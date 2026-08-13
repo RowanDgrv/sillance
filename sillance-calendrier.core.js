@@ -4116,7 +4116,6 @@ function renderClubAthletes(filter){
         <div class="club-ath-m">${tr('clubAthList.memberSince', {since:a.since})} · ${tr(nbInscr>1?'clubAthList.nSlotsPlural':'clubAthList.nSlotsSingular', {n:nbInscr})}</div>
         <select class="club-ath-grp-sel ${g?'':'none'}" data-aid="${a.id}" style="${g?`--gc:${g.color}`:''}" title="${tr('clubAthList.changeGroup')}">${grpOptions}</select>
         <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="${tr('clubAthList.clickToChangePlan')}">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
-        <span class="club-ath-vid ${a.videos?'on':''}" data-vaid="${a.id}" title="${tr('clubAthList.videosSoonTitle')}"><i class="ic ic-film"></i> ${tr('clubAthList.videos')} <span class="cc-soon" style="margin-left:4px">${tr('sidebar.comingSoon')}</span></span>
         <span class="club-ath-cal" data-caid="${a.id}" title="${tr('clubAthList.openCalendarTitle')}"><i class="ic ic-calendar"></i> ${tr('clubAthList.calendar')}</span>
         ${minorChip(a)}
         ${licenceChip(a)}
@@ -4146,9 +4145,6 @@ function renderClubAthletes(filter){
     if(window.PF?.user && window.__pf_clubId && (a.offer==='sub'||a.offer==='coach')){
       PF.subscribeToClubOffer(window.__pf_clubId, a.id, a.offer).catch(e=>{console.warn('subscribe',e);toast(tr('toast.paiementIndisponibleDemo'), 'error');});
     }
-  });
-  box.querySelectorAll('.club-ath-vid').forEach(el=>el.onclick=()=>{
-    toast(tr('toast.bibliothequeVideoBientotDisponibleContenu'));
   });
   box.querySelectorAll('.club-ath-minor').forEach(el=>el.onclick=()=> openConsent(el.dataset.maid, filter));
   box.querySelectorAll('.club-ath-licence').forEach(el=>el.onclick=()=> openLicence(el.dataset.lid, filter));
