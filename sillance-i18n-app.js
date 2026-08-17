@@ -145,6 +145,16 @@
     "builder.strokeType": `Nage`, "builder.sendoff": `Départ toutes les`, "builder.sendoffAbbr": `départ`,
     "builder.sendoffHint": `Intervalle entre 2 départs du même effort (ex. 10×100 départ 1'40) — laisse à 0 si non pertinent.`,
     "builder.profileLabel": `Profil de la séance`,
+    "builder.shorthandLabel": `Écris ta séance`,
+    "builder.shorthandHint": `Tape ta séance comme sur ton carnet, un bloc par ligne (ou séparés par « + ») : distance, type, nage, repos.`,
+    "builder.shorthandPlaceholder": `200m échauffement
+4x100m seuil crawl départ 1'40
+4x50m récup 20 passif
+200m retour au calme`,
+    "builder.shorthandGo": `Générer la séance`,
+    "builder.shorthandUnparsed": `Non reconnu, à ajouter à la main : {list}`,
+    "builder.shorthandNothing": `Aucun bloc reconnu — commence chaque ligne par une distance (ex. "200m" ou "4x100m").`,
+    "builder.shorthandRestNote": `Repos {sec}s`,
     "builder.exercisePlaceholder": `Nom de l'exercice (squat, développé couché…)`,
     "builder.repsUnit": `reps`, "builder.switchRepsTime": `Basculer répétitions ⇄ temps (ex. repos chronométré, gainage tenu)`,
 
@@ -1375,6 +1385,16 @@
     "builder.strokeType": `Stroke`, "builder.sendoff": `Send-off every`, "builder.sendoffAbbr": `send-off`,
     "builder.sendoffHint": `Interval between 2 starts of the same effort (e.g. 10×100 send-off 1'40) — leave at 0 if not relevant.`,
     "builder.profileLabel": `Session profile`,
+    "builder.shorthandLabel": `Type your session`,
+    "builder.shorthandHint": `Reads French swim shorthand — one block per line (or separated by "+"): distance, type (échauffement/récup/seuil...), stroke, rest.`,
+    "builder.shorthandPlaceholder": `200m échauffement
+4x100m seuil crawl départ 1'40
+4x50m récup 20 passif
+200m retour au calme`,
+    "builder.shorthandGo": `Generate session`,
+    "builder.shorthandUnparsed": `Not recognized, add by hand: {list}`,
+    "builder.shorthandNothing": `No block recognized — start each line with a distance (e.g. "200m" or "4x100m").`,
+    "builder.shorthandRestNote": `Rest {sec}s`,
     "builder.exercisePlaceholder": `Exercise name (squat, bench press…)`,
     "builder.repsUnit": `reps`, "builder.switchRepsTime": `Switch reps ⇄ time (e.g. timed rest, held plank)`,
 
@@ -2605,6 +2625,16 @@
     "builder.strokeType": `Estilo`, "builder.sendoff": `Salida cada`, "builder.sendoffAbbr": `salida`,
     "builder.sendoffHint": `Intervalo entre 2 salidas del mismo esfuerzo (ej. 10×100 salida 1'40) — deja en 0 si no aplica.`,
     "builder.profileLabel": `Perfil de la sesión`,
+    "builder.shorthandLabel": `Escribe tu sesión`,
+    "builder.shorthandHint": `Reconoce el argot francés de natación — un bloque por línea (o separados por «+»): distancia, tipo (échauffement/récup/seuil...), estilo, descanso.`,
+    "builder.shorthandPlaceholder": `200m échauffement
+4x100m seuil crawl départ 1'40
+4x50m récup 20 passif
+200m retour au calme`,
+    "builder.shorthandGo": `Generar sesión`,
+    "builder.shorthandUnparsed": `No reconocido, añadir a mano: {list}`,
+    "builder.shorthandNothing": `Ningún bloque reconocido — empieza cada línea con una distancia (ej. "200m" o "4x100m").`,
+    "builder.shorthandRestNote": `Descanso {sec}s`,
     "builder.exercisePlaceholder": `Nombre del ejercicio (sentadilla, press banca…)`,
     "builder.repsUnit": `reps`, "builder.switchRepsTime": `Cambiar repeticiones ⇄ tiempo (ej. descanso cronometrado, plancha mantenida)`,
 

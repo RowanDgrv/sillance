@@ -1830,7 +1830,8 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 }
 
 /* ---------- Éditeur de séance (riche) ---------- */
-.builder-modal{width:min(820px,100%);max-height:92vh;display:flex;flex-direction:column;padding:0}
+.builder-modal{width:min(820px,100%);max-height:92vh;display:flex;flex-direction:column;padding:0;transition:width .2s}
+.builder-modal.wide{width:min(1140px,100%)}
 .builder-head{padding:22px 26px 14px;border-bottom:1px solid var(--line)}
 .builder-meta-row{display:flex;gap:var(--space-3);align-items:center;margin-top:14px}
 .b-title-input{flex:1;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--panel-2);
@@ -1854,6 +1855,22 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .b-ref-chip.on::before{content:"✓ ";color:var(--swim);font-weight:700}
 
 .builder-body{padding:var(--space-4) 26px;overflow-y:auto;flex:1;background:var(--ink)}
+.b-body-cols{display:flex;gap:22px;align-items:flex-start}
+.b-main{flex:1;min-width:0}
+@media (max-width:900px){.b-body-cols{flex-direction:column}}
+/* encadré "écris ta séance" (natation) — texte libre → blocs générés */
+.b-shorthand{flex:0 0 300px;position:sticky;top:0;border:1px solid rgba(47,217,255,.3);border-radius:13px;
+  background:rgba(47,217,255,.05);padding:16px}
+@media (max-width:900px){.b-shorthand{position:static;flex:none}}
+.b-shorthand-lbl{display:flex;align-items:center;gap:7px;font-family:var(--font-ui);font-weight:700;font-size:var(--fs-md);color:var(--swim)}
+.b-shorthand-lbl .ic{width:15px;height:15px}
+.b-shorthand-hint{font-size:var(--fs-sm);color:var(--muted);margin:6px 0 10px;line-height:1.4}
+.b-shorthand textarea{width:100%;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:9px;
+  background:var(--panel-2);color:var(--text);font-family:var(--font-data);font-size:12.5px;line-height:1.5;
+  padding:10px;resize:vertical}
+.b-shorthand-go{width:100%;margin-top:10px;justify-content:center}
+.b-shorthand-warn{margin-top:10px;font-size:var(--fs-sm);color:var(--bike);background:rgba(255,177,61,.1);
+  border:1px solid rgba(255,177,61,.3);border-radius:8px;padding:8px 10px;line-height:1.4}
 .b-blocks{display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:14px}
 
 /* bloc = conteneur avec séries + lignes */
@@ -3128,17 +3145,32 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     </div>
 
     <div class="builder-body">
-      <div class="b-profile-wrap" id="bProfileWrap" style="display:none"><div class="b-profile-lbl" data-i18n="builder.profileLabel">Profil de la séance</div><div class="prof-bar" id="bProfile"></div></div>
-      <div class="b-blocks" id="bBlocks"></div>
-      <button class="b-add-block" id="bAddBlock">+ Ajouter un bloc</button>
+      <div class="b-body-cols">
+        <div class="b-main">
+          <div class="b-profile-wrap" id="bProfileWrap" style="display:none"><div class="b-profile-lbl" data-i18n="builder.profileLabel">Profil de la séance</div><div class="prof-bar" id="bProfile"></div></div>
+          <div class="b-blocks" id="bBlocks"></div>
+          <button class="b-add-block" id="bAddBlock">+ Ajouter un bloc</button>
 
-      <div class="b-nutri">
-        <div class="b-nutri-head"><i class="ic ic-utensils"></i> Consignes nutrition <span id="bNutriAuto" class="b-nutri-auto"></span></div>
-        <div class="b-nutri-grid">
-          <div class="b-fld"><label for="bNutriPre" data-i18n="session.beforeSessionLabel">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type — ou écris ta consigne" data-i18n-attr="placeholder:session.notePh"></textarea></div>
-          <div class="b-fld"><label for="bNutriPost" data-i18n="session.afterSessionLabel">Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides" data-i18n-attr="placeholder:session.nutritionPh"></textarea></div>
+          <div class="b-nutri">
+            <div class="b-nutri-head"><i class="ic ic-utensils"></i> Consignes nutrition <span id="bNutriAuto" class="b-nutri-auto"></span></div>
+            <div class="b-nutri-grid">
+              <div class="b-fld"><label for="bNutriPre" data-i18n="session.beforeSessionLabel">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type — ou écris ta consigne" data-i18n-attr="placeholder:session.notePh"></textarea></div>
+              <div class="b-fld"><label for="bNutriPost" data-i18n="session.afterSessionLabel">Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides" data-i18n-attr="placeholder:session.nutritionPh"></textarea></div>
+            </div>
+            <button class="b-nutri-reset" id="bNutriReset" type="button">↺ Regénérer automatiquement</button>
+          </div>
         </div>
-        <button class="b-nutri-reset" id="bNutriReset" type="button">↺ Regénérer automatiquement</button>
+
+        <aside class="b-shorthand" id="bShorthand" style="display:none">
+          <div class="b-shorthand-lbl"><i class="ic ic-edit-3"></i> <span data-i18n="builder.shorthandLabel">Écris ta séance</span></div>
+          <p class="b-shorthand-hint" data-i18n="builder.shorthandHint">Tape ta séance comme sur ton carnet, un bloc par ligne (ou séparés par « + ») : distance, type, nage, repos.</p>
+          <textarea id="bShorthandInput" rows="8" data-i18n-attr="placeholder:builder.shorthandPlaceholder" placeholder="200m échauffement
+4x100m seuil crawl départ 1'40
+4x50m récup 20 passif
+200m retour au calme"></textarea>
+          <button class="btn b-shorthand-go" id="bShorthandGo" type="button" data-i18n="builder.shorthandGo">Générer la séance</button>
+          <div class="b-shorthand-warn" id="bShorthandWarn" style="display:none"></div>
+        </aside>
       </div>
     </div>
 

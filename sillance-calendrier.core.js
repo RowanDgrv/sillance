@@ -5033,6 +5033,94 @@ const NAGE_LABEL = {
 // séparément (calculé à la volée depuis la cible de temps de la ligne).
 function fmtMS(t){ if(!t) return ''; const m=t.m||0, s=t.s||0; return `${m}'${String(s).padStart(2,'0')}"`; }
 
+/* ============================================================
+   NOTATION NATATION ABRÉGÉE → BLOCS (parseur déterministe)
+   ------------------------------------------------------------
+   Convertit un texte tapé façon carnet de coach (ex. "200m
+   échauffement + 4x100m seuil départ 1'40") en blocs/lignes du
+   builder. Segments séparés par saut de ligne, "+" ou ",". Chaque
+   segment doit commencer par une distance ("Dm" ou "NxDm") — sinon il
+   est signalé comme non reconnu plutôt que silencieusement perdu.
+   Reconnaît : type (échauffement/récup/seuil.../éducatif/retour au
+   calme), nage, repos ("20 passif"/"repos 20"/"r20") ou départ
+   ("départ 1'40"). Pas de répétitions imbriquées ("2x(4x50m)") en v1.
+   ============================================================ */
+const SWIM_TYPE_KEYWORDS = [
+  [/[ée]chauffement|warm[- ]?up/i, 'warmup'],
+  [/retour\s*au\s*calme|cool[- ]?down|d[ée]contract/i, 'cooldown'],
+  [/[ée]ducatif|technique|drill|gammes?/i, 'educatif'],
+  [/contre[- ]?effort/i, 'contre'],
+  [/r[ée]cup(?:[ée]ration)?|facile|easy|aisance/i, 'recov'],
+];
+// % CSS inversé (pace100) : % plus bas = nage plus vite = plus dur — donc
+// l'ordre est inversé par rapport à un modèle normal type %FTP.
+const SWIM_PACE_KEYWORDS = [
+  [/vma|vo2|sprint|rapide|maximal/i, 88],
+  [/allure\s*course|race\s*pace/i, 94],
+  [/seuil|css|threshold/i, 100],
+  [/soutenu|tempo/i, 105],
+  [/endurance|\bef\b|aisance/i, 111],
+];
+const SWIM_STROKE_KEYWORDS = [
+  [/papillon|\bpap\b|\bfly\b/i, 'papillon'],
+  [/\bdos\b|\bback\b/i, 'dos'],
+  [/brasse|breast/i, 'brasse'],
+  [/4\s*nages|\b4n\b|quatre\s*nages|\bim\b/i, '4n'],
+  [/crawl|nage\s*libre|freestyle/i, 'crawl'],
+];
+function parseSwimShorthandSegment(raw){
+  const txt = raw.trim();
+  if(!txt) return null;
+  let m = txt.match(/^(\d+)\s*[x×]\s*(\d+)\s*m\b/i);
+  let reps=1, dist=0, rest='';
+  if(m){ reps=Math.max(1,+m[1]); dist=+m[2]; rest=txt.slice(m[0].length); }
+  else {
+    m = txt.match(/^(\d+)\s*m\b/i);
+    if(!m) return {unparsed:txt};
+    dist=+m[1]; rest=txt.slice(m[0].length);
+  }
+  let type='exo';
+  for(const [re,t] of SWIM_TYPE_KEYWORDS){ if(re.test(rest)){ type=t; break; } }
+  let nage=null;
+  for(const [re,n] of SWIM_STROKE_KEYWORDS){ if(re.test(rest)){ nage=n; break; } }
+  // % CSS inversé (comme SWIM_PACE_KEYWORDS ci-dessus) : + haut = + facile.
+  let pct = {warmup:112, exo:98, contre:108, recov:112, cooldown:110}[type] ?? 105;
+  for(const [re,p] of SWIM_PACE_KEYWORDS){ if(re.test(rest)){ pct=p; break; } }
+  // "départ toutes les X" (send-off) prioritaire sur un simple repos —
+  // les deux notations sont incompatibles sur une même ligne.
+  let sendoff=null;
+  const dep = rest.match(/d[ée]part[^\d]*(\d{1,2})(?:['’](\d{1,2}))?/i);
+  if(dep) sendoff = {m:+dep[1]||0, s:+dep[2]||0};
+  let restSec = null;
+  if(!sendoff){
+    const rp = rest.match(/(?:repos|r[ée]cup(?:[ée]ration)?|passif)\D{0,6}(\d{1,3})|(\d{1,3})\s*(?:s|sec)?\s*(?:passif|repos)/i);
+    if(rp) restSec = +(rp[1]||rp[2]);
+  }
+  return { reps, dist, type, nage, pct, sendoff, restSec };
+}
+function parseSwimShorthand(text){
+  const segments = String(text||'').split(/\n|\+|,/).map(s=>s.trim()).filter(Boolean);
+  const blocks=[]; const unparsed=[];
+  segments.forEach(seg=>{
+    const p = parseSwimShorthandSegment(seg);
+    if(!p) return;
+    if(p.unparsed){ unparsed.push(p.unparsed); return; }
+    const work = defaultLine(p.type, 'swim');
+    work.metric='dist'; work.dist=p.dist;
+    work.pct=p.pct; work.rpe=rpeFromPct(p.pct);
+    if(p.nage) work.nage=p.nage;
+    if(p.sendoff) work.sendoff=p.sendoff;
+    // Un repos court ("20 passif") ne peut PAS être représenté par le champ
+    // temps générique du builder : celui-ci n'expose que les minutes à
+    // l'écran (0-59), les secondes existent dans les données mais ne sont
+    // ni affichées ni éditables — un repos de 20s y apparaîtrait comme
+    // "0 min", trompeur. Mis en note sur la ligne plutôt que dans ce champ.
+    if(p.restSec) work.note = tr('builder.shorthandRestNote', {sec:p.restSec});
+    blocks.push({bid:'b'+(builderUid++), series:p.reps, title:'', lines:[work]});
+  });
+  return {blocks, unparsed};
+}
+
 /* références activables par sport (le coach coche celles qu'il veut voir) */
 function refsForDisc(disc){
   const keys = Object.entries(INTENSITY_MODELS)
@@ -5051,7 +5139,16 @@ function defaultLine(type, disc){
             station:st.key, target:st.def, weight:st.weighted?st.wDef:0};
   }
   const def = {bike:'ftp', run:'vma', swim:'css', strength:'fc'}[disc] || 'fc';
-  const pct = {warmup:60, exo:95, contre:50, recov:50, cooldown:55}[type] ?? 70;
+  // % CSS natation = modèle INVERSÉ (unit pace100, invert:true) : le %
+  // multiplie un TEMPS de référence, donc % plus bas = moins de temps =
+  // nage plus vite. La table générique (60% = facile) donnait donc une
+  // allure d'échauffement plus rapide que le seuil de l'athlète — non-sens
+  // physiologique. Trouvé le 17/08/2026 en calibrant le parseur de notation
+  // abrégée : 0'59"/100m calculé pour un échauffement à 60%, alors que le
+  // seuil (référence ATHLETE_REF.css) est 1'38"/100m.
+  const pct = disc==='swim'
+    ? ({warmup:112, exo:98, contre:108, recov:112, cooldown:110}[type] ?? 105)
+    : ({warmup:60, exo:95, contre:50, recov:50, cooldown:55}[type] ?? 70);
   // métrique par défaut : la natation se planifie en distance, le renfo en
   // répétitions pour ses lignes de travail (exo/contre-effort — le vrai
   // fondamental d'une séance de muscu : séries × répétitions × charge),
@@ -5141,10 +5238,19 @@ function openBuilder(dateKey, existing){
   document.getElementById('bObjectif').value = builderState.objectif||'';
   document.getElementById('builderBadge').textContent = existing ? tr('builder.editSession') : tr('builder.newSession');
   document.getElementById('bDiscPick').value = builderState.disc;
+  toggleShorthandPanel();
   renderRefs();
   renderBlocks();
   initBuilderNutrition(existing);
   document.getElementById('builderOverlay').classList.add('open');
+}
+/* encadré "écris ta séance" (texte libre → blocs) — natation uniquement pour l'instant */
+function toggleShorthandPanel(){
+  const aside=document.getElementById('bShorthand');
+  const modal=document.querySelector('.builder-modal');
+  const show = builderState.disc==='swim';
+  if(aside) aside.style.display = show ? '' : 'none';
+  if(modal) modal.classList.toggle('wide', show);
 }
 function defaultActiveRefs(disc){
   const m = {bike:['ftp','fc','rpe'], run:['vma','fc','rpe'], swim:['css','rpe'], strength:['fc','rpe']}[disc];
@@ -5751,6 +5857,7 @@ document.getElementById('bObjectif').addEventListener('change', e=>{ builderStat
 document.getElementById('bDiscPick').addEventListener('change', e=>{
     builderState.disc=e.target.value;
     builderState.activeRefs=defaultActiveRefs(builderState.disc);
+    toggleShorthandPanel();
     if(builderState.disc==='hyrox'){
       // convertit chaque bloc en stations Hyrox (une station par défaut si vide)
       builderState.blocks.forEach(blk=>{
@@ -5801,6 +5908,24 @@ document.getElementById('bSaveLib').addEventListener('click', ()=>{
   }
   closeBuilder(); if(mode==='coach') renderSidebar();
   toast(tr('toast.seanceRangeeEnBibliotheque'));
+});
+document.getElementById('bShorthandGo').addEventListener('click', ()=>{
+  const input=document.getElementById('bShorthandInput');
+  const warn=document.getElementById('bShorthandWarn');
+  const {blocks, unparsed} = parseSwimShorthand(input.value);
+  if(blocks.length){
+    builderState.blocks = blocks;
+    renderBlocks();
+  }
+  if(unparsed.length){
+    warn.style.display='';
+    warn.textContent = tr('builder.shorthandUnparsed', {list: unparsed.join(' · ')});
+  } else if(!blocks.length){
+    warn.style.display='';
+    warn.textContent = tr('builder.shorthandNothing');
+  } else {
+    warn.style.display='none';
+  }
 });
 document.getElementById('bSaveCal').addEventListener('click', ()=>{
   const s=builderToSession();
