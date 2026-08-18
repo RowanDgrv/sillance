@@ -1,13 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
-  <defs>
-    <linearGradient id="fuseV" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#46C2D8"/>
-    </linearGradient>
-  </defs>
   <rect width="96" height="96" rx="22" fill="#0B1120"/>
-  <path d="M76 48 C56 34 36 28 8 24" stroke="#FF9A3D" stroke-width="11" stroke-linecap="round"/>
-  <path d="M76 48 C56 62 36 68 8 72" stroke="#46C2D8" stroke-width="11" stroke-linecap="round"/>
-  <circle cx="76" cy="48" r="12" fill="url(#fuseV)"/>
-  <path d="M30 48 A8 8 0 0 1 46 48 Z" fill="#FF9A3D"/>
-  <path d="M46 48 A8 8 0 0 1 30 48 Z" fill="#46C2D8"/>
+  <path d="M 48 24.617 A 27 27 0 0 0 48 71.383 L 48 24.617 Z" fill="#46C2D8"/>
+  <path d="M 48 24.617 A 27 27 0 0 1 48 71.383 L 48 24.617 Z" fill="#FF9A3D"/>
 </svg>
