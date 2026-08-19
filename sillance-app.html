@@ -841,6 +841,10 @@ body:not([data-athview]):not([data-clubview]) .gear-card .gear-del{display:none}
 .cb-flag.warn{background:rgba(255,177,61,.10);border:1px solid rgba(255,177,61,.3);color:var(--bike)}
 .cb-flag.danger{background:rgba(255,84,112,.10);border:1px solid rgba(255,84,112,.3);color:var(--run)}
 .cb-flag.ok{background:rgba(57,230,163,.07);border:1px solid rgba(57,230,163,.18);color:var(--good)}
+/* rappel planif coach : case "prévenir l'athlète que sa semaine est prête" */
+.cb-notify{display:flex;align-items:center;gap:8px;margin-top:var(--space-2);padding-top:var(--space-2);
+  border-top:1px solid var(--line);font-size:var(--fs-sm);color:var(--soft);cursor:pointer}
+.cb-notify input{width:16px;height:16px;accent-color:var(--swim);cursor:pointer;flex:none}
 @media(max-width:880px){
   .coach-band{grid-template-columns:1fr;gap:18px}
   .cb-id,.cb-forme,.cb-flags{min-width:0;max-width:100%}
@@ -2003,6 +2007,11 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .sn-item:first-of-type{border-top:none}
 .sn-when{flex:none;min-width:120px;font-family:var(--font-data);font-size:var(--fs-sm);color:var(--soft);padding-top:1px}
 .sn-txt{font-size:var(--fs-md);color:var(--text);line-height:1.45}
+/* rappel planif coach : sélecteur du jour deadline (même recette que .ck-dispo-seg) */
+.pr-seg{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:var(--space-2);padding-top:var(--space-2);border-top:1px solid var(--line)}
+.pr-seg-lbl{font-size:var(--fs-xs);color:var(--muted);margin-right:2px}
+.pr-seg button{padding:5px 10px;font-size:var(--fs-sm);font-weight:600;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:99px;cursor:pointer}
+.pr-seg button.sel{color:var(--swim);border-color:var(--swim);background:color-mix(in srgb, var(--swim) 14%, transparent)}
 /* éditeur de zones de travail personnalisées (coach) */
 .zed-modal{max-width:560px}
 .zed-model{margin-top:var(--space-4);border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:var(--panel-2)}
