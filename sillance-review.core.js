@@ -431,30 +431,30 @@ function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${Str
    remplace la démo via setCoachAthletes().
    ============================================================ */
 const COACH_ROSTER = [
- {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8,cyclePhase:'follicular',cycleDay:9}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,  refsUpdatedAt:new Date(Date.now()-1000*60*60*24*10).toISOString(),
+ {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8,cyclePhase:'follicular',cycleDay:9}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,  planGap:null, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*10).toISOString(),
   gear:[
     {id:'g1', type:'shoe', name:'Nike Pegasus 40', km:612, max:900, price:130, cat:'daily', comm:870, notified:[540]},
     {id:'g2', type:'shoe', name:'Saucony Endorphin Speed 4', km:284, max:650, price:180, cat:'tempo', comm:630, notified:[]},
     {id:'g3', type:'shoe', name:'Asics Metaspeed Sky Paris', km:118, max:350, price:250, cat:'race', comm:320, notified:[]},
     {id:'g4', type:'bike', name:'Canyon Ultimate CF', km:4380, max:20000, price:3200, cat:null, comm:null, notified:[]},
   ]},
- {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',get dispoNote(){return tr('demoNote.a2')},hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*210).toISOString(),
+ {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',get dispoNote(){return tr('demoNote.a2')},hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55, planGap:'h48', refsUpdatedAt:new Date(Date.now()-1000*60*60*24*210).toISOString(),
   gear:[
     {id:'g5', type:'shoe', name:'Adidas Boston 12', km:723, max:700, price:150, cat:'tempo', comm:660, notified:[420,595,700]},
     {id:'g6', type:'shoe', name:'Adidas Ultraboost Light', km:214, max:850, price:180, cat:'daily', comm:800, notified:[]},
   ]},
- {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8,cyclePhase:'luteal',cycleDay:24}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*25).toISOString(),
+ {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8,cyclePhase:'luteal',cycleDay:24}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95, planGap:null, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*25).toISOString(),
   gear:[
     {id:'g7', type:'shoe', name:'Puma Deviate Nitro 3', km:405, max:700, price:160, cat:'tempo', comm:650, notified:[420]},
   ]},
- {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',get dispoNote(){return tr('demoNote.a4')},hrv:60}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*104).toISOString(),
+ {id:'a4', name:'Théo Rambert',   ini:'TR', color:'#DD5C72', checkin:{sommeil:6,fatigue:5,motivation:6,dispo:'blesse',get dispoNote(){return tr('demoNote.a4')},hrv:60}, race:{name:'Semi de Blagnac',       days:14}, group:'g3', drop:0.25, comp:0.70, planGap:'h24', refsUpdatedAt:new Date(Date.now()-1000*60*60*24*104).toISOString(),
   gear:[
     {id:'g8', type:'shoe', name:'Asics Novablast 5', km:648, max:750, price:150, cat:'tempo', comm:710, notified:[450,638]},
     {id:'g9', type:'bike', name:'BMC Roadmachine', km:2150, max:20000, price:2400, cat:null, comm:null, notified:[]},
   ]},
- {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9,cyclePhase:'menstrual',cycleDay:2}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,  refsUpdatedAt:new Date(Date.now()-1000*60*60*24*45).toISOString(),
+ {id:'a5', name:'Emma Laurens',   ini:'EL', color:'#35C58C', checkin:{sommeil:9,fatigue:2,motivation:9,cyclePhase:'menstrual',cycleDay:2}, race:{name:'70.3 Aix-en-Provence',  days:98}, group:'g4', drop:0.30, comp:1.0,  planGap:'h72', refsUpdatedAt:new Date(Date.now()-1000*60*60*24*45).toISOString(),
   gear:[]},
- {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',get dispoNote(){return tr('demoNote.a6')},hrv:48}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35,
+ {id:'a6', name:'Sofiane Kerbal', ini:'SK', color:'#FF8A3D', checkin:{sommeil:4,fatigue:8,motivation:4,dispo:'malade',get dispoNote(){return tr('demoNote.a6')},hrv:48}, race:{name:'10 km de Toulouse',     days:9},  drop:0.15, comp:0.35, planGap:'h72',
   gear:[]},
 ];
 let ROSTER = COACH_ROSTER;     // remplacé par le roster réel une fois connecté
@@ -819,9 +819,57 @@ function needRadarHTML(){
     ${scored.map(({a,reasons})=>`<div class="sn-item" style="cursor:pointer" data-need-aid="${a.id}"><div class="sn-when">${dispoSafe(a.name)}</div><div class="sn-txt">${reasons.map(dispoSafe).join(' · ')}</div></div>`).join('')}
   </div>`;
 }
+
+/* ============================================================
+   RAPPEL PLANIF COACH — semaine suivante pas encore planifiée
+   ------------------------------------------------------------
+   Jour deadline choisi par le coach (vendredi/samedi/dimanche) : les 3
+   rappels (H-72/H-48/H-24) sont comptés à rebours depuis CE jour, pas
+   depuis un jour fixe. Spec complète :
+   ~/sillance-docs-prives/SPEC-RAPPEL-PLANIF-COACH.md.
+   En démo, chaque athlète du ROSTER porte un `planGap` figé
+   ('h72'|'h48'|'h24'|null) — le modèle démo ne garde que le planning de
+   l'athlète sélectionné (cf. applyDemoAthlete), impossible d'y calculer
+   un vrai statut par athlète sans le reconstruire pour chacun.
+   ============================================================ */
+const WEEK_DEADLINE_DAYS = ['friday','saturday','sunday'];
+let weekDeadlineDay = localStorage.getItem('sil_week_deadline') || 'sunday';
+function setWeekDeadlineDay(d){
+  if(!WEEK_DEADLINE_DAYS.includes(d) || d===weekDeadlineDay) return;
+  weekDeadlineDay = d;
+  try{ localStorage.setItem('sil_week_deadline', d); }catch(e){}
+  if(window.PF?.user && PF.setWeekDeadlineDay) PF.setWeekDeadlineDay(d).catch(e=>console.warn('[PF] weekDeadlineDay:', e));
+  renderSidebar();
+}
+const PLAN_GAP_ORDER = {h24:0, h48:1, h72:2}; // le plus urgent (H-24) en premier
+function planGapMeta(gap){
+  return {
+    h72:{c:'var(--swim)', l:tr('planGap.h72')},
+    h48:{c:'var(--bike)', l:tr('planGap.h48')},
+    h24:{c:'var(--run)',  l:tr('planGap.h24')},
+  }[gap] || null;
+}
+function planningRadarHTML(){
+  if(!ROSTER.length) return '';
+  // pas encore câblé côté compte réel (Phase 2 backend) : on se tait plutôt
+  // que d'affirmer à tort que tout le monde est planifié.
+  if(rosterIsReal && !ROSTER.some(a=>a.planGap!==undefined)) return '';
+  const dLabel = tr('weekDeadline.'+weekDeadlineDay);
+  const seg = `<div class="pr-seg" role="group" aria-label="${tr('planGap.deadlineAria')}">
+      <span class="pr-seg-lbl">${tr('planGap.deadlineLabel')}</span>
+      ${WEEK_DEADLINE_DAYS.map(d=>`<button type="button" data-wd="${d}" class="${weekDeadlineDay===d?'sel':''}">${tr('weekDeadline.'+d)}</button>`).join('')}
+    </div>`;
+  const gaps = ROSTER.filter(a=>a.planGap).sort((a,b)=>PLAN_GAP_ORDER[a.planGap]-PLAN_GAP_ORDER[b.planGap]);
+  if(!gaps.length) return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-calendar"></i> ${tr('planGap.title')}</div><p class="club-hint">${tr('planGap.allSet', {day:dLabel})}</p>${seg}</div>`;
+  return `<div class="sn-block" style="margin-bottom:14px">
+    <div class="sn-head"><i class="ic ic-calendar"></i> ${tr('planGap.title')}</div>
+    ${gaps.map(a=>{ const m=planGapMeta(a.planGap); return `<div class="sn-item" style="cursor:pointer" data-need-aid="${a.id}"><div class="sn-when" style="color:${m.c}">${m.l}</div><div class="sn-txt">${dispoSafe(a.name)}</div></div>`; }).join('')}
+    ${seg}
+  </div>`;
+}
 function renderSidebar(){
   if(mode==='coach'){
-    sidebarContent.innerHTML = coachGuideHTML() + needRadarHTML() + `
+    sidebarContent.innerHTML = coachGuideHTML() + needRadarHTML() + planningRadarHTML() + `
       <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> ${tr('sidebar.myAthletesTracking')}</button>
       <button class="btn adh-open-btn" id="inviteAthOpen" style="margin-top:8px"><i class="ic ic-user-plus"></i> ${tr('sidebar.inviteAthlete')}</button>
       <h2>${tr('sidebar.library')}</h2>
@@ -865,6 +913,7 @@ function renderSidebar(){
       const idx = ROSTER.findIndex(x=>x.id===el.dataset.needAid);
       if(idx>-1){ selectAthlete(idx); render(); }
     });
+    sidebarContent.querySelectorAll('[data-wd]').forEach(el=> el.onclick=()=> setWeekDeadlineDay(el.dataset.wd));
     var _invAthOpen=document.getElementById('inviteAthOpen'); if(_invAthOpen) _invAthOpen.onclick=openInviteAthlete;
     buildCycles(document.getElementById('cycleList'));
     document.getElementById('createCycleBtn').addEventListener('click', ()=> openCycleBuilder(null));
@@ -3378,6 +3427,10 @@ function renderCoachBand(){
     if(refsAge>=90) flags.push(`<span class="cb-flag warn"><i class="ic ic-target"></i>${tr('coachBand.refsNotRetested', {days:refsAge})}</span>`);
   }
   if(!flags.length) flags.push(`<span class="cb-flag ok"><i class="ic ic-check"></i>${tr('coachBand.nothingToReport')}</span>`);
+  // semaine SUIVANTE planifiée pour cet athlète (pas la semaine en cours) :
+  // la case "prévenir" n'a de sens que s'il y a déjà quelque chose à annoncer.
+  const nextMon = mondayOf(1);
+  let nextTot=0; for(let i=0;i<7;i++){ (planning[iso(addDays(nextMon,i))]||[]).forEach(()=>nextTot++); }
   const ck = a.checkin;
   band.style.setProperty('--cbc', a.color);
   band.innerHTML = `
@@ -3415,12 +3468,24 @@ function renderCoachBand(){
         </div>`:''}
       </div>
     </div>
-    <div class="cb-flags">${flags.join('')}</div>`;
+    <div class="cb-flags">${flags.join('')}</div>
+    ${nextTot>0 ? `<label class="cb-notify">
+      <input type="checkbox" id="cbNotifyReady">
+      ${tr('coachBand.notifyReady', {name:a.name})}
+    </label>` : ''}`;
   const _bb=document.getElementById('bilanBtn'); if(_bb) _bb.onclick=()=>exportBilan(a.name);
   const _csb=document.getElementById('caseStudyBtn'); if(_csb) _csb.onclick=()=>exportCaseStudy(a.name);
   const _ssb=document.getElementById('shareSpecBtn'); if(_ssb) _ssb.onclick=()=>openSpectatorShare(a.id);
   const _zb=document.getElementById('zonesBtn'); if(_zb) _zb.onclick=()=>openZoneEditor();
   const _pb=document.getElementById('profileBtn'); if(_pb) _pb.onclick=()=>openAthleteProfile(a.id);
+  const _cbn=document.getElementById('cbNotifyReady');
+  if(_cbn) _cbn.onchange=(ev)=>{
+    if(!ev.target.checked) return;
+    const done=()=>toast(tr('toast.athleteNotifiedReady', {name:a.name}));
+    if(window.PF?.user && PF.notifyWeekReady){
+      PF.notifyWeekReady(a.id, iso(nextMon)).then(done).catch(e=>{ console.warn('[PF] notifyWeekReady:', e); toast(tr('toast.portailIndisponible'), 'error'); ev.target.checked=false; });
+    } else { done(); ev.target.checked=false; }
+  };
 }
 
 /* ---- Fiche athlète (coach) : VO2max, parcours, records, blessures, habitudes ---- */
