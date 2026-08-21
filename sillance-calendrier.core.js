@@ -903,7 +903,14 @@ function renderSidebar(){
         <div class="cc-price">${tr('sidebar.trackingRate')} <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/${tr('sidebar.perMonth')}</small> · <a href="#" id="coachPriceEdit">${tr('sidebar.edit')}</a></div>
         <button class="cc-btn" id="coachConnectBtn">${tr('sidebar.connectStripe')}</button>
         <button class="cc-btn" id="coachInvoicesBtn" style="margin-top:8px">${tr('sidebar.seeInvoices')}</button>
-      </div>`;
+      </div>
+      ${window.PF?.user ? `<div class="coach-connect" style="margin-top:14px">
+        <div class="cc-t"><b><i class="ic ic-user-plus"></i> ${tr('sidebar.selfCoach')}</b></div>
+        ${window.__pf_selfCoached
+          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> ${tr('sidebar.selfCoachActive')}</div>`
+          : `<div class="cc-s">${tr('sidebar.selfCoachText')}</div>
+             <button class="cc-btn" id="selfCoachBtn" style="margin-top:10px">${tr('sidebar.selfCoachBtn')}</button>`}
+      </div>` : ''}`;
     buildTemplates(document.getElementById('tplList'));
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
@@ -946,6 +953,19 @@ function renderSidebar(){
         toast(tr('toast.tarifCoachingMisAJour'));
         if(window.PF?.user) PF.saveCoachOffer({name:COACH_OFFER.name, price:COACH_OFFER.price}).catch(er=>console.warn('saveCoachOffer',er));
       }
+    };
+    const scb=document.getElementById('selfCoachBtn');
+    if(scb) scb.onclick=()=>{
+      if(!window.PF?.user || !PF.enableSelfCoaching) return;
+      scb.disabled=true;
+      PF.enableSelfCoaching().then(()=>{
+        toast(tr('toast.selfCoachEnabled'));
+        location.reload();
+      }).catch(e=>{
+        console.warn('[PF] self-coach:', e);
+        scb.disabled=false;
+        toast(tr('toast.selfCoachError'), 'error');
+      });
     };
   } else {
     const s = readinessScore(), adv = readinessAdvice(s);
@@ -2969,9 +2989,14 @@ function realRoleMode(){
   if(!r) return null;
   return r==='club_admin' ? 'club' : r;
 }
+// Auto-coaching (25/08) : un coach qui s'est ajouté à son propre roster
+// (coach_athlete self-référent, PF.enableSelfCoaching) débloque en plus la
+// vue Athlète pour gérer son propre entraînement — les autres comptes
+// restent limités à leur unique rôle réel.
 function guardModeSwitch(target){
   const real = realRoleMode();
-  if(real && real!==target){
+  const selfCoachAllowed = real==='coach' && target==='athlete' && window.__pf_selfCoached;
+  if(real && real!==target && !selfCoachAllowed){
     toast(tr('mode.notAvailable'));
     return false;
   }
@@ -2979,8 +3004,9 @@ function guardModeSwitch(target){
 }
 window.__pf_lockModes = function(realMode){
   const map = {coach:mc, athlete:ma, club:mcl};
+  const selfCoachUnlock = realMode==='coach' && window.__pf_selfCoached;
   Object.entries(map).forEach(([k,btn])=>{
-    const locked = k!==realMode;
+    const locked = k!==realMode && !(selfCoachUnlock && k==='athlete');
     btn.classList.toggle('mode-locked', locked);
     btn.title = locked ? tr('mode.reservedOther') : '';
   });
@@ -3002,12 +3028,32 @@ function setActiveMode(btn){
     if(cible) cible.scrollIntoView({behavior:'smooth', block:'start'});
   }, 120);
 }
-mc.onclick = ()=>{ if(!guardModeSwitch('coach')) return; mode='coach'; setActiveMode(mc); renderSidebar(); render(); updateVideolibVisibility(); updatePlanAthleteVisibility(); if(typeof renderCoachBand==='function') renderCoachBand(); if(typeof renderGear==='function') renderGear(); };
+mc.onclick = ()=>{
+  if(!guardModeSwitch('coach')) return;
+  // auto-coaching réel : en revenant de la vue Athlète (où le planning affiché
+  // était le SIEN), il faut recharger celui de l'athlète du roster sélectionné,
+  // sinon le calendrier coach afficherait par erreur son propre planning perso.
+  const cameFromSelfAthlete = mode==='athlete' && rosterIsReal && window.__pf_selfCoached;
+  mode='coach'; setActiveMode(mc);
+  if(cameFromSelfAthlete && currentAthleteId && typeof window.__pf_loadPlanningFor==='function'){
+    window.__pf_loadPlanningFor(currentAthleteId);
+  }
+  renderSidebar(); render(); updateVideolibVisibility(); updatePlanAthleteVisibility(); if(typeof renderCoachBand==='function') renderCoachBand(); if(typeof renderGear==='function') renderGear();
+};
 ma.onclick = ()=>{
   if(!guardModeSwitch('athlete')) return;
+  // symétrique : en venant de la vue Coach (roster d'un AUTRE athlète chargé),
+  // il faut recharger SON PROPRE planning avant d'afficher la vue Athlète —
+  // sinon un coach en auto-coaching verrait par erreur le planning de l'athlète
+  // qu'il suivait juste avant, dans son propre espace personnel.
+  const cameFromCoachOther = mode==='coach' && rosterIsReal && window.__pf_selfCoached
+    && window.PF?.user && currentAthleteId!==window.PF.user.id;
   mode='athlete'; setActiveMode(ma);
   // la vue Athlète = SON espace : on restaure les données de l'athlète démo (roster[0])
   if(!rosterIsReal && selectedAthleteIdx!==0){ selectedAthleteIdx=0; applyDemoAthlete(0); renderAthPicker(); }
+  else if(cameFromCoachOther && typeof window.__pf_loadPlanningFor==='function'){
+    window.__pf_loadPlanningFor(window.PF.user.id);
+  }
   else if(typeof renderGear==='function') renderGear();
   renderSidebar(); render(); updateVideolibVisibility(); updatePlanAthleteVisibility();
 };
