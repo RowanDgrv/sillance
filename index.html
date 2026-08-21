@@ -131,7 +131,8 @@ main,.nav,footer{position:relative;z-index:1}
 
 /* ---------- hero immersif ---------- */
 .hero{position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:center;padding:120px 0 80px}
-.hero .wrap{position:relative;z-index:1}
+.hero .wrap{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:48px}
+.hero-copy{flex:1 1 560px;min-width:0}
 .hero .kicker{display:block;margin-bottom:26px}
 .hero .lede{margin:28px 0 36px}
 .cta-row{display:flex;gap:14px;flex-wrap:wrap}
@@ -139,6 +140,23 @@ main,.nav,footer{position:relative;z-index:1}
   letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px}
 .scrollcue .ln{width:1px;height:34px;background:linear-gradient(var(--accent),transparent)}
 @media(max-width:680px){.scrollcue{display:none}}
+
+/* ---------- preuve produit dans le hero : capture réelle de l'app dans un
+   mockup téléphone — additif, ne remplace pas le fond WebGL "sillage" ---------- */
+.hero-visual{position:relative;flex:0 0 auto;display:flex;justify-content:center}
+.phone-glow{position:absolute;inset:-70px;z-index:-1;filter:blur(46px);
+  background:
+    radial-gradient(closest-side,rgba(70,194,216,.38),transparent 72%) 18% 15%/62% 62% no-repeat,
+    radial-gradient(closest-side,rgba(255,154,61,.24),transparent 72%) 82% 85%/62% 62% no-repeat;}
+.phone-mock{position:relative;width:clamp(200px,19vw,272px);padding:13px;background:#050810;
+  border-radius:30px;box-shadow:0 40px 90px -28px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.07) inset;
+  transform:rotate(-5deg)}
+.phone-mock img{display:block;width:100%;height:auto;border-radius:17px;box-shadow:0 0 0 1px rgba(255,255,255,.05) inset}
+.phone-tag{position:absolute;left:-6%;bottom:-22px;transform:rotate(-5deg);background:var(--paper);
+  border:1px solid var(--line-strong);border-radius:99px;padding:9px 15px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.7);white-space:nowrap}
+@media(max-width:880px){.hero-visual{display:none}}
 
 /* ---------- sections ---------- */
 .section{padding:96px 0;border-top:1px solid var(--line);background:var(--paper)}
@@ -249,12 +267,19 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <canvas class="hero-canvas" id="heroGl" aria-hidden="true"></canvas>
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="wrap">
+    <div class="hero-copy">
     <span class="kicker" data-i18n="hero.kicker">Triathlon · Hyrox · Course à pied</span>
     <h1 class="h1" data-i18n-html="hero.title">Sillance,<br>ton <span class="alt2">sillage</span></h1>
     <p class="lede" data-i18n-html="hero.lede">Dans l'eau, dans une roue, le sillage porte l'effort à ta place. Ton coach fait de même avec ton entraînement&nbsp;: il calcule la charge, gère la récupération, ajuste la suite, et il ne te reste qu'à suivre le plan.</p>
     <div class="cta-row">
       <a class="btn primary" href="./sillance-app.html" data-i18n="hero.cta1">Découvrir la démo</a>
       <a class="btn ghost" href="#roles" data-i18n="hero.cta2">En savoir plus</a>
+    </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="phone-glow"></div>
+      <div class="phone-mock"><img src="./hero-analytics.png" alt="" width="618" height="720" loading="eager"></div>
+      <span class="phone-tag" data-i18n="hero.phoneTag">Charge, forme, risque — en direct</span>
     </div>
   </div>
   <div class="scrollcue"><span data-i18n="hero.scroll">Défiler</span><span class="ln"></span></div>
