@@ -20,7 +20,6 @@
     "hero.cta1": `Découvrir la démo`,
     "hero.cta2": `En savoir plus`,
     "hero.scroll": `Défiler`,
-    "hero.phoneTag": `Charge, forme, risque — en direct`,
 
     "roles.kicker": `Pour qui`,
     "roles.title": `Trois rôles, une même plateforme`,
@@ -127,7 +126,6 @@
     "hero.cta1": `Try the demo`,
     "hero.cta2": `Learn more`,
     "hero.scroll": `Scroll`,
-    "hero.phoneTag": `Load, form, risk — live`,
 
     "roles.kicker": `Who it's for`,
     "roles.title": `Three roles, one platform`,
@@ -234,7 +232,6 @@
     "hero.cta1": `Ver la demo`,
     "hero.cta2": `Saber más`,
     "hero.scroll": `Desplázate`,
-    "hero.phoneTag": `Carga, forma, riesgo — en directo`,
 
     "roles.kicker": `Para quién`,
     "roles.title": `Tres roles, una sola plataforma`,
