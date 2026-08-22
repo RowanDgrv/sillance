@@ -216,10 +216,15 @@ l'analyse individuelle, réservée aux entraîneurs.</p>
 </table></div>
 
 <h3 data-i18n="legal.priv.t4">3.4 Durées de conservation</h3>
+<p data-i18n="legal.priv.retIntro">Nous conservons chaque catégorie de données le temps strictement nécessaire à sa finalité :</p>
 <ul>
   <li data-i18n="legal.priv.ret1">Données de compte et d'entraînement : pendant la durée de vie du compte, puis suppression dans les 30 jours suivant la demande de suppression du compte.</li>
-  <li data-i18n="legal.priv.ret2">Documents de facturation : 10 ans (obligation comptable).</li>
-  <li data-i18n="legal.priv.ret3">Jetons de connexion aux services tiers (Garmin, Coros, Strava) : supprimés dès la déconnexion du service.</li>
+  <li data-i18n="legal.priv.ret2">Compte inactif (aucune connexion) : au-delà de 3 ans d'inactivité, un e-mail d'information est envoyé puis, sans réponse sous 60 jours, le compte et ses données sont supprimés.</li>
+  <li data-i18n="legal.priv.ret3">Données de santé (fréquence cardiaque, sommeil, HRV, disponibilité/blessure, cycle menstruel) : suivent le même sort que les données d'entraînement ci-dessus ; en cas de rupture du lien coach-athlète, elles cessent immédiatement d'être visibles par le coach.</li>
+  <li data-i18n="legal.priv.ret4">Résumés générés par l'Assistant IA (add-on) : conservés le temps de la séance d'entraînement associée, supprimés avec elle.</li>
+  <li data-i18n="legal.priv.ret5">Documents de facturation : 10 ans (obligation comptable, art. L123-22 du Code de commerce).</li>
+  <li data-i18n="legal.priv.ret6">Jetons de connexion aux services tiers (Garmin, Coros, Strava) : supprimés dès la déconnexion du service.</li>
+  <li data-i18n="legal.priv.ret7">Sauvegardes techniques de la base de données : rétention glissante de 30 jours maximum, à seule fin de continuité de service.</li>
 </ul>
 
 <h3 data-i18n="legal.priv.t5">3.5 Vos droits</h3>
@@ -233,10 +238,20 @@ réclamation auprès de la CNIL (<a href="https://www.cnil.fr" rel="noopener">cn
 <p data-i18n="legal.priv.p6">Le traitement des données d'un mineur de moins de 15 ans requiert le consentement conjoint du titulaire de
 l'autorité parentale, recueilli dans l'application lors de l'adhésion à un club.</p>
 
-<h3 data-i18n="legal.priv.t7">3.7 Cookies et stockage local</h3>
-<p data-i18n-html="legal.priv.p7">Sillance n'utilise <strong>aucun cookie publicitaire ni traceur d'audience tiers</strong>. Le navigateur stocke uniquement
-des éléments strictement nécessaires : jeton de session (authentification Supabase) et préférences d'affichage
-(thème, graphiques masqués). À ce titre, aucune bannière de consentement n'est requise.</p>
+<h3 data-i18n="legal.priv.t7">3.7 Cookies et gestion du consentement</h3>
+<p data-i18n-html="legal.priv.p7">Sillance dépose des éléments de stockage <strong>strictement nécessaires</strong> au fonctionnement du site (authentification,
+langue, thème, préférences d'affichage) : ils sont actifs par défaut et ne requièrent pas de consentement (art. 82 de la loi
+Informatique et Libertés). Un bandeau affiché à votre première visite vous permet d'<strong>accepter ou refuser</strong> une
+catégorie optionnelle de <strong>mesure d'audience anonyme</strong> — non utilisée à ce jour, préparée pour une éventuelle évolution
+du site, sans traceur publicitaire ni revente de données. Vous pouvez modifier votre choix à tout moment via le bouton
+« 🍪 » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.</p>
+<div class="table-wrap"><table>
+  <tr><th data-i18n="legal.priv.ckth1">Élément</th><th data-i18n="legal.priv.ckth2">Finalité</th><th data-i18n="legal.priv.ckth3">Durée</th><th data-i18n="legal.priv.ckth4">Catégorie</th></tr>
+  <tr><td data-i18n="legal.priv.ck1.a">Jeton d'authentification (Supabase)</td><td data-i18n="legal.priv.ck1.b">Garder la session connectée</td><td data-i18n="legal.priv.ck1.c">Jusqu'à déconnexion ou expiration du jeton</td><td data-i18n="legal.priv.necessary">Nécessaire</td></tr>
+  <tr><td data-i18n="legal.priv.ck2.a">Préférences d'interface (langue, thème, filtres de graphiques, guides masqués)</td><td data-i18n="legal.priv.ck2.b">Mémoriser vos réglages d'affichage</td><td data-i18n="legal.priv.ck2.c">Persistant, jusqu'à suppression manuelle</td><td data-i18n="legal.priv.necessary">Nécessaire</td></tr>
+  <tr><td data-i18n="legal.priv.ck3.a">Choix de consentement cookies</td><td data-i18n="legal.priv.ck3.b">Retenir votre réponse au bandeau</td><td data-i18n="legal.priv.ck3.c">12 mois, puis nouvelle demande</td><td data-i18n="legal.priv.necessary">Nécessaire</td></tr>
+  <tr><td data-i18n="legal.priv.ck4.a">Mesure d'audience</td><td data-i18n="legal.priv.ck4.b">Statistiques de fréquentation anonymisées</td><td data-i18n="legal.priv.ck4.c">Non applicable — fonctionnalité non activée</td><td data-i18n="legal.priv.optional">Optionnelle (soumise à votre accord)</td></tr>
+</table></div>
 
 <h3 data-i18n="legal.priv.t8">3.8 Sécurité</h3>
 <p data-i18n="legal.priv.p8">Données hébergées dans l'Union européenne, chiffrées en transit (TLS) et au repos ; cloisonnement des accès par
@@ -252,5 +267,6 @@ CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.</p>
 </div>
 <script src="./sillance-i18n.js"></script>
 <script src="./sillance-i18n-legal.js"></script>
+<script src="./sillance-cookies.js"></script>
 </body>
 </html>

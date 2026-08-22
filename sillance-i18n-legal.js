@@ -156,9 +156,14 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.sub5.c": `Selon prestataire`,
     "legal.priv.sub6.b": `Envoi d'e-mails transactionnels (invitations, rappels)`,
     "legal.priv.t4": `3.4 Durées de conservation`,
+    "legal.priv.retIntro": `Nous conservons chaque catégorie de données le temps strictement nécessaire à sa finalité :`,
     "legal.priv.ret1": `Données de compte et d'entraînement : pendant la durée de vie du compte, puis suppression dans les 30 jours suivant la demande de suppression du compte.`,
-    "legal.priv.ret2": `Documents de facturation : 10 ans (obligation comptable).`,
-    "legal.priv.ret3": `Jetons de connexion aux services tiers (Garmin, Coros, Strava) : supprimés dès la déconnexion du service.`,
+    "legal.priv.ret2": `Compte inactif (aucune connexion) : au-delà de 3 ans d'inactivité, un e-mail d'information est envoyé puis, sans réponse sous 60 jours, le compte et ses données sont supprimés.`,
+    "legal.priv.ret3": `Données de santé (fréquence cardiaque, sommeil, HRV, disponibilité/blessure, cycle menstruel) : suivent le même sort que les données d'entraînement ci-dessus ; en cas de rupture du lien coach-athlète, elles cessent immédiatement d'être visibles par le coach.`,
+    "legal.priv.ret4": `Résumés générés par l'Assistant IA (add-on) : conservés le temps de la séance d'entraînement associée, supprimés avec elle.`,
+    "legal.priv.ret5": `Documents de facturation : 10 ans (obligation comptable, art. L123-22 du Code de commerce).`,
+    "legal.priv.ret6": `Jetons de connexion aux services tiers (Garmin, Coros, Strava) : supprimés dès la déconnexion du service.`,
+    "legal.priv.ret7": `Sauvegardes techniques de la base de données : rétention glissante de 30 jours maximum, à seule fin de continuité de service.`,
     "legal.priv.t5": `3.5 Vos droits`,
     "legal.priv.p5": `Vous disposez des droits d'accès, de rectification, d'effacement, de portabilité, de limitation et d'opposition,
 ainsi que du droit de retirer votre consentement à tout moment (notamment pour les données de santé — le retrait
@@ -168,10 +173,31 @@ réclamation auprès de la CNIL (<a href="https://www.cnil.fr" rel="noopener">cn
     "legal.priv.t6": `3.6 Mineurs`,
     "legal.priv.p6": `Le traitement des données d'un mineur de moins de 15 ans requiert le consentement conjoint du titulaire de
 l'autorité parentale, recueilli dans l'application lors de l'adhésion à un club.`,
-    "legal.priv.t7": `3.7 Cookies et stockage local`,
-    "legal.priv.p7": `Sillance n'utilise <strong>aucun cookie publicitaire ni traceur d'audience tiers</strong>. Le navigateur stocke uniquement
-des éléments strictement nécessaires : jeton de session (authentification Supabase) et préférences d'affichage
-(thème, graphiques masqués). À ce titre, aucune bannière de consentement n'est requise.`,
+    "legal.priv.t7": `3.7 Cookies et gestion du consentement`,
+    "legal.priv.p7": `Sillance dépose des éléments de stockage <strong>strictement nécessaires</strong> au fonctionnement du site (authentification,
+langue, thème, préférences d'affichage) : ils sont actifs par défaut et ne requièrent pas de consentement (art. 82 de la loi
+Informatique et Libertés). Un bandeau affiché à votre première visite vous permet d'<strong>accepter ou refuser</strong> une
+catégorie optionnelle de <strong>mesure d'audience anonyme</strong> — non utilisée à ce jour, préparée pour une éventuelle évolution
+du site, sans traceur publicitaire ni revente de données. Vous pouvez modifier votre choix à tout moment via le bouton
+« 🍪 » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.`,
+    "legal.priv.ckth1": `Élément`,
+    "legal.priv.ckth2": `Finalité`,
+    "legal.priv.ckth3": `Durée`,
+    "legal.priv.ckth4": `Catégorie`,
+    "legal.priv.ck1.a": `Jeton d'authentification (Supabase)`,
+    "legal.priv.ck1.b": `Garder la session connectée`,
+    "legal.priv.ck1.c": `Jusqu'à déconnexion ou expiration du jeton`,
+    "legal.priv.ck2.a": `Préférences d'interface (langue, thème, filtres de graphiques, guides masqués)`,
+    "legal.priv.ck2.b": `Mémoriser vos réglages d'affichage`,
+    "legal.priv.ck2.c": `Persistant, jusqu'à suppression manuelle`,
+    "legal.priv.ck3.a": `Choix de consentement cookies`,
+    "legal.priv.ck3.b": `Retenir votre réponse au bandeau`,
+    "legal.priv.ck3.c": `12 mois, puis nouvelle demande`,
+    "legal.priv.ck4.a": `Mesure d'audience`,
+    "legal.priv.ck4.b": `Statistiques de fréquentation anonymisées`,
+    "legal.priv.ck4.c": `Non applicable — fonctionnalité non activée`,
+    "legal.priv.necessary": `Nécessaire`,
+    "legal.priv.optional": `Optionnelle (soumise à votre accord)`,
     "legal.priv.t8": `3.8 Sécurité`,
     "legal.priv.p8": `Données hébergées dans l'Union européenne, chiffrées en transit (TLS) et au repos ; cloisonnement des accès par
 rôle appliqué au niveau de la base de données (Row Level Security) ; paiements traités exclusivement par Stripe
@@ -333,9 +359,14 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.sub5.c": `Depends on provider`,
     "legal.priv.sub6.b": `Sending transactional emails (invitations, reminders)`,
     "legal.priv.t4": `3.4 Retention periods`,
+    "legal.priv.retIntro": `We keep each category of data only as long as strictly necessary for its purpose:`,
     "legal.priv.ret1": `Account and training data: for the lifetime of the account, then deleted within 30 days of the account deletion request.`,
-    "legal.priv.ret2": `Billing documents: 10 years (accounting obligation).`,
-    "legal.priv.ret3": `Third-party service connection tokens (Garmin, Coros, Strava): deleted as soon as the service is disconnected.`,
+    "legal.priv.ret2": `Inactive account (no sign-in): after 3 years of inactivity, a notice email is sent, then, absent a reply within 60 days, the account and its data are deleted.`,
+    "legal.priv.ret3": `Health data (heart rate, sleep, HRV, availability/injury, menstrual cycle): follows the same fate as the training data above; if the coach-athlete link is broken, it immediately stops being visible to the coach.`,
+    "legal.priv.ret4": `AI Assistant add-on summaries: kept for as long as the associated training session, deleted with it.`,
+    "legal.priv.ret5": `Billing documents: 10 years (accounting obligation, art. L123-22 of the French Commercial Code).`,
+    "legal.priv.ret6": `Third-party service connection tokens (Garmin, Coros, Strava): deleted as soon as the service is disconnected.`,
+    "legal.priv.ret7": `Technical database backups: rolling retention of 30 days maximum, solely for service continuity.`,
     "legal.priv.t5": `3.5 Your rights`,
     "legal.priv.p5": `You have the right to access, rectify, erase, port, restrict and object to processing,
 as well as the right to withdraw your consent at any time (notably for health data — withdrawal
@@ -345,10 +376,30 @@ complaint with the CNIL, the French data protection authority (<a href="https://
     "legal.priv.t6": `3.6 Minors`,
     "legal.priv.p6": `Processing the data of a minor under 15 requires the joint consent of the holder of
 parental authority, collected in the application when joining a club.`,
-    "legal.priv.t7": `3.7 Cookies and local storage`,
-    "legal.priv.p7": `Sillance uses <strong>no advertising cookies or third-party audience trackers</strong>. The browser only stores
-strictly necessary items: a session token (Supabase authentication) and display preferences
-(theme, hidden charts). As such, no consent banner is required.`,
+    "legal.priv.t7": `3.7 Cookies and consent management`,
+    "legal.priv.p7": `Sillance stores <strong>strictly necessary</strong> items for the site to function (authentication, language, theme,
+display preferences): these are active by default and require no consent. A banner shown on your first visit lets you
+<strong>accept or reject</strong> an optional <strong>anonymous audience measurement</strong> category — not in use today, prepared for a
+possible future evolution of the site, with no advertising tracker and no data resale. You can change your choice at any
+time via the "🍪" button shown at the bottom of the screen, or by clearing your browser's site data.`,
+    "legal.priv.ckth1": `Item`,
+    "legal.priv.ckth2": `Purpose`,
+    "legal.priv.ckth3": `Duration`,
+    "legal.priv.ckth4": `Category`,
+    "legal.priv.ck1.a": `Authentication token (Supabase)`,
+    "legal.priv.ck1.b": `Keep the session signed in`,
+    "legal.priv.ck1.c": `Until sign-out or token expiry`,
+    "legal.priv.ck2.a": `Interface preferences (language, theme, chart filters, dismissed guides)`,
+    "legal.priv.ck2.b": `Remember your display settings`,
+    "legal.priv.ck2.c": `Persistent, until manually cleared`,
+    "legal.priv.ck3.a": `Cookie consent choice`,
+    "legal.priv.ck3.b": `Remember your answer to the banner`,
+    "legal.priv.ck3.c": `12 months, then asked again`,
+    "legal.priv.ck4.a": `Audience measurement`,
+    "legal.priv.ck4.b": `Anonymised visit statistics`,
+    "legal.priv.ck4.c": `Not applicable — feature not enabled`,
+    "legal.priv.necessary": `Necessary`,
+    "legal.priv.optional": `Optional (subject to your consent)`,
     "legal.priv.t8": `3.8 Security`,
     "legal.priv.p8": `Data hosted within the European Union, encrypted in transit (TLS) and at rest; access is partitioned by
 role at the database level (Row Level Security); payments are processed exclusively by Stripe
@@ -510,9 +561,14 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.sub5.c": `Según el proveedor`,
     "legal.priv.sub6.b": `Envío de correos transaccionales (invitaciones, recordatorios)`,
     "legal.priv.t4": `3.4 Períodos de conservación`,
+    "legal.priv.retIntro": `Conservamos cada categoría de datos solo durante el tiempo estrictamente necesario para su finalidad:`,
     "legal.priv.ret1": `Datos de cuenta y de entrenamiento: durante la vida de la cuenta, después eliminación en los 30 días siguientes a la solicitud de eliminación de la cuenta.`,
-    "legal.priv.ret2": `Documentos de facturación: 10 años (obligación contable).`,
-    "legal.priv.ret3": `Tokens de conexión a servicios externos (Garmin, Coros, Strava): eliminados en cuanto se desconecta el servicio.`,
+    "legal.priv.ret2": `Cuenta inactiva (sin conexión): más allá de 3 años de inactividad, se envía un correo informativo y, sin respuesta en 60 días, la cuenta y sus datos se eliminan.`,
+    "legal.priv.ret3": `Datos de salud (frecuencia cardíaca, sueño, HRV, disponibilidad/lesión, ciclo menstrual): siguen la misma suerte que los datos de entrenamiento anteriores; si se rompe el vínculo entrenador-atleta, dejan de ser visibles para el entrenador de inmediato.`,
+    "legal.priv.ret4": `Resúmenes generados por el Asistente IA (add-on): conservados durante el tiempo de la sesión de entrenamiento asociada, eliminados junto con ella.`,
+    "legal.priv.ret5": `Documentos de facturación: 10 años (obligación contable, art. L123-22 del Código de Comercio francés).`,
+    "legal.priv.ret6": `Tokens de conexión a servicios externos (Garmin, Coros, Strava): eliminados en cuanto se desconecta el servicio.`,
+    "legal.priv.ret7": `Copias de seguridad técnicas de la base de datos: retención móvil de 30 días como máximo, solo para la continuidad del servicio.`,
     "legal.priv.t5": `3.5 Tus derechos`,
     "legal.priv.p5": `Dispones de los derechos de acceso, rectificación, supresión, portabilidad, limitación y oposición,
 así como del derecho a retirar tu consentimiento en cualquier momento (en particular para los datos de salud — la retirada
@@ -522,10 +578,31 @@ reclamación ante la CNIL, la autoridad francesa de protección de datos (<a hre
     "legal.priv.t6": `3.6 Menores`,
     "legal.priv.p6": `El tratamiento de los datos de un menor de 15 años requiere el consentimiento conjunto del titular de
 la patria potestad, recogido en la aplicación al afiliarse a un club.`,
-    "legal.priv.t7": `3.7 Cookies y almacenamiento local`,
-    "legal.priv.p7": `Sillance no utiliza <strong>ninguna cookie publicitaria ni rastreador de audiencia de terceros</strong>. El navegador solo almacena
-elementos estrictamente necesarios: un token de sesión (autenticación Supabase) y preferencias de visualización
-(tema, gráficos ocultos). Por ello, no se requiere ningún banner de consentimiento.`,
+    "legal.priv.t7": `3.7 Cookies y gestión del consentimiento`,
+    "legal.priv.p7": `Sillance almacena elementos <strong>estrictamente necesarios</strong> para el funcionamiento del sitio (autenticación, idioma,
+tema, preferencias de visualización): están activos por defecto y no requieren consentimiento. Un banner mostrado en tu
+primera visita te permite <strong>aceptar o rechazar</strong> una categoría opcional de <strong>medición de audiencia anónima</strong> —
+no utilizada actualmente, preparada para una posible evolución futura del sitio, sin rastreador publicitario ni reventa de
+datos. Puedes cambiar tu elección en cualquier momento mediante el botón «🍪» que aparece en la parte inferior de la
+pantalla, o borrando los datos del sitio en tu navegador.`,
+    "legal.priv.ckth1": `Elemento`,
+    "legal.priv.ckth2": `Finalidad`,
+    "legal.priv.ckth3": `Duración`,
+    "legal.priv.ckth4": `Categoría`,
+    "legal.priv.ck1.a": `Token de autenticación (Supabase)`,
+    "legal.priv.ck1.b": `Mantener la sesión conectada`,
+    "legal.priv.ck1.c": `Hasta el cierre de sesión o la expiración del token`,
+    "legal.priv.ck2.a": `Preferencias de interfaz (idioma, tema, filtros de gráficos, guías ocultadas)`,
+    "legal.priv.ck2.b": `Recordar tus ajustes de visualización`,
+    "legal.priv.ck2.c": `Persistente, hasta borrado manual`,
+    "legal.priv.ck3.a": `Elección de consentimiento de cookies`,
+    "legal.priv.ck3.b": `Recordar tu respuesta al banner`,
+    "legal.priv.ck3.c": `12 meses, después se vuelve a preguntar`,
+    "legal.priv.ck4.a": `Medición de audiencia`,
+    "legal.priv.ck4.b": `Estadísticas de visitas anonimizadas`,
+    "legal.priv.ck4.c": `No aplicable — función no activada`,
+    "legal.priv.necessary": `Necesaria`,
+    "legal.priv.optional": `Opcional (sujeta a tu consentimiento)`,
     "legal.priv.t8": `3.8 Seguridad`,
     "legal.priv.p8": `Datos alojados en la Unión Europea, cifrados en tránsito (TLS) y en reposo; segmentación de accesos por
 rol aplicada a nivel de base de datos (Row Level Security); pagos procesados exclusivamente por Stripe
