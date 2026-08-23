@@ -13,7 +13,7 @@
 <!-- CSP : app (polices Google + module supabase-js via esm.sh + API supabase + iframe Calendly).
      unsafe-inline requis (gros scripts/styles inline, site statique sans nonce).
      frame-ancestors/X-Frame-Options non applicables via <meta> (en-tête HTTP requis). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co wss://onbsgohvqejccowfnrbs.supabase.co https://esm.sh; frame-src https://calendly.com; base-uri 'self'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co wss://onbsgohvqejccowfnrbs.supabase.co https://esm.sh https://challenges.cloudflare.com; frame-src https://calendly.com https://challenges.cloudflare.com; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -3325,6 +3325,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script type="module" src="./sillance-integration.js"></script>
 <script src="./sillance-cookies.js"></script>
 <script src="./sillance-analytics.js"></script>
