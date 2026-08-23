@@ -18,7 +18,7 @@
 
   var TXT = {
     fr: {
-      text: 'Sillance utilise des cookies et un stockage local strictement nécessaires au fonctionnement du site (connexion, préférences). Avec votre accord, nous pourrions aussi utiliser une mesure d’audience anonyme pour améliorer le service — aucun traceur publicitaire.',
+      text: 'Sillance utilise des cookies et un stockage local strictement nécessaires au fonctionnement du site (connexion, préférences). Avec votre accord, nous pourrions aussi utiliser une mesure d’audience anonyme pour améliorer le service, sans aucun traceur publicitaire.',
       necessaryTitle: 'Strictement nécessaires',
       necessaryDesc: 'Connexion, sécurité, préférences d’affichage. Toujours actifs, sans dépôt possible d’opposition.',
       analyticsTitle: 'Mesure d’audience',
@@ -32,7 +32,7 @@
       close: 'Fermer'
     },
     en: {
-      text: 'Sillance uses cookies and local storage strictly necessary for the site to work (login, preferences). With your consent, we could also use anonymous audience measurement to improve the service — no advertising trackers.',
+      text: 'Sillance uses cookies and local storage strictly necessary for the site to work (login, preferences). With your consent, we could also use anonymous audience measurement to improve the service, with no advertising trackers.',
       necessaryTitle: 'Strictly necessary',
       necessaryDesc: 'Login, security, display preferences. Always active, cannot be disabled.',
       analyticsTitle: 'Audience measurement',
@@ -46,7 +46,7 @@
       close: 'Close'
     },
     es: {
-      text: 'Sillance utiliza cookies y almacenamiento local estrictamente necesarios para el funcionamiento del sitio (conexión, preferencias). Con su consentimiento, también podríamos usar una medición de audiencia anónima para mejorar el servicio — ningún rastreador publicitario.',
+      text: 'Sillance utiliza cookies y almacenamiento local estrictamente necesarios para el funcionamiento del sitio (conexión, preferencias). Con su consentimiento, también podríamos usar una medición de audiencia anónima para mejorar el servicio, sin ningún rastreador publicitario.',
       necessaryTitle: 'Estrictamente necesarias',
       necessaryDesc: 'Conexión, seguridad, preferencias de visualización. Siempre activas, no se pueden desactivar.',
       analyticsTitle: 'Medición de audiencia',

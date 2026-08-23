@@ -4,27 +4,27 @@
    est le droit français (voir art. 2.12) quelle que soit la langue lue. */
 (function(){
   var fr = {
-    "legal.pageTitle": `Sillance — Mentions légales, CGU & Confidentialité`,
+    "legal.pageTitle": `Sillance : Mentions légales, CGU & Confidentialité`,
     "legal.nav.mentions": `Mentions légales`,
     "legal.nav.cgu": `CGU / CGV`,
     "legal.nav.confidentialite": `Confidentialité`,
     "legal.h1": `Informations légales`,
-    "legal.updated": `Version provisoire — Sillance est en phase de pré-lancement.`,
+    "legal.updated": `Version provisoire. Sillance est en phase de pré-lancement.`,
     "legal.langNote": `En cas de divergence entre les versions, la version française fait foi.`,
     "legal.provisional": `<b>Service en phase de pré-lancement.</b> Aucun paiement réel n'est encore encaissé à ce stade ; le médiateur de la consommation sera désigné à l'ouverture officielle du service.`,
 
     "legal.mentions.title": `Mentions légales`,
     "legal.mentions.editorTitle": `Éditeur du site`,
     "legal.mentions.editorIntro": `Le site et l'application Sillance (ci-après « le Service ») sont édités par :`,
-    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — micro-entreprise`,
+    "legal.mentions.li1": `<strong>Rowan Degraeve</strong>, micro-entreprise`,
     "legal.mentions.li2": `SIRET : 108 626 847 00017`,
     "legal.mentions.li3": `Adresse : 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane`,
     "legal.mentions.li4": `Contact : <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
     "legal.mentions.li5": `Directeur de la publication : Rowan Degraeve`,
     "legal.mentions.li6": `TVA non applicable, article 293 B du CGI (franchise en base de TVA)`,
     "legal.mentions.hostingTitle": `Hébergement`,
-    "legal.mentions.hosting1": `<strong>Site web :</strong> GitHub Pages — GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.`,
-    "legal.mentions.hosting2": `<strong>Données applicatives :</strong> Supabase — projet hébergé dans l'Union européenne.`,
+    "legal.mentions.hosting1": `<strong>Site web :</strong> GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis).`,
+    "legal.mentions.hosting2": `<strong>Données applicatives :</strong> Supabase, hébergé dans l'Union européenne.`,
 
     "legal.cgu.title": `Conditions générales d'utilisation et de vente (CGUV)`,
     "legal.cgu.t1": `2.1 Objet`,
@@ -86,7 +86,7 @@ un compte en cas de violation des présentes conditions, d'usage frauduleux ou d
     "legal.cgu.p7": `Vous vous engagez à ne pas : tenter d'accéder aux données d'autres utilisateurs, perturber le fonctionnement du
 Service, publier des contenus illicites, injurieux ou portant atteinte aux droits de tiers, ni utiliser le Service à
 des fins autres que l'entraînement sportif et sa gestion.`,
-    "legal.cgu.t8": `2.8 Avertissement santé — pas un avis médical`,
+    "legal.cgu.t8": `2.8 Avertissement santé (pas un avis médical)`,
     "legal.cgu.p8": `Sillance est un outil de planification et d'analyse de l'entraînement. Les indicateurs fournis (charge
 d'entraînement, fraîcheur, zones, résumés générés par intelligence artificielle, etc.) sont des
 <strong>estimations à visée informative</strong> : ils ne constituent ni un avis médical, ni une prescription.
@@ -114,7 +114,7 @@ avant toute action judiciaire ; les consommateurs peuvent recourir gratuitement 
 <span class="todo">(un médiateur de la consommation sera désigné à l'ouverture du service)</span>. À défaut, les tribunaux français sont compétents.`,
 
     "legal.priv.title": `Politique de confidentialité (RGPD)`,
-    "legal.priv.controller": `<strong>Responsable de traitement :</strong> Rowan Degraeve, micro-entreprise (SIRET 108 626 847 00017) —
+    "legal.priv.controller": `<strong>Responsable de traitement :</strong> Rowan Degraeve, micro-entreprise (SIRET 108 626 847 00017),
 contact : <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
     "legal.priv.t1": `3.1 Données collectées et finalités`,
     "legal.priv.th1": `Données`,
@@ -148,7 +148,7 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.eu": `Union européenne`,
     "legal.priv.sub2.b": `Paiements et abonnements`,
     "legal.priv.sub2.c": `UE / transferts encadrés (clauses contractuelles types)`,
-    "legal.priv.sub3.b": `Génération des résumés IA (add-on) — reçoit uniquement le bilan chiffré et anonymisé de la séance, jamais votre identité`,
+    "legal.priv.sub3.b": `Génération des résumés IA (add-on), qui reçoit uniquement le bilan chiffré et anonymisé de la séance, jamais votre identité`,
     "legal.priv.sub3.c": `États-Unis (clauses contractuelles types)`,
     "legal.priv.sub4.b": `Hébergement du site statique (aucune donnée personnelle)`,
     "legal.priv.us": `États-Unis`,
@@ -166,8 +166,8 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.ret7": `Sauvegardes techniques de la base de données : rétention glissante de 30 jours maximum, à seule fin de continuité de service.`,
     "legal.priv.t5": `3.5 Vos droits`,
     "legal.priv.p5": `Vous disposez des droits d'accès, de rectification, d'effacement, de portabilité, de limitation et d'opposition,
-ainsi que du droit de retirer votre consentement à tout moment (notamment pour les données de santé — le retrait
-désactive les fonctionnalités concernées : check-ins, analyse cardiaque). Pour les exercer :
+ainsi que du droit de retirer votre consentement à tout moment (notamment pour les données de santé : le retrait
+désactive les fonctionnalités concernées, check-ins et analyse cardiaque). Pour les exercer :
 <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>. Réponse sous 30 jours. Vous pouvez introduire une
 réclamation auprès de la CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Mineurs`,
@@ -177,9 +177,9 @@ l'autorité parentale, recueilli dans l'application lors de l'adhésion à un cl
     "legal.priv.p7": `Sillance dépose des éléments de stockage <strong>strictement nécessaires</strong> au fonctionnement du site (authentification,
 langue, thème, préférences d'affichage) : ils sont actifs par défaut et ne requièrent pas de consentement (art. 82 de la loi
 Informatique et Libertés). Un bandeau affiché à votre première visite vous permet d'<strong>accepter ou refuser</strong> une
-catégorie optionnelle de <strong>mesure d'audience anonyme</strong> — non utilisée à ce jour, préparée pour une éventuelle évolution
+catégorie optionnelle de <strong>mesure d'audience anonyme</strong>, non utilisée à ce jour, préparée pour une éventuelle évolution
 du site, sans traceur publicitaire ni revente de données. Vous pouvez modifier votre choix à tout moment via le bouton
-« 🍪 » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.`,
+« cookies » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.`,
     "legal.priv.ckth1": `Élément`,
     "legal.priv.ckth2": `Finalité`,
     "legal.priv.ckth3": `Durée`,
@@ -195,7 +195,7 @@ du site, sans traceur publicitaire ni revente de données. Vous pouvez modifier 
     "legal.priv.ck3.c": `12 mois, puis nouvelle demande`,
     "legal.priv.ck4.a": `Mesure d'audience`,
     "legal.priv.ck4.b": `Statistiques de fréquentation anonymisées`,
-    "legal.priv.ck4.c": `Non applicable — fonctionnalité non activée`,
+    "legal.priv.ck4.c": `Non applicable (fonctionnalité non activée)`,
     "legal.priv.necessary": `Nécessaire`,
     "legal.priv.optional": `Optionnelle (soumise à votre accord)`,
     "legal.priv.t8": `3.8 Sécurité`,
@@ -203,31 +203,31 @@ du site, sans traceur publicitaire ni revente de données. Vous pouvez modifier 
 rôle appliqué au niveau de la base de données (Row Level Security) ; paiements traités exclusivement par Stripe
 (certifié PCI-DSS). En cas de violation de données susceptible d'engendrer un risque pour vos droits, vous et la
 CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
-    "legal.footer": `Sillance — micro-entreprise · <a href="index.html">Retour au site</a>`,
+    "legal.footer": `Sillance, micro-entreprise · <a href="index.html">Retour au site</a>`,
   };
 
   var en = {
-    "legal.pageTitle": `Sillance — Legal Notice, Terms & Privacy`,
+    "legal.pageTitle": `Sillance: Legal Notice, Terms & Privacy`,
     "legal.nav.mentions": `Legal notice`,
     "legal.nav.cgu": `Terms of use`,
     "legal.nav.confidentialite": `Privacy`,
     "legal.h1": `Legal information`,
-    "legal.updated": `Provisional version — Sillance is in pre-launch.`,
+    "legal.updated": `Provisional version. Sillance is in pre-launch.`,
     "legal.langNote": `In case of discrepancy between versions, the French version prevails.`,
     "legal.provisional": `<b>Service in pre-launch phase.</b> No real payments are collected at this stage; the consumer mediator will be designated when the service officially launches.`,
 
     "legal.mentions.title": `Legal notice`,
     "legal.mentions.editorTitle": `Site publisher`,
     "legal.mentions.editorIntro": `The Sillance site and application (hereafter "the Service") are published by:`,
-    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — sole proprietorship (French "micro-entreprise")`,
+    "legal.mentions.li1": `<strong>Rowan Degraeve</strong>, sole proprietorship (French "micro-entreprise")`,
     "legal.mentions.li2": `Business registration number (SIRET): 108 626 847 00017`,
     "legal.mentions.li3": `Address: 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane, France`,
     "legal.mentions.li4": `Contact: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
     "legal.mentions.li5": `Publication director: Rowan Degraeve`,
     "legal.mentions.li6": `VAT not applicable, article 293 B of the French Tax Code (VAT exemption for small businesses)`,
     "legal.mentions.hostingTitle": `Hosting`,
-    "legal.mentions.hosting1": `<strong>Website:</strong> GitHub Pages — GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA.`,
-    "legal.mentions.hosting2": `<strong>Application data:</strong> Supabase — project hosted within the European Union.`,
+    "legal.mentions.hosting1": `<strong>Website:</strong> GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA).`,
+    "legal.mentions.hosting2": `<strong>Application data:</strong> Supabase, hosted within the European Union.`,
 
     "legal.cgu.title": `Terms of use and sale`,
     "legal.cgu.t1": `2.1 Purpose`,
@@ -289,7 +289,7 @@ an account in the event of a breach of these terms, fraudulent use, or non-payme
     "legal.cgu.p7": `You agree not to: attempt to access other users' data, disrupt the operation of the
 Service, publish unlawful, abusive content or content infringing the rights of third parties, or use the Service for
 purposes other than sports training and its management.`,
-    "legal.cgu.t8": `2.8 Health disclaimer — not medical advice`,
+    "legal.cgu.t8": `2.8 Health disclaimer (not medical advice)`,
     "legal.cgu.p8": `Sillance is a training planning and analysis tool. The indicators provided (training
 load, freshness, zones, AI-generated summaries, etc.) are
 <strong>estimates for informational purposes</strong>: they do not constitute medical advice or a prescription.
@@ -317,7 +317,7 @@ before any legal action; consumers may use a consumer mediator free of charge
 <span class="todo">(a consumer mediator will be appointed when the service launches)</span>. Failing that, the French courts have jurisdiction.`,
 
     "legal.priv.title": `Privacy policy (GDPR)`,
-    "legal.priv.controller": `<strong>Data controller:</strong> Rowan Degraeve, sole proprietorship (SIRET 108 626 847 00017) —
+    "legal.priv.controller": `<strong>Data controller:</strong> Rowan Degraeve, sole proprietorship (SIRET 108 626 847 00017),
 contact: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
     "legal.priv.t1": `3.1 Data collected and purposes`,
     "legal.priv.th1": `Data`,
@@ -351,7 +351,7 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.eu": `European Union`,
     "legal.priv.sub2.b": `Payments and subscriptions`,
     "legal.priv.sub2.c": `EU / safeguarded transfers (standard contractual clauses)`,
-    "legal.priv.sub3.b": `AI summary generation (add-on) — only receives the anonymized numerical summary of the session, never your identity`,
+    "legal.priv.sub3.b": `AI summary generation (add-on), which only receives the anonymized numerical summary of the session, never your identity`,
     "legal.priv.sub3.c": `United States (standard contractual clauses)`,
     "legal.priv.sub4.b": `Static site hosting (no personal data)`,
     "legal.priv.us": `United States`,
@@ -369,8 +369,8 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.ret7": `Technical database backups: rolling retention of 30 days maximum, solely for service continuity.`,
     "legal.priv.t5": `3.5 Your rights`,
     "legal.priv.p5": `You have the right to access, rectify, erase, port, restrict and object to processing,
-as well as the right to withdraw your consent at any time (notably for health data — withdrawal
-disables the related features: check-ins, cardiac analysis). To exercise these rights:
+as well as the right to withdraw your consent at any time (notably for health data: withdrawal
+disables the related features, check-ins, cardiac analysis). To exercise these rights:
 <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>. Response within 30 days. You can file a
 complaint with the CNIL, the French data protection authority (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Minors`,
@@ -379,7 +379,7 @@ parental authority, collected in the application when joining a club.`,
     "legal.priv.t7": `3.7 Cookies and consent management`,
     "legal.priv.p7": `Sillance stores <strong>strictly necessary</strong> items for the site to function (authentication, language, theme,
 display preferences): these are active by default and require no consent. A banner shown on your first visit lets you
-<strong>accept or reject</strong> an optional <strong>anonymous audience measurement</strong> category — not in use today, prepared for a
+<strong>accept or reject</strong> an optional <strong>anonymous audience measurement</strong> category, not in use today, prepared for a
 possible future evolution of the site, with no advertising tracker and no data resale. You can change your choice at any
 time via the "🍪" button shown at the bottom of the screen, or by clearing your browser's site data.`,
     "legal.priv.ckth1": `Item`,
@@ -397,7 +397,7 @@ time via the "🍪" button shown at the bottom of the screen, or by clearing you
     "legal.priv.ck3.c": `12 months, then asked again`,
     "legal.priv.ck4.a": `Audience measurement`,
     "legal.priv.ck4.b": `Anonymised visit statistics`,
-    "legal.priv.ck4.c": `Not applicable — feature not enabled`,
+    "legal.priv.ck4.c": `Not applicable (feature not enabled)`,
     "legal.priv.necessary": `Necessary`,
     "legal.priv.optional": `Optional (subject to your consent)`,
     "legal.priv.t8": `3.8 Security`,
@@ -405,31 +405,31 @@ time via the "🍪" button shown at the bottom of the screen, or by clearing you
 role at the database level (Row Level Security); payments are processed exclusively by Stripe
 (PCI-DSS certified). In the event of a data breach likely to create a risk to your rights, you and the
 CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
-    "legal.footer": `Sillance — sole proprietorship · <a href="index.html">Back to site</a>`,
+    "legal.footer": `Sillance, sole proprietorship · <a href="index.html">Back to site</a>`,
   };
 
   var es = {
-    "legal.pageTitle": `Sillance — Aviso legal, Términos y Privacidad`,
+    "legal.pageTitle": `Sillance: Aviso legal, Términos y Privacidad`,
     "legal.nav.mentions": `Aviso legal`,
     "legal.nav.cgu": `Términos de uso`,
     "legal.nav.confidentialite": `Privacidad`,
     "legal.h1": `Información legal`,
-    "legal.updated": `Versión provisional — Sillance está en fase de prelanzamiento.`,
+    "legal.updated": `Versión provisional. Sillance está en fase de prelanzamiento.`,
     "legal.langNote": `En caso de discrepancia entre las versiones, prevalece la versión francesa.`,
     "legal.provisional": `<b>Servicio en fase de prelanzamiento.</b> Todavía no se cobra ningún pago real en esta etapa; el mediador de consumo se designará en la apertura oficial del servicio.`,
 
     "legal.mentions.title": `Aviso legal`,
     "legal.mentions.editorTitle": `Editor del sitio`,
     "legal.mentions.editorIntro": `El sitio y la aplicación Sillance (en adelante «el Servicio») son editados por:`,
-    "legal.mentions.li1": `<strong>Rowan Degraeve</strong> — micro-empresa (autónomo francés)`,
+    "legal.mentions.li1": `<strong>Rowan Degraeve</strong>, micro-empresa (autónomo francés)`,
     "legal.mentions.li2": `Número de registro (SIRET): 108 626 847 00017`,
     "legal.mentions.li3": `Dirección: 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane, Francia`,
     "legal.mentions.li4": `Contacto: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
     "legal.mentions.li5": `Director de publicación: Rowan Degraeve`,
     "legal.mentions.li6": `IVA no aplicable, artículo 293 B del Código General de Impuestos francés (franquicia de IVA)`,
     "legal.mentions.hostingTitle": `Alojamiento`,
-    "legal.mentions.hosting1": `<strong>Sitio web:</strong> GitHub Pages — GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, EE. UU.`,
-    "legal.mentions.hosting2": `<strong>Datos de la aplicación:</strong> Supabase — proyecto alojado en la Unión Europea.`,
+    "legal.mentions.hosting1": `<strong>Sitio web:</strong> GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, EE. UU.).`,
+    "legal.mentions.hosting2": `<strong>Datos de la aplicación:</strong> Supabase, alojado en la Unión Europea.`,
 
     "legal.cgu.title": `Términos y condiciones generales de uso y venta`,
     "legal.cgu.t1": `2.1 Objeto`,
@@ -491,7 +491,7 @@ una cuenta en caso de incumplimiento de estas condiciones, uso fraudulento o imp
     "legal.cgu.p7": `Te comprometes a no: intentar acceder a datos de otros usuarios, perturbar el funcionamiento del
 Servicio, publicar contenido ilícito, injurioso o que vulnere derechos de terceros, ni usar el Servicio con
 fines distintos al entrenamiento deportivo y su gestión.`,
-    "legal.cgu.t8": `2.8 Advertencia de salud — no es un consejo médico`,
+    "legal.cgu.t8": `2.8 Advertencia de salud (no es un consejo médico)`,
     "legal.cgu.p8": `Sillance es una herramienta de planificación y análisis del entrenamiento. Los indicadores proporcionados (carga
 de entrenamiento, frescura, zonas, resúmenes generados por inteligencia artificial, etc.) son
 <strong>estimaciones con fines informativos</strong>: no constituyen ni un consejo médico ni una prescripción.
@@ -519,7 +519,7 @@ antes de cualquier acción judicial; los consumidores pueden recurrir gratuitame
 <span class="todo">(se designará un mediador de consumo en la apertura del servicio)</span>. En su defecto, los tribunales franceses son competentes.`,
 
     "legal.priv.title": `Política de privacidad (RGPD)`,
-    "legal.priv.controller": `<strong>Responsable del tratamiento:</strong> Rowan Degraeve, micro-empresa (SIRET 108 626 847 00017) —
+    "legal.priv.controller": `<strong>Responsable del tratamiento:</strong> Rowan Degraeve, micro-empresa (SIRET 108 626 847 00017),
 contacto: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
     "legal.priv.t1": `3.1 Datos recopilados y finalidades`,
     "legal.priv.th1": `Datos`,
@@ -553,7 +553,7 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.eu": `Unión Europea`,
     "legal.priv.sub2.b": `Pagos y suscripciones`,
     "legal.priv.sub2.c": `UE / transferencias reguladas (cláusulas contractuales tipo)`,
-    "legal.priv.sub3.b": `Generación de resúmenes de IA (add-on) — recibe únicamente el balance numérico y anonimizado de la sesión, nunca tu identidad`,
+    "legal.priv.sub3.b": `Generación de resúmenes de IA (add-on), que recibe únicamente el balance numérico y anonimizado de la sesión, nunca tu identidad`,
     "legal.priv.sub3.c": `Estados Unidos (cláusulas contractuales tipo)`,
     "legal.priv.sub4.b": `Alojamiento del sitio estático (sin datos personales)`,
     "legal.priv.us": `Estados Unidos`,
@@ -571,7 +571,7 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.ret7": `Copias de seguridad técnicas de la base de datos: retención móvil de 30 días como máximo, solo para la continuidad del servicio.`,
     "legal.priv.t5": `3.5 Tus derechos`,
     "legal.priv.p5": `Dispones de los derechos de acceso, rectificación, supresión, portabilidad, limitación y oposición,
-así como del derecho a retirar tu consentimiento en cualquier momento (en particular para los datos de salud — la retirada
+así como del derecho a retirar tu consentimiento en cualquier momento (en particular para los datos de salud: la retirada
 desactiva las funcionalidades correspondientes: check-ins, análisis cardíaco). Para ejercerlos:
 <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>. Respuesta en un plazo de 30 días. Puedes presentar una
 reclamación ante la CNIL, la autoridad francesa de protección de datos (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
@@ -581,7 +581,7 @@ la patria potestad, recogido en la aplicación al afiliarse a un club.`,
     "legal.priv.t7": `3.7 Cookies y gestión del consentimiento`,
     "legal.priv.p7": `Sillance almacena elementos <strong>estrictamente necesarios</strong> para el funcionamiento del sitio (autenticación, idioma,
 tema, preferencias de visualización): están activos por defecto y no requieren consentimiento. Un banner mostrado en tu
-primera visita te permite <strong>aceptar o rechazar</strong> una categoría opcional de <strong>medición de audiencia anónima</strong> —
+primera visita te permite <strong>aceptar o rechazar</strong> una categoría opcional de <strong>medición de audiencia anónima</strong>,
 no utilizada actualmente, preparada para una posible evolución futura del sitio, sin rastreador publicitario ni reventa de
 datos. Puedes cambiar tu elección en cualquier momento mediante el botón «🍪» que aparece en la parte inferior de la
 pantalla, o borrando los datos del sitio en tu navegador.`,
@@ -600,7 +600,7 @@ pantalla, o borrando los datos del sitio en tu navegador.`,
     "legal.priv.ck3.c": `12 meses, después se vuelve a preguntar`,
     "legal.priv.ck4.a": `Medición de audiencia`,
     "legal.priv.ck4.b": `Estadísticas de visitas anonimizadas`,
-    "legal.priv.ck4.c": `No aplicable — función no activada`,
+    "legal.priv.ck4.c": `No aplicable (función no activada)`,
     "legal.priv.necessary": `Necesaria`,
     "legal.priv.optional": `Opcional (sujeta a tu consentimiento)`,
     "legal.priv.t8": `3.8 Seguridad`,
@@ -608,7 +608,7 @@ pantalla, o borrando los datos del sitio en tu navegador.`,
 rol aplicada a nivel de base de datos (Row Level Security); pagos procesados exclusivamente por Stripe
 (certificado PCI-DSS). En caso de violación de datos que pueda suponer un riesgo para tus derechos, tú y la
 CNIL seréis notificados conforme a los artículos 33 y 34 del RGPD.`,
-    "legal.footer": `Sillance — micro-empresa · <a href="index.html">Volver al sitio</a>`,
+    "legal.footer": `Sillance, micro-empresa · <a href="index.html">Volver al sitio</a>`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

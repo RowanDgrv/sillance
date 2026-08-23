@@ -1,10 +1,10 @@
 /* Sillance — dictionnaire i18n de la page démo technique (front + back-end) */
 (function(){
   var fr = {
-    "demo.title": `Sillance — Démo (front + back-end)`,
+    "demo.title": `Sillance · Démo (front + back-end)`,
     "demo.tag": `Coaching triathlon · Hyrox`,
-    "demo.lead": `Plateforme de coaching pour les 3 rôles — <b>coach</b>, <b>athlète</b> et
-  <b>club</b> — avec synchronisation des montres connectées. Ci-dessous : l'application
+    "demo.lead": `Plateforme de coaching pour les 3 rôles (<b>coach</b>, <b>athlète</b> et
+  <b>club</b>) avec synchronisation des montres connectées. Ci-dessous : l'application
   (front) et l'architecture back-end, prêtes à présenter.`,
     "demo.stat.tables": `tables Postgres (RLS)`,
     "demo.stat.functions": `edge functions`,
@@ -41,13 +41,13 @@
     <span class="arrow">→</span> import des activités <span class="arrow">→</span>
     <b>external_activities</b> <span class="arrow">→</span> affichage « Activités synchronisées ».<br>
     Puis chaque nouvelle sortie est poussée en temps réel par <b>strava-webhook</b>.`,
-    "demo.footer": `Sillance — démo locale. Détails de mise en ligne : <code>~/pairform-backend/DEPLOY.md</code>.`,
+    "demo.footer": `Sillance, démo locale. Détails de mise en ligne : <code>~/pairform-backend/DEPLOY.md</code>.`,
   };
   var en = {
-    "demo.title": `Sillance — Demo (front + back-end)`,
+    "demo.title": `Sillance · Demo (front + back-end)`,
     "demo.tag": `Triathlon · Hyrox coaching`,
-    "demo.lead": `Coaching platform for all 3 roles — <b>coach</b>, <b>athlete</b> and
-  <b>club</b> — with connected watch sync. Below: the application
+    "demo.lead": `Coaching platform for all 3 roles (<b>coach</b>, <b>athlete</b> and
+  <b>club</b>) with connected watch sync. Below: the application
   (front-end) and the back-end architecture, ready to present.`,
     "demo.stat.tables": `Postgres tables (RLS)`,
     "demo.stat.functions": `edge functions`,
@@ -84,13 +84,13 @@
     <span class="arrow">→</span> activity import <span class="arrow">→</span>
     <b>external_activities</b> <span class="arrow">→</span> "Synced activities" display.<br>
     Every new outing is then pushed in real time by <b>strava-webhook</b>.`,
-    "demo.footer": `Sillance — local demo. Deployment details: <code>~/pairform-backend/DEPLOY.md</code>.`,
+    "demo.footer": `Sillance, local demo. Deployment details: <code>~/pairform-backend/DEPLOY.md</code>.`,
   };
   var es = {
-    "demo.title": `Sillance — Demo (front + back-end)`,
+    "demo.title": `Sillance · Demo (front + back-end)`,
     "demo.tag": `Coaching de triatlón · Hyrox`,
-    "demo.lead": `Plataforma de coaching para los 3 roles — <b>entrenador</b>, <b>atleta</b> y
-  <b>club</b> — con sincronización de relojes conectados. Abajo: la aplicación
+    "demo.lead": `Plataforma de coaching para los 3 roles (<b>entrenador</b>, <b>atleta</b> y
+  <b>club</b>) con sincronización de relojes conectados. Abajo: la aplicación
   (front) y la arquitectura back-end, listas para presentar.`,
     "demo.stat.tables": `tablas Postgres (RLS)`,
     "demo.stat.functions": `edge functions`,
@@ -127,7 +127,7 @@
     <span class="arrow">→</span> importación de actividades <span class="arrow">→</span>
     <b>external_activities</b> <span class="arrow">→</span> muestra «Actividades sincronizadas».<br>
     Luego cada nueva salida se envía en tiempo real por <b>strava-webhook</b>.`,
-    "demo.footer": `Sillance — demo local. Detalles de despliegue: <code>~/pairform-backend/DEPLOY.md</code>.`,
+    "demo.footer": `Sillance, demo local. Detalles de despliegue: <code>~/pairform-backend/DEPLOY.md</code>.`,
   };
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
   Object.assign(window.SIL_I18N.fr, fr);

@@ -1,7 +1,7 @@
 /* Sillance — dictionnaire i18n de la page 404 */
 (function(){
   var fr = {
-    "p404.title": `Page introuvable — Sillance`,
+    "p404.title": `Page introuvable · Sillance`,
     "p404.code": `Erreur 404`,
     "p404.h1": `Hors du <span class="o">sillage</span>`,
     "p404.text": `Cette page n'existe pas ou a été déplacée. Reviens dans le courant.`,
@@ -9,7 +9,7 @@
     "p404.demo": `Découvrir la démo`,
   };
   var en = {
-    "p404.title": `Page not found — Sillance`,
+    "p404.title": `Page not found · Sillance`,
     "p404.code": `Error 404`,
     "p404.h1": `Out of the <span class="o">wake</span>`,
     "p404.text": `This page doesn't exist or has been moved. Get back into the current.`,
@@ -17,7 +17,7 @@
     "p404.demo": `Try the demo`,
   };
   var es = {
-    "p404.title": `Página no encontrada — Sillance`,
+    "p404.title": `Página no encontrada · Sillance`,
     "p404.code": `Error 404`,
     "p404.h1": `Fuera de la <span class="o">estela</span>`,
     "p404.text": `Esta página no existe o ha sido movida. Vuelve a la corriente.`,
