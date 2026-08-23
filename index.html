@@ -4,7 +4,7 @@
 <!-- CSP : landing statique (polices Google + inline WebGL, aucun appel externe).
      Note : frame-ancestors/X-Frame-Options ne sont pas applicables via <meta>
      (en-tête HTTP requis, indisponible sur GitHub Pages). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title data-i18n="meta.title">Sillance, logiciel de coaching triathlon &amp; Hyrox</title>
 <meta name="description" data-i18n-attr="content:meta.description" content="Sillance, la plateforme de coaching qui met ton entraînement dans le sillage de ton coach : data, planning et facturation pour le triathlon, le Hyrox et la course à pied.">
@@ -429,4 +429,5 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 <script src="./sillance-flow.js"></script>
 <script src="./sillance-index.js"></script>
 <script src="./sillance-cookies.js"></script>
+<script src="./sillance-analytics.js"></script>
 </body></html>

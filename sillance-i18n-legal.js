@@ -5,6 +5,7 @@
 (function(){
   var fr = {
     "legal.pageTitle": `Sillance : Mentions légales, CGU & Confidentialité`,
+    "legal.metaDescription": `Mentions légales, conditions générales d'utilisation et de vente, et politique de confidentialité RGPD de Sillance, la plateforme de coaching triathlon et Hyrox.`,
     "legal.nav.mentions": `Mentions légales`,
     "legal.nav.cgu": `CGU / CGV`,
     "legal.nav.confidentialite": `Confidentialité`,
@@ -164,6 +165,7 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.ret5": `Documents de facturation : 10 ans (obligation comptable, art. L123-22 du Code de commerce).`,
     "legal.priv.ret6": `Jetons de connexion aux services tiers (Garmin, Coros, Strava) : supprimés dès la déconnexion du service.`,
     "legal.priv.ret7": `Sauvegardes techniques de la base de données : rétention glissante de 30 jours maximum, à seule fin de continuité de service.`,
+    "legal.priv.ret8": `Mesure d'audience (si acceptée) : 13 mois, en agrégat, sans identifiant permettant de relier plusieurs visites à une même personne.`,
     "legal.priv.t5": `3.5 Vos droits`,
     "legal.priv.p5": `Vous disposez des droits d'accès, de rectification, d'effacement, de portabilité, de limitation et d'opposition,
 ainsi que du droit de retirer votre consentement à tout moment (notamment pour les données de santé : le retrait
@@ -177,9 +179,10 @@ l'autorité parentale, recueilli dans l'application lors de l'adhésion à un cl
     "legal.priv.p7": `Sillance dépose des éléments de stockage <strong>strictement nécessaires</strong> au fonctionnement du site (authentification,
 langue, thème, préférences d'affichage) : ils sont actifs par défaut et ne requièrent pas de consentement (art. 82 de la loi
 Informatique et Libertés). Un bandeau affiché à votre première visite vous permet d'<strong>accepter ou refuser</strong> une
-catégorie optionnelle de <strong>mesure d'audience anonyme</strong>, non utilisée à ce jour, préparée pour une éventuelle évolution
-du site, sans traceur publicitaire ni revente de données. Vous pouvez modifier votre choix à tout moment via le bouton
-« cookies » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.`,
+catégorie optionnelle de <strong>mesure d'audience anonyme</strong> : si vous l'acceptez, la page consultée, le site
+d'origine et la langue d'affichage sont comptabilisés, sans cookie, sans identifiant et sans possibilité de vous
+identifier individuellement, sans traceur publicitaire ni revente de données. Vous pouvez modifier votre choix à tout
+moment via le bouton « cookies » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.`,
     "legal.priv.ckth1": `Élément`,
     "legal.priv.ckth2": `Finalité`,
     "legal.priv.ckth3": `Durée`,
@@ -194,8 +197,8 @@ du site, sans traceur publicitaire ni revente de données. Vous pouvez modifier 
     "legal.priv.ck3.b": `Retenir votre réponse au bandeau`,
     "legal.priv.ck3.c": `12 mois, puis nouvelle demande`,
     "legal.priv.ck4.a": `Mesure d'audience`,
-    "legal.priv.ck4.b": `Statistiques de fréquentation anonymisées`,
-    "legal.priv.ck4.c": `Non applicable (fonctionnalité non activée)`,
+    "legal.priv.ck4.b": `Statistiques de fréquentation anonymes (page, site d'origine, langue)`,
+    "legal.priv.ck4.c": `13 mois, en agrégat, sans identifiant individuel`,
     "legal.priv.necessary": `Nécessaire`,
     "legal.priv.optional": `Optionnelle (soumise à votre accord)`,
     "legal.priv.t8": `3.8 Sécurité`,
@@ -208,6 +211,7 @@ CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
 
   var en = {
     "legal.pageTitle": `Sillance: Legal Notice, Terms & Privacy`,
+    "legal.metaDescription": `Legal notice, terms of use and sale, and GDPR privacy policy for Sillance, the triathlon and Hyrox coaching platform.`,
     "legal.nav.mentions": `Legal notice`,
     "legal.nav.cgu": `Terms of use`,
     "legal.nav.confidentialite": `Privacy`,
@@ -367,6 +371,7 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.ret5": `Billing documents: 10 years (accounting obligation, art. L123-22 of the French Commercial Code).`,
     "legal.priv.ret6": `Third-party service connection tokens (Garmin, Coros, Strava): deleted as soon as the service is disconnected.`,
     "legal.priv.ret7": `Technical database backups: rolling retention of 30 days maximum, solely for service continuity.`,
+    "legal.priv.ret8": `Audience measurement (if accepted): 13 months, in aggregate, with no identifier linking multiple visits to the same person.`,
     "legal.priv.t5": `3.5 Your rights`,
     "legal.priv.p5": `You have the right to access, rectify, erase, port, restrict and object to processing,
 as well as the right to withdraw your consent at any time (notably for health data: withdrawal
@@ -379,9 +384,10 @@ parental authority, collected in the application when joining a club.`,
     "legal.priv.t7": `3.7 Cookies and consent management`,
     "legal.priv.p7": `Sillance stores <strong>strictly necessary</strong> items for the site to function (authentication, language, theme,
 display preferences): these are active by default and require no consent. A banner shown on your first visit lets you
-<strong>accept or reject</strong> an optional <strong>anonymous audience measurement</strong> category, not in use today, prepared for a
-possible future evolution of the site, with no advertising tracker and no data resale. You can change your choice at any
-time via the "🍪" button shown at the bottom of the screen, or by clearing your browser's site data.`,
+<strong>accept or reject</strong> an optional <strong>anonymous audience measurement</strong> category: if you accept it, the page
+visited, the referring site and the display language are counted, with no cookie, no identifier and no way to identify
+you individually, with no advertising tracker and no data resale. You can change your choice at any time via the
+"cookies" button shown at the bottom of the screen, or by clearing your browser's site data.`,
     "legal.priv.ckth1": `Item`,
     "legal.priv.ckth2": `Purpose`,
     "legal.priv.ckth3": `Duration`,
@@ -396,8 +402,8 @@ time via the "🍪" button shown at the bottom of the screen, or by clearing you
     "legal.priv.ck3.b": `Remember your answer to the banner`,
     "legal.priv.ck3.c": `12 months, then asked again`,
     "legal.priv.ck4.a": `Audience measurement`,
-    "legal.priv.ck4.b": `Anonymised visit statistics`,
-    "legal.priv.ck4.c": `Not applicable (feature not enabled)`,
+    "legal.priv.ck4.b": `Anonymous visit statistics (page, referring site, language)`,
+    "legal.priv.ck4.c": `13 months, in aggregate, with no individual identifier`,
     "legal.priv.necessary": `Necessary`,
     "legal.priv.optional": `Optional (subject to your consent)`,
     "legal.priv.t8": `3.8 Security`,
@@ -410,6 +416,7 @@ CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
 
   var es = {
     "legal.pageTitle": `Sillance: Aviso legal, Términos y Privacidad`,
+    "legal.metaDescription": `Aviso legal, términos generales de uso y venta, y política de privacidad RGPD de Sillance, la plataforma de coaching de triatlón y Hyrox.`,
     "legal.nav.mentions": `Aviso legal`,
     "legal.nav.cgu": `Términos de uso`,
     "legal.nav.confidentialite": `Privacidad`,
@@ -569,6 +576,7 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.ret5": `Documentos de facturación: 10 años (obligación contable, art. L123-22 del Código de Comercio francés).`,
     "legal.priv.ret6": `Tokens de conexión a servicios externos (Garmin, Coros, Strava): eliminados en cuanto se desconecta el servicio.`,
     "legal.priv.ret7": `Copias de seguridad técnicas de la base de datos: retención móvil de 30 días como máximo, solo para la continuidad del servicio.`,
+    "legal.priv.ret8": `Medición de audiencia (si se acepta): 13 meses, en conjunto agregado, sin identificador que vincule varias visitas a la misma persona.`,
     "legal.priv.t5": `3.5 Tus derechos`,
     "legal.priv.p5": `Dispones de los derechos de acceso, rectificación, supresión, portabilidad, limitación y oposición,
 así como del derecho a retirar tu consentimiento en cualquier momento (en particular para los datos de salud: la retirada
@@ -581,9 +589,10 @@ la patria potestad, recogido en la aplicación al afiliarse a un club.`,
     "legal.priv.t7": `3.7 Cookies y gestión del consentimiento`,
     "legal.priv.p7": `Sillance almacena elementos <strong>estrictamente necesarios</strong> para el funcionamiento del sitio (autenticación, idioma,
 tema, preferencias de visualización): están activos por defecto y no requieren consentimiento. Un banner mostrado en tu
-primera visita te permite <strong>aceptar o rechazar</strong> una categoría opcional de <strong>medición de audiencia anónima</strong>,
-no utilizada actualmente, preparada para una posible evolución futura del sitio, sin rastreador publicitario ni reventa de
-datos. Puedes cambiar tu elección en cualquier momento mediante el botón «🍪» que aparece en la parte inferior de la
+primera visita te permite <strong>aceptar o rechazar</strong> una categoría opcional de <strong>medición de audiencia anónima</strong>:
+si la aceptas, se contabilizan la página visitada, el sitio de origen y el idioma de visualización, sin cookie, sin
+identificador y sin posibilidad de identificarte individualmente, sin rastreador publicitario ni reventa de datos.
+Puedes cambiar tu elección en cualquier momento mediante el botón «cookies» que aparece en la parte inferior de la
 pantalla, o borrando los datos del sitio en tu navegador.`,
     "legal.priv.ckth1": `Elemento`,
     "legal.priv.ckth2": `Finalidad`,
@@ -599,8 +608,8 @@ pantalla, o borrando los datos del sitio en tu navegador.`,
     "legal.priv.ck3.b": `Recordar tu respuesta al banner`,
     "legal.priv.ck3.c": `12 meses, después se vuelve a preguntar`,
     "legal.priv.ck4.a": `Medición de audiencia`,
-    "legal.priv.ck4.b": `Estadísticas de visitas anonimizadas`,
-    "legal.priv.ck4.c": `No aplicable (función no activada)`,
+    "legal.priv.ck4.b": `Estadísticas de visitas anónimas (página, sitio de origen, idioma)`,
+    "legal.priv.ck4.c": `13 meses, en conjunto agregado, sin identificador individual`,
     "legal.priv.necessary": `Necesaria`,
     "legal.priv.optional": `Opcional (sujeta a tu consentimiento)`,
     "legal.priv.t8": `3.8 Seguridad`,

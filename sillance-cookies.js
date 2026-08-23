@@ -18,11 +18,11 @@
 
   var TXT = {
     fr: {
-      text: 'Sillance utilise des cookies et un stockage local strictement nécessaires au fonctionnement du site (connexion, préférences). Avec votre accord, nous pourrions aussi utiliser une mesure d’audience anonyme pour améliorer le service, sans aucun traceur publicitaire.',
+      text: 'Sillance utilise des cookies et un stockage local strictement nécessaires au fonctionnement du site (connexion, préférences). Avec votre accord, une mesure d’audience anonyme nous aide à améliorer le service, sans aucun traceur publicitaire.',
       necessaryTitle: 'Strictement nécessaires',
       necessaryDesc: 'Connexion, sécurité, préférences d’affichage. Toujours actifs, sans dépôt possible d’opposition.',
       analyticsTitle: 'Mesure d’audience',
-      analyticsDesc: 'Statistiques de fréquentation anonymisées. Non utilisé actuellement ; votre choix est conservé pour le jour où ce serait le cas.',
+      analyticsDesc: 'Page visitée, site d’origine et langue, comptés de façon anonyme et agrégée. Aucun cookie, aucun identifiant, aucune donnée revendue.',
       accept: 'Accepter tout',
       reject: 'Refuser',
       customize: 'Personnaliser',
@@ -32,11 +32,11 @@
       close: 'Fermer'
     },
     en: {
-      text: 'Sillance uses cookies and local storage strictly necessary for the site to work (login, preferences). With your consent, we could also use anonymous audience measurement to improve the service, with no advertising trackers.',
+      text: 'Sillance uses cookies and local storage strictly necessary for the site to work (login, preferences). With your consent, anonymous audience measurement helps us improve the service, with no advertising trackers.',
       necessaryTitle: 'Strictly necessary',
       necessaryDesc: 'Login, security, display preferences. Always active, cannot be disabled.',
       analyticsTitle: 'Audience measurement',
-      analyticsDesc: 'Anonymised visit statistics. Not in use today; your choice is kept for if that changes.',
+      analyticsDesc: 'Page visited, referring site and language, counted anonymously in aggregate. No cookie, no identifier, no data resold.',
       accept: 'Accept all',
       reject: 'Reject',
       customize: 'Customize',
@@ -46,11 +46,11 @@
       close: 'Close'
     },
     es: {
-      text: 'Sillance utiliza cookies y almacenamiento local estrictamente necesarios para el funcionamiento del sitio (conexión, preferencias). Con su consentimiento, también podríamos usar una medición de audiencia anónima para mejorar el servicio, sin ningún rastreador publicitario.',
+      text: 'Sillance utiliza cookies y almacenamiento local estrictamente necesarios para el funcionamiento del sitio (conexión, preferencias). Con tu consentimiento, una medición de audiencia anónima nos ayuda a mejorar el servicio, sin ningún rastreador publicitario.',
       necessaryTitle: 'Estrictamente necesarias',
       necessaryDesc: 'Conexión, seguridad, preferencias de visualización. Siempre activas, no se pueden desactivar.',
       analyticsTitle: 'Medición de audiencia',
-      analyticsDesc: 'Estadísticas de visitas anonimizadas. No se usa actualmente; su elección se conserva por si eso cambia.',
+      analyticsDesc: 'Página visitada, sitio de origen e idioma, contados de forma anónima y agregada. Sin cookie, sin identificador, sin venta de datos.',
       accept: 'Aceptar todo',
       reject: 'Rechazar',
       customize: 'Personalizar',
