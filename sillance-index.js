@@ -24,6 +24,21 @@
   }
 })();
 
+/* CTA fixe mobile : le nav du haut a déjà un bouton sticky, mais un coin
+   supérieur reste peu accessible au pouce en usage une main sur mobile — une
+   barre pleine largeur en bas du viewport est la position réellement
+   atteignable. Repoussée après le hero pour ne pas s'afficher dès le
+   chargement (le hero a déjà ses 2 CTA visibles). */
+(function(){
+  var bar = document.getElementById('mobileCta');
+  var hero = document.querySelector('.hero');
+  if(!bar || !hero || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(entries){
+    bar.classList.toggle('show', !entries[0].isIntersecting);
+  }, {threshold:0});
+  io.observe(hero);
+})();
+
 /* Cartes data : tilt 3D + halo qui suit le curseur */
 (function(){
   if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;

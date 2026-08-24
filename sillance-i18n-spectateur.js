@@ -2,6 +2,7 @@
 (function(){
   var fr = {
     "spec.title": `Suivre une course · Sillance`,
+    "spec.metaDescription": `Suis un athlète Sillance pendant sa course : repères laissés par le coach et résultat dès qu'il est synchronisé.`,
     "spec.loading": `Chargement…`,
     "spec.kicker": `Suivi de course`,
     "spec.notesTitle": `Repères laissés par le coach`,
@@ -17,6 +18,7 @@
   };
   var en = {
     "spec.title": `Follow a race · Sillance`,
+    "spec.metaDescription": `Follow a Sillance athlete during their race: notes left by the coach and the result as soon as it syncs.`,
     "spec.loading": `Loading…`,
     "spec.kicker": `Race tracking`,
     "spec.notesTitle": `Notes left by the coach`,
@@ -32,6 +34,7 @@
   };
   var es = {
     "spec.title": `Seguir una carrera · Sillance`,
+    "spec.metaDescription": `Sigue a un atleta de Sillance durante su carrera: notas dejadas por el entrenador y el resultado en cuanto se sincronice.`,
     "spec.loading": `Cargando…`,
     "spec.kicker": `Seguimiento de carrera`,
     "spec.notesTitle": `Notas dejadas por el entrenador`,
