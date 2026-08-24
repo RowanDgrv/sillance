@@ -2,6 +2,7 @@
 (function(){
   var fr = {
     "demo.title": `Sillance · Démo (front + back-end)`,
+    "demo.metaDescription": `Explore la démo interactive de Sillance : plan d'entraînement, suivi coach-athlète et facturation, sans créer de compte.`,
     "demo.tag": `Coaching triathlon · Hyrox`,
     "demo.lead": `Plateforme de coaching pour les 3 rôles (<b>coach</b>, <b>athlète</b> et
   <b>club</b>) avec synchronisation des montres connectées. Ci-dessous : l'application
@@ -45,6 +46,7 @@
   };
   var en = {
     "demo.title": `Sillance · Demo (front + back-end)`,
+    "demo.metaDescription": `Try the interactive Sillance demo: training plan, coach-athlete tracking and billing, no account needed.`,
     "demo.tag": `Triathlon · Hyrox coaching`,
     "demo.lead": `Coaching platform for all 3 roles (<b>coach</b>, <b>athlete</b> and
   <b>club</b>) with connected watch sync. Below: the application
@@ -88,6 +90,7 @@
   };
   var es = {
     "demo.title": `Sillance · Demo (front + back-end)`,
+    "demo.metaDescription": `Prueba la demo interactiva de Sillance: plan de entrenamiento, seguimiento coach-atleta y facturación, sin crear cuenta.`,
     "demo.tag": `Coaching de triatlón · Hyrox`,
     "demo.lead": `Plataforma de coaching para los 3 roles (<b>entrenador</b>, <b>atleta</b> y
   <b>club</b>) con sincronización de relojes conectados. Abajo: la aplicación

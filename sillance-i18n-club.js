@@ -50,6 +50,7 @@
     "club.title.dash": `Tableau de bord`,
     "club.titleSuffixBookingSpace": ` · espace réservations`,
     "club.pageTitle": `Espace salle : gestion créneaux, adhérents & facturation`,
+    "club.metaDescription": `L'espace club Sillance : crée tes créneaux, gère tes adhérents et encaisse tes cotisations, le tout depuis un seul tableau de bord.`,
     "club.toAssign": `à affecter`,
 
     "club.poweredBy": `Espace salle, propulsé par&nbsp;Sillance`,
@@ -130,6 +131,7 @@
     "club.title.dash": `Dashboard`,
     "club.titleSuffixBookingSpace": ` · booking space`,
     "club.pageTitle": `Gym space: manage time slots, members & billing`,
+    "club.metaDescription": `The Sillance club space: create your time slots, manage your members, and collect membership fees, all from one dashboard.`,
     "club.toAssign": `to assign`,
 
     "club.poweredBy": `Gym space, powered&nbsp;by&nbsp;Sillance`,
@@ -210,6 +212,7 @@
     "club.title.dash": `Panel`,
     "club.titleSuffixBookingSpace": ` · espacio de reservas`,
     "club.pageTitle": `Espacio del gimnasio: gestión de horarios, socios y facturación`,
+    "club.metaDescription": `El espacio club de Sillance: crea tus horarios, gestiona tus socios y cobra las cuotas, todo desde un solo panel.`,
     "club.toAssign": `por asignar`,
 
     "club.poweredBy": `Espacio gimnasio, con la tecnología de&nbsp;Sillance`,
