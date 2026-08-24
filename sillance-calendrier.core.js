@@ -647,7 +647,7 @@ function debriefsFor(aid){ return RACE_DEBRIEFS[aid] || (RACE_DEBRIEFS[aid]=[]);
 function myDebriefKey(){ return (window.PF?.user) ? PF.user.id : 'a1'; }
 function debriefItemHTML(d){
   const bits=[]; if(d.result) bits.push(dispoSafe(d.result)); if(d.felt) bits.push(dispoSafe(d.felt));
-  return `<div class="sn-item"><div class="sn-when">${dispoSafe(d.race)} — ${d.date?fmtDateFr(new Date(d.date+'T12:00:00')):''}</div><div class="sn-txt">${bits.join(' · ')||'—'}</div></div>`;
+  return `<div class="sn-item"><div class="sn-when">${dispoSafe(d.race)} · ${d.date?fmtDateFr(new Date(d.date+'T12:00:00')):''}</div><div class="sn-txt">${bits.join(' · ')||'—'}</div></div>`;
 }
 function debriefsBlockHTML(list, emptyTxt){
   if(!list || !list.length) return `<p class="club-hint">${emptyTxt}</p>`;
@@ -685,7 +685,7 @@ function coPendingItemHTML(r, viewerRole, aid){
   const who = r.requestedByRole==='coach' ? 'un coach' : "l'athlète";
   return `<div class="sn-item">
     <div class="sn-when">${dispoSafe(r.roleLabel||'Coach')}</div>
-    <div class="sn-txt">${dispoSafe(r.coachEmail)} — proposé par ${who}
+    <div class="sn-txt">${dispoSafe(r.coachEmail)} (proposé par ${who})
       ${canDecide ? `<div style="margin-top:6px;display:flex;gap:8px">
         <button class="btn" style="padding:5px 12px;font-size:11.5px" data-cc-approve="${r.id}" data-cc-aid="${aid}">Valider</button>
         <button class="group-edit" style="padding:5px 12px;font-size:11.5px" data-cc-decline="${r.id}" data-cc-aid="${aid}">Refuser</button>
@@ -762,9 +762,9 @@ function readinessScore(){
   return Math.round((checkin.sommeil + (10-checkin.fatigue) + checkin.motivation)/30*100);
 }
 function readinessAdvice(s){
-  if(s>=75) return {c:'var(--good)', t:'Feu vert — la qualité passera bien aujourd\'hui'};
-  if(s>=55) return {c:'var(--bike)', t:'Correct — séance OK, garde une marge sur l\'intensité'};
-  return {c:'var(--run)', t:'Fatigue marquée — privilégie du Z1/Z2 ou du repos, préviens ton coach'};
+  if(s>=75) return {c:'var(--good)', t:'Feu vert : la qualité passera bien aujourd\'hui'};
+  if(s>=55) return {c:'var(--bike)', t:'Correct : séance OK, garde une marge sur l\'intensité'};
+  return {c:'var(--run)', t:'Fatigue marquée : privilégie du Z1/Z2 ou du repos, préviens ton coach'};
 }
 
 /* ---- sidebar dynamique selon le mode ---- */
@@ -814,7 +814,7 @@ function athNeedScore(a){
 function needRadarHTML(){
   if(!ROSTER.length) return '';
   const scored = ROSTER.map(a=>({a, ...athNeedScore(a)})).filter(x=>x.score>0).sort((x,y)=>y.score-x.score).slice(0,5);
-  if(!scored.length) return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-check"></i> Qui a besoin de toi</div><p class="club-hint">Rien d'urgent — le roster est propre aujourd'hui.</p></div>`;
+  if(!scored.length) return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-check"></i> Qui a besoin de toi</div><p class="club-hint">Rien d'urgent : le roster est propre aujourd'hui.</p></div>`;
   return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-alert-triangle"></i> Qui a besoin de toi cette semaine</div>
     ${scored.map(({a,reasons})=>`<div class="sn-item" style="cursor:pointer" data-need-aid="${a.id}"><div class="sn-when">${dispoSafe(a.name)}</div><div class="sn-txt">${reasons.map(dispoSafe).join(' · ')}</div></div>`).join('')}
   </div>`;
@@ -1028,7 +1028,7 @@ function renderSidebar(){
       </div>
       <div class="records" id="refsBlock">
         <h2>${tr('refs.title')}</h2>
-        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return tr('refs.never'); const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return tr('refs.lastUpdate', {days}) + (days>=90?' — '+tr('refs.retest'):''); })()}</p>
+        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return tr('refs.never'); const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return tr('refs.lastUpdate', {days}) + (days>=90?' : '+tr('refs.retest'):''); })()}</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
           ${[['ftp','FTP','W'],['pma',tr('refs.map'),'W'],['cpBike',tr('refs.bikeCp'),'W'],['vma',tr('refs.vVo2max'),'km/h'],['cv','CV','km/h'],['seuilRun',tr('refs.threshold'),'s/km'],['css','CSS','s/100m'],['fcMax',tr('refs.maxHr'),'bpm'],['fcRepos',tr('refs.restHr'),'bpm']].map(([k,l,u])=>`
           <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)"><span>${l} <em style="font-style:normal;opacity:.65">${u}</em></span>
@@ -1214,7 +1214,7 @@ function notifyCoach(a){
   const pre = a.level==='urgent' ? tr('notif.urgent') : tr('notif.alert');
   if('Notification' in window){
     if(Notification.permission==='granted'){
-      new Notification(`${pre} ${a.athlete} — ${tr('notif.freshness')} ${a.score}%`,
+      new Notification(`${pre} ${a.athlete} · ${tr('notif.freshness')} ${a.score}%`,
         {body:tr('notif.checkinBody', {sommeil:a.checkin.sommeil, fatigue:a.checkin.fatigue, motiv:a.checkin.motivation})});
     } else if(Notification.permission!=='denied'){
       Notification.requestPermission();
@@ -1387,7 +1387,7 @@ function buildMorningPreview(){
         if(channel !== 'email'){
           const reg = await enableMorningPush();
           // notification de test immédiate pour valider le canal
-          reg.showNotification('Sillance — '+m.title, {body:tr('morning.toBring')+' : '+m.gear.join(', '), icon:'./icon-192.png', tag:'sillance-test'});
+          reg.showNotification('Sillance · '+m.title, {body:tr('morning.toBring')+' : '+m.gear.join(', '), icon:'./icon-192.png', tag:'sillance-test'});
         }
         if(window.PF?.user && PF.saveNotifPrefs){
           await PF.saveNotifPrefs({ hour:hh, minute:mm - (mm % 15),
@@ -1747,7 +1747,7 @@ function tplCard(t, z){
    passe déjà par PF.scheduleSession séance par séance.
    ============================================================ */
 const CYCLES = [
-  {id:'c1', name:'Endurance — 4 semaines', weeks:4,
+  {id:'c1', name:'Endurance · 4 semaines', weeks:4,
    plan:(()=>{ const p={}; for(let w=0;w<4;w++){ p[w+'-0']=['t1']; p[w+'-1']=['t5']; p[w+'-3']=['t8']; p[w+'-5']=['t3']; p[w+'-6']=['t17']; } delete p['3-5']; return p; })()}
 ];
 let cycleState=null, cycleUid=10;
@@ -2062,7 +2062,7 @@ function settingsStructureHtml(){
         <div><div class="k">${tr('settings.nextPayment')}</div><div class="v">${tr('settings.renewalOn', {date:'09/08/2026'})}</div></div>
         <div><div class="k">${tr('settings.lastPaymentStatus')}</div><div class="v" style="color:var(--good)">${tr('settings.paid')}</div></div>
         <div><div class="k">${tr('settings.issueDate')}</div><div class="v">09/07/2026</div></div>
-        <div><div class="k">${tr('settings.paymentMethod')}</div><div class="v">Visa •••• 4242 — ${tr('settings.expires')} 11/2029</div></div>
+        <div><div class="k">${tr('settings.paymentMethod')}</div><div class="v">Visa •••• 4242 · ${tr('settings.expires')} 11/2029</div></div>
       </div>
       <div class="set-actions">
         <button class="btn cy-ghost" id="setPortalBtn"><i class="ic ic-credit-card"></i> ${tr('settings.detailsManage')}</button>
@@ -2071,7 +2071,7 @@ function settingsStructureHtml(){
       <p class="set-sub" style="margin:2px 0 12px">${tr('sidebar.unlockCoach')}</p>
       ${coachTiersHTML()}
       <div class="set-actions">
-        <button class="btn" id="setSubscribeBtn">${tr('sidebar.subscribe')} — ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/${tr('sidebar.perMonth')}</button>
+        <button class="btn" id="setSubscribeBtn">${tr('sidebar.subscribe')} · ${COACH_TIERS.find(t=>t.id===selectedCoachTier).price} €/${tr('sidebar.perMonth')}</button>
       </div>`}
     </div>
     <div class="set-upsell">
@@ -2357,7 +2357,7 @@ function renderWeekPulse(mon){
           <textarea id="wpAthNote" rows="2" placeholder="${tr('pulse.athNotePlaceholder')}" style="width:100%;box-sizing:border-box;margin-top:6px">${p.athleteNote?dispoSafe(p.athleteNote):''}</textarea>
           <button class="btn" id="wpAthSave" style="margin-top:6px">${tr('pulse.saveMyReview')}</button>
         ` : (p.athleteFeel||p.athleteNote) ? `
-          <div class="sn-txt">${p.athleteFeel&&WEEK_FEELS[p.athleteFeel]?`<b style="color:${WEEK_FEELS[p.athleteFeel].c}">${WEEK_FEELS[p.athleteFeel].l}</b>${p.athleteNote?' — ':''}`:''}${p.athleteNote?dispoSafe(p.athleteNote):''}</div>
+          <div class="sn-txt">${p.athleteFeel&&WEEK_FEELS[p.athleteFeel]?`<b style="color:${WEEK_FEELS[p.athleteFeel].c}">${WEEK_FEELS[p.athleteFeel].l}</b>${p.athleteNote?' · ':''}`:''}${p.athleteNote?dispoSafe(p.athleteNote):''}</div>
         ` : `<p class="club-hint">${tr('pulse.noAthleteReviewYet')}</p>`}
       </div>
       <div>
@@ -2834,7 +2834,7 @@ function openZoneEditor(){
   const el=document.createElement('div'); el.className='adh-overlay';
   el.innerHTML=`<div class="adh-modal zed-modal" role="dialog" aria-label="${tr('zoneEd.workZones')}">
     <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
-    <h3>${tr('zoneEd.workZones')} — ${dispoSafe(name)}</h3>
+    <h3>${tr('zoneEd.workZones')} · ${dispoSafe(name)}</h3>
     <p class="adh-sub">${tr('zoneEd.subtitle')}</p>
     <div class="zed-tabs">
       <button class="zed-tab on" data-ztab="ref">${tr('zoneEd.byReference')}</button>
@@ -2928,7 +2928,7 @@ function sessionNotesHTML(s){
     blk.lines.forEach(ln=>{
       if(ln.note && ln.note.trim()){
         const lbl = lineLabel(ln);
-        const pre = (blk.series>1?`${blk.series}× `:'') + (blk.title && !lbl.startsWith(blk.title) ? blk.title+' — ' : '');
+        const pre = (blk.series>1?`${blk.series}× `:'') + (blk.title && !lbl.startsWith(blk.title) ? blk.title+' · ' : '');
         items.push(`<div class="sn-item"><div class="sn-when">${dispoSafe(pre+lbl)}</div><div class="sn-txt">${dispoSafe(ln.note.trim())}</div></div>`);
       }
     });
@@ -3228,7 +3228,7 @@ function renderAthPicker(){
   if(!btn || !menu) return;
   if(!ROSTER.length){
     btn.innerHTML = `<span>Aucun athlète</span><span class="ap-chev"></span>`;
-    menu.innerHTML = `<div class="ap-head">Aucun athlète lié — invite ton premier athlète pour le suivre ici.</div>`;
+    menu.innerHTML = `<div class="ap-head">Aucun athlète lié. Invite ton premier athlète pour le suivre ici.</div>`;
     return;
   }
   const a = ROSTER[selectedAthleteIdx];
@@ -3327,7 +3327,7 @@ function exportBilan(name){
     const sessRows = recent.length?recent.map(({date,s})=>`<tr><td>${dfmt(date)}</td><td>${esc(s.title||s.disc||tr('bilan.session'))}</td><td>${s.tss?esc(s.tss)+' TSS':'—'}</td><td>${s.done?(s.rpe?'RPE '+esc(s.rpe):`<i class="ic ic-check"></i> ${tr('bilan.done')}`):tr('bilan.upcoming')}</td></tr>`).join(''):`<tr><td colspan="4">${tr('bilan.noSessionPeriod')}</td></tr>`;
     const gearRows = gear.length?gear.map(g=>{const p=g.max?Math.round(g.km/g.max*100):0;const c=p>=100?'bad':p>=85?'warn':'good';return `<div class="row"><span class="l">${esc(g.name)}</span><span class="v ${c}">${esc(g.km)} / ${esc(g.max||'?')} km · ${p}%</span></div>`;}).join(''):'';
     const lg=(window.SilI18n?SilI18n.getLang():'fr');
-    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.title')} — ${esc(name)}</title><style>
+    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.title')} · ${esc(name)}</title><style>
 @page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
 .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
@@ -3362,7 +3362,7 @@ table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{text-align:left
 <h2>${tr('bilan.recentSessions')}</h2>
 <table><thead><tr><th>${tr('invoices.date')}</th><th>${tr('bilan.session')}</th><th>${tr('modal.load')}</th><th>${tr('adherence.status')}</th></tr></thead><tbody>${sessRows}</tbody></table>
 ${gearRows?(`<h2>${tr('bilan.gearWear')}</h2>`+gearRows):''}
-<div class="foot"><span>${tr('bilan.generatedBy')} — ${today}</span><span>sillance.app</span></div>
+<div class="foot"><span>${tr('bilan.generatedBy')} : ${today}</span><span>sillance.app</span></div>
 </body></html>`;
     const w=window.open('','_blank');
     if(!w){ if(typeof toast==='function') toast(tr('toast.autorisePopUpsPourExporter')); return; }
@@ -3396,7 +3396,7 @@ function exportCaseStudy(name){
     const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const recRows = newRecs.length ? newRecs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v acc">${esc(r.v)}</span></div>`).join('') : '';
     const lg=(window.SilI18n?SilI18n.getLang():'fr');
-    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.progressTitle')} — ${esc(name)}</title><style>
+    const html=`<!doctype html><html lang="${lg}"><head><meta charset="utf-8"><title>${tr('bilan.progressTitle')} · ${esc(name)}</title><style>
 @page{size:A4;margin:13mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font:13px/1.5 -apple-system,system-ui,'Segoe UI',Roboto,sans-serif;color:#12203a}
 .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0B1120;padding-bottom:12px}
@@ -3425,7 +3425,7 @@ ${ctlDeltaPct!=null ? `<div class="hero"><div class="v">${ctlDeltaPct>0?'+':''}$
 </div>
 ${recRows?(`<h2>${tr('bilan.recordsBeaten')}</h2>${recRows}`):''}
 ${quote?(`<div class="quote">« ${esc(quote)} »<br><span style="font-style:normal;font-size:11px;color:#5a6a86">— ${esc(coachName)}</span></div>`):''}
-<div class="foot"><span>${tr('bilan.generatedBy')} — ${today}</span><span>sillance.app</span></div>
+<div class="foot"><span>${tr('bilan.generatedBy')} : ${today}</span><span>sillance.app</span></div>
 </body></html>`;
     const w=window.open('','_blank');
     if(!w){ if(typeof toast==='function') toast(tr('toast.autorisePopUpsPourExporter2')); return; }
@@ -3457,7 +3457,7 @@ function renderCoachBand(){
   const dk = athDispo(a);
   if(dk && dk!=='ok'){
     const d = DISPO_META[dk];
-    flags.unshift(`<span class="cb-flag ${dk==='fatigue'?'warn':'danger'}"><i class="ic ${d.ic}"></i>${d.l}${a.checkin.dispoNote?' — '+dispoSafe(a.checkin.dispoNote):''}</span>`);
+    flags.unshift(`<span class="cb-flag ${dk==='fatigue'?'warn':'danger'}"><i class="ic ${d.ic}"></i>${d.l}${a.checkin.dispoNote?' · '+dispoSafe(a.checkin.dispoNote):''}</span>`);
   }
   const hs = a.checkin && hrvStatus(a.checkin.hrv, ATHLETE_REF.hrvBase);
   if(hs && (hs.level==='low'||hs.level==='warn')){
@@ -3466,7 +3466,7 @@ function renderCoachBand(){
   const cp = athCycle(a);
   if(cp && (cp==='menstrual' || cp==='luteal' || cp==='ovulation')){
     const cm = CYCLE_META[cp];
-    flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>${tr('coachBand.cycle')} · ${cm.l} — ${cm.tip}</span>`);
+    flags.push(`<span class="cb-flag" style="border-color:color-mix(in srgb,${cm.c} 45%,var(--line));color:${cm.c}"><i class="ic ${cm.ic}"></i>${tr('coachBand.cycle')} · ${cm.l} : ${cm.tip}</span>`);
   }
   if(a.refsUpdatedAt){
     const refsAge = Math.floor((Date.now()-new Date(a.refsUpdatedAt).getTime())/86400000);
@@ -3947,7 +3947,7 @@ function clubBills(){
   CRENEAUX.filter(c=>c.price>0).forEach(c=>{
     c.attendees.forEach(id=>{
       if(!CLUB_ATHLETES.find(x=>x.id===id)) return;
-      bills.push({m:id, why:`${c.title} — ${tr('club.aLaCarte')}`, type:'card', amt:c.price, ok:true});
+      bills.push({m:id, why:`${c.title} · ${tr('club.aLaCarte')}`, type:'card', amt:c.price, ok:true});
     });
   });
   if(bills[2]) bills[2].ok=false;   // démo : 2 paiements en attente
@@ -3994,7 +3994,7 @@ function renderClubBill(){
   const wait=bills.filter(b=>!b.ok).reduce((a,b)=>a+b.amt,0);
   const rec=bills.filter(b=>b.type==='sub'&&b.ok).length;
   box.innerHTML=clubSillanceCardHTML()+`
-    <p class="club-hint" style="margin:0 0 12px"><b>${tr('clubBill.memberRevenue')}</b> — ${tr('clubBill.memberRevenueNote')}</p>
+    <p class="club-hint" style="margin:0 0 12px"><b>${tr('clubBill.memberRevenue')}</b> : ${tr('clubBill.memberRevenueNote')}</p>
     <div class="cdash-kpis cols3">
       <div class="cdash-kpi"><div class="v good">${tot} €</div><div class="k">${tr('clubBill.collectedThisMonth')}</div></div>
       <div class="cdash-kpi"><div class="v" style="color:var(--bike)">${wait} €</div><div class="k">${tr('clubBill.pending')}</div></div>
@@ -5883,11 +5883,11 @@ function builderToText(){
         const st=hyroxStation(ln.station)||HYROX_STATIONS[0];
         const tgt = st.unit==='m' ? `${ln.target} m` : `${ln.target} reps`;
         const w = (st.weighted && ln.weight) ? ` @ ${ln.weight} kg` : '';
-        return `${st.name} — ${tgt}${w}`;
+        return `${st.name} · ${tgt}${w}`;
       }
       if(builderState.disc==='strength' && ln.metric==='reps'){
         const T=LINE_TYPES[ln.type];
-        const ex = ln.exercise ? `${dispoSafe(ln.exercise)} — ` : '';
+        const ex = ln.exercise ? `${dispoSafe(ln.exercise)} · ` : '';
         const w = ln.weight ? ` @ ${ln.weight} kg` : '';
         return `${T.l} ${ex}${ln.reps} reps${w} → RPE ${ln.rpe}`;
       }
@@ -6055,7 +6055,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
   // lundi de la semaine affichée sans que le coach l'ait choisi — sans ce
   // repère, il peut chercher sa séance sur le mauvais jour.
   const targetDayLabel = new Date(key+'T00:00:00').toLocaleDateString(localeStr(), {weekday:'long', day:'numeric', month:'long'});
-  toast(tr('toast.seanceAjouteeCalendrier')+' — '+targetDayLabel);
+  toast(tr('toast.seanceAjouteeCalendrier')+' : '+targetDayLabel);
 });
 
 /* ============================================================

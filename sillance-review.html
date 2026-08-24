@@ -21,7 +21,7 @@
 <link rel="shortcut icon" href="./favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="manifest" href="./manifest.webmanifest">
-<title data-i18n="meta.appTitle">Sillance — Coaching triathlon</title>
+<title data-i18n="meta.appTitle">Sillance · Coaching triathlon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Perf (audit 03/08/2026) : preconnect gstatic manquant + feuille en
@@ -2135,7 +2135,7 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 body:not([data-athview]) #athStatsToggleWrap{display:none}
 body.ath-stats-off .analytics .chart-filter,
 body.ath-stats-off .analytics .charts{display:none}
-body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche la case ci-dessus pour les réafficher.';
+body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la case ci-dessus pour les réafficher.';
   display:block;color:var(--muted);font-size:12.5px;padding:10px 0 var(--space-1)}
 .chart-filter{display:flex;flex-direction:column;gap:10px;margin:0 0 18px}
 .cf-cat{display:flex;flex-wrap:wrap;gap:var(--space-2);align-items:center}
@@ -2258,7 +2258,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <a class="icon-btn help-btn" href="./sillance-aide.html" target="_blank" rel="noopener" aria-label="Aide" title="Aide &amp; guide" data-i18n-attr="aria-label:nav.help,title:nav.helpTitle">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M9.3 9.3a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.2" r="0.5" fill="currentColor" stroke="none"/></svg>
     </a>
-    <button class="icon-btn tuto-btn" id="tutoBtn" aria-label="Tutoriel guidé" title="Tutoriel guidé — créer une séance" data-i18n-attr="aria-label:tour.guidedAria,title:tour.guidedTitle">
+    <button class="icon-btn tuto-btn" id="tutoBtn" aria-label="Tutoriel guidé" title="Tutoriel guidé · créer une séance" data-i18n-attr="aria-label:tour.guidedAria,title:tour.guidedTitle">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 7-6 2-2 6-6-15z"/></svg>
     </button>
     <button class="icon-btn theme-btn" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre" data-i18n-attr="aria-label:theme.changeAria,title:theme.changeTitle">
@@ -2375,7 +2375,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div>
         <div class="ai-badge"><span class="ai-dot"></span><span data-i18n="perf.aiAssisted">Analyse assistée</span></div>
         <h2><span data-i18n="fitness.stateHeading">État de forme</span> <span data-i18n="fitness.riskSuffix">&amp; risque</span></h2>
-        <p class="rh-sub">Un moteur d'analyse croise la charge d'entraînement, le ressenti et la récupération pour t'aider à décider : <b>poursuivre</b> ou <b>relâcher</b>. Recommandation indicative — c'est toujours le coach qui tranche.</p>
+        <p class="rh-sub">Un moteur d'analyse croise la charge d'entraînement, le ressenti et la récupération pour t'aider à décider : <b>poursuivre</b> ou <b>relâcher</b>. Recommandation indicative : c'est toujours le coach qui tranche.</p>
       </div>
     </div>
 
@@ -2414,12 +2414,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <h2><span data-i18n="perf.analysisHeading">Analyse</span> <span data-i18n="perf.performanceSuffix">performance</span></h2>
       <span class="src">données <b>STRAVA</b> · sync auto</span>
     </div>
-    <p class="sub">Vitesse, fréquence cardiaque, volume et charge d'entraînement de l'athlète — mis à jour à chaque activité synchronisée.</p>
+    <p class="sub">Vitesse, fréquence cardiaque, volume et charge d'entraînement de l'athlète, mis à jour à chaque activité synchronisée.</p>
 
     <label class="ath-stats-toggle" id="athStatsToggleWrap">
       <input type="checkbox" id="athStatsToggle" checked>
       <span data-i18n="stats.showDetailed">Afficher mes statistiques détaillées</span>
-      <small data-i18n="stats.showDetailedHint">Décoche si ça fait trop d'informations — tu peux revenir dessus à tout moment.</small>
+      <small data-i18n="stats.showDetailedHint">Décoche si ça fait trop d'informations : tu peux revenir dessus à tout moment.</small>
     </label>
 
     <div class="chart-filter" id="chartFilter" aria-label="Choisir les graphiques à afficher" data-i18n-attr="aria-label:charts.chooseAria"></div>
@@ -2451,7 +2451,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       </div>
 
       <div class="chart-card c6">
-        <h3>FTP & PMA estimées — vélo</h3>
+        <h3>FTP & PMA estimées · vélo</h3>
         <div class="sub">8 dernières semaines · watts</div>
         <div class="big" style="color:var(--bike)" id="ftpNow"></div>
         <svg id="ftpChart" viewBox="0 0 460 220" role="img" aria-label="Évolution FTP et PMA" data-i18n-attr="aria-label:chart.ftpPmaAria"></svg>
@@ -2476,7 +2476,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <!-- ===== Onglet : Seuils & tests ===== -->
     <div class="charts stats-group" data-group="tests">
       <div class="chart-card c12">
-        <h3>Courbe lactate — vélo</h3>
+        <h3>Courbe lactate · vélo</h3>
         <div class="sub">test terrain · lactate (mmol/L) vs puissance</div>
         <svg id="lactateBike" viewBox="0 0 460 250" role="img" aria-label="Courbe lactate vélo" data-i18n-attr="aria-label:chart.lactateAria"></svg>
         <div class="lactate-legend">
@@ -2507,7 +2507,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <div class="charts stats-group" data-group="biomeca">
       <div class="chart-card c7">
         <h3><span data-i18n="chart.raceDynamicsHeading">Dynamiques de course</span> <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0" data-i18n="chart.raceDynamicsSub">— zones</span></h3>
-        <div class="sub">cadence · oscillation verticale · ratio vertical · contact au sol — repère par rapport aux zones de référence</div>
+        <div class="sub">cadence · oscillation verticale · ratio vertical · contact au sol : repère par rapport aux zones de référence</div>
         <div class="rd-note">Nécessite un capteur de dynamique de course (montre Garmin compatible, Stryd, RunScribe…). Valeurs de démonstration.</div>
         <div id="runDynBody"></div>
       </div>
@@ -2631,7 +2631,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <div class="mental-txt">
       <span class="mental-tag" data-i18n="mental.includedTag">Inclus dans ta formule coaching</span>
       <h2>Le mental, ta 4<sup>e</sup> discipline</h2>
-      <p>Gestion du stress de course, visualisation, routines pré-compétition — une séance individuelle avec <b>Éric</b>, notre préparateur mental, directement dans son agenda.</p>
+      <p>Gestion du stress de course, visualisation, routines pré-compétition : une séance individuelle avec <b>Éric</b>, notre préparateur mental, directement dans son agenda.</p>
     </div>
     <button class="btn mental-btn" id="mentalBtn"><i class="ic ic-calendar"></i>Prendre RDV prépa mentale</button>
   </section>
@@ -2643,7 +2643,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <div class="lactest-txt">
       <span class="lactest-tag" data-i18n="lactate.knowThresholdsTag">Connais tes vrais seuils</span>
       <h2 data-i18n="lactate.bookHeading">Réserve ton test lactate</h2>
-      <p>Un test à l'effort avec prélèvements sanguins détermine précisément tes seuils SV1 et SV2 — la base la plus fiable pour calibrer tes zones d'entraînement. Course à pied ou vélo, sur le terrain ou en labo.</p>
+      <p>Un test à l'effort avec prélèvements sanguins détermine précisément tes seuils SV1 et SV2 : la base la plus fiable pour calibrer tes zones d'entraînement. Course à pied ou vélo, sur le terrain ou en labo.</p>
     </div>
     <button class="btn lactest-btn" id="lactestBtn"><i class="ic ic-flask"></i><span data-i18n="lactate.bookMyTest">Réserver mon test</span></button>
   </section>
@@ -2675,7 +2675,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div id="clubHistory"></div>
       <div class="club-actions">
         <button class="btn club-add" id="clubAddCreneau">+ Créer un créneau</button>
-        <span class="club-hint">Les athlètes du club s'inscrivent eux-mêmes — tu vois la liste de présence en direct.</span>
+        <span class="club-hint">Les athlètes du club s'inscrivent eux-mêmes, tu vois la liste de présence en direct.</span>
       </div>
       <div class="creneau-list" id="creneauList"></div>
     </div>
@@ -2762,12 +2762,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
         <div class="b-fld"><label for="crCoach" data-i18n="mode.coach">Coach</label><input type="text" id="crCoach" placeholder="Nom du coach" data-i18n-attr="placeholder:slot.coachNamePh"></div>
         <div class="b-fld"><label for="crPrice">Tarif séance (€)</label><input type="number" id="crPrice" value="0" min="0" step="0.5"></div>
       </div>
-      <div class="b-fld"><label for="crDesc" data-i18n="slot.contentLabel">Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage — visible par les inscrits" data-i18n-attr="placeholder:slot.descPh"></textarea></div>
+      <div class="b-fld"><label for="crDesc" data-i18n="slot.contentLabel">Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage (visible par les inscrits)" data-i18n-attr="placeholder:slot.descPh"></textarea></div>
       <div class="cr-row">
         <div class="b-fld"><label for="crGroup" data-i18n="slot.groupRestrictedLabel">Groupe (contenu réservé)</label><select id="crGroup"><option value="" data-i18n="slot.wholeClubOption">Tout le club</option></select></div>
         <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> Inviter tout le groupe</label></div>
       </div>
-      <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres — ils n'ont qu'à confirmer leur présence.</p>
+      <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres : ils n'ont qu'à confirmer leur présence.</p>
       <p class="cr-note" id="crPriceNote">Mets 0 pour un créneau inclus dans l'adhésion. Un tarif &gt; 0 active la séance « à la carte » (utile pour un stage ou une séance ouverte aux invités).</p>
     </div>
     <button class="btn" id="crSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Publier le créneau</button>
@@ -2816,7 +2816,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <div class="modal group-modal">
     <button class="close" id="consentClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--run)"><i class="ic ic-shield"></i> Protection des mineurs</span>
-    <h3>Consentement parental — <span id="consentAthName"></span></h3>
+    <h3>Consentement parental · <span id="consentAthName"></span></h3>
     <div class="cr-form">
       <label class="consent-check"><input type="checkbox" id="consentIsMinor"> <span><span data-i18n="parental.athleteIsPrefix">Cet athlète est</span> <b data-i18n="parental.minorWord">mineur</b> <span data-i18n="parental.under18">(moins de 18 ans)</span></span></label>
       <div id="consentFields" hidden>
@@ -2835,12 +2835,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <div class="modal group-modal">
     <button class="close" id="licenceClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--bike)"><i class="ic ic-shield"></i> Licence sportive</span>
-    <h3>Licence — <span id="licenceAthName"></span></h3>
+    <h3>Licence · <span id="licenceAthName"></span></h3>
     <div class="cr-form">
       <div class="b-fld"><label for="licFed" data-i18n="license.federationLabel">Fédération</label>
         <select id="licFed">
-          <option value="FFTri">FFTri — Fédération Française de Triathlon</option>
-          <option value="FFC">FFC — Fédération Française de Cyclisme</option>
+          <option value="FFTri">FFTri (Fédération Française de Triathlon)</option>
+          <option value="FFC">FFC (Fédération Française de Cyclisme)</option>
           <option value="Autre">Autre / aucune</option>
         </select>
       </div>
@@ -2857,7 +2857,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <div class="modal group-modal">
     <button class="close" id="profileClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--strength)"><i class="ic ic-user"></i> Fiche athlète</span>
-    <h3>Fiche — <span id="profileAthName"></span></h3>
+    <h3>Fiche · <span id="profileAthName"></span></h3>
     <div class="cr-form">
       <div class="b-fld"><label for="profVo2max">VO2max (ml/kg/min, optionnel)</label><input type="number" step="0.1" min="0" max="99" id="profVo2max" placeholder="Ex. 58" data-i18n-attr="placeholder:athlete.weightPh"></div>
       <div class="b-fld"><label for="profBackground" data-i18n="athlete.backgroundLabel">Parcours sportif</label><textarea id="profBackground" rows="3" placeholder="Depuis quand il/elle pratique, expérience, contexte…" data-i18n-attr="placeholder:athlete.experiencePh"></textarea></div>
@@ -2899,11 +2899,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
   <div class="modal group-modal">
     <button class="close" id="spectatorClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" style="background:var(--bike)"><i class="ic ic-link"></i> Partager la course</span>
-    <h3>Lien pour les proches — <span id="specRaceName"></span></h3>
+    <h3>Lien pour les proches · <span id="specRaceName"></span></h3>
     <div class="cr-form">
       <div class="b-fld"><label for="specNotes" data-i18n="share.spectatorNoteLabel">Repères pour tes proches (optionnel)</label>
         <textarea id="specNotes" rows="3" placeholder="Ex. À 30 km, ralentis si FC > 170. Ravito prévu au km 15." data-i18n-attr="placeholder:race.instructionsPh"></textarea></div>
-      <p class="club-hint">Aucun tracking GPS en direct — juste ces repères, et le résultat dès qu'il est disponible.</p>
+      <p class="club-hint">Aucun tracking GPS en direct, juste ces repères, et le résultat dès qu'il est disponible.</p>
     </div>
     <button class="btn" id="specGenerate" style="width:100%;margin-top:8px"><i class="ic ic-link"></i> Générer le lien</button>
     <div id="specLinkResult" style="margin-top:10px"></div>
@@ -2989,7 +2989,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
     <a href="#" class="pm-back" id="mentalBack" hidden>← Choisir un autre préparateur</a>
     <div class="pm-picker" id="mentalPicker" aria-label="Préparateurs mentaux disponibles" data-i18n-attr="aria-label:mental.availableAria"></div>
     <div class="calendly-wrap" id="calendlyWrap" hidden>
-      <iframe id="calendlyFrame" title="Agenda de réservation — préparation mentale" data-i18n-attr="title:mental.calendlyTitle"
+      <iframe id="calendlyFrame" title="Agenda de réservation · préparation mentale" data-i18n-attr="title:mental.calendlyTitle"
               loading="lazy" allow="camera; microphone"></iframe>
     </div>
     <p class="mental-fallback" id="mentalFallback" hidden>L'agenda ne s'affiche pas ? <a id="calendlyLink" href="#" target="_blank" rel="noopener">Ouvrir l'agenda dans un nouvel onglet ↗</a></p>
@@ -3058,7 +3058,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
       <div class="an-sub-sec" style="margin-top:18px">
         <h5 class="an-sub-h" data-i18n="chart.strideLenHeading">Longueur de foulée</h5>
         <svg id="anStepLen" viewBox="0 0 720 150" role="img" aria-label="Longueur de foulée" data-i18n-attr="aria-label:chart.strideAria" style="display:none"></svg>
-        <p class="hint" id="anStepLenNA">Pas de données de longueur de foulée disponibles sur cette activité (nécessite une montre avec capteur de dynamiques de course — Coros, Garmin… — via import .FIT).</p>
+        <p class="hint" id="anStepLenNA">Pas de données de longueur de foulée disponibles sur cette activité (nécessite une montre avec capteur de dynamiques de course : Coros, Garmin… ou via import .FIT).</p>
       </div>
     </div>
     <div class="an-section" id="anDecoupleWrap">
@@ -3142,7 +3142,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <option value="strength">Renfo</option>
           <option value="hyrox">Hyrox</option>
         </select>
-        <select id="bObjectif" title="Objectif de la séance — sert à l'analyse IA" aria-label="Objectif de la séance" data-i18n-attr="title:session.goalTitle,aria-label:session.goalAria" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:var(--radius-sm);padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
+        <select id="bObjectif" title="Objectif de la séance · sert à l'analyse IA" aria-label="Objectif de la séance" data-i18n-attr="title:session.goalTitle,aria-label:session.goalAria" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:var(--radius-sm);padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
           <option value="" data-i18n="session.goalAutoOption">Objectif : auto</option>
           <option value="endurance|Z2">Endurance fondamentale (Z2)</option>
           <option value="seuil|Z3">Seuil aérobie · LT1 (Z3)</option>
@@ -3167,7 +3167,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées — coche l
           <div class="b-nutri">
             <div class="b-nutri-head"><i class="ic ic-utensils"></i> Consignes nutrition <span id="bNutriAuto" class="b-nutri-auto"></span></div>
             <div class="b-nutri-grid">
-              <div class="b-fld"><label for="bNutriPre" data-i18n="session.beforeSessionLabel">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type — ou écris ta consigne" data-i18n-attr="placeholder:session.notePh"></textarea></div>
+              <div class="b-fld"><label for="bNutriPre" data-i18n="session.beforeSessionLabel">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type, ou écris ta consigne" data-i18n-attr="placeholder:session.notePh"></textarea></div>
               <div class="b-fld"><label for="bNutriPost" data-i18n="session.afterSessionLabel">Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides" data-i18n-attr="placeholder:session.nutritionPh"></textarea></div>
             </div>
             <button class="b-nutri-reset" id="bNutriReset" type="button">↺ Regénérer automatiquement</button>
