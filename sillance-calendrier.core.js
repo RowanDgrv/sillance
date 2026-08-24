@@ -5001,7 +5001,7 @@ document.querySelectorAll('.vl-filter').forEach(b=>{
     vlFilter=b.dataset.f; renderVideoGrid();
   });
 });
-document.getElementById('vlSearch').addEventListener('input', e=>{ vlQuery=e.target.value; renderVideoGrid(); });
+document.getElementById('vlSearch')?.addEventListener('input', e=>{ vlQuery=e.target.value; renderVideoGrid(); });
 /* ---- Müller-Brockmann : overlay de grille (même boîte que le contenu) + alignement optique ----
    Colonnes numérotées qui PROUVENT que les cartes tombent sur les lignes ;
    le numéral (display) est nudgé pour que son ENCRE soit sur la ligne, pas sa boîte. */

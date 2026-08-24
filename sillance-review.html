@@ -1063,6 +1063,15 @@ body[data-athview="home"] .today-panel{display:block}
 /* ---------- Bibliothèque vidéo ---------- */
 .videolib{position:relative;margin-top:var(--space-6);border:1px solid var(--line);border-radius:var(--radius);
   background:linear-gradient(180deg,var(--panel-2),var(--panel));padding:var(--space-5) clamp(var(--space-4),3vw,26px)}
+.videolib-soon{padding:clamp(48px,8vw,80px) var(--space-5)}
+.vl-soon{max-width:440px;margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--space-2)}
+.vl-soon-icon{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:20px;
+  background:linear-gradient(135deg,rgba(47,217,255,.16),rgba(157,123,255,.16));color:var(--swim);margin-bottom:var(--space-2)}
+.vl-soon .vl-eyebrow{margin-bottom:0}
+.vl-soon h2{font-family:var(--font-display);font-size:clamp(20px,3vw,27px);font-weight:700;margin-top:var(--space-2)}
+.vl-soon .vl-sub{margin-top:var(--space-2);max-width:100%}
+.vl-soon-contact{font-size:13.5px;color:var(--muted);margin-top:var(--space-3)}
+.vl-soon-contact a{color:var(--swim);font-weight:600}
 .vl-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:var(--space-4)}
 .vl-eyebrow{display:inline-flex;align-items:center;gap:var(--space-2);font-family:var(--font-data);font-size:var(--fs-sm);
   letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--swim);margin-bottom:10px}
@@ -2597,28 +2606,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
   </div><!-- /ath-panel-stats -->
 
   <!-- ===================== BIBLIOTHÈQUE VIDÉO ===================== -->
-  <section class="videolib" id="videolib" aria-label="Bibliothèque vidéo" data-i18n-attr="aria-label:video.libraryAria">
-    <div class="vl-head">
-      <div>
-        <div class="vl-eyebrow"><span class="vl-dot"></span><span data-i18n="video.eyebrow">Technique</span></div>
-        <h2><span data-i18n="video.libraryHeading">Bibliothèque</span> <span data-i18n="video.librarySuffix">vidéo</span></h2>
-        <p class="vl-sub">Éducatifs, gammes et gestes techniques, filtrés par sport. Les vidéos liées à tes séances apparaissent au survol dans ton programme.</p>
-        <div class="vl-count"><b id="vlCount">0</b> vidéos · <span id="vlCountDisc">Natation</span> · <span class="cc-soon" data-i18n="video.contentComingSoon">Contenu en cours d'ajout</span></div>
-      </div>
-      <div class="vl-search">
-        <input type="search" id="vlSearch" placeholder="Rechercher (rattrapé, gammes, squat…)" aria-label="Rechercher une vidéo" data-i18n-attr="placeholder:video.searchPh,aria-label:video.searchAria">
-      </div>
-      <button class="vl-grid-toggle" id="vlGridToggle" aria-pressed="false" title="Afficher la grille modulaire (Müller-Brockmann)" data-i18n-attr="title:video.gridTitle"><span class="gt-dot"></span>Grille</button>
+  <section class="videolib videolib-soon" id="videolib" aria-label="Bibliothèque vidéo" data-i18n-attr="aria-label:video.libraryAria">
+    <div class="vl-soon">
+      <div class="vl-soon-icon"><i class="ic ic-film"></i></div>
+      <div class="vl-eyebrow"><span class="vl-dot"></span><span data-i18n="video.eyebrow">Technique</span></div>
+      <h2 data-i18n="video.soonTitle">Arrive bientôt</h2>
+      <p class="vl-sub" data-i18n="video.soonText">La bibliothèque de vidéos techniques est en tournage.</p>
+      <p class="vl-soon-contact" data-i18n-html="video.soonContact">Une question ? Écris au support : <a href="mailto:contact@sillance.app">contact@sillance.app</a></p>
     </div>
-    <div class="vl-filters" id="vlFilters" role="tablist" aria-label="Filtrer par sport" data-i18n-attr="aria-label:video.filterSportAria">
-      <button class="vl-filter active" data-f="swim" role="tab" aria-selected="true"><i class="ic ic-waves"></i><span data-i18n="disc.swim">Natation</span></button>
-      <button class="vl-filter" data-f="bike" role="tab"><i class="ic ic-bike"></i>Vélo</button>
-      <button class="vl-filter" data-f="run" role="tab"><i class="ic ic-run"></i><span data-i18n="disc.run">Course</span></button>
-      <button class="vl-filter" data-f="strength" role="tab"><i class="ic ic-dumbbell"></i><span data-i18n="disc.strength">Renfo</span></button>
-      <button class="vl-filter" data-f="hyrox" role="tab"><i class="ic ic-dumbbell"></i><span data-i18n="disc.hyrox">Hyrox</span></button>
-    </div>
-    <div class="vl-grid" id="vlGrid"></div>
-    <div class="vl-guides" aria-hidden="true"><div class="vg-cols" id="vlCols"></div><div class="vg-rows"></div></div>
   </section>
 
   <!-- ===================== PRÉPA MENTALE =====================
