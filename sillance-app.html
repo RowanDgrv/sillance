@@ -351,6 +351,12 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
      sinon on scrolle une colonne interminable avant de voir les séances */
   .planner .calendar{order:1}
   .planner .library{order:2;position:static}
+  /* nav semaine déplacée juste au-dessus du planning par JS (initWeekNavPlacement) —
+     agrandie ici pour de vraies cibles tactiles, au lieu de rester coincée
+     en haut du topbar loin du calendrier qu'elle pilote. */
+  .week-nav{width:100%;justify-content:center;margin:0 0 14px;gap:14px}
+  .week-nav .label{font-size:17px;min-width:0}
+  .week-nav .icon-btn{width:44px;height:44px;font-size:19px}
 }
 
 /* ---------- Bibliothèque de séances ---------- */
@@ -1399,6 +1405,11 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 /* affûtage / tapering sur le calendrier */
 .taper-hint{display:flex;align-items:center;gap:11px;margin-bottom:var(--space-3);padding:11px 15px;border-radius:12px;
   border:1px solid color-mix(in srgb,var(--bike) 40%,var(--line));background:color-mix(in srgb,var(--bike) 9%,transparent)}
+/* .taper-hint{display:flex} passe devant l'attribut hidden (même spécificité,
+   la règle auteur gagne sur le défaut navigateur) : #taperHint/#weekRiskHint
+   s'affichaient vides tant qu'ils n'avaient pas de contenu — signalé
+   25/08/2026 comme un "espace inutile" entre les stats et le calendrier. */
+.taper-hint[hidden]{display:none}
 .taper-hint .ic{width:18px;height:18px;color:var(--bike);flex:none}
 .taper-hint .th-txt{font-size:var(--fs-md);color:var(--soft);line-height:1.4}
 .taper-hint .th-txt b{color:var(--text)}
