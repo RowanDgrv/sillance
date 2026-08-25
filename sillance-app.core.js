@@ -433,10 +433,10 @@ function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${Str
 const COACH_ROSTER = [
  {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8,cyclePhase:'follicular',cycleDay:9}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,  planGap:null, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*10).toISOString(),
   races:[
-    {name:'Tri de Balma (M)', location:'Balma', days:-70, priority:'B', result:'1:58:32 · 4e SF'},
-    {name:'10 km de Muret', location:'Muret', days:-40, priority:'C', result:'42:18 · 3e V2'},
-    {name:'Gorillaman · Sprint', location:'Gorille', days:22, priority:'A'},
-    {name:'70.3 Vichy', location:'Vichy', days:130, priority:'A'},
+    {name:'Tri de Balma (M)', location:'Balma', days:-70, priority:'B', type:'tri', result:'1:58:32 · 4e SF'},
+    {name:'10 km de Muret', location:'Muret', days:-40, priority:'C', type:'run', result:'42:18 · 3e V2'},
+    {name:'Gorillaman · Sprint', location:'Gorille', days:22, priority:'A', type:'tri'},
+    {name:'70.3 Vichy', location:'Vichy', days:130, priority:'A', type:'tri'},
   ],
   gear:[
     {id:'g1', type:'shoe', name:'Nike Pegasus 40', km:612, max:900, price:130, cat:'daily', comm:870, notified:[540]},
@@ -446,8 +446,8 @@ const COACH_ROSTER = [
   ]},
  {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',get dispoNote(){return tr('demoNote.a2')},hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55, planGap:'h48', refsUpdatedAt:new Date(Date.now()-1000*60*60*24*210).toISOString(),
   races:[
-    {name:'Semi de Colomiers', location:'Colomiers', days:-55, priority:'C', result:'1:32:10'},
-    {name:'Marathon de Toulouse', location:'Toulouse', days:60, priority:'A'},
+    {name:'Semi de Colomiers', location:'Colomiers', days:-55, priority:'C', type:'run', result:'1:32:10'},
+    {name:'Marathon de Toulouse', location:'Toulouse', days:60, priority:'A', type:'run'},
   ],
   gear:[
     {id:'g5', type:'shoe', name:'Adidas Boston 12', km:723, max:700, price:150, cat:'tempo', comm:660, notified:[420,595,700]},
@@ -455,8 +455,8 @@ const COACH_ROSTER = [
   ]},
  {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8,cyclePhase:'luteal',cycleDay:24}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95, planGap:null, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*25).toISOString(),
   races:[
-    {name:'HYROX Bordeaux', location:'Bordeaux', days:35, priority:'A'},
-    {name:'HYROX Lyon', location:'Lyon', days:150, priority:'B'},
+    {name:'HYROX Bordeaux', location:'Bordeaux', days:35, priority:'A', type:'hyrox'},
+    {name:'HYROX Lyon', location:'Lyon', days:150, priority:'B', type:'hyrox'},
   ],
   gear:[
     {id:'g7', type:'shoe', name:'Puma Deviate Nitro 3', km:405, max:700, price:160, cat:'tempo', comm:650, notified:[420]},
@@ -4526,9 +4526,11 @@ function openMiniPrompt({title, label, value, textarea, inputType, onSave}){
 let _seasonAth=null;
 function athRaces(a){
   if(Array.isArray(a.races) && a.races.length) return a.races;
-  return a.race ? [{name:a.race.name, days:a.race.days, priority:'A'}] : [];
+  return a.race ? [{name:a.race.name, days:a.race.days, priority:'A', type:'run'}] : [];
 }
 const SEASON_PRIO_COLOR = {A:'var(--run)', B:'var(--bike)', C:'var(--muted)'};
+const RACE_TYPE_ICON = {run:'ic-run', tri:'ic-waves', hyrox:'ic-zap'};
+function raceTypeLabel(t){ return {run:tr('recap.typeRun'), tri:tr('recap.typeTri'), hyrox:tr('recap.typeHyrox')}[t] || tr('recap.typeRun'); }
 function fmtRaceDate(days){
   const d=addDays(new Date(), days);
   return d.toLocaleDateString(localeStr(),{day:'numeric',month:'short',year:'numeric'});
@@ -4540,18 +4542,20 @@ function renderSeasonList(){
   if(!races.length){ box.innerHTML=`<p class="club-hint">${tr('season.empty')}</p>`; return; }
   box.innerHTML = races.map((r,i)=>{
     const past = r.days<0;
+    const type = r.type||'run';
     return `<div class="season-row ${past?'past':''}">
       <span class="season-prio" style="background:${SEASON_PRIO_COLOR[r.priority]||SEASON_PRIO_COLOR.C}">${r.priority||'C'}</span>
       <div class="season-info">
-        <div class="season-name">${r.name}${r.location?` <small>· ${r.location}</small>`:''}</div>
+        <div class="season-name"><i class="ic ${RACE_TYPE_ICON[type]}" style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;opacity:.7"></i>${r.name}${r.location?` <small>· ${r.location}</small>`:''}</div>
         <div class="season-date">${fmtRaceDate(r.days)} ${past?'':`· J–${r.days}`}</div>
+        ${past?`<a class="season-recap-link" data-i="${i}" href="#">${r.recap?tr('recap.editLink'):tr('recap.addLink')}</a>`:''}
       </div>
       <div class="season-result" data-i="${i}">${r.result ? r.result : (past ? `<span class="season-add-result">${tr('season.addResult')}</span>` : '')}</div>
     </div>`;
   }).join('');
   box.querySelectorAll('.season-row').forEach((row,i)=>{
     const races2=athRaces(a).slice().sort((x,y)=>x.days-y.days);
-    const r=races2[i]; if(r.days>=0) return; // résultat éditable seulement pour le passé
+    const r=races2[i]; if(r.days>=0) return; // résultat/analyse éditables seulement pour le passé
     row.querySelector('.season-result').style.cursor='pointer';
     row.querySelector('.season-result').onclick=()=>{
       openMiniPrompt({title:tr('season.resultFor', {name:r.name}), value:r.result||'', onSave:(v)=>{
@@ -4562,6 +4566,8 @@ function renderSeasonList(){
         renderSeasonList();
       }});
     };
+    const rl=row.querySelector('.season-recap-link');
+    if(rl) rl.onclick=(ev)=>{ ev.preventDefault(); openRaceRecap(a, r); };
   });
 }
 function openSeasonCalendar(a){
@@ -4580,15 +4586,179 @@ function openSeasonCalendar(a){
     const name=document.getElementById('seaName').value.trim();
     const loc=document.getElementById('seaLoc').value.trim();
     const dateVal=document.getElementById('seaDate').value;
+    const type=document.getElementById('seaType').value;
     const prio=document.getElementById('seaPrio').value;
     if(!name || !dateVal){ toast(tr('season.fillNameDate'), 'error'); return; }
     const days=Math.round((new Date(dateVal+'T00:00:00')-new Date(new Date().toDateString()))/86400000);
     if(!Array.isArray(a.races)) a.races = athRaces(a);
-    a.races.push({name, location:loc||null, days, priority:prio});
+    a.races.push({name, location:loc||null, days, priority:prio, type});
     document.getElementById('seaName').value=''; document.getElementById('seaLoc').value=''; document.getElementById('seaDate').value='';
     renderSeasonList();
     toast(tr('season.added'));
   });
+})();
+
+/* ============================================================
+   ANALYSE DE COURSE — recap manuel temps/FC/watts, par km (course à
+   pied), par segment (triathlon) ou par run+atelier (Hyrox) — demande
+   utilisateur 25/08/2026. Saisie par l'athlète OU le coach, sur les
+   courses passées du calendrier de saison. Stocké sur race.recap ;
+   AUCUN capteur requis, pensé pour les athlètes sans montre connectée
+   ou pour compléter une course sans structure de lap (chrono officiel
+   + splits relevés à la main).
+   ============================================================ */
+function parseClock(str){
+  if(!str) return null;
+  const parts=String(str).trim().split(':').map(s=>+s);
+  if(!parts.length || parts.some(isNaN)) return null;
+  if(parts.length===3) return parts[0]*3600+parts[1]*60+parts[2];
+  if(parts.length===2) return parts[0]*60+parts[1];
+  return parts[0];
+}
+function fmtSecClock(sec){
+  if(sec==null || isNaN(sec)) return '—';
+  sec=Math.round(sec);
+  const h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60;
+  return h>0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
+}
+function defaultRecap(type){
+  if(type==='hyrox'){
+    const segs=[];
+    HYROX_STATIONS.forEach((st,i)=>{
+      segs.push({n:i+1, kind:'run', label:tr('recap.runN', {n:i+1}), time:'', hr:''});
+      segs.push({n:i+1, kind:'station', label:st.name, time:'', hr:''});
+    });
+    return {segments:segs};
+  }
+  if(type==='tri') return {swim:{time:''}, bike:{time:'', watts:'', hr:''}, splits:[{km:1,time:'',hr:''}]};
+  return {splits:[{km:1,time:'',hr:''}]};
+}
+function ensureRecap(race){
+  if(!race.recap) race.recap = defaultRecap(race.type||'run');
+  return race.recap;
+}
+function recapAllTimes(recap){
+  const times=[];
+  if(recap.splits) recap.splits.forEach(s=>{ const t=parseClock(s.time); if(t) times.push(t); });
+  if(recap.swim && recap.swim.time){ const t=parseClock(recap.swim.time); if(t) times.push(t); }
+  if(recap.bike && recap.bike.time){ const t=parseClock(recap.bike.time); if(t) times.push(t); }
+  if(recap.segments) recap.segments.forEach(s=>{ const t=parseClock(s.time); if(t) times.push(t); });
+  return times;
+}
+function recapAllHr(recap){
+  const hrs=[];
+  if(recap.splits) recap.splits.forEach(s=>{ if(s.hr) hrs.push(+s.hr); });
+  if(recap.bike && recap.bike.hr) hrs.push(+recap.bike.hr);
+  if(recap.segments) recap.segments.forEach(s=>{ if(s.hr) hrs.push(+s.hr); });
+  return hrs;
+}
+function renderRecapSummary(race){
+  const recap=ensureRecap(race);
+  const times=recapAllTimes(recap), hrs=recapAllHr(recap);
+  const total=times.reduce((a,b)=>a+b,0);
+  const avgHr=hrs.length?Math.round(hrs.reduce((a,b)=>a+b,0)/hrs.length):null;
+  let avgPace=null;
+  if(recap.splits){
+    const valid=recap.splits.map(s=>parseClock(s.time)).filter(Boolean);
+    if(valid.length) avgPace=valid.reduce((a,b)=>a+b,0)/valid.length;
+  }
+  const stats=[{k:tr('recap.totalTime'), v: times.length?fmtSecClock(total):'—'}];
+  if(avgPace!=null) stats.push({k:tr('recap.avgPace'), v:`${fmtSecClock(avgPace)}<small>/km</small>`});
+  if(avgHr!=null) stats.push({k:tr('recap.avgHr'), v:`${avgHr}<small> bpm</small>`});
+  const box=document.getElementById('recapSummary'); if(box) box.innerHTML = stats.map(s=>`<div class="recap-stat"><div class="k">${s.k}</div><div class="v">${s.v}</div></div>`).join('');
+}
+function splitsSectionHTML(splits, titleKey, iconClass){
+  return `<div class="recap-section">
+    <h4><i class="ic ${iconClass}"></i> ${tr(titleKey)}</h4>
+    ${splits.map((s,i)=>`<div class="recap-row" style="grid-template-columns:34px 1fr 1fr auto" data-split-i="${i}">
+      <span class="rr-n">${i+1}</span>
+      <label><span>${tr('recap.pace')}</span><input type="text" placeholder="4:30" data-f="time" value="${s.time||''}"></label>
+      <label><span>${tr('recap.hr')}</span><input type="number" min="0" max="230" placeholder="—" data-f="hr" value="${s.hr||''}"></label>
+      <button class="recap-del" data-del-split="${i}" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
+    </div>`).join('')}
+    <button class="btn cy-ghost recap-add" data-add-split="1">+ ${tr('recap.addKm')}</button>
+  </div>`;
+}
+function renderRecapBody(race){
+  const recap=ensureRecap(race);
+  const box=document.getElementById('recapBody');
+  const type=race.type||'run';
+  let html='';
+  if(type==='tri'){
+    html += `<div class="recap-section">
+      <h4><i class="ic ic-waves"></i> ${tr('recap.swim')}</h4>
+      <div class="recap-row" style="grid-template-columns:1fr">
+        <label><span>${tr('recap.time')}</span><input type="text" placeholder="18:30" data-tri="swimTime" value="${(recap.swim&&recap.swim.time)||''}"></label>
+      </div>
+    </div>`;
+    html += `<div class="recap-section">
+      <h4><i class="ic ic-bike"></i> ${tr('recap.bike')}</h4>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 1fr">
+        <label><span>${tr('recap.time')}</span><input type="text" placeholder="1:02:00" data-tri="bikeTime" value="${(recap.bike&&recap.bike.time)||''}"></label>
+        <label><span>${tr('recap.watts')}</span><input type="number" min="0" placeholder="—" data-tri="bikeWatts" value="${(recap.bike&&recap.bike.watts)||''}"></label>
+        <label><span>${tr('recap.hr')}</span><input type="number" min="0" max="230" placeholder="—" data-tri="bikeHr" value="${(recap.bike&&recap.bike.hr)||''}"></label>
+      </div>
+    </div>`;
+    html += splitsSectionHTML(recap.splits, 'recap.run', 'ic-run');
+  } else if(type==='hyrox'){
+    html += `<div class="recap-section">
+      <h4><i class="ic ic-zap"></i> ${tr('recap.hyroxSegments')}</h4>
+      ${recap.segments.map((s,i)=>`<div class="recap-row" style="grid-template-columns:26px 1fr 1fr 1fr" data-seg-i="${i}">
+        <span class="rr-n">${s.kind==='run'?`<i class="ic ic-run"></i>`:s.n}</span>
+        <span class="rr-lbl">${s.label}${s.kind==='run'?`<small>${tr('recap.runLeg')}</small>`:''}</span>
+        <label><span>${tr('recap.time')}</span><input type="text" placeholder="3:45" data-f="time" value="${s.time||''}"></label>
+        <label><span>${tr('recap.hr')}</span><input type="number" min="0" max="230" placeholder="—" data-f="hr" value="${s.hr||''}"></label>
+      </div>`).join('')}
+    </div>`;
+  } else {
+    html += splitsSectionHTML(recap.splits, 'recap.splitsHeading', 'ic-run');
+  }
+  box.innerHTML = html;
+  wireRecapBody(race);
+  renderRecapSummary(race);
+}
+function wireRecapBody(race){
+  const recap=ensureRecap(race);
+  const box=document.getElementById('recapBody');
+  box.querySelectorAll('[data-tri]').forEach(inp=>inp.addEventListener('input',()=>{
+    const f=inp.dataset.tri;
+    if(f==='swimTime'){ recap.swim=recap.swim||{}; recap.swim.time=inp.value; }
+    if(f==='bikeTime'){ recap.bike=recap.bike||{}; recap.bike.time=inp.value; }
+    if(f==='bikeWatts'){ recap.bike=recap.bike||{}; recap.bike.watts=inp.value; }
+    if(f==='bikeHr'){ recap.bike=recap.bike||{}; recap.bike.hr=inp.value; }
+    renderRecapSummary(race);
+  }));
+  box.querySelectorAll('[data-seg-i]').forEach(row=>{
+    const seg=recap.segments[+row.dataset.segI];
+    row.querySelectorAll('[data-f]').forEach(inp=>inp.addEventListener('input',()=>{
+      seg[inp.dataset.f]=inp.value; renderRecapSummary(race);
+    }));
+  });
+  box.querySelectorAll('[data-split-i]').forEach(row=>{
+    const s=recap.splits[+row.dataset.splitI];
+    row.querySelectorAll('[data-f]').forEach(inp=>inp.addEventListener('input',()=>{
+      s[inp.dataset.f]=inp.value; renderRecapSummary(race);
+    }));
+  });
+  box.querySelectorAll('[data-del-split]').forEach(b=>b.onclick=()=>{
+    recap.splits.splice(+b.dataset.delSplit,1);
+    renderRecapBody(race);
+  });
+  box.querySelectorAll('[data-add-split]').forEach(b=>b.onclick=()=>{
+    recap.splits.push({km:recap.splits.length+1, time:'', hr:''});
+    renderRecapBody(race);
+  });
+}
+function openRaceRecap(a, race){
+  document.getElementById('recapRaceName').textContent = race.name;
+  renderRecapBody(race);
+  document.getElementById('raceRecapOverlay').classList.add('open');
+}
+(function initRaceRecap(){
+  const ov=document.getElementById('raceRecapOverlay'); if(!ov) return;
+  const close=()=>{ ov.classList.remove('open'); if(typeof renderSeasonList==='function') renderSeasonList(); };
+  document.getElementById('raceRecapClose').addEventListener('click', close);
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
 })();
 
 /* ============================================================
