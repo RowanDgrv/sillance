@@ -885,32 +885,7 @@ function renderSidebar(){
         <div class="lbl">${tr('sidebar.athleteFreshness')}</div>
         <div class="score" style="color:${readinessAdvice(readinessScore()).c}">${readinessScore()}%</div>
       </div>
-      <div class="coach-connect" style="margin-top:14px">
-        <div class="cc-t"><b>⭐ ${tr('sidebar.sillanceSub')}</b></div>
-        ${window.__pf_subscribed
-          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> ${tr('sidebar.subActive')}</div>
-             <button class="cc-btn" id="coachManageBtn">${tr('sidebar.manageSub')}</button>`
-          : `<div class="cc-s">${tr('sidebar.unlockCoach')}</div>
-             <button class="cc-btn" id="coachSeePlansBtn" style="margin-top:10px">${tr('sidebar.seePlans')}</button>`}
-      </div>
-      <div class="coach-connect" style="margin-top:14px;opacity:.85">
-        <div class="cc-t"><b><i class="ic ic-brain"></i> ${tr('sidebar.aiAssistant')}</b> <span class="cc-soon">${tr('sidebar.comingSoon')}</span></div>
-        <div class="cc-s">${tr('sidebar.aiAssistantText')}</div>
-      </div>
-      <div class="coach-connect" style="margin-top:14px">
-        <div class="cc-t"><b><i class="ic ic-credit-card"></i> ${tr('sidebar.getPaid')}</b></div>
-        <div class="cc-s">${tr('sidebar.getPaidText')}</div>
-        <div class="cc-price">${tr('sidebar.trackingRate')} <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/${tr('sidebar.perMonth')}</small> · <a href="#" id="coachPriceEdit">${tr('sidebar.edit')}</a></div>
-        <button class="cc-btn" id="coachConnectBtn">${tr('sidebar.connectStripe')}</button>
-        <button class="cc-btn" id="coachInvoicesBtn" style="margin-top:8px">${tr('sidebar.seeInvoices')}</button>
-      </div>
-      ${window.PF?.user ? `<div class="coach-connect" style="margin-top:14px">
-        <div class="cc-t"><b><i class="ic ic-user-plus"></i> ${tr('sidebar.selfCoach')}</b></div>
-        ${window.__pf_selfCoached
-          ? `<div class="cc-s" style="color:#39e6a3"><i class="ic ic-check"></i> ${tr('sidebar.selfCoachActive')}</div>`
-          : `<div class="cc-s">${tr('sidebar.selfCoachText')}</div>
-             <button class="cc-btn" id="selfCoachBtn" style="margin-top:10px">${tr('sidebar.selfCoachBtn')}</button>`}
-      </div>` : ''}`;
+      <div class="lib-note" style="margin-top:14px"><i class="ic ic-credit-card"></i> ${tr('sidebar.accountMovedNote')}</div>`;
     buildTemplates(document.getElementById('tplList'));
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
@@ -924,49 +899,6 @@ function renderSidebar(){
     var _invAthOpen=document.getElementById('inviteAthOpen'); if(_invAthOpen) _invAthOpen.onclick=openInviteAthlete;
     buildCycles(document.getElementById('cycleList'));
     document.getElementById('createCycleBtn').addEventListener('click', ()=> openCycleBuilder(null));
-    /* Assistant IA — essai 14 jours (checkout Stripe connecté, déverrouillage en démo) */
-    const aiT=document.getElementById('aiTrialBtn');
-    if(aiT) aiT.onclick=()=>{
-      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>{console.warn('[PF] ai-addon:',e); toast(tr('toast.stripeIndisponible'), 'error');}); return; }
-      window.__pf_aiDemo=true; window.__pf_aiDemoStart=Date.now(); renderSidebar(); toast(tr('toast.assistantIaActiveEssai14'));
-    };
-    const aiM=document.getElementById('aiManageBtn');
-    if(aiM) aiM.onclick=()=> openSettings('coach');
-    const ccb=document.getElementById('coachConnectBtn');
-    if(ccb) ccb.onclick=()=>{
-      if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast(tr('toast.stripeIndisponible'), 'error');});
-      else toast(tr('toast.connecteEspaceCoachPourRelier'));
-    };
-    const cib=document.getElementById('coachInvoicesBtn');
-    if(cib) cib.onclick=()=> openCoachInvoices();
-    const cspb=document.getElementById('coachSeePlansBtn');
-    if(cspb) cspb.onclick=()=> openSettings('structure');
-    const cmb=document.getElementById('coachManageBtn');
-    if(cmb) cmb.onclick=()=> openSettings('structure');
-    const cpe=document.getElementById('coachPriceEdit');
-    if(cpe) cpe.onclick=(ev)=>{
-      ev.preventDefault();
-      const v=prompt(tr('sidebar.pricePrompt'), COACH_OFFER.price);
-      if(v!==null && !isNaN(+v) && v!==''){
-        COACH_OFFER.price=+v;
-        const pv=document.getElementById('coachPriceVal'); if(pv) pv.textContent=COACH_OFFER.price+' €';
-        toast(tr('toast.tarifCoachingMisAJour'));
-        if(window.PF?.user) PF.saveCoachOffer({name:COACH_OFFER.name, price:COACH_OFFER.price}).catch(er=>console.warn('saveCoachOffer',er));
-      }
-    };
-    const scb=document.getElementById('selfCoachBtn');
-    if(scb) scb.onclick=()=>{
-      if(!window.PF?.user || !PF.enableSelfCoaching) return;
-      scb.disabled=true;
-      PF.enableSelfCoaching().then(()=>{
-        toast(tr('toast.selfCoachEnabled'));
-        location.reload();
-      }).catch(e=>{
-        console.warn('[PF] self-coach:', e);
-        scb.disabled=false;
-        toast(tr('toast.selfCoachError'), 'error');
-      });
-    };
   } else {
     const s = readinessScore(), adv = readinessAdvice(s);
     sidebarContent.innerHTML = `
@@ -2112,12 +2044,66 @@ function settingsCoachHtml(){
       <div class="set-note">${tr('settings.trialNote', {price:AI_ADDON_PRICE})}</div>`}
     </div>`;
 }
+/* Onglet « Compte & paiements » : reçoit ce qui traînait avant en bas de la
+   sidebar coach (Fais-toi payer/Stripe + Self-coach) — n'a rien à faire sur
+   l'écran de planification au quotidien, déplacé dans Paramètres (25/08/2026). */
+function settingsAccountHtml(){
+  return `
+    <div class="set-h">${tr('sidebar.getPaid')}</div>
+    <div class="set-sub">${tr('sidebar.getPaidText')}</div>
+    <div class="set-plan">
+      <div class="cc-price">${tr('sidebar.trackingRate')} <b id="coachPriceVal">${COACH_OFFER.price} €</b><small>/${tr('sidebar.perMonth')}</small> · <a href="#" id="coachPriceEdit">${tr('sidebar.edit')}</a></div>
+      <div class="set-actions">
+        <button class="btn" id="coachConnectBtn">${tr('sidebar.connectStripe')}</button>
+        <button class="btn cy-ghost" id="coachInvoicesBtn">${tr('sidebar.seeInvoices')}</button>
+      </div>
+    </div>
+    ${window.PF?.user ? `
+    <div class="set-plan" style="margin-top:14px">
+      <div class="p-name"><i class="ic ic-user-plus"></i> ${tr('sidebar.selfCoach')}</div>
+      ${window.__pf_selfCoached
+        ? `<div class="set-sub" style="color:var(--good)"><i class="ic ic-check"></i> ${tr('sidebar.selfCoachActive')}</div>`
+        : `<p class="set-sub">${tr('sidebar.selfCoachText')}</p>
+           <div class="set-actions"><button class="btn cy-ghost" id="selfCoachBtn">${tr('sidebar.selfCoachBtn')}</button></div>`}
+    </div>` : ''}`;
+}
 let settingsTab='structure';
 function renderSettings(){
   document.querySelectorAll('#setNav .set-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===settingsTab));
   const body=document.getElementById('setBody');
-  body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsCoachHtml();
+  body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsTab==='coach' ? settingsCoachHtml() : settingsAccountHtml();
   wireCoachTiers(body, renderSettings);
+  const ccb=document.getElementById('coachConnectBtn');
+  if(ccb) ccb.onclick=()=>{
+    if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast(tr('toast.stripeIndisponible'), 'error');});
+    else toast(tr('toast.connecteEspaceCoachPourRelier'));
+  };
+  const cib=document.getElementById('coachInvoicesBtn');
+  if(cib) cib.onclick=()=> openCoachInvoices();
+  const cpe=document.getElementById('coachPriceEdit');
+  if(cpe) cpe.onclick=(ev)=>{
+    ev.preventDefault();
+    openMiniPrompt({title:tr('sidebar.trackingRate'), label:tr('sidebar.pricePrompt'), value:COACH_OFFER.price, inputType:'number', onSave:(v)=>{
+      if(v===null || v==='' || isNaN(+v)) return;
+      COACH_OFFER.price=+v;
+      const pv=document.getElementById('coachPriceVal'); if(pv) pv.textContent=COACH_OFFER.price+' €';
+      toast(tr('toast.tarifCoachingMisAJour'));
+      if(window.PF?.user) PF.saveCoachOffer({name:COACH_OFFER.name, price:COACH_OFFER.price}).catch(er=>console.warn('saveCoachOffer',er));
+    }});
+  };
+  const scb=document.getElementById('selfCoachBtn');
+  if(scb) scb.onclick=()=>{
+    if(!window.PF?.user || !PF.enableSelfCoaching) return;
+    scb.disabled=true;
+    PF.enableSelfCoaching().then(()=>{
+      toast(tr('toast.selfCoachEnabled'));
+      location.reload();
+    }).catch(e=>{
+      console.warn('[PF] self-coach:', e);
+      scb.disabled=false;
+      toast(tr('toast.selfCoachError'), 'error');
+    });
+  };
   const portal=document.getElementById('setPortalBtn');
   if(portal) portal.onclick=()=>{ if(window.PF?.user && PF.openBillingPortal){ PF.openBillingPortal().catch(()=>toast(tr('toast.portailIndisponible'), 'error')); } else toast(tr('toast.portailStripeDemo')); };
   const subB=document.getElementById('setSubscribeBtn');
@@ -2582,12 +2568,13 @@ function sessionCard(s, dateKey){
   el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
   el.addEventListener('click', e=>{
     if(e.target.closest('.note-btn')){
-      const next = prompt(tr('session.notePrompt'), s.coachNote||'');
-      if(next!=null){
-        s.coachNote = next.trim() || null;
-        if(window.PF?.user && s.id){ PF.setCoachNote(s.id, s.coachNote).catch(err=>console.warn('[PF] setCoachNote', err)); }
-        render();
-      }
+      openMiniPrompt({title:tr('session.notePrompt'), value:s.coachNote||'', textarea:true, onSave:(next)=>{
+        if(next!=null){
+          s.coachNote = next.trim() || null;
+          if(window.PF?.user && s.id){ PF.setCoachNote(s.id, s.coachNote).catch(err=>console.warn('[PF] setCoachNote', err)); }
+          render();
+        }
+      }});
       return;
     }
     if(e.target.closest('.del')){
@@ -3391,7 +3378,9 @@ function exportCaseStudy(name){
     let done=0, tot=0;
     for(let i=0;i<84;i++){ const d=iso(addDays(new Date(),-i)); (planning[d]||[]).forEach(s=>{ tot++; if(s.done) done++; }); }
     const adherence = tot ? Math.round(done/tot*100) : null;
-    const quote = (prompt(tr('bilan.quotePrompt', {name}), "") || '').trim();
+    openMiniPrompt({title:tr('bilan.quotePrompt', {name}), value:'', textarea:true, onSave:(qraw)=>{
+    try{
+    const quote = (qraw || '').trim();
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const today=new Date().toLocaleDateString(localeStr(),{day:'numeric',month:'long',year:'numeric'});
     const recRows = newRecs.length ? newRecs.map(r=>`<div class="row"><span class="l">${esc(r.d)}</span><span class="v acc">${esc(r.v)}</span></div>`).join('') : '';
@@ -3432,6 +3421,8 @@ ${quote?(`<div class="quote">« ${esc(quote)} »<br><span style="font-style:norm
     w.document.write(html); w.document.close();
     const go=()=>{ try{ w.focus(); w.print(); }catch(e){} };
     if(w.document.readyState==='complete') setTimeout(go,300); else w.onload=()=>setTimeout(go,300);
+    }catch(e){ console.error('exportCaseStudy',e); if(typeof toast==='function') toast(tr('toast.exportIndisponible'), 'error'); }
+    }});
   }catch(e){ console.error('exportCaseStudy',e); if(typeof toast==='function') toast(tr('toast.exportIndisponible'), 'error'); }
 }
 
@@ -4026,11 +4017,13 @@ function renderClubOffres(){
       <div class="co-who">${o.who}</div>
     </div>`).join('')}</div>`;
   box.querySelectorAll('.co-edit[data-o]').forEach(btn=>btn.onclick=()=>{
-    const o=clubOffer(btn.dataset.o); const v=prompt(tr('clubOffres.pricePrompt', {name:o.name}), o.price);
+    const o=clubOffer(btn.dataset.o);
+    openMiniPrompt({title:tr('clubOffres.editPrice'), label:tr('clubOffres.pricePrompt', {name:o.name}), value:o.price, inputType:'number', onSave:(v)=>{
     if(v!==null && !isNaN(+v) && v!==''){
       o.price=+v; renderClubOffres(); toast(tr('toast.tarifMisAJour'));
       if(window.PF?.user && window.__pf_clubId) PF.saveClubOffer(window.__pf_clubId, o.id, o.price).catch(e=>console.warn('saveClubOffer',e));
     }
+    }});
   });
   const cc=document.getElementById('clubConnectBtn');
   if(cc) cc.onclick=()=>{
@@ -4221,17 +4214,21 @@ function renderClubAthletes(filter){
     const g = a.group ? clubGroup(a.group) : null;
     const grpOptions = `<option value="">${tr('clubAthList.noGroup')}</option>` + CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${a.group===gr.id?'selected':''}>${gr.name}</option>`).join('');
     return `<div class="club-ath">
-      <div class="club-ath-av">${initials(a.name)}</div>
-      <div class="club-ath-i">
-        <div class="club-ath-n">${a.name}</div>
-        <div class="club-ath-m">${tr('clubAthList.memberSince', {since:a.since})} · ${tr(nbInscr>1?'clubAthList.nSlotsPlural':'clubAthList.nSlotsSingular', {n:nbInscr})}</div>
+      <div class="club-ath-head">
+        <div class="club-ath-av">${initials(a.name)}</div>
+        <div class="club-ath-i">
+          <div class="club-ath-n">${a.name}</div>
+          <div class="club-ath-m">${tr('clubAthList.memberSince', {since:a.since})} · ${tr(nbInscr>1?'clubAthList.nSlotsPlural':'clubAthList.nSlotsSingular', {n:nbInscr})}</div>
+        </div>
+        <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||tr('clubDisc.tri')}</span>
+      </div>
+      <div class="club-ath-badges">
         <select class="club-ath-grp-sel ${g?'':'none'}" data-aid="${a.id}" style="${g?`--gc:${g.color}`:''}" title="${tr('clubAthList.changeGroup')}">${grpOptions}</select>
         <span class="club-ath-offer co-${a.offer}" data-aid="${a.id}" title="${tr('clubAthList.clickToChangePlan')}">${clubOffer(a.offer).name}${a.offer==='coach'&&a.coach?` · ${a.coach}`:''}</span>
         <span class="club-ath-cal" data-caid="${a.id}" title="${tr('clubAthList.openCalendarTitle')}"><i class="ic ic-calendar"></i> ${tr('clubAthList.calendar')}</span>
         ${minorChip(a)}
         ${licenceChip(a)}
       </div>
-      <span class="club-ath-tag">${CLUB_DISC_LABEL[a.disc]||tr('clubDisc.tri')}</span>
     </div>`;
   }).join('') || `<p class="club-hint">${tr('clubAthList.noAthleteFound')}</p>`;
   box.innerHTML = banner + rows;
@@ -4317,6 +4314,32 @@ function saveLicence(){
   document.getElementById('licSave').addEventListener('click', saveLicence);
   document.getElementById('licenceClose').addEventListener('click', ()=> ov.classList.remove('open'));
   ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+})();
+
+/* ---- Modale générique de saisie rapide (remplace les prompt() natifs) ---- */
+let _miniPromptCb=null, _miniPromptIsArea=false;
+function openMiniPrompt({title, label, value, textarea, inputType, onSave}){
+  _miniPromptCb = onSave; _miniPromptIsArea = !!textarea;
+  const badge=document.getElementById('miniPromptBadge'); if(badge) badge.textContent = title||tr('sidebar.edit');
+  const lbl=document.getElementById('miniPromptLabel'); if(lbl) lbl.textContent = label||'';
+  const inp=document.getElementById('miniPromptInput');
+  const ta=document.getElementById('miniPromptTextarea');
+  if(_miniPromptIsArea){ ta.hidden=false; ta.value=value??''; inp.hidden=true; }
+  else { inp.hidden=false; inp.type=inputType||'text'; inp.value=value??''; ta.hidden=true; }
+  document.getElementById('miniPromptOverlay').classList.add('open');
+  setTimeout(()=>(_miniPromptIsArea?ta:inp).focus(), 30);
+}
+(function initMiniPrompt(){
+  const ov=document.getElementById('miniPromptOverlay'); if(!ov) return;
+  const close=()=> ov.classList.remove('open');
+  document.getElementById('miniPromptClose').addEventListener('click', close);
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
+  document.getElementById('miniPromptSave').addEventListener('click', ()=>{
+    const v = _miniPromptIsArea ? document.getElementById('miniPromptTextarea').value : document.getElementById('miniPromptInput').value;
+    const cb=_miniPromptCb; _miniPromptCb=null;
+    close();
+    if(cb) cb(v);
+  });
 })();
 
 /* Chip « mineur / consentement parental » sur chaque fiche athlète club. */
@@ -4846,13 +4869,14 @@ const QUICK_ATHLETE = [tr('chat.q.recoveredWell'),tr('chat.q.tiredLegs'),tr('cha
    gère 20-30 athlètes au clavier. */
 let CHAT_MACROS = (()=>{ try{ const s=JSON.parse(localStorage.getItem('sil_chat_macros')||'null'); return (Array.isArray(s)&&s.length) ? s : QUICK_COACH_DEFAULT.slice(); }catch(e){ return QUICK_COACH_DEFAULT.slice(); } })();
 function manageChatMacros(){
-  const next = prompt(tr('chat.macrosPrompt'), CHAT_MACROS.join('\n'));
-  if(next==null) return;
-  // Échappé à la saisie : rendu ensuite en boutons via innerHTML sans
-  // ré-échapper (`<button>${x}</button>`).
-  CHAT_MACROS = next.split('\n').map(s=>dispoSafe(s.trim())).filter(Boolean).slice(0,8);
-  localStorage.setItem('sil_chat_macros', JSON.stringify(CHAT_MACROS));
-  renderChat();
+  openMiniPrompt({title:tr('chat.macrosPrompt'), value:CHAT_MACROS.join('\n'), textarea:true, onSave:(next)=>{
+    if(next==null) return;
+    // Échappé à la saisie : rendu ensuite en boutons via innerHTML sans
+    // ré-échapper (`<button>${x}</button>`).
+    CHAT_MACROS = next.split('\n').map(s=>dispoSafe(s.trim())).filter(Boolean).slice(0,8);
+    localStorage.setItem('sil_chat_macros', JSON.stringify(CHAT_MACROS));
+    renderChat();
+  }});
 }
 
 const chatPanel=document.getElementById('chatPanel');

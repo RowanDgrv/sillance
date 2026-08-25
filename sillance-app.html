@@ -89,6 +89,20 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
+/* Champs texte/nombre/date/select non classés (ex. refs physio, check-in) :
+   sans ce reset ils gardent le rendu natif du navigateur (fond blanc, police
+   système) au lieu du thème sombre de l'app — audit 25/08/2026. */
+input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{
+  font-family:inherit;font-size:13px;color:var(--text);
+  background:var(--panel-2);border:1px solid var(--line-strong);
+  border-radius:8px;padding:7px 9px;
+}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;
+}
+input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-calendar-picker-indicator{
+  filter:invert(.8);cursor:pointer;
+}
 /* ===== Thème clair (façon Strava / iDO / Nolio) ===== */
 body.light{
   --ink:#F4F6FB;
@@ -160,7 +174,9 @@ button{font-family:inherit;cursor:pointer}
   width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--line-strong);
   background:var(--panel);color:var(--text);font-size:15px;
   transition:border-color .2s, transform .15s;
+  display:inline-flex;align-items:center;justify-content:center;
 }
+.icon-btn .ic{margin-right:0}
 .icon-btn:hover{border-color:var(--swim);transform:translateY(-1px)}
 .icon-btn:focus-visible,.mode button:focus-visible,.btn:focus-visible{outline:2px solid var(--swim);outline-offset:2px}
 
@@ -328,7 +344,7 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 @keyframes ecgDraw{to{stroke-dashoffset:-1200}}
 
 /* ---------- Layout principal ---------- */
-.planner{display:grid;grid-template-columns:236px 1fr;gap:20px;align-items:start}
+.planner{display:grid;grid-template-columns:236px 1fr;gap:20px;align-items:stretch}
 @media (max-width:980px){
   .planner{grid-template-columns:minmax(0,1fr)}
   /* mobile : le CALENDRIER d'abord, le panneau (bibliothèque / espace athlète) ensuite —
@@ -1297,7 +1313,7 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .csub-foot{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
 .csub-terms{font-size:var(--fs-sm);color:var(--muted);max-width:560px;display:flex;gap:7px;align-items:flex-start}
 @media(max-width:760px){.csub-tiers{grid-template-columns:1fr;min-width:0}}
-.club-ath-offer{display:inline-block;font-size:var(--fs-xs);font-weight:700;padding:2px var(--space-2);border-radius:99px;margin-top:var(--space-1);margin-left:6px;cursor:pointer;border:1px solid var(--line-strong);color:var(--muted)}
+.club-ath-offer{display:inline-block;font-size:var(--fs-xs);font-weight:700;padding:2px var(--space-2);border-radius:99px;cursor:pointer;border:1px solid var(--line-strong);color:var(--muted)}
 .club-ath-offer.co-sub{color:var(--good)}
 .club-ath-offer.co-coach{background:rgba(70,194,216,.14);color:var(--accent);border-color:transparent}
 .cconnect{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);background:var(--panel-2);border-radius:12px;padding:13px 15px;margin-bottom:14px}
@@ -1539,7 +1555,7 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .grp-mem .gm-n{font-size:var(--fs-md);font-weight:600}
 .group-modal{width:min(540px,100%)}
 .club-ath-grp{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:99px;color:#fff;margin-top:3px;display:inline-block}
-.club-ath-grp-sel{font-size:9.5px;font-weight:700;padding:2px 20px 2px var(--space-2);border-radius:99px;color:#fff;margin-top:3px;display:inline-block;border:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-color:var(--gc,var(--muted));background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center;background-size:9px;font-family:inherit}
+.club-ath-grp-sel{font-size:9.5px;font-weight:700;padding:2px 20px 2px var(--space-2);border-radius:99px;color:#fff;display:inline-block;border:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-color:var(--gc,var(--muted));background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center;background-size:9px;font-family:inherit}
 .club-ath-grp-sel.none{background-color:transparent;border:1px dashed var(--line-strong);color:var(--muted)}
 .grp-search{margin-bottom:var(--space-2)}
 .grp-mem-other{font-size:var(--fs-xs);color:var(--muted);margin-left:auto;padding:2px 7px;border-radius:99px;border:1px solid var(--line-strong);white-space:nowrap}
@@ -1573,16 +1589,18 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 
 /* athlètes club */
 .club-athletes{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:11px}
-.club-ath{display:flex;align-items:center;gap:var(--space-3);border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:var(--space-3) 14px}
+.club-ath{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:var(--space-3) 14px;height:100%}
+.club-ath-head{display:flex;align-items:flex-start;gap:var(--space-3)}
 .club-ath-av{width:42px;height:42px;border-radius:50%;background:var(--strength);display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff;flex:none}
 .club-ath-i{flex:1;min-width:0}
-.club-ath-n{font-weight:700;font-size:var(--fs-lg)}
-.club-ath-m{font-size:11.5px;color:var(--muted);font-family:var(--font-data)}
-.club-ath-tag{font-size:var(--fs-xs);font-weight:700;padding:2px var(--space-2);border-radius:99px;background:var(--panel-2);color:var(--muted)}
-.club-ath-vid{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+.club-ath-n{font-weight:700;font-size:var(--fs-lg);line-height:1.25}
+.club-ath-m{font-size:11.5px;color:var(--muted);font-family:var(--font-data);margin-top:2px}
+.club-ath-tag{font-size:var(--fs-xs);font-weight:700;padding:2px var(--space-2);border-radius:99px;background:var(--panel-2);color:var(--muted);flex:none;align-self:flex-start}
+.club-ath-badges{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.club-ath-vid{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   cursor:pointer;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);user-select:none}
 .club-ath-vid.on{background:rgba(70,194,216,.14);color:var(--accent);border-color:rgba(70,194,216,.5)}
-.club-ath-cal{display:inline-block;margin-top:5px;margin-left:6px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+.club-ath-cal{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   cursor:pointer;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);user-select:none}
 .club-ath-cal:hover{color:var(--accent);border-color:rgba(70,194,216,.5)}
 /* créneaux : contenu de séance, groupe, invitations */
@@ -1618,11 +1636,11 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .cr-viewbtn.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 50%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
 .cr-viewbar em{font-style:normal;font-family:var(--font-data);font-size:var(--fs-sm)}
 
-.club-ath-minor{display:inline-block;margin-top:5px;margin-left:6px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+.club-ath-minor{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   border:1px solid var(--line-strong);color:var(--muted);cursor:pointer}
 .club-ath-minor.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
 .club-ath-minor.ok{background:rgba(57,230,163,.12);color:var(--good);border-color:rgba(57,230,163,.4)}
-.club-ath-licence{display:inline-block;margin-top:5px;margin-left:6px;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+.club-ath-licence{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
   border:1px solid var(--line-strong);color:var(--muted);cursor:pointer}
 .club-ath-licence.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
 .club-ath-licence.soon{background:rgba(255,177,61,.14);color:var(--bike);border-color:rgba(255,177,61,.5)}
@@ -2924,6 +2942,23 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
   </div>
 </div>
 
+<!-- Modale générique de saisie rapide — remplace les prompt() natifs (fond
+     blanc hors-thème) pour un tarif, une note, une citation… -->
+<div class="overlay" id="miniPromptOverlay" role="dialog" aria-modal="true" aria-label="Modifier">
+  <div class="modal group-modal">
+    <button class="close" id="miniPromptClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" id="miniPromptBadge">Modifier</span>
+    <div class="cr-form">
+      <div class="b-fld">
+        <label for="miniPromptInput" id="miniPromptLabel"></label>
+        <input type="text" id="miniPromptInput">
+        <textarea id="miniPromptTextarea" rows="5" hidden></textarea>
+      </div>
+    </div>
+    <button class="btn" id="miniPromptSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
+  </div>
+</div>
+
 <!-- Modal fiche athlète (coach) : VO2max, parcours, records, blessures, habitudes -->
 <div class="overlay" id="profileOverlay" role="dialog" aria-modal="true" aria-label="Fiche athlète" data-i18n-attr="aria-label:athlete.sheetAria">
   <div class="modal group-modal">
@@ -3167,6 +3202,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <nav class="set-nav" id="setNav">
         <button class="set-tab active" data-tab="structure"><i class="ic ic-landmark"></i> Abonnement Structure</button>
         <button class="set-tab" data-tab="coach"><i class="ic ic-brain"></i> Abonnement coach · IA</button>
+        <button class="set-tab" data-tab="account"><i class="ic ic-credit-card"></i> Compte &amp; paiements</button>
       </nav>
       <div class="set-body" id="setBody"></div>
     </div>

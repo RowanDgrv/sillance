@@ -235,15 +235,27 @@
     return !!btn && btn.classList.contains('active');
   }
 
+  // L'écran d'accueil démo (#welcomeOverlay, z-index 200) est bien en dessous
+  // du voile du tuto (z-index 99997) : si l'auto-lancement tombait pendant que
+  // ce welcome est encore ouvert, le voile du tuto s'affichait par-dessus et
+  // rendait son bouton "Commencer à explorer" inatteignable — la page semblait
+  // bloquée (rapporté 25/08/2026). On attend sa fermeture avant de démarrer.
+  function welcomeOverlayOpen(){
+    var ov = document.getElementById('welcomeOverlay');
+    return !!ov && getComputedStyle(ov).display !== 'none';
+  }
+
   function maybeAutoLaunch(){
     try{
       if(localStorage.getItem('sil_tour_done')) return;
     }catch(e){ return; }
-    setTimeout(function(){
+    function attempt(){
       if(active) return;
       if(!isCoachMode()) return;
+      if(welcomeOverlayOpen()){ setTimeout(attempt, 400); return; }
       start();
-    }, 900);
+    }
+    setTimeout(attempt, 900);
   }
 
   function init(){
