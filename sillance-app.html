@@ -168,7 +168,9 @@ button{font-family:inherit;cursor:pointer}
 .brand h1 span{color:var(--swim)}
 .brand small{display:block;color:var(--muted);font-size:var(--fs-sm);letter-spacing:.18em;text-transform:uppercase;font-weight:500}
 
-.week-nav{display:flex;align-items:center;gap:10px;margin-left:auto}
+/* En-tête de la carte calendrier (déplacée là par initWeekNavPlacement,
+   toujours — plus seulement sur mobile, cf. audit 25/08/2026). */
+.week-nav{display:flex;align-items:center;gap:10px;padding:16px var(--space-4);border-bottom:1px solid var(--line)}
 .week-nav .label{font-family:var(--font-data);font-size:var(--fs-md);color:var(--muted);min-width:185px;text-align:center}
 .icon-btn{
   width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--line-strong);
@@ -351,10 +353,9 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
      sinon on scrolle une colonne interminable avant de voir les séances */
   .planner .calendar{order:1}
   .planner .library{order:2;position:static}
-  /* nav semaine déplacée juste au-dessus du planning par JS (initWeekNavPlacement) —
-     agrandie ici pour de vraies cibles tactiles, au lieu de rester coincée
-     en haut du topbar loin du calendrier qu'elle pilote. */
-  .week-nav{width:100%;justify-content:center;margin:0 0 14px;gap:14px}
+  /* nav semaine (déjà en tête de la carte calendrier à toutes les tailles,
+     cf. .week-nav de base) : agrandie ici pour de vraies cibles tactiles. */
+  .week-nav{justify-content:center;gap:14px}
   .week-nav .label{font-size:17px;min-width:0}
   .week-nav .icon-btn{width:44px;height:44px;font-size:19px}
 }

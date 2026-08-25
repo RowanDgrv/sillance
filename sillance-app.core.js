@@ -2263,29 +2263,18 @@ document.querySelectorAll('#setNav .set-tab').forEach(b=> b.addEventListener('cl
 const calGrid = document.getElementById('calGrid');
 const weekLabel = document.getElementById('weekLabel');
 
-/* Barre de semaine (‹ 24 août → 30 août 2026 ›) : sur mobile le topbar
-   (logo + nav semaine + mode + sélecteur d'athlète + icônes) empile 5 rangées
-   avant d'arriver au calendrier — la nav semaine s'y retrouve coincée tout en
-   haut, loin du planning qu'elle pilote (signalé 25/08/2026). On la déplace
-   en tête de la carte calendrier elle-même (même encadré, juste au-dessus de
-   la grille) en dessous de cette largeur (même seuil que l'empilement
-   sidebar/calendrier), agrandie pour l'ergonomie tactile — cf. CSS
-   `.week-nav` dans le `<style>`. Déplace le NŒUD réel (pas de clone) : mêmes
-   ids, mêmes écouteurs, aucune duplication à maintenir en JS. Repris tel
-   quel côté desktop dès qu'on repasse au-dessus du seuil. */
+/* Barre de semaine (‹ 24 août → 30 août 2026 ›) : restait dans le topbar,
+   loin du calendrier qu'elle pilote (signalé 25/08/2026, deux fois — le
+   premier essai ne la déplaçait qu'en dessous de 980px, insuffisant : elle
+   doit être collée au calendrier TOUT LE TEMPS, pas juste sur mobile).
+   Déplacée en tête de la carte calendrier elle-même, systématiquement,
+   quelle que soit la largeur d'écran. Déplace le NŒUD réel (pas de clone) :
+   mêmes ids, mêmes écouteurs, rien à dupliquer. */
 (function initWeekNavPlacement(){
   const wn = document.querySelector('.week-nav');
   const calendar = document.querySelector('.planner .calendar');
-  const brand = document.querySelector('.topbar .brand');
-  if(!wn || !calendar || !brand) return;
-  function place(){
-    const mobile = window.innerWidth <= 980;
-    if(mobile){ if(calendar.firstElementChild !== wn) calendar.insertBefore(wn, calendar.firstElementChild); }
-    else { if(wn.previousElementSibling !== brand) brand.after(wn); }
-  }
-  place();
-  window.addEventListener('resize', place);
-  window.addEventListener('orientationchange', place);
+  if(!wn || !calendar) return;
+  if(calendar.firstElementChild !== wn) calendar.insertBefore(wn, calendar.firstElementChild);
 })();
 
 /* ============================================================
