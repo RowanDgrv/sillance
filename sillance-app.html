@@ -1811,22 +1811,7 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .an-legend span{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .an-legend i{width:14px;height:3px;border-radius:2px}
 .an-section svg{width:100%;height:auto;display:block}
-/* table des laps */
-.an-laps{border:1px solid var(--line);border-radius:11px;overflow:hidden}
-.an-lap-row{display:grid;grid-template-columns:34px 1fr 1fr 1fr 1fr 1fr;gap:6px;padding:9px var(--space-3);align-items:center;
-  font-family:var(--font-data);font-size:var(--fs-base);border-bottom:1px solid var(--line)}
-.an-lap-row.head{background:var(--panel-2);color:var(--muted);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
-.an-lap-row:last-child{border-bottom:none}
-.an-lap-row .lapn{width:24px;height:24px;border-radius:7px;background:var(--panel-2);display:grid;place-items:center;font-weight:700;font-size:var(--fs-sm)}
-.an-lap-row .vbar{position:relative;height:6px;border-radius:99px;background:rgba(148,163,196,.15);margin-top:3px}
-.an-lap-row .vbar i{position:absolute;left:0;top:0;height:100%;border-radius:99px;background:var(--swim)}
-.an-lap-col{display:flex;flex-direction:column;gap:1px}
-.an-lap-col b{font-weight:700;font-size:12.5px}
-.an-lap-col small{font-size:9.5px;color:var(--muted)}
-@media (max-width:640px){
-  .an-lap-row{grid-template-columns:30px 1fr 1fr 1fr;font-size:var(--fs-sm)}
-  .an-lap-row .hide-sm{display:none}
-}
+/* cartes des laps (voir injectLapCss en JS pour .lap-card/.lc-*) */
 
 /* ---------- Impact des conditions (chaleur, vent, D+) ---------- */
 .an-impact{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:11px}

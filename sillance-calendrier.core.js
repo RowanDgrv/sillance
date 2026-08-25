@@ -7083,13 +7083,22 @@ function injectLapCss(){
   .lapcol:hover{color:var(--text)} .lapcol.on{color:var(--text);border-color:var(--accent);background:rgba(70,194,216,.10)}
   .lapcol .box{width:13px;height:13px;border-radius:4px;border:1.5px solid currentColor;display:grid;place-items:center;font-size:9px;line-height:1}
   .lapcol.on .box{background:var(--accent);border-color:var(--accent);color:#06222a}
-  .an-laps .an-lap-row{display:grid;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid var(--line)}
-  .an-laps .an-lap-row.head{border-bottom:1px solid var(--line-strong)}
-  .an-laps .an-lap-row.head span{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;font-weight:700}
-  .an-laps .an-lap-row.head span:first-child{text-align:center}
-  .an-laps .lapn{justify-self:center;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:rgba(150,165,200,.12);font-family:var(--font-data);font-weight:700;font-size:12px}
-  .an-laps .lapcell{text-align:right;font-size:12.5px;font-family:var(--font-data);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .an-laps .lapcell small{color:var(--muted);font-size:10px;font-family:var(--font-ui,inherit)}
+  /* Cartes par lap façon Nolio (25/08/2026) : une petite carte par lap avec
+     toutes les métriques cochées en un coup d'œil, plutôt qu'un tableau à
+     faire défiler horizontalement — plus lisible pour le coach en visu rapide. */
+  .an-laps .lap-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:10px}
+  .an-laps .lap-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:11px 13px;display:flex;flex-direction:column;gap:9px}
+  .an-laps .lap-card.hard{border-color:rgba(255,84,112,.4);background:rgba(255,84,112,.05)}
+  .an-laps .lc-head{display:flex;align-items:center;gap:8px}
+  .an-laps .lc-n{flex:none;width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:rgba(150,165,200,.14);font-family:var(--font-data);font-weight:700;font-size:12px}
+  .an-laps .lap-card.hard .lc-n{background:rgba(255,84,112,.22);color:var(--run)}
+  .an-laps .lc-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  .an-laps .lc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px 10px}
+  .an-laps .lc-m{display:flex;flex-direction:column;gap:1px;min-width:0}
+  .an-laps .lc-k{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .an-laps .lc-v{font-family:var(--font-data);font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .an-laps .lc-v small{color:var(--muted);font-weight:500;font-size:10px;font-family:var(--font-ui,inherit)}
+  @media (max-width:480px){.an-laps .lc-metrics{grid-template-columns:1fr 1fr 1fr}}
   .zbadge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid}`;
   document.head.appendChild(st);
 }
@@ -7151,10 +7160,11 @@ function renderLaps(data, isSwim){
   const lbl=c=>typeof c.label==='function'?c.label(disc):c.label;
   const tools=cols.map(c=>`<button class="lapcol ${sel.has(c.key)?'on':''}" data-k="${c.key}"><span class="box">${sel.has(c.key)?'<i class="ic ic-check"></i>':''}</span>${lbl(c)}</button>`).join('');
   const vis=cols.filter(c=>sel.has(c.key));
-  const grid=`grid-template-columns:30px repeat(${vis.length||1}, minmax(0,1fr))`;
-  const head=`<div class="an-lap-row head" style="${grid}"><span>#</span>${vis.map(c=>`<span>${lbl(c)}</span>`).join('')}</div>`;
-  const rows=data.laps.map(l=>`<div class="an-lap-row" style="${grid}"><span class="lapn" style="${l.hard?'background:rgba(255,84,112,.22);color:var(--run)':''}">${l.n}</span>${vis.map(c=>`<span class="lapcell">${c.v(l,data,disc)}</span>`).join('')}</div>`).join('');
-  box.innerHTML=`<div class="lapcols">${tools}</div>`+head+rows;
+  const cards=data.laps.map(l=>`<div class="lap-card ${l.hard?'hard':''}">
+      <div class="lc-head"><span class="lc-n">${l.n}</span><span class="lc-label">Lap ${l.n}</span></div>
+      <div class="lc-metrics">${vis.map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(l,data,disc)}</span></div>`).join('')}</div>
+    </div>`).join('');
+  box.innerHTML=`<div class="lapcols">${tools}</div><div class="lap-cards">${cards}</div>`;
   box.querySelectorAll('.lapcol').forEach(b=>b.onclick=()=>{
     const k=b.dataset.k; sel.has(k)?sel.delete(k):sel.add(k);
     try{ localStorage.setItem('pf_lapcols_'+disc, JSON.stringify([...sel])); }catch(e){}
