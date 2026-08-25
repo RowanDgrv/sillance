@@ -3041,6 +3041,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <span class="badge" id="anBadge"></span>
     <h3 id="anTitle"></h3>
     <div class="an-kpis" id="anKpis"></div>
+    <div class="an-section" id="anChargeWrap">
+      <div class="an-sec-head"><h4 data-i18n="charge.heading">Charge de la séance</h4><span class="an-hint" data-i18n="charge.hint">Coggan · TRIMP · Foster, au choix</span></div>
+      <div id="anCharge"></div>
+    </div>
     <div class="an-section" id="anImpactWrap">
       <div class="an-sec-head"><h4><span data-i18n="perf.conditionsImpactHeading">Impact des conditions</span> <span class="an-hint" data-i18n="perf.conditionsImpactHint">ce que l'environnement t'a coûté</span></h4></div>
       <div class="an-impact" id="anImpact"></div>
@@ -3052,6 +3056,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <div class="an-section" id="anPowerWrap">
       <div class="an-sec-head"><h4>Puissance (W)</h4></div>
       <svg id="anPower" viewBox="0 0 720 180" role="img" aria-label="Courbe de puissance" data-i18n-attr="aria-label:chart.powerAria"></svg>
+    </div>
+    <div class="an-section" id="anWbalWrap">
+      <div class="an-sec-head"><h4 data-i18n="wbal.heading">W'bal · réserve anaérobie</h4><span class="an-hint" data-i18n="wbal.hintShort">estimée, décharge/recharge en temps réel</span></div>
+      <div class="an-dc-kpi" id="anWbalKpi"></div>
+      <svg id="anWbal" viewBox="0 0 720 170" role="img" aria-label="W'bal" data-i18n-attr="aria-label:wbal.chartAria"></svg>
     </div>
     <div class="an-section">
       <div class="an-sec-head"><h4 data-i18n="chart.hrHeading">Fréquence cardiaque</h4></div>
@@ -3074,6 +3083,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         <p class="hint" id="anStepLenNA">Pas de données de longueur de foulée disponibles sur cette activité (nécessite une montre avec capteur de dynamiques de course : Coros, Garmin… ou via import .FIT).</p>
       </div>
     </div>
+    <div class="an-section" id="anBestWrap">
+      <div class="an-sec-head"><h4 data-i18n="best.heading">Meilleurs efforts &amp; records</h4><span class="an-hint" data-i18n="best.hint">puissance/allure sur les durées de référence</span></div>
+      <svg id="anBestCurve" viewBox="0 0 720 190" role="img" aria-label="Courbe des meilleurs efforts" data-i18n-attr="aria-label:best.chartAria"></svg>
+      <p class="hint" id="anBestCurveEmpty" data-i18n="best.tooShort">Séance trop courte pour une courbe de meilleurs efforts exploitable.</p>
+      <div class="best-records" id="anBestRecords"></div>
+    </div>
     <div class="an-section" id="anDecoupleWrap">
       <div class="an-sec-head"><h4><span data-i18n="chart.decouplingHeading">Découplage</span> <span class="an-hint" id="anDecoupleHint" data-i18n="chart.decouplingHint">efficacité cardiaque sur la durée</span></h4></div>
       <div class="an-dc-kpi" id="anDecoupleKpi"></div>
@@ -3091,6 +3106,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <div class="an-section">
       <div class="an-sec-head"><h4 data-i18n="perf.lapDetailHeading">Détail par lap</h4><span class="an-hint" id="anLapHint"></span></div>
       <div class="an-laps" id="anLaps"></div>
+    </div>
+    <div class="an-section" id="anCompareWrap">
+      <div class="an-sec-head"><h4 data-i18n="compare.heading">Comparateur — séances superposées</h4><span class="an-hint" data-i18n="compare.hint">axe temps ou distance</span></div>
+      <svg id="anCompareChart" viewBox="0 0 720 200" role="img" aria-label="Comparateur de séances en overlay" data-i18n-attr="aria-label:compare.chartAria"></svg>
+      <div id="anCompareLegend"></div>
     </div>
     <div class="an-section" id="anSimilarWrap">
       <div class="an-sec-head"><h4 data-i18n="perf.similarSessionsHeading">Séances similaires</h4><span class="an-hint" data-i18n="perf.autoComparison">comparaison automatique</span></div>

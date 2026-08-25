@@ -6098,59 +6098,129 @@ const analysisOverlay = document.getElementById('analysisOverlay');
 /* PRNG déterministe pour que la même séance donne toujours le même tracé */
 function seededRand(seed){ let s=seed%2147483647; if(s<=0)s+=2147483646; return ()=>{ s=s*16807%2147483647; return (s-1)/2147483646; }; }
 
-function genSessionData(s){
-  const rnd = seededRand(s.id.split('').reduce((a,c)=>a+c.charCodeAt(0),7)+(s.dur||60));
+/* Génère le flux de points bruts d'une séance (résolution fine, indépendante
+   du découpage en laps — la détection d'intervalles se fait APRÈS, sur ce
+   flux continu, cf. autoDetectLaps). Factorisé pour être réutilisé par le
+   comparateur (séances synthétiques comparables, cf. genComparisonPts). */
+function genSessionPts(s, rnd, FTP){
   const isRun = s.disc==='run', isBike = s.disc==='bike', isSwim = s.disc==='swim';
-  const FTP=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)?ATHLETE_REF.ftp:(STRAVA_DEMO.ftp?STRAVA_DEMO.ftp.at(-1):270);
-  const nLaps = isSwim ? Math.max(4,Math.round((s.dur||40)/8)) : Math.max(4, Math.min(12, Math.round((s.dur||60)/10)));
-  const ptsPerLap = 14;
   const baseSpeed = isBike?30: isRun?12: 3.2;            // km/h moyen plausible
   const baseHr = 130 + (s.zone==='Z4'||s.zone==='Z5'?28: s.zone==='Z3'?16:6);
+  const intervalish = s.zone==='Z4'||s.zone==='Z5'||/interval|seuil|vma|vo2|fractionn/i.test(s.title||'');
+  const totalMin = s.dur||60;
+  // résolution ~20s/point (bornée pour rester fluide sur de très longues séances)
+  const nPts = Math.max(60, Math.min(420, Math.round(totalMin/0.34)));
+  const dt = totalMin/nPts;
+  const blockLenMin = isSwim ? 7 : 9;
   let alt = 120 + rnd()*60;
-  const pts=[], laps=[];
-  let tElapsed=0; const totalMin=s.dur||60;
-  for(let l=0; l<nLaps; l++){
-    const hard = (l%2===1) && (s.zone==='Z4'||s.zone==='Z5'||/interval|seuil|vma|vo2|fractionn/i.test(s.title||''));
-    const lapSpeedBase = baseSpeed * (hard?1.18: (l===0?0.82:1)) * (isSwim?1:1);
-    const lapPts=[];
-    let lapDplus=0, lapDist=0, hrSum=0, spSum=0, gradeAdjSum=0, pwSum=0, cadSum=0, maxHrLap=0; const pwArr=[];
-    for(let i=0;i<ptsPerLap;i++){
-      const grade = isSwim?0 : (Math.sin((l*ptsPerLap+i)/7)*4 + (rnd()-0.5)*3); // % de pente
-      alt += grade*0.9;
-      if(grade>0) lapDplus += grade*0.9;
-      const sp = Math.max(2, lapSpeedBase*(1 + (rnd()-0.5)*0.08) - grade*0.18); // la montée ralentit
-      const hr = Math.round(baseHr*(hard?1.08:1) + (rnd()-0.5)*8 + grade*1.1 + l*0.6);
-      // VAP : vitesse corrigée de la pente (modèle simplifié type Strava GAP)
-      const gap = sp * (1 + 0.025*grade + 0.0018*grade*grade);
-      const dt = totalMin/(nLaps*ptsPerLap); // min par point
-      const dist = sp/60*dt; // km
-      lapDist += dist; lapDplus; hrSum+=hr; spSum+=sp; gradeAdjSum+=gap;
-      tElapsed+=dt;
-      const pw = isBike ? Math.max(40, Math.round((hard?FTP*1.05:FTP*0.70)*(1+(rnd()-0.5)*0.16)+grade*4)) : 0;
-      const cad = isBike ? Math.round((hard?92:86)+(rnd()-0.5)*8) : 0;
-      if(isBike){ pwSum+=pw; pwArr.push(pw); cadSum+=cad; }
-      if(hr>maxHrLap) maxHrLap=hr;
-      const pt={t:tElapsed, sp, hr, alt, grade, gap, pw, cad};
-      pts.push(pt); lapPts.push(pt);
+  const pts=[];
+  for(let i=0;i<nPts;i++){
+    const t = (i+1)*dt;
+    const blockIdx = Math.floor(t/blockLenMin);
+    const hard = intervalish && (blockIdx%2===1);
+    const speedBase = baseSpeed * (hard?1.18: (blockIdx===0?0.82:1));
+    const grade = isSwim?0 : (Math.sin(i/7)*4 + (rnd()-0.5)*3); // % de pente
+    alt += grade*0.9;
+    const sp = Math.max(2, speedBase*(1 + (rnd()-0.5)*0.08) - grade*0.18); // la montée ralentit
+    const hr = Math.round(baseHr*(hard?1.08:1) + (rnd()-0.5)*8 + grade*1.1 + blockIdx*0.6);
+    // VAP : vitesse corrigée de la pente (modèle simplifié type Strava GAP)
+    const gap = sp * (1 + 0.025*grade + 0.0018*grade*grade);
+    const pw = isBike ? Math.max(40, Math.round((hard?FTP*1.05:FTP*0.70)*(1+(rnd()-0.5)*0.16)+grade*4)) : 0;
+    const cad = isBike ? Math.round((hard?92:86)+(rnd()-0.5)*8) : 0;
+    const pt={t, sp, hr, alt, grade, gap, pw, cad};
+    if(isBike){
+      // équilibre gauche/droite (léger déséquilibre plausible, borné 42-58%)
+      pt.lbal = Math.max(42, Math.min(58, Math.round(49 + Math.sin(i/11)*3 + (rnd()-0.5)*3)));
+      // couple estimé à partir de la puissance et de la cadence : Nm = P·60/(2π·cad)
+      pt.tq = cad>0 ? +(pw*60/(2*Math.PI*cad)).toFixed(1) : 0;
     }
-    const npLap = isBike ? Math.round(Math.pow(pwArr.reduce((a,p)=>a+Math.pow(p,4),0)/pwArr.length, 0.25)) : 0;
-    laps.push({
-      n:l+1,
-      dist:lapDist,
-      durMin: totalMin/nLaps,
-      avgSpeed: spSum/ptsPerLap,
-      avgGap: gradeAdjSum/ptsPerLap,
-      avgHr: Math.round(hrSum/ptsPerLap),
-      maxHr: maxHrLap,
-      avgPower: isBike?Math.round(pwSum/ptsPerLap):0,
-      np: npLap,
-      cad: isBike?Math.round(cadSum/ptsPerLap):0,
-      if: isBike && FTP ? +(npLap/FTP).toFixed(2) : 0,
-      kj: isBike ? Math.round((pwSum/ptsPerLap)*(totalMin/nLaps*60)/1000) : 0,
-      dplus: Math.round(lapDplus),
-      hard
+    pts.push(pt);
+  }
+  return pts;
+}
+
+/* Détection automatique d'intervalles (façon intervals.icu/Nolio) : classe
+   chaque point effort/récup/neutre par rapport à la moyenne de la séance
+   (puissance en vélo, vitesse sinon), regroupe les points contigus de même
+   classe en segments, puis fusionne les segments trop courts (bruit) dans
+   leur voisin. Repli en tranches égales si la séance est trop steady-state
+   pour donner ≥3 segments exploitables (même logique que Garmin/Strava quand
+   aucune vraie répétition n'est détectée). */
+function autoDetectLaps(pts, disc, FTP){
+  const isBike = disc==='bike';
+  const metricOf = p => isBike ? p.pw : p.sp;
+  const vals = pts.map(metricOf);
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const sm = vals.map((v,i)=>{
+    const a=Math.max(0,i-1), b=Math.min(vals.length-1,i+1);
+    let s=0,n=0; for(let k=a;k<=b;k++){ s+=vals[k]; n++; }
+    return s/n;
+  });
+  const hi=avg*1.08, lo=avg*0.94;
+  const cls = sm.map(v=> v>=hi?'hard' : v<=lo?'easy' : 'mid');
+  let segs=[], curCls=cls[0], start=0;
+  for(let i=1;i<=cls.length;i++){
+    if(i===cls.length || cls[i]!==curCls){
+      segs.push({cls:curCls, i0:start, i1:i-1});
+      if(i<cls.length){ curCls=cls[i]; start=i; }
+    }
+  }
+  const minPts = Math.max(2, Math.round(pts.length*0.03));
+  let merged=[];
+  segs.forEach(seg=>{
+    const len = seg.i1-seg.i0+1;
+    if(merged.length && len<minPts) merged[merged.length-1].i1 = seg.i1;
+    else merged.push({cls:seg.cls, i0:seg.i0, i1:seg.i1});
+  });
+  if(merged.length<3){
+    // séance trop homogène pour de vraies répétitions → tranches égales
+    const nChunks = Math.max(3, Math.min(10, Math.round(pts.length/24)));
+    merged = Array.from({length:nChunks}, (_,c)=>{
+      const i0=Math.round(c*pts.length/nChunks), i1=Math.round((c+1)*pts.length/nChunks)-1;
+      return {cls: metricOf(pts[Math.floor((i0+i1)/2)])>=hi?'hard':'mid', i0, i1:Math.max(i0,i1)};
     });
   }
+  return merged.map((seg,idx)=>{
+    const slice = pts.slice(seg.i0, seg.i1+1);
+    const n=slice.length;
+    const t0 = seg.i0>0 ? pts[seg.i0-1].t : 0;
+    const durMin = slice[n-1].t - t0;
+    const dist = slice.reduce((a,p,k)=>{ const dtp = k===0 ? (p.t-t0) : (p.t-slice[k-1].t); return a + p.sp/60*dtp; }, 0);
+    const dplus = slice.reduce((a,p,k)=>{ if(k===0) return a; const g=p.grade; return a + (g>0? g*0.9 : 0); }, 0);
+    const hrSum = slice.reduce((a,p)=>a+p.hr,0), maxHr = Math.max(...slice.map(p=>p.hr));
+    const spSum = slice.reduce((a,p)=>a+p.sp,0), gapSum = slice.reduce((a,p)=>a+p.gap,0);
+    const pwArr = slice.map(p=>p.pw);
+    const pwSum = pwArr.reduce((a,b)=>a+b,0);
+    const cadSum = slice.reduce((a,p)=>a+p.cad,0);
+    const np = isBike ? Math.round(Math.pow(pwArr.reduce((a,p)=>a+Math.pow(p,4),0)/n, 0.25)) : 0;
+    const lbal = isBike ? Math.round(slice.reduce((a,p)=>a+p.lbal,0)/n) : 0;
+    const tq = isBike ? +(slice.reduce((a,p)=>a+p.tq,0)/n).toFixed(1) : 0;
+    return {
+      n: idx+1,
+      dist,
+      durMin,
+      avgSpeed: spSum/n,
+      avgGap: gapSum/n,
+      avgHr: Math.round(hrSum/n),
+      maxHr,
+      avgPower: isBike?Math.round(pwSum/n):0,
+      np,
+      cad: isBike?Math.round(cadSum/n):0,
+      if: isBike && FTP ? +(np/FTP).toFixed(2) : 0,
+      kj: isBike ? Math.round((pwSum/n)*(durMin*60)/1000) : 0,
+      dplus: Math.round(dplus),
+      lbal, tq,
+      hard: seg.cls==='hard'
+    };
+  });
+}
+
+function genSessionData(s){
+  const rnd = seededRand(s.id.split('').reduce((a,c)=>a+c.charCodeAt(0),7)+(s.dur||60));
+  const isSwim = s.disc==='swim';
+  const FTP=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)?ATHLETE_REF.ftp:(STRAVA_DEMO.ftp?STRAVA_DEMO.ftp.at(-1):270);
+  const pts = genSessionPts(s, rnd, FTP);
+  const laps = autoDetectLaps(pts, s.disc, FTP);
   const dplus = Math.round(laps.reduce((a,l)=>a+l.dplus,0));
   const dist = laps.reduce((a,l)=>a+l.dist,0);
   const avgHr = Math.round(pts.reduce((a,p)=>a+p.hr,0)/pts.length);
@@ -6270,6 +6340,322 @@ function renderImpact(s, data){
 
 function paceFromSpeed(kmh){ if(kmh<=0) return '—'; const s=3600/kmh; return Math.floor(s/60)+"'"+String(Math.round(s%60)).padStart(2,'0')+'"'; }
 
+/* ============================================================
+   MÉTHODE DE CALCUL DE CHARGE — Coggan (TSS/rTSS/sTSS) · TRIMP
+   (Banister) · Foster (session-RPE) — #7 de l'audit concurrentiel
+   (iDO propose les 3 au choix). Les 3 sont toujours calculées ; le
+   coach choisit celle mise en avant, mémorisé en local.
+   ============================================================ */
+function chargeThresholdSpeed(disc){
+  if(disc==='run') return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF.seuilRun) ? 3600/ATHLETE_REF.seuilRun : null;
+  if(disc==='swim') return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF.css) ? 360/ATHLETE_REF.css : null;
+  return null;
+}
+function computeChargeCoggan(s, data){
+  const disc=s.disc; const durHr=data.pts[data.pts.length-1].t/60; if(!durHr) return null;
+  if(disc==='bike'){
+    const FTP=lapFTPval(); if(!FTP) return null;
+    const pts=data.pts, np=Math.pow(pts.reduce((a,p)=>a+Math.pow(p.pw,4),0)/pts.length,0.25);
+    const ifv=np/FTP;
+    return {label:'TSS', value:Math.round(durHr*ifv*ifv*100), ifv:+ifv.toFixed(2)};
+  }
+  const thr=chargeThresholdSpeed(disc); if(!thr) return null;
+  const ifv=data.avgGap/thr;
+  return {label: disc==='run'?'rTSS':'sTSS', value:Math.round(durHr*ifv*ifv*100), ifv:+ifv.toFixed(2)};
+}
+function computeChargeTrimp(s, data){
+  const fcMax=(typeof ATHLETE_REF!=='undefined')?ATHLETE_REF.fcMax:null, fcRest=(typeof ATHLETE_REF!=='undefined')?ATHLETE_REF.fcRepos:null;
+  if(!fcMax||!fcRest||fcMax<=fcRest) return null;
+  const durMin=data.pts[data.pts.length-1].t;
+  const hrr=Math.max(0,Math.min(1,(data.avgHr-fcRest)/(fcMax-fcRest)));
+  return {label:'TRIMP', value:Math.round(durMin*hrr*0.64*Math.exp(1.92*hrr)), hrr:+hrr.toFixed(2)};
+}
+function computeChargeFoster(s, data){
+  const fcMax=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:190;
+  const estimated=!s.rpe;
+  const rpe = s.rpe || Math.max(1,Math.min(10, Math.round(2+(data.maxHr/fcMax)*8)));
+  const durMin=data.pts[data.pts.length-1].t;
+  return {label:tr('charge.foster'), value:Math.round(durMin*rpe), rpe, estimated};
+}
+const CHARGE_METHODS = [
+  {key:'coggan', get label(){return tr('charge.coggan')}, compute:computeChargeCoggan},
+  {key:'trimp',  label:'TRIMP', compute:computeChargeTrimp},
+  {key:'foster', get label(){return tr('charge.foster')}, compute:computeChargeFoster},
+];
+function chargeMethodPref(){ try{ return localStorage.getItem('sil_charge_method')||'coggan'; }catch(e){ return 'coggan'; } }
+function injectChargeCss(){
+  if(document.getElementById('pf-charge-css')) return;
+  const st=document.createElement('style'); st.id='pf-charge-css';
+  st.textContent=`
+  .charge-picks{display:flex;flex-wrap:wrap;gap:10px}
+  .charge-pick{flex:1;min-width:120px;text-align:left;cursor:pointer;border:1px solid var(--line-strong);background:var(--panel-2);border-radius:12px;padding:12px 14px;font-family:inherit;color:var(--muted);transition:border-color .15s,background .15s}
+  .charge-pick:hover{border-color:var(--accent)}
+  .charge-pick.on{border-color:var(--accent);background:rgba(70,194,216,.1);color:var(--text)}
+  .charge-pick .cp-lbl{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:4px}
+  .charge-pick.on .cp-lbl{color:var(--accent)}
+  .charge-pick .cp-val{display:block;font-family:var(--font-data);font-size:22px;font-weight:700;color:var(--text)}
+  .charge-pick .cp-est{display:block;font-size:10px;color:var(--muted);margin-top:3px}`;
+  document.head.appendChild(st);
+}
+function renderCharge(s, data){
+  const wrap=document.getElementById('anChargeWrap'); if(!wrap) return;
+  if(s.disc==='hyrox'||s.disc==='strength'){ wrap.style.display='none'; return; }
+  injectChargeCss();
+  const results = CHARGE_METHODS.map(m=>({key:m.key, label:(typeof m.label==='function'?m.label():m.label), r:m.compute(s,data)})).filter(m=>m.r);
+  if(!results.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  let sel=chargeMethodPref(); if(!results.some(m=>m.key===sel)) sel=results[0].key;
+  const box=document.getElementById('anCharge');
+  box.innerHTML = `<div class="charge-picks">${results.map(m=>`
+    <button class="charge-pick ${m.key===sel?'on':''}" data-cm="${m.key}">
+      <span class="cp-lbl">${m.r.label}</span>
+      <span class="cp-val">${m.r.value}</span>
+      ${m.r.estimated?`<span class="cp-est">${tr('charge.rpeEstimated')}</span>`:''}
+    </button>`).join('')}</div>`;
+  box.querySelectorAll('.charge-pick').forEach(b=>b.onclick=()=>{
+    try{ localStorage.setItem('sil_charge_method', b.dataset.cm); }catch(e){}
+    renderCharge(s, data);
+  });
+}
+
+/* ============================================================
+   RECORDS PERSONNELS — stockage local par métrique (#8 audit)
+   ------------------------------------------------------------
+   Clé = discipline + métrique (+ durée pour la courbe des meilleurs
+   efforts). En prod : par athlète, côté serveur. `prev==null` = 1ʳᵉ
+   captation (pas de notif) ; sinon dépassement → nouveau record.
+   ============================================================ */
+function loadPR(key){ try{ const v=localStorage.getItem('sil_pr_'+key); return v!=null?+v:null; }catch(e){ return null; } }
+function savePR(key,val){ try{ localStorage.setItem('sil_pr_'+key, String(val)); }catch(e){} }
+
+/* ============================================================
+   COURBE DES MEILLEURS EFFORTS (power/pace curve) — #1 de l'audit
+   ------------------------------------------------------------
+   Meilleure moyenne glissante sur une série de durées standards,
+   comme TrainingPeaks/intervals.icu/iDO. Vélo : puissance (NP-like,
+   moyenne quadratique d'ordre 4 sur la fenêtre). Course/nat : vitesse
+   moyenne (converti en allure à l'affichage).
+   ============================================================ */
+const BEST_EFFORT_DURS_MIN = [1,2,5,10,15,20,30,45,60,90,120,180];
+function computeBestEfforts(data, disc){
+  const pts=data.pts; const totalMin=pts[pts.length-1].t;
+  const isBike=disc==='bike';
+  const durs=BEST_EFFORT_DURS_MIN.filter(d=>d<=totalMin*0.98);
+  if(durs.length<2) return [];
+  return durs.map(durMin=>{
+    let best=0, i0=0;
+    for(let i1=0;i1<pts.length;i1++){
+      while(i0<i1 && pts[i1].t-(i0>0?pts[i0-1].t:0) > durMin) i0++;
+      const span = pts[i1].t-(i0>0?pts[i0-1].t:0);
+      if(span < durMin*0.9) continue;
+      const slice = pts.slice(i0,i1+1);
+      const avg = isBike
+        ? Math.pow(slice.reduce((a,p)=>a+Math.pow(p.pw,4),0)/slice.length,0.25)
+        : slice.reduce((a,p)=>a+p.sp,0)/slice.length;
+      if(avg>best) best=avg;
+    }
+    return {durMin, value:best};
+  }).filter(e=>e.value>0);
+}
+function fmtBEDur(min){ if(min<60) return min+"'"; const h=Math.floor(min/60), m=min%60; return m?`${h}h${String(m).padStart(2,'0')}`:`${h}h`; }
+
+/* Records ponctuels (pas liés à une durée) : FC max, pic de cadence, pic de
+   couple (vélo), VAM (vitesse ascensionnelle moyenne sur les portions en
+   montée). "Puissance/allure" sont déjà couverts par la courbe ci-dessus. */
+function computeDiscreteRecords(s, data, disc){
+  const recs=[{key:'hrmax', label:tr('records.hrMax'), value:data.maxHr, unit:'bpm'}];
+  if(disc==='bike'){
+    const pts=data.pts;
+    recs.push({key:'cadpeak', label:tr('records.cadPeak'), value:Math.max(...pts.map(p=>p.cad)), unit:'rpm'});
+    recs.push({key:'tqpeak', label:tr('records.tqPeak'), value:Math.round(Math.max(...pts.map(p=>p.tq))), unit:'Nm'});
+  }
+  if(disc!=='swim' && data.dplus>3){
+    const climbFrac = data.pts.filter(p=>p.grade>0).length/data.pts.length;
+    const durHr = data.pts[data.pts.length-1].t/60;
+    const climbHr = Math.max(0.02, climbFrac*durHr);
+    recs.push({key:'vam', label:'VAM', value:Math.round(data.dplus/climbHr), unit:'m/h'});
+  }
+  return recs;
+}
+function injectBestEffortsCss(){
+  if(document.getElementById('pf-best-css')) return;
+  const st=document.createElement('style'); st.id='pf-best-css';
+  st.textContent=`
+  .best-records{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:16px}
+  .best-rec{border:1px solid var(--line);border-radius:11px;background:var(--panel-2);padding:10px 13px;position:relative}
+  .best-rec.pr{border-color:var(--good)}
+  .br-k{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .br-v{font-family:var(--font-data);font-size:17px;font-weight:700}
+  .br-v small{font-size:10.5px;color:var(--muted);font-weight:500;font-family:var(--font-ui,inherit)}
+  .br-badge{position:absolute;top:8px;right:9px;font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--good);background:rgba(57,230,163,.14);border:1px solid rgba(57,230,163,.4);border-radius:99px;padding:1.5px 7px}`;
+  document.head.appendChild(st);
+}
+function renderBestEfforts(s, data){
+  const wrap=document.getElementById('anBestWrap'); if(!wrap) return;
+  const disc=s.disc;
+  if(disc==='hyrox'||disc==='strength'){ wrap.style.display='none'; return; }
+  injectBestEffortsCss();
+  const efforts=computeBestEfforts(data, disc);
+  const newPRs=[];
+  const svg=document.getElementById('anBestCurve'); svg.innerHTML='';
+  document.getElementById('anBestCurveEmpty').style.display = efforts.length<2 ? '' : 'none';
+  if(efforts.length>=2){
+    const W=720,H=190,P={l:54,r:16,t:16,b:26};
+    const durs=efforts.map(e=>e.durMin), minD=Math.min(...durs), maxD=Math.max(...durs);
+    const xs=d=>P.l+(Math.log(d)-Math.log(minD))/(Math.log(maxD)-Math.log(minD))*(W-P.l-P.r);
+    const vVals=efforts.map(e=>e.value);
+    const vMax=Math.max(...vVals)*1.1, vMin=Math.min(...vVals)*0.85;
+    const y=v=>H-P.b-(v-vMin)/(vMax-vMin)*(H-P.t-P.b);
+    for(let g=0;g<=3;g++){ const yv=P.t+g/3*(H-P.t-P.b); svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${yv}" y2="${yv}" stroke="rgba(148,163,196,.1)"/>`); }
+    let path=''; efforts.forEach((e,i)=>{ path+=(i?'L':'M')+xs(e.durMin)+' '+y(e.value); });
+    const area=path+`L${xs(maxD)} ${H-P.b}L${xs(minD)} ${H-P.b}Z`;
+    svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="var(--strength)" opacity="0.12"/>`);
+    svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--strength)" stroke-width="2"/>`);
+    efforts.forEach(e=>{
+      const x=xs(e.durMin), yy=y(e.value);
+      const prKey=`${disc}_be_${e.durMin}`, prev=loadPR(prKey);
+      const isPR = prev==null || e.value>prev*1.001;
+      if(isPR){ savePR(prKey, e.value); if(prev!=null) newPRs.push(fmtBEDur(e.durMin)); }
+      svg.insertAdjacentHTML('beforeend',`<circle cx="${x}" cy="${yy}" r="${isPR&&prev!=null?4.5:3}" fill="${isPR&&prev!=null?'var(--good)':'var(--strength)'}"/>`);
+      svg.insertAdjacentHTML('beforeend',`<text x="${x}" y="${H-8}" fill="var(--muted)" font-size="8.5" font-family="var(--font-data)" text-anchor="middle">${fmtBEDur(e.durMin)}</text>`);
+    });
+    [vMin,(vMin+vMax)/2,vMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--strength)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${disc==='bike'?Math.round(v):paceFromSpeed(v)}</text>`); });
+    svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${disc==='bike'?'W':'/km'}</text>`);
+  }
+  const drecs=computeDiscreteRecords(s, data, disc);
+  document.getElementById('anBestRecords').innerHTML = drecs.map(r=>{
+    const prKey=`${disc}_${r.key}`, prev=loadPR(prKey);
+    const isPR = prev==null || r.value>prev*1.001;
+    if(isPR){ savePR(prKey, r.value); if(prev!=null) newPRs.push(r.label); }
+    return `<div class="best-rec ${isPR&&prev!=null?'pr':''}">
+      <span class="br-k">${r.label}</span>
+      <span class="br-v">${r.value}<small> ${r.unit}</small></span>
+      ${isPR&&prev!=null?`<span class="br-badge">${tr('records.newPr')}</span>`:''}
+    </div>`;
+  }).join('');
+  if(newPRs.length && typeof toast==='function') toast(tr(newPRs.length>1?'records.toastPlural':'records.toastSingular', {n:newPRs.length}));
+}
+
+/* ============================================================
+   W'BAL — réserve anaérobie restante en temps réel (vélo) — #4 audit
+   ------------------------------------------------------------
+   Modèle différentiel de Skiba : décharge au-dessus de la puissance
+   critique (CP), recharge exponentielle en dessous (tau variable
+   selon le déficit). W' (capacité, en kJ) est estimé faute de test
+   dédié dans l'app — affiché comme tel.
+   ============================================================ */
+function computeWbal(data, disc){
+  if(disc!=='bike') return null;
+  const CP=(typeof ATHLETE_REF!=='undefined')?(ATHLETE_REF.cpBike||ATHLETE_REF.ftp):null; if(!CP) return null;
+  const FTP=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF.ftp)||CP;
+  const Wp=Math.max(15000, Math.min(30000, 20000+(FTP-250)*20));
+  const pts=data.pts;
+  let bal=Wp; const series=[];
+  for(let i=0;i<pts.length;i++){
+    const p=pts[i].pw;
+    const dtSec=(i===0?pts[0].t:(pts[i].t-pts[i-1].t))*60;
+    if(p>CP) bal -= (p-CP)*dtSec;
+    else { const tau=546*Math.exp(-0.01*(CP-p))+316; bal += (Wp-bal)*(1-Math.exp(-dtSec/tau)); }
+    bal=Math.max(0, Math.min(Wp, bal));
+    series.push({t:pts[i].t, bal});
+  }
+  const minBal=Math.min(...series.map(x=>x.bal));
+  return {Wp, CP, series, minPct:Math.round(minBal/Wp*100)};
+}
+function renderWbal(s, data){
+  const wrap=document.getElementById('anWbalWrap'); if(!wrap) return;
+  const wb=computeWbal(data, s.disc);
+  if(!wb){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  const svg=document.getElementById('anWbal'); svg.innerHTML='';
+  const W=720,H=170,P={l:54,r:16,t:14,b:24};
+  const xs=i=>P.l+i/(wb.series.length-1)*(W-P.l-P.r);
+  const y=v=>H-P.b-(v/100)*(H-P.t-P.b);
+  for(let g=0;g<=3;g++){ const yv=P.t+g/3*(H-P.t-P.b); svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${yv}" y2="${yv}" stroke="rgba(148,163,196,.1)"/>`); }
+  let path=''; wb.series.forEach((pt,i)=>{ const pct=pt.bal/wb.Wp*100; path+=(i?'L':'M')+xs(i)+' '+y(pct); });
+  const area=path+`L${xs(wb.series.length-1)} ${H-P.b}L${P.l} ${H-P.b}Z`;
+  svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="var(--accent)" opacity="0.12"/>`);
+  svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/>`);
+  [0,50,100].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--accent)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${v}%</text>`); });
+  svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">W'bal</text>`);
+  document.getElementById('anWbalKpi').innerHTML = `<span>${tr('wbal.capacity')} <b>${(wb.Wp/1000).toFixed(1)} kJ</b> <small>(${tr('wbal.estimated')})</small></span><span>${tr('wbal.minReached')} <b style="color:${wb.minPct<15?'var(--run)':'var(--text)'}">${wb.minPct}%</b></span>`;
+}
+
+/* ============================================================
+   COMPARATEUR MULTI-SÉANCES EN OVERLAY — #3 de l'audit
+   ------------------------------------------------------------
+   Superpose la séance en cours à 1-2 séances similaires passées
+   (façon intervals.icu), axe temps ↔ distance interchangeable.
+   Les séances passées n'ont pas de flux de points stocké (démo) :
+   on en resynthétise un plausible via genSessionPts, avec le même
+   profil (durée proche, type, discipline) — déterministe par date.
+   ============================================================ */
+function computeCumDist(pts){ let d=0; return pts.map((p,i)=>{ const dtp=i===0?p.t:(p.t-pts[i-1].t); d+=p.sp/60*dtp; return d; }); }
+function genHistPts(h, seedExtra, FTP, refDurMin){
+  const seedStr=(h.date+h.type+seedExtra);
+  const seed=seedStr.split('').reduce((a,c)=>a+c.charCodeAt(0),11);
+  const rnd=seededRand(seed);
+  const jitter=0.85+rnd()*0.3;
+  const fakeS={id:seedStr, dur:Math.max(15,Math.round(refDurMin*jitter)),
+    zone: h.type==='vo2'?'Z5':h.type==='seuil'?'Z4':'Z2', title:h.type, disc:h.disc};
+  return genSessionPts(fakeS, rnd, FTP);
+}
+let compareAxis='time';
+function injectCompareCss(){
+  if(document.getElementById('pf-cmp-css')) return;
+  const st=document.createElement('style'); st.id='pf-cmp-css';
+  st.textContent=`
+  .cmp-axis{display:flex;gap:6px;margin-bottom:10px}
+  .cmp-ax-btn{font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line-strong);background:var(--panel-2);border-radius:99px;padding:5px 12px;cursor:pointer;font-family:inherit}
+  .cmp-ax-btn.on{color:var(--text);border-color:var(--accent);background:rgba(70,194,216,.1)}
+  .cmp-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
+  .cmp-leg-item{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+  .cmp-leg-item i{width:14px;height:3px;border-radius:2px;display:inline-block}`;
+  document.head.appendChild(st);
+}
+function drawCompareChart(series, disc, axis){
+  const svg=document.getElementById('anCompareChart'); svg.innerHTML='';
+  const W=720,H=200,P={l:54,r:16,t:14,b:26};
+  const isBike=disc==='bike';
+  const metricOf=p=>isBike?p.pw:p.sp;
+  const xArrs=series.map(sr=> axis==='time' ? sr.pts.map(p=>p.t) : computeCumDist(sr.pts));
+  const xMax=Math.max(...xArrs.map(a=>a[a.length-1]));
+  const vAll=series.flatMap(sr=>sr.pts.map(metricOf));
+  const vMax=Math.max(...vAll)*1.08, vMin=Math.min(...vAll)*0.9;
+  const xs=v=>P.l+v/xMax*(W-P.l-P.r);
+  const y=v=>H-P.b-(v-vMin)/(vMax-vMin)*(H-P.t-P.b);
+  for(let g=0;g<=3;g++){ const yv=P.t+g/3*(H-P.t-P.b); svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${yv}" y2="${yv}" stroke="rgba(148,163,196,.1)"/>`); }
+  series.forEach((sr,si)=>{
+    const xArr=xArrs[si]; let path='';
+    sr.pts.forEach((p,i)=>{ path+=(i?'L':'M')+xs(xArr[i])+' '+y(metricOf(p)); });
+    svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="${sr.color}" stroke-width="${sr.current?2.4:1.6}" ${sr.current?'':'stroke-dasharray="5 4" opacity="0.85"'}/>`);
+  });
+  [vMin,(vMin+vMax)/2,vMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--muted)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${isBike?Math.round(v):paceFromSpeed(v)}</text>`); });
+  svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">${axis==='time'?tr('compare.minutes'):'km'}</text>`);
+}
+function renderCompareOverlay(s, data){
+  const wrap=document.getElementById('anCompareWrap'); if(!wrap) return;
+  const disc=s.disc;
+  if(disc==='hyrox'||disc==='strength'||disc==='swim'){ wrap.style.display='none'; return; }
+  const type=sessionType(s);
+  const matches=SESSION_HISTORY.filter(h=>h.disc===disc&&h.type===type).slice(0,2);
+  if(!matches.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  injectCompareCss();
+  const FTP=lapFTPval();
+  const refDurMin=data.pts[data.pts.length-1].t;
+  const series=[{label:tr('compare.thisSession'), pts:data.pts, color:'var(--accent)', current:true}]
+    .concat(matches.map((h,i)=>({label:h.date, pts:genHistPts(h,i,FTP,refDurMin), color: i===0?'#8B95AD':'var(--strength)', current:false})));
+  drawCompareChart(series, disc, compareAxis);
+  const box=document.getElementById('anCompareLegend');
+  box.innerHTML = `<div class="cmp-axis">
+      <button class="cmp-ax-btn ${compareAxis==='time'?'on':''}" data-ax="time">${tr('compare.byTime')}</button>
+      <button class="cmp-ax-btn ${compareAxis==='dist'?'on':''}" data-ax="dist">${tr('compare.byDist')}</button>
+    </div>
+    <div class="cmp-legend">${series.map(sr=>`<span class="cmp-leg-item"><i style="background:${sr.color}"></i>${sr.label}</span>`).join('')}</div>`;
+  box.querySelectorAll('.cmp-ax-btn').forEach(b=>b.onclick=()=>{ compareAxis=b.dataset.ax; renderCompareOverlay(s, data); });
+}
+
 function openAnalysis(s){
   const D=DISC[s.disc];
   document.getElementById('anBadge').textContent=D.label;
@@ -6304,11 +6690,19 @@ function openAnalysis(s){
   // biomécanique (cadence/foulée) — n'affiche que si le fichier réel fournit ces champs
   drawCadence(data);
   drawStepLen(data);
+  // charge de la séance (Coggan / TRIMP / Foster au choix du coach)
+  renderCharge(s, data);
+  // meilleurs efforts (courbe puissance/allure) + records personnels
+  renderBestEfforts(s, data);
+  // W'bal (réserve anaérobie, vélo) — après la courbe de puissance
+  renderWbal(s, data);
   // laps
   renderLapChart(data);
   renderLaps(data, isSwim);
   // impact des conditions (chaleur, vent, D+) — course & vélo
   renderImpact(s, data);
+  // comparateur multi-séances en overlay (temps/distance)
+  renderCompareOverlay(s, data);
   // séances similaires (comparateur — vélo & course)
   renderSimilar(s.disc, sessionType(s), currentSimMetrics(s, data));
   // découplage (Pw:Hr vélo · Pa:Hr course) — coach only, endurance/seuil
@@ -7069,6 +7463,8 @@ const LAP_COLS = [
   {key:'wkg',  label:'W/kg', def:0, app:'bike', v:l=>(l.avgPower/lapWeightVal()).toFixed(1)},
   {key:'cad',  get label(){return tr('lapCol.cadence')}, def:0, app:'bike', v:l=>`${l.cad}<small> rpm</small>`},
   {key:'kj',   label:'kJ', def:0, app:'bike', v:l=>l.kj},
+  {key:'lbal', get label(){return tr('lapCol.lrBalance')}, def:0, app:'bike', v:l=>`${l.lbal}<small>/${100-l.lbal}</small>`},
+  {key:'tq',   get label(){return tr('lapCol.torque')}, def:0, app:'bike', v:l=>`${l.tq}<small> Nm</small>`},
   {key:'hrmax',get label(){return tr('refs.maxHr')}, def:0, app:'all', v:l=>`${l.maxHr}<small> bpm</small>`},
   {key:'vap',  label:'VAP', def:0, app:'!bike', v:(l,_,d)=>d==='swim'?paceFromSpeed2(l.avgGap)+'<small>/100m</small>':paceFromSpeed(l.avgGap)+'<small>/km</small>'},
   {key:'dplus',label:'D+', def:0, app:'!swim', v:l=>`${l.dplus}<small> m</small>`},
@@ -7089,6 +7485,9 @@ function injectLapCss(){
   .an-laps .lap-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:10px}
   .an-laps .lap-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:11px 13px;display:flex;flex-direction:column;gap:9px}
   .an-laps .lap-card.hard{border-color:rgba(255,84,112,.4);background:rgba(255,84,112,.05)}
+  .an-laps .lap-card-total{border-color:var(--accent);background:rgba(70,194,216,.07)}
+  .an-laps .lap-card-total .lc-n{background:var(--accent);color:#06222a;font-size:14px}
+  .an-laps .lap-card-total .lc-label{color:var(--accent)}
   .an-laps .lc-head{display:flex;align-items:center;gap:8px}
   .an-laps .lc-n{flex:none;width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:rgba(150,165,200,.14);font-family:var(--font-data);font-weight:700;font-size:12px}
   .an-laps .lap-card.hard .lc-n{background:rgba(255,84,112,.22);color:var(--run)}
@@ -7152,6 +7551,25 @@ function renderLapChart(data){
     </div>`;
   }).join('');
 }
+/* Ligne "pseudo-lap" agrégeant toute la séance : total pour les métriques
+   cumulatives (temps, distance, D+, kJ), moyenne/max réels pour les métriques
+   de rythme (vitesse, FC, puissance…) — réutilise les mêmes formateurs de
+   colonne que les laps pour rester cohérent avec ce que le coach a coché. */
+function sessionTotalsPseudoLap(data, disc){
+  const pts=data.pts, n=pts.length||1, isBike=disc==='bike';
+  const avgPower = isBike ? Math.round(pts.reduce((a,p)=>a+p.pw,0)/n) : 0;
+  const np = isBike ? Math.round(Math.pow(pts.reduce((a,p)=>a+Math.pow(p.pw,4),0)/n, 0.25)) : 0;
+  const cad = isBike ? Math.round(pts.reduce((a,p)=>a+p.cad,0)/n) : 0;
+  const lbal = isBike ? Math.round(pts.reduce((a,p)=>a+p.lbal,0)/n) : 0;
+  const tq = isBike ? +(pts.reduce((a,p)=>a+p.tq,0)/n).toFixed(1) : 0;
+  const FTP=lapFTPval();
+  return {
+    durMin: data.laps.reduce((a,l)=>a+l.durMin,0), dist: data.dist,
+    avgSpeed: data.avgSpeed, avgGap: data.avgGap, avgHr: data.avgHr, maxHr: data.maxHr,
+    avgPower, np, cad, if: isBike && FTP ? +(np/FTP).toFixed(2) : 0,
+    kj: data.laps.reduce((a,l)=>a+l.kj,0), dplus: data.dplus, lbal, tq
+  };
+}
 function renderLaps(data, isSwim){
   const box=document.getElementById('anLaps'); const disc=data.disc; injectLapCss();
   document.getElementById('anLapHint').textContent = (isSwim?tr('lapCol.perSet'):tr('lapCol.autoSplits'))+' · '+tr('lapCol.chooseColumns');
@@ -7160,11 +7578,16 @@ function renderLaps(data, isSwim){
   const lbl=c=>typeof c.label==='function'?c.label(disc):c.label;
   const tools=cols.map(c=>`<button class="lapcol ${sel.has(c.key)?'on':''}" data-k="${c.key}"><span class="box">${sel.has(c.key)?'<i class="ic ic-check"></i>':''}</span>${lbl(c)}</button>`).join('');
   const vis=cols.filter(c=>sel.has(c.key));
+  const totLap = sessionTotalsPseudoLap(data, disc);
+  const totalCard = `<div class="lap-card lap-card-total">
+      <div class="lc-head"><span class="lc-n">Σ</span><span class="lc-label">${tr('lapCol.sessionTotal')}</span></div>
+      <div class="lc-metrics">${vis.filter(c=>c.key!=='zone'&&c.key!=='temp').map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(totLap,data,disc)}</span></div>`).join('')}</div>
+    </div>`;
   const cards=data.laps.map(l=>`<div class="lap-card ${l.hard?'hard':''}">
       <div class="lc-head"><span class="lc-n">${l.n}</span><span class="lc-label">Lap ${l.n}</span></div>
       <div class="lc-metrics">${vis.map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(l,data,disc)}</span></div>`).join('')}</div>
     </div>`).join('');
-  box.innerHTML=`<div class="lapcols">${tools}</div><div class="lap-cards">${cards}</div>`;
+  box.innerHTML=`<div class="lapcols">${tools}</div><div class="lap-cards">${totalCard}${cards}</div>`;
   box.querySelectorAll('.lapcol').forEach(b=>b.onclick=()=>{
     const k=b.dataset.k; sel.has(k)?sel.delete(k):sel.add(k);
     try{ localStorage.setItem('pf_lapcols_'+disc, JSON.stringify([...sel])); }catch(e){}

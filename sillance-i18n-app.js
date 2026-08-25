@@ -243,6 +243,17 @@
     "checkin.freshness": `Fraîcheur`, "checkin.validate": `Valider mon check-in`,
 
     "records.title": `Records personnels`, "records.empty": `Aucun record pour l'instant · importe ou synchronise une première activité.`,
+    "records.hrMax": `FC max`, "records.cadPeak": `Pic cadence`, "records.tqPeak": `Pic couple`, "records.newPr": `RECORD`,
+    "records.toastSingular": `Nouveau record personnel !`, "records.toastPlural": `{n} nouveaux records personnels !`,
+    "charge.heading": `Charge de la séance`, "charge.hint": `Coggan · TRIMP · Foster, au choix`,
+    "charge.coggan": `Coggan (TSS)`, "charge.foster": `Foster (RPE)`, "charge.rpeEstimated": `RPE estimée`,
+    "wbal.heading": `W'bal · réserve anaérobie`, "wbal.hintShort": `estimée, décharge/recharge en temps réel`,
+    "wbal.chartAria": `Courbe de réserve anaérobie W'bal`, "wbal.capacity": `Capacité W'`, "wbal.estimated": `estimée`, "wbal.minReached": `Minimum atteint`,
+    "best.heading": `Meilleurs efforts & records`, "best.hint": `puissance/allure sur les durées de référence`,
+    "best.chartAria": `Courbe des meilleurs efforts`, "best.tooShort": `Séance trop courte pour une courbe de meilleurs efforts exploitable.`,
+    "compare.heading": `Comparateur — séances superposées`, "compare.hint": `axe temps ou distance`,
+    "compare.chartAria": `Comparateur de séances en overlay`, "compare.thisSession": `Cette séance`,
+    "compare.byTime": `Temps`, "compare.byDist": `Distance`, "compare.minutes": `min`,
 
     "refs.title": `Mes références physio`, "refs.never": `Jamais renseignées.`,
     "refs.lastUpdate": `Dernière mise à jour&nbsp;: il y a {days}&nbsp;j`, "refs.retest": `pense à retester tes zones`,
@@ -800,6 +811,7 @@
     "analysis.stepsPerMin": `pas/min`, "analysis.strideLen": `{m} m foulée`,
 
     "lapCol.speed": `Vitesse`, "lapCol.pace": `Allure`, "lapCol.zone": `Zone`, "lapCol.cadence": `Cadence`, "lapCol.temp": `Temp.`,
+    "lapCol.lrBalance": `Équilibre G/D`, "lapCol.torque": `Couple`, "lapCol.sessionTotal": `Total séance`,
     "lapCol.notEnoughLaps": `Pas assez de laps pour un visuel.`,
     "lapCol.paceSpeedLap": `Allure/vitesse · lap {n}`, "lapCol.avgHrLap": `FC moyenne · lap {n}`,
     "lapCol.perSet": `par série`, "lapCol.autoSplits": `splits automatiques`, "lapCol.chooseColumns": `colonnes au choix`,
@@ -1524,6 +1536,17 @@
     "checkin.freshness": `Freshness`, "checkin.validate": `Submit my check-in`,
 
     "records.title": `Personal records`, "records.empty": `No records yet · import or sync a first activity.`,
+    "records.hrMax": `Max HR`, "records.cadPeak": `Peak cadence`, "records.tqPeak": `Peak torque`, "records.newPr": `PR`,
+    "records.toastSingular": `New personal record!`, "records.toastPlural": `{n} new personal records!`,
+    "charge.heading": `Session load`, "charge.hint": `Coggan · TRIMP · Foster, your choice`,
+    "charge.coggan": `Coggan (TSS)`, "charge.foster": `Foster (RPE)`, "charge.rpeEstimated": `Estimated RPE`,
+    "wbal.heading": `W'bal · anaerobic reserve`, "wbal.hintShort": `estimated, real-time discharge/recharge`,
+    "wbal.chartAria": `W'bal anaerobic reserve curve`, "wbal.capacity": `W' capacity`, "wbal.estimated": `estimated`, "wbal.minReached": `Lowest point`,
+    "best.heading": `Best efforts & records`, "best.hint": `power/pace across reference durations`,
+    "best.chartAria": `Best efforts curve`, "best.tooShort": `Session too short for a meaningful best-efforts curve.`,
+    "compare.heading": `Comparator — overlaid sessions`, "compare.hint": `time or distance axis`,
+    "compare.chartAria": `Overlaid session comparator`, "compare.thisSession": `This session`,
+    "compare.byTime": `Time`, "compare.byDist": `Distance`, "compare.minutes": `min`,
 
     "refs.title": `My physio references`, "refs.never": `Never entered.`,
     "refs.lastUpdate": `Last updated&nbsp;: {days}&nbsp;day(s) ago`, "refs.retest": `consider retesting your zones`,
@@ -2081,6 +2104,7 @@
     "analysis.stepsPerMin": `steps/min`, "analysis.strideLen": `{m} m stride`,
 
     "lapCol.speed": `Speed`, "lapCol.pace": `Pace`, "lapCol.zone": `Zone`, "lapCol.cadence": `Cadence`, "lapCol.temp": `Temp.`,
+    "lapCol.lrBalance": `L/R balance`, "lapCol.torque": `Torque`, "lapCol.sessionTotal": `Session total`,
     "lapCol.notEnoughLaps": `Not enough laps for a visual.`,
     "lapCol.paceSpeedLap": `Pace/speed · lap {n}`, "lapCol.avgHrLap": `Average HR · lap {n}`,
     "lapCol.perSet": `per set`, "lapCol.autoSplits": `automatic splits`, "lapCol.chooseColumns": `choose columns`,
@@ -2805,6 +2829,17 @@
     "checkin.freshness": `Frescura`, "checkin.validate": `Validar mi check-in`,
 
     "records.title": `Récords personales`, "records.empty": `Aún no hay récords · importa o sincroniza una primera actividad.`,
+    "records.hrMax": `FC máx`, "records.cadPeak": `Pico cadencia`, "records.tqPeak": `Pico par`, "records.newPr": `RÉCORD`,
+    "records.toastSingular": `¡Nuevo récord personal!`, "records.toastPlural": `¡{n} nuevos récords personales!`,
+    "charge.heading": `Carga de la sesión`, "charge.hint": `Coggan · TRIMP · Foster, a elegir`,
+    "charge.coggan": `Coggan (TSS)`, "charge.foster": `Foster (RPE)`, "charge.rpeEstimated": `RPE estimado`,
+    "wbal.heading": `W'bal · reserva anaeróbica`, "wbal.hintShort": `estimada, descarga/recarga en tiempo real`,
+    "wbal.chartAria": `Curva de reserva anaeróbica W'bal`, "wbal.capacity": `Capacidad W'`, "wbal.estimated": `estimada`, "wbal.minReached": `Mínimo alcanzado`,
+    "best.heading": `Mejores esfuerzos & récords`, "best.hint": `potencia/ritmo en las duraciones de referencia`,
+    "best.chartAria": `Curva de mejores esfuerzos`, "best.tooShort": `Sesión demasiado corta para una curva de mejores esfuerzos útil.`,
+    "compare.heading": `Comparador — sesiones superpuestas`, "compare.hint": `eje tiempo o distancia`,
+    "compare.chartAria": `Comparador de sesiones superpuestas`, "compare.thisSession": `Esta sesión`,
+    "compare.byTime": `Tiempo`, "compare.byDist": `Distancia`, "compare.minutes": `min`,
 
     "refs.title": `Mis referencias fisiológicas`, "refs.never": `Nunca registradas.`,
     "refs.lastUpdate": `Última actualización&nbsp;: hace {days}&nbsp;día(s)`, "refs.retest": `piensa en volver a testear tus zonas`,
@@ -3362,6 +3397,7 @@
     "analysis.stepsPerMin": `pasos/min`, "analysis.strideLen": `{m} m zancada`,
 
     "lapCol.speed": `Velocidad`, "lapCol.pace": `Ritmo`, "lapCol.zone": `Zona`, "lapCol.cadence": `Cadencia`, "lapCol.temp": `Temp.`,
+    "lapCol.lrBalance": `Equilibrio I/D`, "lapCol.torque": `Par`, "lapCol.sessionTotal": `Total de la sesión`,
     "lapCol.notEnoughLaps": `No hay suficientes laps para un visual.`,
     "lapCol.paceSpeedLap": `Ritmo/velocidad · lap {n}`, "lapCol.avgHrLap": `FC media · lap {n}`,
     "lapCol.perSet": `por serie`, "lapCol.autoSplits": `splits automáticos`, "lapCol.chooseColumns": `columnas a elegir`,
