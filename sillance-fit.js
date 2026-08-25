@@ -35,8 +35,8 @@
         const r = new FileReader();
         r.onload = () => {
           try {
-            const { raw, disc } = readFitArrayBuffer(r.result);
-            resolve(finishParse(raw, disc, [], opts, "FIT"));
+            const { raw, disc, lapsRaw } = readFitArrayBuffer(r.result);
+            resolve(finishParse(raw, disc, lapsRaw, opts, "FIT"));
           } catch (e) {
             resolve({ ok: false, error: tr("fitImport.unreadableFit") + " : " + (e && e.message ? e.message : e) });
           }
@@ -83,6 +83,13 @@
   // 85=step_length (dynamiques de course, présent seulement sur les montres
   // avec capteur RD type Coros/Garmin — jamais inventé si absent du fichier).
   const REC_FIELDS = { 253:'timestamp', 0:'lat', 1:'lon', 2:'alt', 78:'ealt', 3:'hr', 4:'cad', 5:'dist', 6:'spd', 73:'espd', 7:'pw', 85:'steplen' };
+  // Message "lap" (global msg 19) : on ne lit que sa timestamp (253), qui
+  // marque la FIN du lap dans le protocole FIT — posée par la montre à
+  // chaque lap manuel ou auto (ex. chaque phase d'un entraînement fractionné
+  // structuré : échauffement / gammes / répétition / récup ont chacune leur
+  // message lap). Sans ça on retombait sur un découpage régulier qui mélange
+  // effort et récup dans le même lap (signalé 25/08/2026).
+  const LAP_FIELDS = { 253:'timestamp' };
 
   function readFitArrayBuffer(buf) {
     const view = new DataView(buf);
@@ -96,6 +103,7 @@
     let offset = headerSize;
     const localDefs = {};
     const raw = [];
+    const lapEnds = []; // timestamps FIT (secondes) de fin de chaque lap réel
     let lastTimestamp = null; // secondes FIT, pour les en-têtes "compressed timestamp"
     let sportMsg = null;
 
@@ -178,7 +186,7 @@
 
       const rec = {};
       for (const f of def.fields) {
-        const name = def.globalMsgNum === 20 ? REC_FIELDS[f.num] : null;
+        const name = def.globalMsgNum === 20 ? REC_FIELDS[f.num] : def.globalMsgNum === 19 ? LAP_FIELDS[f.num] : null;
         if (name) rec[name] = readField(f.size, f.type, def.le);
         else offset += f.size; // champ non reconnu : on saute sans décoder
       }
@@ -220,9 +228,31 @@
           stepLen: rec.steplen != null ? rec.steplen / 10000 : null,
         });
       }
+      if (def.globalMsgNum === 19) {
+        const ts = rec.timestamp != null ? rec.timestamp : lastTimestamp;
+        if (ts != null) { lapEnds.push(ts); lastTimestamp = ts; }
+      }
     }
     if (!raw.length) throw new Error("aucun point d'activité (message 'record') trouvé dans le fichier");
-    return { raw, disc: sportMsg || "run" };
+    // Convertit les timestamps de fin de lap (FIT) en bornes d'index sur `raw`,
+    // même format que lapsRaw côté TCX ({start, end}, end exclu). Un fichier
+    // sans messages lap (ex. sortie libre sans structure) laisse lapsRaw=[] :
+    // buildLaps() applique alors son repli habituel.
+    let lapsRaw = [];
+    if (lapEnds.length) {
+      const sortedEnds = lapEnds.slice().sort((a, b) => a - b);
+      let start = 0;
+      sortedEnds.forEach((endFitSec) => {
+        const endMs = (endFitSec + FIT_EPOCH_OFFSET) * 1000;
+        let idx = raw.length;
+        for (let i = start; i < raw.length; i++) { if (raw[i].time >= endMs) { idx = i; break; } }
+        const boundEnd = Math.max(idx, start + 1);
+        if (boundEnd > start) lapsRaw.push({ start, end: Math.min(boundEnd, raw.length) });
+        start = Math.min(boundEnd, raw.length);
+      });
+      if (start < raw.length) lapsRaw.push({ start, end: raw.length });
+    }
+    return { raw, disc: sportMsg || "run", lapsRaw };
   }
 
   function parse(text, filename, opts) {
@@ -405,12 +435,26 @@
   }
 
   function buildLaps(pts, lapsRaw, disc, ftp, gAvgHr, gMaxHr) {
-    // bornes : laps réels (TCX) sinon découpage régulier (~8 segments)
+    // bornes : laps réels du fichier (TCX <Lap>, FIT message 19) sinon repli
+    // 1 km (même convention que Garmin/Strava/Coros quand l'activité n'a pas
+    // de structure de lap propre) — jamais un découpage par effort qui
+    // risquerait de fusionner récup et répétition dans le même lap.
     let bounds = lapsRaw && lapsRaw.length ? lapsRaw.slice() : null;
     if (!bounds) {
-      const n = Math.max(4, Math.min(12, Math.round((pts[pts.length - 1].t) / 10)));
       bounds = [];
-      for (let k = 0; k < n; k++) bounds.push({ start: Math.floor((k * pts.length) / n), end: Math.floor(((k + 1) * pts.length) / n) });
+      const totalDist = pts.length ? (pts[pts.length - 1]._cum || 0) : 0;
+      if (totalDist >= 1) {
+        let start = 0, nextKm = 1;
+        for (let i = 0; i < pts.length; i++) {
+          if (pts[i]._cum >= nextKm) { bounds.push({ start, end: i + 1 }); start = i + 1; nextKm++; }
+        }
+        if (start < pts.length) bounds.push({ start, end: pts.length });
+      } else {
+        // pas assez de distance (nat en bassin, home-trainer sans capteur…) :
+        // repli sur des tranches de temps régulières
+        const n = Math.max(4, Math.min(12, Math.round((pts[pts.length - 1].t) / 10)));
+        for (let k = 0; k < n; k++) bounds.push({ start: Math.floor((k * pts.length) / n), end: Math.floor(((k + 1) * pts.length) / n) });
+      }
     }
     const fcMax = (gMaxHr && gMaxHr > 0) ? Math.max(gMaxHr, 185) : 190;
     return bounds.map((b, i) => {

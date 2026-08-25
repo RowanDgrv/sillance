@@ -6444,41 +6444,35 @@ function genSessionPts(s, rnd, FTP){
    leur voisin. Repli en tranches égales si la séance est trop steady-state
    pour donner ≥3 segments exploitables (même logique que Garmin/Strava quand
    aucune vraie répétition n'est détectée). */
+/* Découpage en laps : 1 km (course/vélo) ou tranches de temps régulières
+   (natation) — jamais un regroupement par effort. L'ancienne version
+   classait chaque point effort/récup/neutre puis fusionnait les segments
+   courts : un lap de récup de 2' entre deux répétitions de 5' se faisait
+   fusionner avec la répétition voisine (signalé 25/08/2026 — 5×(5'+2')
+   affiché comme des blocs fourre-tout au lieu de ~10 laps distincts).
+   Même principe que buildLaps() dans sillance-fit.js pour les fichiers
+   réels, qui priment de toute façon sur ce découpage démo dès qu'ils
+   contiennent de vrais laps (TCX <Lap> ou message FIT 19). */
 function autoDetectLaps(pts, disc, FTP){
-  const isBike = disc==='bike';
-  const metricOf = p => isBike ? p.pw : p.sp;
-  const vals = pts.map(metricOf);
-  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-  const sm = vals.map((v,i)=>{
-    const a=Math.max(0,i-1), b=Math.min(vals.length-1,i+1);
-    let s=0,n=0; for(let k=a;k<=b;k++){ s+=vals[k]; n++; }
-    return s/n;
-  });
-  const hi=avg*1.08, lo=avg*0.94;
-  const cls = sm.map(v=> v>=hi?'hard' : v<=lo?'easy' : 'mid');
-  let segs=[], curCls=cls[0], start=0;
-  for(let i=1;i<=cls.length;i++){
-    if(i===cls.length || cls[i]!==curCls){
-      segs.push({cls:curCls, i0:start, i1:i-1});
-      if(i<cls.length){ curCls=cls[i]; start=i; }
+  const isBike = disc==='bike', isSwim = disc==='swim';
+  const cum = computeCumDist(pts);
+  let bounds=[];
+  if(!isSwim && cum[cum.length-1]>=1){
+    let start=0, nextKm=1;
+    for(let i=0;i<pts.length;i++){
+      if(cum[i]>=nextKm){ bounds.push({i0:start, i1:i}); start=i+1; nextKm++; }
+    }
+    if(start<pts.length) bounds.push({i0:start, i1:pts.length-1});
+  } else {
+    const nChunks = Math.max(3, Math.min(12, Math.round(pts.length/24)));
+    for(let c=0;c<nChunks;c++){
+      const i0=Math.round(c*pts.length/nChunks), i1=Math.round((c+1)*pts.length/nChunks)-1;
+      bounds.push({i0, i1:Math.max(i0,i1)});
     }
   }
-  const minPts = Math.max(2, Math.round(pts.length*0.03));
-  let merged=[];
-  segs.forEach(seg=>{
-    const len = seg.i1-seg.i0+1;
-    if(merged.length && len<minPts) merged[merged.length-1].i1 = seg.i1;
-    else merged.push({cls:seg.cls, i0:seg.i0, i1:seg.i1});
-  });
-  if(merged.length<3){
-    // séance trop homogène pour de vraies répétitions → tranches égales
-    const nChunks = Math.max(3, Math.min(10, Math.round(pts.length/24)));
-    merged = Array.from({length:nChunks}, (_,c)=>{
-      const i0=Math.round(c*pts.length/nChunks), i1=Math.round((c+1)*pts.length/nChunks)-1;
-      return {cls: metricOf(pts[Math.floor((i0+i1)/2)])>=hi?'hard':'mid', i0, i1:Math.max(i0,i1)};
-    });
-  }
-  return merged.map((seg,idx)=>{
+  const metricOf = p => isBike ? p.pw : p.sp;
+  const avgAll = pts.reduce((a,p)=>a+metricOf(p),0)/pts.length;
+  return bounds.map((seg,idx)=>{
     const slice = pts.slice(seg.i0, seg.i1+1);
     const n=slice.length;
     const t0 = seg.i0>0 ? pts[seg.i0-1].t : 0;
@@ -6508,7 +6502,7 @@ function autoDetectLaps(pts, disc, FTP){
       kj: isBike ? Math.round((pwSum/n)*(durMin*60)/1000) : 0,
       dplus: Math.round(dplus),
       lbal, tq,
-      hard: seg.cls==='hard'
+      hard: (isBike ? (pwSum/n) : (spSum/n)) >= avgAll*1.08
     };
   });
 }
