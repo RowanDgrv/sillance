@@ -159,7 +159,7 @@
     "recap.pace": `Allure`, "recap.hr": `FC`, "recap.time": `Temps`, "recap.watts": `Watts`,
     "recap.addKm": `Ajouter un km`, "recap.swim": `Natation`, "recap.bike": `Vélo`, "recap.run": `Course à pied`,
     "recap.splitsHeading": `Détail par km`, "recap.hyroxSegments": `Runs & ateliers`,
-    "recap.runN": `Run {n}`, "recap.runLeg": `1 km`,
+    "recap.runN": `Run {n}`, "recap.runLeg": `1 km`, "recap.roxzone": `Roxzone`,
     "alert.metric.forme": `Forme (check-in)`, "alert.metric.hrv": `HRV`, "alert.metric.drop": `Découplage`, "alert.metric.racedays": `Jours avant course`,
 
     "ready.flag.continue": `Poursuivre le plan`, "ready.flag.watch": `Maintenir, avec vigilance`, "ready.flag.lighten": `Allègement suggéré`, "ready.flag.rest": `Repos recommandé`,
@@ -1486,7 +1486,7 @@
     "recap.pace": `Pace`, "recap.hr": `HR`, "recap.time": `Time`, "recap.watts": `Watts`,
     "recap.addKm": `Add a km`, "recap.swim": `Swim`, "recap.bike": `Bike`, "recap.run": `Run`,
     "recap.splitsHeading": `Km-by-km detail`, "recap.hyroxSegments": `Runs & stations`,
-    "recap.runN": `Run {n}`, "recap.runLeg": `1 km`,
+    "recap.runN": `Run {n}`, "recap.runLeg": `1 km`, "recap.roxzone": `Roxzone`,
     "alert.metric.forme": `Form (check-in)`, "alert.metric.hrv": `HRV`, "alert.metric.drop": `Decoupling`, "alert.metric.racedays": `Days to race`,
 
     "ready.flag.continue": `Keep the plan`, "ready.flag.watch": `Maintain, with caution`, "ready.flag.lighten": `Lightening suggested`, "ready.flag.rest": `Rest recommended`,
@@ -2813,7 +2813,7 @@
     "recap.pace": `Ritmo`, "recap.hr": `FC`, "recap.time": `Tiempo`, "recap.watts": `Vatios`,
     "recap.addKm": `Añadir un km`, "recap.swim": `Natación`, "recap.bike": `Bici`, "recap.run": `Carrera a pie`,
     "recap.splitsHeading": `Detalle por km`, "recap.hyroxSegments": `Carreras & estaciones`,
-    "recap.runN": `Carrera {n}`, "recap.runLeg": `1 km`,
+    "recap.runN": `Carrera {n}`, "recap.runLeg": `1 km`, "recap.roxzone": `Roxzone`,
     "alert.metric.forme": `Forma (check-in)`, "alert.metric.hrv": `HRV`, "alert.metric.drop": `Desacoplamiento`, "alert.metric.racedays": `Días para la carrera`,
 
     "ready.flag.continue": `Continuar el plan`, "ready.flag.watch": `Mantener, con vigilancia`, "ready.flag.lighten": `Aligeramiento sugerido`, "ready.flag.rest": `Descanso recomendado`,

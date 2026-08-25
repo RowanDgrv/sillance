@@ -4628,7 +4628,7 @@ function defaultRecap(type){
       segs.push({n:i+1, kind:'run', label:tr('recap.runN', {n:i+1}), time:'', hr:''});
       segs.push({n:i+1, kind:'station', label:st.name, time:'', hr:''});
     });
-    return {segments:segs};
+    return {segments:segs, roxzone:{time:'', hr:''}};
   }
   if(type==='tri') return {swim:{time:''}, bike:{time:'', watts:'', hr:''}, splits:[{km:1,time:'',hr:''}]};
   return {splits:[{km:1,time:'',hr:''}]};
@@ -4643,6 +4643,7 @@ function recapAllTimes(recap){
   if(recap.swim && recap.swim.time){ const t=parseClock(recap.swim.time); if(t) times.push(t); }
   if(recap.bike && recap.bike.time){ const t=parseClock(recap.bike.time); if(t) times.push(t); }
   if(recap.segments) recap.segments.forEach(s=>{ const t=parseClock(s.time); if(t) times.push(t); });
+  if(recap.roxzone && recap.roxzone.time){ const t=parseClock(recap.roxzone.time); if(t) times.push(t); }
   return times;
 }
 function recapAllHr(recap){
@@ -4650,6 +4651,7 @@ function recapAllHr(recap){
   if(recap.splits) recap.splits.forEach(s=>{ if(s.hr) hrs.push(+s.hr); });
   if(recap.bike && recap.bike.hr) hrs.push(+recap.bike.hr);
   if(recap.segments) recap.segments.forEach(s=>{ if(s.hr) hrs.push(+s.hr); });
+  if(recap.roxzone && recap.roxzone.hr) hrs.push(+recap.roxzone.hr);
   return hrs;
 }
 function renderRecapSummary(race){
@@ -4702,6 +4704,13 @@ function renderRecapBody(race){
     html += splitsSectionHTML(recap.splits, 'recap.run', 'ic-run');
   } else if(type==='hyrox'){
     html += `<div class="recap-section">
+      <h4><i class="ic ic-shoe"></i> ${tr('recap.roxzone')}</h4>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr">
+        <label><span>${tr('recap.time')}</span><input type="text" placeholder="6:40" data-rox="time" value="${(recap.roxzone&&recap.roxzone.time)||''}"></label>
+        <label><span>${tr('recap.hr')}</span><input type="number" min="0" max="230" placeholder="—" data-rox="hr" value="${(recap.roxzone&&recap.roxzone.hr)||''}"></label>
+      </div>
+    </div>`;
+    html += `<div class="recap-section">
       <h4><i class="ic ic-zap"></i> ${tr('recap.hyroxSegments')}</h4>
       ${recap.segments.map((s,i)=>`<div class="recap-row" style="grid-template-columns:26px 1fr 1fr 1fr" data-seg-i="${i}">
         <span class="rr-n">${s.kind==='run'?`<i class="ic ic-run"></i>`:s.n}</span>
@@ -4726,6 +4735,11 @@ function wireRecapBody(race){
     if(f==='bikeTime'){ recap.bike=recap.bike||{}; recap.bike.time=inp.value; }
     if(f==='bikeWatts'){ recap.bike=recap.bike||{}; recap.bike.watts=inp.value; }
     if(f==='bikeHr'){ recap.bike=recap.bike||{}; recap.bike.hr=inp.value; }
+    renderRecapSummary(race);
+  }));
+  box.querySelectorAll('[data-rox]').forEach(inp=>inp.addEventListener('input',()=>{
+    recap.roxzone=recap.roxzone||{};
+    recap.roxzone[inp.dataset.rox]=inp.value;
     renderRecapSummary(race);
   }));
   box.querySelectorAll('[data-seg-i]').forEach(row=>{
