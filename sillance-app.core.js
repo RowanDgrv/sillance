@@ -432,6 +432,12 @@ function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${Str
    ============================================================ */
 const COACH_ROSTER = [
  {id:'a1', name:'Léa Fontan',     ini:'LF', color:'#46C2D8', checkin:{sommeil:8,fatigue:3,motivation:8,cyclePhase:'follicular',cycleDay:9}, race:{name:'Gorillaman · Sprint',   days:22}, group:'g3', drop:0,    comp:1.0,  planGap:null, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*10).toISOString(),
+  races:[
+    {name:'Tri de Balma (M)', location:'Balma', days:-70, priority:'B', result:'1:58:32 · 4e SF'},
+    {name:'10 km de Muret', location:'Muret', days:-40, priority:'C', result:'42:18 · 3e V2'},
+    {name:'Gorillaman · Sprint', location:'Gorille', days:22, priority:'A'},
+    {name:'70.3 Vichy', location:'Vichy', days:130, priority:'A'},
+  ],
   gear:[
     {id:'g1', type:'shoe', name:'Nike Pegasus 40', km:612, max:900, price:130, cat:'daily', comm:870, notified:[540]},
     {id:'g2', type:'shoe', name:'Saucony Endorphin Speed 4', km:284, max:650, price:180, cat:'tempo', comm:630, notified:[]},
@@ -439,11 +445,19 @@ const COACH_ROSTER = [
     {id:'g4', type:'bike', name:'Canyon Ultimate CF', km:4380, max:20000, price:3200, cat:null, comm:null, notified:[]},
   ]},
  {id:'a2', name:'Marc Delieux',   ini:'MD', color:'#D9962F', checkin:{sommeil:5,fatigue:7,motivation:5,dispo:'fatigue',get dispoNote(){return tr('demoNote.a2')},hrv:56}, race:{name:'Marathon de Toulouse',  days:60}, drop:0.18, comp:0.55, planGap:'h48', refsUpdatedAt:new Date(Date.now()-1000*60*60*24*210).toISOString(),
+  races:[
+    {name:'Semi de Colomiers', location:'Colomiers', days:-55, priority:'C', result:'1:32:10'},
+    {name:'Marathon de Toulouse', location:'Toulouse', days:60, priority:'A'},
+  ],
   gear:[
     {id:'g5', type:'shoe', name:'Adidas Boston 12', km:723, max:700, price:150, cat:'tempo', comm:660, notified:[420,595,700]},
     {id:'g6', type:'shoe', name:'Adidas Ultraboost Light', km:214, max:850, price:180, cat:'daily', comm:800, notified:[]},
   ]},
  {id:'a3', name:'Chloé Vasseur',  ini:'CV', color:'#8E7FD0', checkin:{sommeil:7,fatigue:4,motivation:8,cyclePhase:'luteal',cycleDay:24}, race:{name:'HYROX Bordeaux',        days:35}, group:'g6', drop:0.10, comp:0.95, planGap:null, refsUpdatedAt:new Date(Date.now()-1000*60*60*24*25).toISOString(),
+  races:[
+    {name:'HYROX Bordeaux', location:'Bordeaux', days:35, priority:'A'},
+    {name:'HYROX Lyon', location:'Lyon', days:150, priority:'B'},
+  ],
   gear:[
     {id:'g7', type:'shoe', name:'Puma Deviate Nitro 3', km:405, max:700, price:160, cat:'tempo', comm:650, notified:[420]},
   ]},
@@ -786,6 +800,40 @@ function coachGuideHTML(){
       </div>`;
 }
 /* ============================================================
+   TABLEAU DE BORD RECONFIGURABLE + ALERTES À SEUIL PERSO
+   ------------------------------------------------------------
+   #4 et #5 de l'audit concurrentiel (suivi athlètes). Le coach choisit,
+   dans Paramètres > Tableau de bord :
+     - quels modules affiche la sidebar/le tableau de forme (dw.*)
+     - ses propres règles d'alerte (métrique + seuil), évaluées sur
+       chaque athlète du roster et injectées dans le radar "qui a
+       besoin de toi" ci-dessous (mêmes signaux, seuils personnalisés).
+   Métriques limitées à ce qui a un vrai équivalent en prod (pas
+   l'adhérence a.comp, démo-only — même logique que le radar plus bas).
+   ============================================================ */
+function dashWidgetPrefs(){
+  try{ const s=JSON.parse(localStorage.getItem('sil_dash_widgets')||'null'); if(s) return {needRadar:true,planningRadar:true,readyhub:true,advanced:true,...s}; }catch(e){}
+  return {needRadar:true, planningRadar:true, readyhub:true, advanced:true};
+}
+function saveDashWidgetPrefs(p){ try{ localStorage.setItem('sil_dash_widgets', JSON.stringify(p)); }catch(e){} }
+const ALERT_METRICS = [
+  {key:'forme', get label(){return tr('alert.metric.forme')}, get:a=>athForme(a), unit:'%'},
+  {key:'hrv',   get label(){return tr('alert.metric.hrv')}, get:a=>(a.checkin&&a.checkin.hrv)??null, unit:'ms'},
+  {key:'drop',  get label(){return tr('alert.metric.drop')}, get:a=>a.drop!=null?Math.round(a.drop*100):null, unit:'%'},
+  {key:'racedays', get label(){return tr('alert.metric.racedays')}, get:a=>(a.race?a.race.days:null), unit:'j'},
+];
+function loadCustomAlerts(){ try{ return JSON.parse(localStorage.getItem('sil_custom_alerts')||'[]'); }catch(e){ return []; } }
+function saveCustomAlerts(list){ try{ localStorage.setItem('sil_custom_alerts', JSON.stringify(list)); }catch(e){} }
+function evalCustomAlerts(a){
+  return loadCustomAlerts().map(r=>{
+    const m=ALERT_METRICS.find(x=>x.key===r.metric); if(!m) return null;
+    const v=m.get(a); if(v==null) return null;
+    const trig = r.cmp==='lt' ? v<r.value : v>r.value;
+    return trig ? `${m.label} ${r.cmp==='lt'?'<':'>'} ${r.value}${m.unit} (${v}${m.unit})` : null;
+  }).filter(Boolean);
+}
+
+/* ============================================================
    RADAR "QUI A BESOIN DE MOI CETTE SEMAINE"
    ------------------------------------------------------------
    Trie le roster par urgence au lieu de forcer le coach à cliquer
@@ -796,6 +844,7 @@ function coachGuideHTML(){
    ============================================================ */
 function athNeedScore(a){
   let score=0; const reasons=[];
+  evalCustomAlerts(a).forEach(txt=>{ score+=25; reasons.push(txt); });
   const dk = athDispo(a);
   if(dk==='blesse'){ score+=100; reasons.push(tr('need.injured')); }
   else if(dk==='malade'){ score+=70; reasons.push(tr('need.sick')); }
@@ -869,9 +918,11 @@ function planningRadarHTML(){
 }
 function renderSidebar(){
   if(mode==='coach'){
-    sidebarContent.innerHTML = coachGuideHTML() + needRadarHTML() + planningRadarHTML() + `
+    const dw=dashWidgetPrefs();
+    sidebarContent.innerHTML = coachGuideHTML() + (dw.needRadar?needRadarHTML():'') + (dw.planningRadar?planningRadarHTML():'') + `
       <button class="btn adh-open-btn" id="adhOpen"><i class="ic ic-users"></i> ${tr('sidebar.myAthletesTracking')}</button>
       <button class="btn adh-open-btn" id="inviteAthOpen" style="margin-top:8px"><i class="ic ic-user-plus"></i> ${tr('sidebar.inviteAthlete')}</button>
+      <button class="btn adh-open-btn" id="compareAthOpen" style="margin-top:8px"><i class="ic ic-chart"></i> ${tr('compareAth.btn')}</button>
       <h2>${tr('sidebar.library')}</h2>
       <p class="hint">${tr('sidebar.libraryHint')}</p>
       <button class="create-btn" id="createSessionBtn">+ ${tr('sidebar.createSession')}</button>
@@ -891,6 +942,7 @@ function renderSidebar(){
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
     var _sgCta=document.getElementById('sgCta'); if(_sgCta) _sgCta.onclick=function(){ openBuilder(null,null); };
     var _adhOpen=document.getElementById('adhOpen'); if(_adhOpen) _adhOpen.onclick=openAdherence;
+    var _cmpAthOpen=document.getElementById('compareAthOpen'); if(_cmpAthOpen) _cmpAthOpen.onclick=openCompareAthletes;
     sidebarContent.querySelectorAll('[data-need-aid]').forEach(el=> el.onclick=()=>{
       const idx = ROSTER.findIndex(x=>x.id===el.dataset.needAid);
       if(idx>-1){ selectAthlete(idx); render(); }
@@ -2067,12 +2119,66 @@ function settingsAccountHtml(){
            <div class="set-actions"><button class="btn cy-ghost" id="selfCoachBtn">${tr('sidebar.selfCoachBtn')}</button></div>`}
     </div>` : ''}`;
 }
+/* Onglet « Tableau de bord » : reconfiguration des widgets (#4 audit) +
+   alertes à seuil personnalisé (#5 audit). */
+const DASH_WIDGET_LIST = [
+  {key:'needRadar', get label(){return tr('dash.widgetNeedRadar')}},
+  {key:'planningRadar', get label(){return tr('dash.widgetPlanningRadar')}},
+  {key:'readyhub', get label(){return tr('dash.widgetReadyhub')}},
+  {key:'advanced', get label(){return tr('dash.widgetAdvanced')}},
+];
+function settingsDashboardHtml(){
+  const dw=dashWidgetPrefs();
+  const rules=loadCustomAlerts();
+  return `
+    <div class="set-h">${tr('dash.widgetsHeading')}</div>
+    <div class="set-sub">${tr('dash.widgetsSub')}</div>
+    <div class="dash-widget-list">
+      ${DASH_WIDGET_LIST.map(w=>`<label class="dash-widget-row"><input type="checkbox" data-dw="${w.key}" ${dw[w.key]?'checked':''}><span>${w.label}</span></label>`).join('')}
+    </div>
+    <div class="set-h" style="margin-top:22px">${tr('dash.alertsHeading')}</div>
+    <div class="set-sub">${tr('dash.alertsSub')}</div>
+    <div class="dash-alert-list">
+      ${rules.length ? rules.map((r,i)=>{
+        const m=ALERT_METRICS.find(x=>x.key===r.metric);
+        return `<div class="dash-alert-row">
+          <span>${m?m.label:r.metric} ${r.cmp==='lt'?'&lt;':'&gt;'} ${r.value}${m?m.unit:''}</span>
+          <button class="dash-alert-del" data-i="${i}" title="${tr('common.delete')}"><i class="ic ic-x"></i></button>
+        </div>`;
+      }).join('') : `<p class="club-hint">${tr('dash.noAlerts')}</p>`}
+    </div>
+    <div class="dash-alert-form">
+      <select id="dashAlertMetric">${ALERT_METRICS.map(m=>`<option value="${m.key}">${m.label}</option>`).join('')}</select>
+      <select id="dashAlertCmp"><option value="lt">&lt;</option><option value="gt">&gt;</option></select>
+      <input type="number" id="dashAlertValue" placeholder="${tr('dash.threshold')}">
+      <button class="btn cy-ghost" id="dashAlertAdd">${tr('dash.addAlert')}</button>
+    </div>`;
+}
 let settingsTab='structure';
 function renderSettings(){
   document.querySelectorAll('#setNav .set-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===settingsTab));
   const body=document.getElementById('setBody');
-  body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsTab==='coach' ? settingsCoachHtml() : settingsAccountHtml();
+  body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsTab==='coach' ? settingsCoachHtml() : settingsTab==='dashboard' ? settingsDashboardHtml() : settingsAccountHtml();
   wireCoachTiers(body, renderSettings);
+  body.querySelectorAll('[data-dw]').forEach(cb=>cb.onchange=()=>{
+    const p=dashWidgetPrefs(); p[cb.dataset.dw]=cb.checked; saveDashWidgetPrefs(p);
+    if(mode==='coach') renderSidebar();
+    renderReadiness();
+  });
+  const alertAdd=document.getElementById('dashAlertAdd');
+  if(alertAdd) alertAdd.onclick=()=>{
+    const metric=document.getElementById('dashAlertMetric').value;
+    const cmp=document.getElementById('dashAlertCmp').value;
+    const value=+document.getElementById('dashAlertValue').value;
+    if(!value && value!==0){ toast(tr('dash.thresholdRequired'), 'error'); return; }
+    const rules=loadCustomAlerts(); rules.push({metric,cmp,value}); saveCustomAlerts(rules);
+    renderSettings(); if(mode==='coach') renderSidebar();
+    toast(tr('dash.alertAdded'));
+  };
+  body.querySelectorAll('.dash-alert-del').forEach(b=>b.onclick=()=>{
+    const rules=loadCustomAlerts(); rules.splice(+b.dataset.i,1); saveCustomAlerts(rules);
+    renderSettings(); if(mode==='coach') renderSidebar();
+  });
   const ccb=document.getElementById('coachConnectBtn');
   if(ccb) ccb.onclick=()=>{
     if(window.PF?.user) PF.connectCoachStripe().catch(e=>{console.warn(e);toast(tr('toast.stripeIndisponible'), 'error');});
@@ -3482,6 +3588,7 @@ function renderCoachBand(){
         ${a.race?`<button class="cb-bilan" id="shareSpecBtn" title="${tr('coachBand.shareRaceLinkTitle')}"><i class="ic ic-link"></i> ${tr('coachBand.shareRace')}</button>`:''}
         <button class="cb-bilan" id="zonesBtn" title="${tr('coachBand.customizeZonesTitle')}"><i class="ic ic-target"></i> ${tr('coachBand.zones')}</button>
         <button class="cb-bilan" id="profileBtn" title="${tr('coachBand.athleteProfileTitle')}"><i class="ic ic-user"></i> ${tr('coachBand.athleteProfile')}</button>
+        <button class="cb-bilan" id="seasonBtn" title="${tr('season.title')}"><i class="ic ic-calendar"></i> ${tr('season.btn')}</button>
       </div>
     </div>
     <div class="cb-forme">
@@ -3515,6 +3622,7 @@ function renderCoachBand(){
   const _ssb=document.getElementById('shareSpecBtn'); if(_ssb) _ssb.onclick=()=>openSpectatorShare(a.id);
   const _zb=document.getElementById('zonesBtn'); if(_zb) _zb.onclick=()=>openZoneEditor();
   const _pb=document.getElementById('profileBtn'); if(_pb) _pb.onclick=()=>openAthleteProfile(a.id);
+  const _seb=document.getElementById('seasonBtn'); if(_seb) _seb.onclick=()=>openSeasonCalendar(a);
   const _cbn=document.getElementById('cbNotifyReady');
   if(_cbn) _cbn.onchange=(ev)=>{
     if(!ev.target.checked) return;
@@ -3766,14 +3874,19 @@ document.querySelectorAll('.ath-tab').forEach(b=>{
    brancher un paiement pour les créneaux tarifés.
    ============================================================ */
 const CLUB_ATHLETES = [
-  {id:'a1', name:'Romain Dubois', disc:'tri', since:'2023', group:'g3', offer:'coach', coach:'Éric', licence:{fed:'FFTri', num:'4501234', medCertUntil:'2027-02-10'}},
-  {id:'a2', name:'Léa Martin', disc:'tri', since:'2024', group:'g4', offer:'sub', minor:true, licence:{fed:'FFTri', num:'4509876', medCertUntil:'2026-09-10'}},
-  {id:'a3', name:'Karim Benali', disc:'bike', since:'2025', group:'g6', offer:'coach', coach:'Karim', licence:{fed:'FFC', num:'1122334', medCertUntil:'2027-01-20'}},
-  {id:'a4', name:'Sophie Laurent', disc:'tri', since:'2022', group:'g5', offer:'sub', licence:{fed:'FFTri', num:'4498765', medCertUntil:'2026-05-30'}},
-  {id:'a5', name:'Tom Variable', disc:'bike', since:'2025', group:'g6', offer:'sub'},
-  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12', licence:{fed:'FFTri', num:'4587654', medCertUntil:'2027-04-01'}},
-  {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie', licence:{fed:'FFTri', num:'4523456', medCertUntil:'2026-12-15'}},
-  {id:'a8', name:'Marie Girard', disc:'bike', since:'2025', group:'g6', offer:'sub'}
+  {id:'a1', name:'Romain Dubois', disc:'tri', since:'2023', group:'g3', offer:'coach', coach:'Éric', level:'confirme', licence:{fed:'FFTri', num:'4501234', medCertUntil:'2027-02-10'}},
+  {id:'a2', name:'Léa Martin', disc:'tri', since:'2024', group:'g4', offer:'sub', minor:true, level:'debutant', licence:{fed:'FFTri', num:'4509876', medCertUntil:'2026-09-10'}},
+  {id:'a3', name:'Karim Benali', disc:'bike', since:'2025', group:'g6', offer:'coach', coach:'Karim', level:'competition', licence:{fed:'FFC', num:'1122334', medCertUntil:'2027-01-20'}},
+  {id:'a4', name:'Sophie Laurent', disc:'tri', since:'2022', group:'g5', offer:'sub', level:'confirme', licence:{fed:'FFTri', num:'4498765', medCertUntil:'2026-05-30'}},
+  {id:'a5', name:'Tom Variable', disc:'bike', since:'2025', group:'g6', offer:'sub', level:'debutant'},
+  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, level:'debutant', guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12', licence:{fed:'FFTri', num:'4587654', medCertUntil:'2027-04-01'}},
+  {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie', level:'competition', licence:{fed:'FFTri', num:'4523456', medCertUntil:'2026-12-15'}},
+  {id:'a8', name:'Marie Girard', disc:'bike', since:'2025', group:'g6', offer:'sub', level:'confirme'}
+];
+const CLUB_LEVELS = [
+  {id:'debutant', get name(){return tr('level.debutant')}},
+  {id:'confirme', get name(){return tr('level.confirme')}},
+  {id:'competition', get name(){return tr('level.competition')}},
 ];
 /* groupes du club : le gestionnaire les crée et y affecte des athlètes.
    Sert à cibler les créneaux (ex. un créneau réservé au groupe Compétition). */
@@ -4199,12 +4312,44 @@ function openClubAthleteCalendar(a){
   toast(tr('clubAth.calendarOf', {name:a.name}) + (rosterIsReal?'':tr('clubAth.demoTypicalPlan')));
 }
 let clubOnlyUnassigned = false;
+/* Segmentation croisée du roster (#7 audit) : sport × groupe (objectif) ×
+   niveau, combinables simultanément avec la recherche texte. Pas de critère
+   « âge » — aucune date de naissance dans le modèle de données actuel,
+   en ajouter un factice aurait été trompeur plutôt qu'utile. */
+let clubFilterDisc='', clubFilterGroup='', clubFilterLevel='';
+function initClubFilters(){
+  const discSel=document.getElementById('clubFilterDisc');
+  if(discSel && !discSel.dataset.init){
+    discSel.dataset.init='1';
+    discSel.innerHTML = `<option value="">${tr('clubFilter.allSports')}</option>` +
+      Object.keys(CLUB_DISC_LABEL).map(k=>`<option value="${k}">${CLUB_DISC_LABEL[k]}</option>`).join('');
+    discSel.onchange=()=>{ clubFilterDisc=discSel.value; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
+  }
+  const grpSel=document.getElementById('clubFilterGroup');
+  if(grpSel){
+    grpSel.innerHTML = `<option value="">${tr('clubFilter.allGroups')}</option>` +
+      CLUB_GROUPS.map(g=>`<option value="${g.id}" ${clubFilterGroup===g.id?'selected':''}>${g.name}</option>`).join('');
+    if(!grpSel.dataset.init){ grpSel.dataset.init='1';
+      grpSel.onchange=()=>{ clubFilterGroup=grpSel.value; renderClubAthletes(document.getElementById('clubAthleteSearch').value); }; }
+  }
+  const lvlSel=document.getElementById('clubFilterLevel');
+  if(lvlSel && !lvlSel.dataset.init){
+    lvlSel.dataset.init='1';
+    lvlSel.innerHTML = `<option value="">${tr('clubFilter.allLevels')}</option>` +
+      CLUB_LEVELS.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+    lvlSel.onchange=()=>{ clubFilterLevel=lvlSel.value; renderClubAthletes(document.getElementById('clubAthleteSearch').value); };
+  }
+}
 function renderClubAthletes(filter){
   renderJoinRequests();
   renderLicenceAlert();
+  initClubFilters();
   const box=document.getElementById('clubAthletesList');
   const q=(filter||'').toLowerCase();
   let list=CLUB_ATHLETES.filter(a=>!q||a.name.toLowerCase().includes(q));
+  if(clubFilterDisc) list=list.filter(a=>a.disc===clubFilterDisc);
+  if(clubFilterGroup) list=list.filter(a=>a.group===clubFilterGroup);
+  if(clubFilterLevel) list=list.filter(a=>a.level===clubFilterLevel);
   if(clubOnlyUnassigned) list=list.filter(a=>!a.group);
   if(clubLicenceOnly) list=list.filter(a=>licenceStatus(a)!=='ok');
   const banner = clubOnlyUnassigned
@@ -4340,6 +4485,159 @@ function openMiniPrompt({title, label, value, textarea, inputType, onSave}){
     close();
     if(cb) cb(v);
   });
+})();
+
+/* ============================================================
+   CALENDRIER DE SAISON — #8 de l'audit concurrentiel (suivi athlètes)
+   ------------------------------------------------------------
+   Toutes les courses de l'athlète sur la saison, priorité A/B/C,
+   lieu, et résultat pour les courses passées (édité inline via
+   openMiniPrompt). `a.races` alimente ; à défaut, on retombe sur le
+   simple `a.race` déjà utilisé partout ailleurs (compat).
+   ============================================================ */
+let _seasonAth=null;
+function athRaces(a){
+  if(Array.isArray(a.races) && a.races.length) return a.races;
+  return a.race ? [{name:a.race.name, days:a.race.days, priority:'A'}] : [];
+}
+const SEASON_PRIO_COLOR = {A:'var(--run)', B:'var(--bike)', C:'var(--muted)'};
+function fmtRaceDate(days){
+  const d=addDays(new Date(), days);
+  return d.toLocaleDateString(localeStr(),{day:'numeric',month:'short',year:'numeric'});
+}
+function renderSeasonList(){
+  const a=_seasonAth; if(!a) return;
+  const box=document.getElementById('seasonList');
+  const races=athRaces(a).slice().sort((x,y)=>x.days-y.days);
+  if(!races.length){ box.innerHTML=`<p class="club-hint">${tr('season.empty')}</p>`; return; }
+  box.innerHTML = races.map((r,i)=>{
+    const past = r.days<0;
+    return `<div class="season-row ${past?'past':''}">
+      <span class="season-prio" style="background:${SEASON_PRIO_COLOR[r.priority]||SEASON_PRIO_COLOR.C}">${r.priority||'C'}</span>
+      <div class="season-info">
+        <div class="season-name">${r.name}${r.location?` <small>· ${r.location}</small>`:''}</div>
+        <div class="season-date">${fmtRaceDate(r.days)} ${past?'':`· J–${r.days}`}</div>
+      </div>
+      <div class="season-result" data-i="${i}">${r.result ? r.result : (past ? `<span class="season-add-result">${tr('season.addResult')}</span>` : '')}</div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.season-row').forEach((row,i)=>{
+    const races2=athRaces(a).slice().sort((x,y)=>x.days-y.days);
+    const r=races2[i]; if(r.days>=0) return; // résultat éditable seulement pour le passé
+    row.querySelector('.season-result').style.cursor='pointer';
+    row.querySelector('.season-result').onclick=()=>{
+      openMiniPrompt({title:tr('season.resultFor', {name:r.name}), value:r.result||'', onSave:(v)=>{
+        // retrouve l'entrée réelle dans a.races (ou la crée si on venait de a.race)
+        if(!Array.isArray(a.races)) a.races = athRaces(a);
+        const target=a.races.find(x=>x.name===r.name && x.days===r.days);
+        if(target) target.result=v||null;
+        renderSeasonList();
+      }});
+    };
+  });
+}
+function openSeasonCalendar(a){
+  _seasonAth=a;
+  document.getElementById('seasonAthName').textContent=a.name;
+  renderSeasonList();
+  document.getElementById('seasonOverlay').classList.add('open');
+}
+(function initSeasonCalendar(){
+  const ov=document.getElementById('seasonOverlay'); if(!ov) return;
+  const close=()=>ov.classList.remove('open');
+  document.getElementById('seasonClose').addEventListener('click', close);
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
+  document.getElementById('seaAdd').addEventListener('click', ()=>{
+    const a=_seasonAth; if(!a) return;
+    const name=document.getElementById('seaName').value.trim();
+    const loc=document.getElementById('seaLoc').value.trim();
+    const dateVal=document.getElementById('seaDate').value;
+    const prio=document.getElementById('seaPrio').value;
+    if(!name || !dateVal){ toast(tr('season.fillNameDate'), 'error'); return; }
+    const days=Math.round((new Date(dateVal+'T00:00:00')-new Date(new Date().toDateString()))/86400000);
+    if(!Array.isArray(a.races)) a.races = athRaces(a);
+    a.races.push({name, location:loc||null, days, priority:prio});
+    document.getElementById('seaName').value=''; document.getElementById('seaLoc').value=''; document.getElementById('seaDate').value='';
+    renderSeasonList();
+    toast(tr('season.added'));
+  });
+})();
+
+/* ============================================================
+   COMPARAISON DIRECTE ENTRE DEUX ATHLÈTES — #10 de l'audit
+   ------------------------------------------------------------
+   Courbes/barres superposées + classement dans le roster, sur les
+   signaux déjà fiables ailleurs dans l'app (forme, HRV, découplage,
+   jours avant course) — même prudence que le radar « qui a besoin
+   de toi » : pas l'adhérence a.comp (démo-only).
+   ============================================================ */
+const COMPARE_METRICS = [
+  {key:'forme', get label(){return tr('compareAth.forme')}, get:a=>athForme(a), unit:'%', max:100, better:'high'},
+  {key:'hrv',   get label(){return tr('compareAth.hrv')}, get:a=>(a.checkin&&a.checkin.hrv)??null, unit:'ms', max:80, better:'high'},
+  {key:'drop',  get label(){return tr('compareAth.drop')}, get:a=>a.drop!=null?Math.round(a.drop*100):null, unit:'%', max:30, better:'low'},
+  {key:'racedays', get label(){return tr('compareAth.racedays')}, get:a=>(a.race?a.race.days:null), unit:'j', max:120, better:null},
+];
+function rankAmongRoster(metric, aid){
+  const vals = ROSTER.map(x=>({id:x.id, v:metric.get(x)})).filter(x=>x.v!=null);
+  if(metric.better) vals.sort((x,y)=> metric.better==='high' ? y.v-x.v : x.v-y.v);
+  const idx = vals.findIndex(x=>x.id===aid);
+  return idx===-1 ? null : {rank:idx+1, total:vals.length};
+}
+function renderCompareAthletes(){
+  const selA=document.getElementById('cmpAthA'), selB=document.getElementById('cmpAthB');
+  const a=ROSTER.find(x=>x.id===selA.value), b=ROSTER.find(x=>x.id===selB.value);
+  const box=document.getElementById('cmpAthBody');
+  if(!a||!b||a.id===b.id){ box.innerHTML=`<p class="club-hint">${tr('compareAth.pickTwo')}</p>`; return; }
+  box.innerHTML = COMPARE_METRICS.map(m=>{
+    const va=m.get(a), vb=m.get(b);
+    if(va==null && vb==null) return '';
+    const wa = va!=null ? Math.max(4,Math.min(100, va/m.max*100)) : 0;
+    const wb = vb!=null ? Math.max(4,Math.min(100, vb/m.max*100)) : 0;
+    const rkA=rankAmongRoster(m,a.id), rkB=rankAmongRoster(m,b.id);
+    return `<div class="cmp-metric">
+      <div class="cmp-metric-lbl">${m.label}</div>
+      <div class="cmp-bar-row">
+        <span class="cmp-bar-val">${va!=null?va+m.unit:'—'}${rkA?` <small>(${rkA.rank}/${rkA.total})</small>`:''}</span>
+        <div class="cmp-bar-track"><i style="width:${wa}%;background:${a.color}"></i></div>
+      </div>
+      <div class="cmp-bar-row">
+        <span class="cmp-bar-val">${vb!=null?vb+m.unit:'—'}${rkB?` <small>(${rkB.rank}/${rkB.total})</small>`:''}</span>
+        <div class="cmp-bar-track"><i style="width:${wb}%;background:${b.color}"></i></div>
+      </div>
+    </div>`;
+  }).join('') || `<p class="club-hint">${tr('compareAth.noData')}</p>`;
+}
+function injectCompareAthCss(){
+  if(document.getElementById('pf-cmpath-css')) return;
+  const st=document.createElement('style'); st.id='pf-cmpath-css';
+  st.textContent=`
+  .cmp-ath-pickers{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:18px}
+  .cmp-ath-vs{font-family:var(--font-display);font-weight:700;color:var(--muted)}
+  .cmp-metric{margin-bottom:16px}
+  .cmp-metric-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .cmp-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .cmp-bar-val{width:90px;flex:none;font-family:var(--font-data);font-size:12px;text-align:right}
+  .cmp-bar-val small{color:var(--muted)}
+  .cmp-bar-track{flex:1;height:9px;border-radius:99px;background:var(--panel-2);overflow:hidden}
+  .cmp-bar-track i{display:block;height:100%;border-radius:99px;transition:width .3s}`;
+  document.head.appendChild(st);
+}
+function openCompareAthletes(){
+  injectCompareAthCss();
+  const opts = ROSTER.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  document.getElementById('cmpAthA').innerHTML=opts;
+  document.getElementById('cmpAthB').innerHTML=opts;
+  if(ROSTER[1]) document.getElementById('cmpAthB').value=ROSTER[1].id;
+  renderCompareAthletes();
+  document.getElementById('compareAthOverlay').classList.add('open');
+}
+(function initCompareAthletes(){
+  const ov=document.getElementById('compareAthOverlay'); if(!ov) return;
+  const close=()=>ov.classList.remove('open');
+  document.getElementById('compareAthClose').addEventListener('click', close);
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
+  document.getElementById('cmpAthA').addEventListener('change', renderCompareAthletes);
+  document.getElementById('cmpAthB').addEventListener('change', renderCompareAthletes);
 })();
 
 /* Chip « mineur / consentement parental » sur chaque fiche athlète club. */
@@ -6698,7 +6996,7 @@ function openAnalysis(s){
   renderWbal(s, data);
   // laps
   renderLapChart(data);
-  renderLaps(data, isSwim);
+  renderLaps(s, data, isSwim);
   // impact des conditions (chaleur, vent, D+) — course & vélo
   renderImpact(s, data);
   // comparateur multi-séances en overlay (temps/distance)
@@ -7498,6 +7796,9 @@ function injectLapCss(){
   .an-laps .lc-v{font-family:var(--font-data);font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .an-laps .lc-v small{color:var(--muted);font-weight:500;font-size:10px;font-family:var(--font-ui,inherit)}
   @media (max-width:480px){.an-laps .lc-metrics{grid-template-columns:1fr 1fr 1fr}}
+  .an-laps .lc-lactate{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px;padding-top:8px;border-top:1px dashed var(--line)}
+  .an-laps .lc-lactate .lc-k{margin:0}
+  .an-laps .lc-lactate input{width:58px;text-align:right;padding:4px 7px;font-size:12.5px}
   .zbadge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid}`;
   document.head.appendChild(st);
 }
@@ -7570,7 +7871,17 @@ function sessionTotalsPseudoLap(data, disc){
     kj: data.laps.reduce((a,l)=>a+l.kj,0), dplus: data.dplus, lbal, tq
   };
 }
-function renderLaps(data, isSwim){
+/* Lactate manuel par lap (mmol/L) — les athlètes équipés d'un lactatemètre
+   portable renseignent leur valeur après l'intervalle ; le coach la voit
+   directement sur la carte du lap. Démo : stocké sur la séance en mémoire
+   (s._lactate, clé = numéro de lap) comme s._hyroxLog pour Hyrox ; en
+   prod, un champ de plus sur la ligne d'activité normalisée. */
+function lapLactateHTML(s, l){
+  const v = s._lactate && s._lactate[l.n]!=null ? s._lactate[l.n] : '';
+  return `<label class="lc-lactate"><span class="lc-k">${tr('lactate.label')}</span>
+    <input type="number" step="0.1" min="0" max="30" placeholder="—" data-lac-lap="${l.n}" value="${v}"></label>`;
+}
+function renderLaps(s, data, isSwim){
   const box=document.getElementById('anLaps'); const disc=data.disc; injectLapCss();
   document.getElementById('anLapHint').textContent = (isSwim?tr('lapCol.perSet'):tr('lapCol.autoSplits'))+' · '+tr('lapCol.chooseColumns');
   const cols=LAP_COLS.filter(c=>colApplies(c.app,disc));
@@ -7586,13 +7897,19 @@ function renderLaps(data, isSwim){
   const cards=data.laps.map(l=>`<div class="lap-card ${l.hard?'hard':''}">
       <div class="lc-head"><span class="lc-n">${l.n}</span><span class="lc-label">Lap ${l.n}</span></div>
       <div class="lc-metrics">${vis.map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(l,data,disc)}</span></div>`).join('')}</div>
+      ${lapLactateHTML(s,l)}
     </div>`).join('');
   box.innerHTML=`<div class="lapcols">${tools}</div><div class="lap-cards">${totalCard}${cards}</div>`;
   box.querySelectorAll('.lapcol').forEach(b=>b.onclick=()=>{
     const k=b.dataset.k; sel.has(k)?sel.delete(k):sel.add(k);
     try{ localStorage.setItem('pf_lapcols_'+disc, JSON.stringify([...sel])); }catch(e){}
-    renderLaps(data, isSwim);
+    renderLaps(s, data, isSwim);
   });
+  box.querySelectorAll('[data-lac-lap]').forEach(inp=>inp.addEventListener('change',()=>{
+    const n=+inp.dataset.lacLap; s._lactate=s._lactate||{};
+    if(inp.value==='') delete s._lactate[n]; else s._lactate[n]=+inp.value;
+    if(window.PF?.user && s.id && PF.setLapLactate) PF.setLapLactate(s.id, n, inp.value===''?null:+inp.value).catch(e=>console.warn('[PF] setLapLactate',e));
+  }));
 }
 
 document.getElementById('analysisClose').addEventListener('click', ()=> analysisOverlay.classList.remove('open'));
@@ -8590,11 +8907,36 @@ function scoreColor(s){
   if(s>=32) return '#FF8A4D'; return '#FF5470';
 }
 
+/* ============================================================
+   TIMER DE RÉCUPÉRATION — #1 de l'audit concurrentiel (suivi athlètes)
+   ------------------------------------------------------------
+   « Xh avant la reprise d'un effort dur » plutôt qu'un score en %
+   (façon COROS EvoLab) : même signaux que scoreReadiness (TSB, ACWR),
+   reformulés en horizon temporel actionnable — plus lisible en démo
+   qu'un pourcentage pour un coach qui doit juste savoir « il peut
+   pousser aujourd'hui ou pas ». Le score % (jauge) reste affiché à
+   côté, les deux se complètent.
+   ============================================================ */
+function computeRecoveryHours(){
+  const t=READINESS.tsb, a=READINESS.acwr;
+  let hours = Math.max(0, -t*3.2);           // TSB très négatif → plus d'heures
+  if(a>1.3) hours += (a-1.3)*60;             // surcharge (ACWR) → pénalité additionnelle
+  return Math.min(168, Math.round(hours));
+}
+function fmtRecoveryHours(h){
+  if(h<=2) return null;
+  if(h<24) return tr('ready.recoveryHours', {h});
+  const d=Math.floor(h/24), r=h%24;
+  return r ? tr('ready.recoveryDaysHours', {d, h:r}) : tr('ready.recoveryDays', {d});
+}
 function renderReadiness(){
-  const {global, factors} = scoreReadiness();
-  const v = readinessVerdict(global);
   const hub = document.getElementById('readyhub');
   if(!hub) return;
+  const dw=dashWidgetPrefs();
+  hub.style.display = dw.readyhub ? '' : 'none';
+  if(!dw.readyhub) return;
+  const {global, factors} = scoreReadiness();
+  const v = readinessVerdict(global);
   hub.style.setProperty('--vc', v.color);
 
   // jauge circulaire (rayon 76 → circonférence ≈ 477)
@@ -8610,6 +8952,15 @@ function renderReadiness(){
   document.getElementById('rhAdvice').textContent = v.advice;
   document.querySelector('.rh-verdict').style.borderLeftColor = v.color;
 
+  const recBox=document.getElementById('rhRecovery');
+  if(recBox){
+    const h=computeRecoveryHours(), txt=fmtRecoveryHours(h);
+    recBox.innerHTML = txt
+      ? `<i class="ic ic-moon"></i> ${tr('ready.recoveryIn', {time:txt})}`
+      : `<i class="ic ic-check"></i> ${tr('ready.recoveryReady')}`;
+    recBox.style.color = txt ? 'var(--bike)' : 'var(--good)';
+  }
+
   document.getElementById('rhFactors').innerHTML = factors.map(f=>{
     const col = scoreColor(f.score);
     return `<div class="rh-factor">
@@ -8618,6 +8969,110 @@ function renderReadiness(){
       <div class="fv" style="color:${col}">${f.score}</div>
     </div>`;
   }).join('');
+
+  renderLoadAdvanced();
+}
+
+/* ============================================================
+   ANALYSE DE CHARGE AVANCÉE — #2, #3, #6 de l'audit (suivi athlètes)
+   ------------------------------------------------------------
+   3 cartes sous le tableau de forme, sur l'athlète chargé (mêmes
+   données que le CTL/ATL/TSB déjà calculé — buildLoadWeeks) :
+     - Prédicteur de course multi-distances (Riegel, calé sur l'allure
+       seuil + ajusté à la forme du moment CTL/pic CTL).
+     - Monotonie & Strain (méthode Foster) — écart-type de la charge
+       quotidienne sur 7 jours, complète l'ACWR déjà présent.
+     - Historique bloc à bloc : 4 dernières semaines vs les 12
+       précédentes.
+   ============================================================ */
+function predictRaceTimes(){
+  const thrPace = (typeof ATHLETE_REF!=='undefined') ? ATHLETE_REF.seuilRun : null; // s/km
+  if(!thrPace) return null;
+  const refDist=10; // km — l'allure seuil approxime une allure ~10K
+  const refTimeSec = thrPace*refDist;
+  const weeks = buildLoadWeeks();
+  const ctlNow = weeks[weeks.length-1].ctl, ctlPeak = Math.max(...weeks.map(w=>w.ctl), 1);
+  const fitnessFactor = Math.max(0.85, Math.min(1, ctlNow/ctlPeak));
+  return [{key:'5K',d:5},{key:'10K',d:10},{key:tr('predict.half'),d:21.0975},{key:tr('predict.marathon'),d:42.195}]
+    .map(x=>({key:x.key, dist:x.d, sec:Math.round(refTimeSec*Math.pow(x.d/refDist,1.06)/fitnessFactor)}));
+}
+function computeMonotonyStrain(){
+  const days=[];
+  for(let i=6;i>=0;i--){ const d=iso(addDays(new Date(),-i)); days.push((planning[d]||[]).reduce((a,s)=>a+(s.tss||0),0)); }
+  const mean=days.reduce((a,b)=>a+b,0)/7;
+  const sd=Math.sqrt(days.reduce((a,b)=>a+Math.pow(b-mean,2),0)/7);
+  const monotony = sd>0.01 ? +(mean/sd).toFixed(2) : (mean>0?9.9:0);
+  return {mean:Math.round(mean), monotony, strain:Math.round(mean*7*monotony)};
+}
+function compareLoadBlocks(){
+  const weeks=buildLoadWeeks();
+  const last4=weeks.slice(-4), prev12=weeks.slice(-16,-4);
+  const avg=(arr,k)=>arr.length?Math.round(arr.reduce((a,w)=>a+w[k],0)/arr.length):0;
+  return {
+    last4:{load:avg(last4,'total'), ctl:avg(last4,'ctl')},
+    prev12:{load:avg(prev12,'total'), ctl:avg(prev12,'ctl')}
+  };
+}
+function injectLoadAdvancedCss(){
+  if(document.getElementById('pf-loadadv-css')) return;
+  const st=document.createElement('style'); st.id='pf-loadadv-css';
+  st.textContent=`
+  .rh-advanced{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:20px 0}
+  .rh-adv-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .rh-adv-card h4{font-family:var(--font-display);font-size:14px;font-weight:600;margin:0 0 3px;display:flex;align-items:center;gap:7px}
+  .rh-adv-card .rh-adv-sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+  .rh-predict-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line);font-family:var(--font-data)}
+  .rh-predict-row:last-child{border-bottom:none}
+  .rh-predict-row .pk{font-size:12px;color:var(--muted);font-family:var(--font-ui,inherit)}
+  .rh-predict-row .pv{font-size:15px;font-weight:700}
+  .rh-mono-val{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+  .rh-mono-val b{font-family:var(--font-data);font-size:26px}
+  .rh-mono-flag{font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 9px;border-radius:99px}
+  .rh-mono-flag.ok{color:var(--good);background:rgba(57,230,163,.12)}
+  .rh-mono-flag.warn{color:var(--run);background:rgba(255,84,112,.12)}
+  .rh-mono-note{font-size:12px;color:var(--muted);line-height:1.5}
+  .rh-block-cmp{display:flex;align-items:center;gap:14px}
+  .rh-block-col{flex:1;text-align:center}
+  .rh-block-col .bk{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+  .rh-block-col .bv{font-family:var(--font-data);font-size:19px;font-weight:700}
+  .rh-block-col .bl{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .rh-block-arrow{font-size:18px;color:var(--muted)}`;
+  document.head.appendChild(st);
+}
+function renderLoadAdvanced(){
+  const box=document.getElementById('rhAdvanced'); if(!box) return;
+  box.style.display = dashWidgetPrefs().advanced ? '' : 'none';
+  if(!dashWidgetPrefs().advanced) return;
+  injectLoadAdvancedCss();
+  const pred=predictRaceTimes();
+  const ms=computeMonotonyStrain();
+  const cmp=compareLoadBlocks();
+  const deltaLoad = cmp.prev12.load ? Math.round((cmp.last4.load-cmp.prev12.load)/cmp.prev12.load*100) : 0;
+
+  const predictCard = pred ? `<div class="rh-adv-card">
+    <h4><i class="ic ic-flag"></i> ${tr('predict.heading')}</h4>
+    <div class="rh-adv-sub">${tr('predict.sub')}</div>
+    ${pred.map(p=>`<div class="rh-predict-row"><span class="pk">${p.key}</span><span class="pv">${fmtClock(p.sec/60)}</span></div>`).join('')}
+  </div>` : '';
+
+  const monoCard = `<div class="rh-adv-card">
+    <h4><i class="ic ic-chart"></i> ${tr('mono.heading')}</h4>
+    <div class="rh-adv-sub">${tr('mono.sub')}</div>
+    <div class="rh-mono-val"><b>${ms.monotony}</b><span class="rh-mono-flag ${ms.monotony>=2?'warn':'ok'}">${ms.monotony>=2?tr('mono.high'):tr('mono.ok')}</span></div>
+    <div class="rh-mono-note">${tr('mono.strainNote', {strain:ms.strain})}</div>
+  </div>`;
+
+  const blockCard = `<div class="rh-adv-card">
+    <h4><i class="ic ic-calendar"></i> ${tr('block.heading')}</h4>
+    <div class="rh-adv-sub">${tr('block.sub')}</div>
+    <div class="rh-block-cmp">
+      <div class="rh-block-col"><div class="bk">${tr('block.prev12')}</div><div class="bv">${cmp.prev12.load}</div><div class="bl">${tr('block.avgLoadWeek')}</div></div>
+      <div class="rh-block-arrow">${deltaLoad>=0?'→':'→'}</div>
+      <div class="rh-block-col"><div class="bk">${tr('block.last4')}</div><div class="bv" style="color:${deltaLoad>=0?'var(--bike)':'var(--good)'}">${cmp.last4.load}</div><div class="bl">${deltaLoad>=0?'+':''}${deltaLoad}%</div></div>
+    </div>
+  </div>`;
+
+  box.innerHTML = predictCard + monoCard + blockCard;
 }
 renderReadiness();
 

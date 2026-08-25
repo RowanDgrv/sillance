@@ -462,6 +462,27 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .set-body{min-height:340px}
 .set-h{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:2px}
 .set-sub{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.dash-widget-list{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dash-widget-row{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line)}
+.dash-widget-row:last-child{border-bottom:none}
+.dash-widget-row input{width:auto;accent-color:var(--accent)}
+.dash-alert-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.dash-alert-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);padding:8px 12px;font-family:var(--font-data);font-size:12.5px}
+.dash-alert-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px}
+.dash-alert-del:hover{color:var(--run)}
+.dash-alert-form{display:grid;grid-template-columns:1.6fr 0.7fr 0.8fr auto;gap:8px;align-items:center}
+.season-list{display:flex;flex-direction:column;gap:8px;margin:14px 0 16px;max-height:340px;overflow-y:auto}
+.season-row{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);padding:10px 13px}
+.season-row.past{opacity:.8}
+.season-prio{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:#06121a;font-weight:800;font-size:13px;font-family:var(--font-data)}
+.season-info{flex:1;min-width:0}
+.season-name{font-weight:700;font-size:13.5px}
+.season-name small{font-weight:500;color:var(--muted)}
+.season-date{font-size:11.5px;color:var(--muted);font-family:var(--font-data);margin-top:2px}
+.season-result{flex:none;font-size:12.5px;font-weight:600;text-align:right;max-width:150px}
+.season-add-result{color:var(--accent);text-decoration:underline;text-underline-offset:2px;font-weight:500}
+.season-form{display:grid;grid-template-columns:1.6fr 1fr 1fr 0.6fr auto;gap:8px}
+@media (max-width:560px){.season-form{grid-template-columns:1fr 1fr}}
 .set-plan{border:1px solid var(--line-strong);border-radius:var(--radius);padding:var(--space-4);background:var(--panel-2);margin-bottom:14px}
 .set-plan .p-name{font-weight:700;font-size:14.5px}
 .set-plan .p-price{font-family:var(--font-data);font-size:22px;font-weight:700;margin:2px 0 var(--space-1)}
@@ -1064,6 +1085,7 @@ body[data-athview="home"] .today-panel{display:block}
 .rh-verdict-txt{flex:1}
 .rh-flag{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--vc,var(--good));margin-bottom:6px;line-height:1.2}
 .rh-verdict-txt p{font-size:13.5px;color:var(--soft,#C4CCDE);line-height:1.55}
+.rh-recovery{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;margin-top:10px;padding:7px 12px;border-radius:99px;background:var(--panel-2);border:1px solid var(--line-strong)}
 
 .rh-factors{display:flex;flex-direction:column;gap:14px}
 .rh-factor{display:grid;grid-template-columns:128px 1fr auto;gap:var(--space-3);align-items:center}
@@ -1451,6 +1473,7 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .analytics-empty{margin-top:26px;border:1px dashed var(--line-strong);border-radius:var(--radius);padding:22px var(--space-5)}
 .analytics-empty .sub{margin-top:var(--space-2)}
 .club-search{border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--panel);color:var(--text);font-size:var(--fs-md);padding:9px 13px;min-width:200px}
+.club-filter-sel{border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--panel);color:var(--text);font-size:13px;padding:9px 11px;cursor:pointer}
 
 /* rappel de séance club */
 .sess-reminder{border:1px solid var(--swim);background:linear-gradient(120deg,rgba(47,217,255,.1),rgba(157,123,255,.06));
@@ -2407,6 +2430,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         <div class="rh-verdict-txt">
           <div class="rh-flag" id="rhFlag">Analyse…</div>
           <p id="rhAdvice">—</p>
+          <div class="rh-recovery" id="rhRecovery"></div>
         </div>
       </div>
 
@@ -2416,6 +2440,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         <div class="rh-factors" id="rhFactors"></div>
       </div>
     </div>
+
+    <div class="rh-advanced" id="rhAdvanced"></div>
 
     <p class="rh-disclaimer"><i class="ic ic-alert-triangle"></i> Recommandations indicatives d'aide à la décision d'entraînement. Elles ne constituent pas un avis médical et ne remplacent pas une consultation. En cas de douleur, de fatigue inhabituelle ou de doute, consulte un professionnel de santé.</p>
   </section>
@@ -2709,6 +2735,9 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 
       <div class="club-actions">
         <input type="search" id="clubAthleteSearch" class="club-search" aria-label="Rechercher un athlète" placeholder="Rechercher un athlète…" data-i18n-attr="aria-label:athlete.searchAria,placeholder:athlete.searchPh">
+        <select id="clubFilterDisc" class="club-filter-sel" aria-label="Filtrer par sport"></select>
+        <select id="clubFilterGroup" class="club-filter-sel" aria-label="Filtrer par groupe / objectif"></select>
+        <select id="clubFilterLevel" class="club-filter-sel" aria-label="Filtrer par niveau"></select>
       </div>
       <div class="club-athletes" id="clubAthletesList"></div>
     </div>
@@ -2862,6 +2891,38 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       </div>
     </div>
     <button class="btn" id="miniPromptSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
+  </div>
+</div>
+
+<!-- Calendrier de saison : toutes les courses de l'athlète, objectifs A/B/C
+     et résultats — #8 de l'audit concurrentiel (suivi athlètes) -->
+<div class="overlay" id="seasonOverlay" role="dialog" aria-modal="true" aria-label="Calendrier de saison">
+  <div class="modal group-modal">
+    <button class="close" id="seasonClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" data-i18n="season.title">Calendrier de saison</span>
+    <h3 id="seasonAthName"></h3>
+    <div id="seasonList" class="season-list"></div>
+    <div class="season-form">
+      <input type="text" id="seaName" placeholder="Nom de la course">
+      <input type="text" id="seaLoc" placeholder="Lieu" style="max-width:120px">
+      <input type="date" id="seaDate">
+      <select id="seaPrio"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+      <button class="btn cy-ghost" id="seaAdd" data-i18n="season.add">+ Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Comparaison directe entre deux athlètes du roster — #10 de l'audit -->
+<div class="overlay" id="compareAthOverlay" role="dialog" aria-modal="true" aria-label="Comparer deux athlètes">
+  <div class="modal group-modal">
+    <button class="close" id="compareAthClose" aria-label="Fermer"><i class="ic ic-x"></i></button>
+    <span class="badge" data-i18n="compareAth.title">Comparer deux athlètes</span>
+    <div class="cmp-ath-pickers">
+      <select id="cmpAthA"></select>
+      <span class="cmp-ath-vs">VS</span>
+      <select id="cmpAthB"></select>
+    </div>
+    <div id="cmpAthBody"></div>
   </div>
 </div>
 
@@ -3129,6 +3190,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         <button class="set-tab active" data-tab="structure"><i class="ic ic-landmark"></i> Abonnement Structure</button>
         <button class="set-tab" data-tab="coach"><i class="ic ic-brain"></i> Abonnement coach · IA</button>
         <button class="set-tab" data-tab="account"><i class="ic ic-credit-card"></i> Compte &amp; paiements</button>
+        <button class="set-tab" data-tab="dashboard"><i class="ic ic-target"></i> Tableau de bord</button>
       </nav>
       <div class="set-body" id="setBody"></div>
     </div>
