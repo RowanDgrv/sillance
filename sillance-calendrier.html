@@ -483,6 +483,14 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .season-add-result{color:var(--accent);text-decoration:underline;text-underline-offset:2px;font-weight:500}
 .season-form{display:grid;grid-template-columns:1.6fr 1fr 1fr 0.6fr auto;gap:8px}
 @media (max-width:560px){.season-form{grid-template-columns:1fr 1fr}}
+
+/* ---------- Sous l'agenda (vue Athlète) : débriefs, coachs, sync, coaching,
+   rappel du matin — en grille de cartes plutôt qu'empilés dans la sidebar,
+   qui rendait la page interminable (surtout mobile). ---------- */
+.ath-below-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;margin-top:26px;align-items:start}
+.ath-below-grid:empty{display:none;margin-top:0}
+.ath-below-card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:var(--space-4);margin-top:0!important;border-top:1px solid var(--line)!important}
+.ath-below-card h2{font-size:var(--fs-base);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:var(--space-1)}
 .set-plan{border:1px solid var(--line-strong);border-radius:var(--radius);padding:var(--space-4);background:var(--panel-2);margin-bottom:14px}
 .set-plan .p-name{font-weight:700;font-size:14.5px}
 .set-plan .p-price{font-family:var(--font-data);font-size:22px;font-weight:700;margin:2px 0 var(--space-1)}
@@ -2397,6 +2405,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <div class="cal-guides" aria-hidden="true"><div class="cg-cols" id="calCols"></div><div class="cg-rows"></div></div>
     </section>
   </div>
+
+  <!-- Vue Athlète uniquement : débriefs, coachs, sync, coaching, rappel du
+       matin — sous l'agenda plutôt que dans la sidebar. Vide (et masqué,
+       cf. :empty) hors vue Athlète. -->
+  <div class="ath-below-grid" id="athBelowGrid"></div>
 
   <!-- ===== ANALYSE (repliée, s'ouvre au clic sur une séance) ===== -->
   <div class="ath-panel-stats" id="athPanelStats">

@@ -917,6 +917,7 @@ function planningRadarHTML(){
   </div>`;
 }
 function renderSidebar(){
+  if(mode!=='athlete'){ const g=document.getElementById('athBelowGrid'); if(g) g.innerHTML=''; }
   if(mode==='coach'){
     const dw=dashWidgetPrefs();
     sidebarContent.innerHTML = coachGuideHTML() + (dw.needRadar?needRadarHTML():'') + (dw.planningRadar?planningRadarHTML():'') + `
@@ -1019,39 +1020,8 @@ function renderSidebar(){
             <input type="number" step="any" data-ref="${k}" value="${ATHLETE_REF[k]??''}" style="width:100%;box-sizing:border-box"></label>`).join('')}
         </div>
         <button class="btn" id="refsSave" style="width:100%;margin-top:10px">${tr('refs.save')}</button>
-      </div>
-      <div class="records" id="debriefCard">
-        ${debriefsBlockHTML(debriefsFor(myDebriefKey()), tr('debrief.empty'))}
-        <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> ${tr('debrief.add')}</button>
-      </div>
-      <div class="records" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}</div>
-      ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
-      <div class="strava-card" id="stravaCard"></div>
-      <div class="coach-sub" id="coachSubCard">
-        <h2>${tr('coachSub.title')}</h2>
-        <p class="hint" style="margin-bottom:10px">${tr('coachSub.text')}</p>
-        <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/${tr('sidebar.perMonth')}</small></span></div>
-        <button class="btn coach-sub-btn" id="coachSubBtn">${tr('coachSub.subscribe')}</button>
-      </div>
-      <div class="morning-card">
-        <h2>${tr('morning.title')}</h2>
-        <p class="hint" style="margin-bottom:10px">${tr('morning.text')}</p>
-        <div class="morning-pre" id="morningPre"></div>
-        <div class="morning-time">
-          <label for="morningHour">${tr('morning.sendTime')}</label>
-          <input type="time" id="morningHour" value="07:00" step="900">
-        </div>
-        <div class="morning-time">
-          <label for="morningChannel">${tr('morning.wantToReceive')}</label>
-          <select id="morningChannel">
-            <option value="push">${tr('morning.push')}</option>
-            <option value="email">${tr('morning.email')}</option>
-            <option value="both">${tr('morning.both')}</option>
-          </select>
-        </div>
-        <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> ${tr('morning.activate')}</button>
-        <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">${tr('morning.howTo')}</a>
       </div>`;
+    renderAthleteBelow();
     sidebarContent.querySelectorAll('input[type=range]').forEach(inp=>{
       inp.addEventListener('input', ()=>{
         checkin[inp.dataset.k] = +inp.value;
@@ -1113,6 +1083,50 @@ function renderSidebar(){
     const assb = document.getElementById('athShareSpecBtn');
     if(assb) assb.addEventListener('click', ()=> openSpectatorShare(myDebriefKey()));
   }
+}
+/* Débriefs, équipe de coachs, partage, sync capteurs, abonnement coaching,
+   rappel du matin — déplacés hors de la sidebar (#4 retour utilisateur
+   25/08/2026) : en dessous de l'agenda, en grille de cartes alignées,
+   plutôt qu'empilés dans la colonne latérale qui rendait la page (surtout
+   mobile, où la sidebar passe déjà sous le calendrier) interminable. Les
+   ids ne changent pas : le câblage des événements dans renderSidebar()
+   fonctionne à l'identique, seul l'emplacement du markup change. */
+function renderAthleteBelow(){
+  const box=document.getElementById('athBelowGrid'); if(!box) return;
+  box.innerHTML = `
+    <div class="records ath-below-card" id="debriefCard">
+      ${debriefsBlockHTML(debriefsFor(myDebriefKey()), tr('debrief.empty'))}
+      <button class="btn" id="debriefAddBtn" style="width:100%;margin-top:10px"><i class="ic ic-flag"></i> ${tr('debrief.add')}</button>
+    </div>
+    <div class="records ath-below-card" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}
+      ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn" style="margin-top:10px"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
+    </div>
+    <div class="strava-card ath-below-card" id="stravaCard"></div>
+    <div class="coach-sub ath-below-card" id="coachSubCard">
+      <h2>${tr('coachSub.title')}</h2>
+      <p class="hint" style="margin-bottom:10px">${tr('coachSub.text')}</p>
+      <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/${tr('sidebar.perMonth')}</small></span></div>
+      <button class="btn coach-sub-btn" id="coachSubBtn">${tr('coachSub.subscribe')}</button>
+    </div>
+    <div class="morning-card ath-below-card" id="morningCard">
+      <h2>${tr('morning.title')}</h2>
+      <p class="hint" style="margin-bottom:10px">${tr('morning.text')}</p>
+      <div class="morning-pre" id="morningPre"></div>
+      <div class="morning-time">
+        <label for="morningHour">${tr('morning.sendTime')}</label>
+        <input type="time" id="morningHour" value="07:00" step="900">
+      </div>
+      <div class="morning-time">
+        <label for="morningChannel">${tr('morning.wantToReceive')}</label>
+        <select id="morningChannel">
+          <option value="push">${tr('morning.push')}</option>
+          <option value="email">${tr('morning.email')}</option>
+          <option value="both">${tr('morning.both')}</option>
+        </select>
+      </div>
+      <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> ${tr('morning.activate')}</button>
+      <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">${tr('morning.howTo')}</a>
+    </div>`;
 }
 
 /* Édition des références physiologiques de l'athlète.
