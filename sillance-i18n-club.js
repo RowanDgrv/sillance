@@ -1,6 +1,7 @@
 /* Sillance — dictionnaire i18n de l'espace salle / club (démo de prospection) */
 (function(){
   var fr = {
+    "club.footer": `<a href="index.html" style="color:var(--accent)">Accueil</a> · <a href="contact.html" style="color:var(--accent)">Contact &amp; support</a> · <a href="legal.html#mentions" style="color:var(--accent)">Mentions légales</a> · <a href="legal.html#cgu" style="color:var(--accent)">CGU / CGV</a> · <a href="legal.html#confidentialite" style="color:var(--accent)">Confidentialité</a>`,
     "day.sunShort": `Dim`, "day.monShort": `Lun`, "day.tueShort": `Mar`, "day.wedShort": `Mer`, "day.thuShort": `Jeu`, "day.friShort": `Ven`, "day.satShort": `Sam`,
     "disc.run": `Course`, "disc.swim": `Natation`,
     "sidebar.subscribe": `S'abonner`, "crd.coach": `Coach`, "crd.present": `présent`,
@@ -82,6 +83,7 @@
   };
 
   var en = {
+    "club.footer": `<a href="index.html" style="color:var(--accent)">Home</a> · <a href="contact.html" style="color:var(--accent)">Contact &amp; support</a> · <a href="legal.html#mentions" style="color:var(--accent)">Legal notice</a> · <a href="legal.html#cgu" style="color:var(--accent)">Terms</a> · <a href="legal.html#confidentialite" style="color:var(--accent)">Privacy</a>`,
     "day.sunShort": `Sun`, "day.monShort": `Mon`, "day.tueShort": `Tue`, "day.wedShort": `Wed`, "day.thuShort": `Thu`, "day.friShort": `Fri`, "day.satShort": `Sat`,
     "disc.run": `Running`, "disc.swim": `Swimming`,
     "sidebar.subscribe": `Subscribe`, "crd.coach": `Coach`, "crd.present": `present`,
@@ -163,6 +165,7 @@
   };
 
   var es = {
+    "club.footer": `<a href="index.html" style="color:var(--accent)">Inicio</a> · <a href="contact.html" style="color:var(--accent)">Contacto y soporte</a> · <a href="legal.html#mentions" style="color:var(--accent)">Aviso legal</a> · <a href="legal.html#cgu" style="color:var(--accent)">Condiciones</a> · <a href="legal.html#confidentialite" style="color:var(--accent)">Privacidad</a>`,
     "day.sunShort": `Dom`, "day.monShort": `Lun`, "day.tueShort": `Mar`, "day.wedShort": `Mié`, "day.thuShort": `Jue`, "day.friShort": `Vie`, "day.satShort": `Sáb`,
     "disc.run": `Carrera`, "disc.swim": `Natación`,
     "sidebar.subscribe": `Suscribirse`, "crd.coach": `Coach`, "crd.present": `presente`,

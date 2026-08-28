@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title data-i18n="contact.pageTitle">Sillance : Nous contacter &amp; support</title>
+<meta name="description" data-i18n-attr="content:contact.metaDescription" content="Contacter le support de Sillance : question d'utilisation, problème technique, facturation, demande RGPD ou partenariat. Réponse sous 2 à 3 jours ouvrés.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sillance">
+<meta property="og:title" data-i18n-attr="content:contact.pageTitle" content="Sillance : Nous contacter &amp; support">
+<meta property="og:description" data-i18n-attr="content:contact.metaDescription" content="Contacter le support de Sillance : question d'utilisation, problème technique, facturation, demande RGPD ou partenariat.">
+<meta property="og:image" content="https://sillance.app/og-image.png">
+<meta property="og:url" content="https://sillance.app/contact.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" data-i18n-attr="content:contact.pageTitle" content="Sillance : Nous contacter &amp; support">
+<meta name="twitter:description" data-i18n-attr="content:contact.metaDescription" content="Contacter le support de Sillance.">
+<meta name="twitter:image" content="https://sillance.app/og-image.png">
+<link rel="canonical" href="https://sillance.app/contact.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+<link rel="shortcut icon" href="./favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600&display=optional" rel="stylesheet">
+<style>
+  :root{--paper:#0B1120;--panel:#121A2B;--ink:#F3F6FC;--soft:#C2CBDD;--muted:#8A93A8;--accent:#46C2D8;--orange:#FF9A3D;--line:rgba(150,165,200,.16);--line-strong:rgba(150,165,200,.30)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper);color:var(--soft);font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 22px 80px}
+  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:22px;border-bottom:1px solid var(--line-strong);margin-bottom:36px}
+  .wm{font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);text-decoration:none}
+  .wm b{color:var(--accent)}
+  nav a{color:var(--muted);text-decoration:none;font-size:13px;margin-left:18px}
+  nav a:hover{color:var(--accent)}
+  .lang-switch{display:inline-flex;gap:2px;margin-left:18px;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;padding:2px}
+  .lang-switch button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 8px;
+    border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer}
+  .lang-switch button.active{background:var(--accent);color:#062028}
+  h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:34px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);margin-bottom:10px}
+  .lead{font-size:16px;color:var(--soft);margin-bottom:8px}
+  h2{font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);margin:52px 0 6px;padding-top:24px;border-top:1px solid var(--line-strong)}
+  h3{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin:22px 0 6px}
+  p{margin:10px 0}
+  ul{margin:10px 0 10px 22px}
+  li{margin:6px 0}
+  strong{color:var(--ink)}
+  a{color:var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 22px;margin:18px 0}
+  .card.accent{border-left:3px solid var(--accent)}
+  .card.orange{border-left:3px solid var(--orange)}
+  form{display:grid;gap:16px;margin-top:6px}
+  .field{display:grid;gap:6px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  label{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+  input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink);background:var(--paper);
+    border:1px solid var(--line-strong);border-radius:8px;padding:11px 12px;width:100%}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  textarea{min-height:140px;resize:vertical}
+  .btn{font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;
+    background:var(--accent);color:#062028;border:none;border-radius:8px;padding:13px 22px;cursor:pointer;justify-self:start}
+  .btn:hover{filter:brightness(1.08)}
+  .form-note{font-size:12.5px;color:var(--muted);margin-top:-4px}
+  .big-mail{font-family:'Oswald',sans-serif;font-weight:600;font-size:19px;letter-spacing:.02em}
+  .quick a{display:inline-block;margin:4px 14px 4px 0}
+  footer{margin-top:70px;padding-top:20px;border-top:1px solid var(--line-strong);font-size:13px;color:var(--muted)}
+  footer nav{margin-top:8px}
+  footer nav a{margin-left:0;margin-right:16px}
+  @media(max-width:640px){
+    .wrap{padding:32px 18px 60px}
+    header{flex-direction:column;align-items:flex-start;gap:14px;padding-bottom:18px;margin-bottom:28px}
+    nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+    nav a{margin-left:0}
+    .lang-switch{margin-left:0}
+    h1{font-size:28px}
+    h2{font-size:19px;margin-top:44px}
+    .row2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <a class="wm" href="index.html">Sill<b>ance</b></a>
+  <nav>
+    <a href="sillance-aide.html" data-i18n="contact.nav.aide">Aide &amp; guide</a>
+    <a href="legal.html" data-i18n="contact.nav.legal">Informations légales</a>
+    <div class="lang-switch" role="group" aria-label="Language / Langue / Idioma">
+      <button type="button" data-lang-btn="fr">FR</button>
+      <button type="button" data-lang-btn="en">EN</button>
+      <button type="button" data-lang-btn="es">ES</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+<h1 data-i18n="contact.h1">Nous contacter</h1>
+<p class="lead" data-i18n="contact.lead">Une question, un souci technique, une demande sur tes données ou une idée de partenariat ? On répond à tout, sous 2 à 3 jours ouvrés.</p>
+
+<!-- ============================ Formulaire ============================ -->
+<h2 data-i18n="contact.form.title">Écris-nous</h2>
+<div class="card accent">
+  <form id="contactForm" novalidate>
+    <div class="row2">
+      <div class="field">
+        <label for="cf-name" data-i18n="contact.form.name">Ton nom</label>
+        <input type="text" id="cf-name" name="name" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="cf-email" data-i18n="contact.form.email">Ton adresse e-mail</label>
+        <input type="email" id="cf-email" name="email" autocomplete="email" required>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="cf-role" data-i18n="contact.form.role">Tu es…</label>
+        <select id="cf-role" name="role">
+          <option value="" data-i18n="contact.form.roleChoose">— au choix —</option>
+          <option value="coach" data-i18n="contact.form.roleCoach">Coach</option>
+          <option value="athlete" data-i18n="contact.form.roleAthlete">Athlète</option>
+          <option value="club" data-i18n="contact.form.roleClub">Club</option>
+          <option value="other" data-i18n="contact.form.roleOther">Autre</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cf-subject" data-i18n="contact.form.subject">Sujet</label>
+        <select id="cf-subject" name="subject">
+          <option value="usage" data-i18n="contact.form.subjUsage">Question d'utilisation</option>
+          <option value="bug" data-i18n="contact.form.subjBug">Problème technique ou bug</option>
+          <option value="billing" data-i18n="contact.form.subjBilling">Facturation &amp; abonnement</option>
+          <option value="privacy" data-i18n="contact.form.subjPrivacy">Données personnelles (RGPD)</option>
+          <option value="partnership" data-i18n="contact.form.subjPartnership">Partenariat</option>
+          <option value="other" data-i18n="contact.form.subjOther">Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="cf-message" data-i18n="contact.form.message">Ton message</label>
+      <textarea id="cf-message" name="message" required></textarea>
+    </div>
+    <button type="submit" class="btn" data-i18n="contact.form.submit">Ouvrir mon e-mail</button>
+    <p class="form-note" data-i18n-html="contact.form.note">Le bouton ouvre ton logiciel de messagerie avec le message pré-rempli — tu n'as plus qu'à envoyer. Si rien ne s'ouvre, écris directement à <a href="mailto:contact@sillance.app">contact@sillance.app</a>.</p>
+  </form>
+</div>
+
+<!-- ============================ E-mail direct ============================ -->
+<h2 data-i18n="contact.direct.title">Par e-mail, directement</h2>
+<div class="card">
+  <p class="big-mail"><a href="mailto:contact@sillance.app">contact@sillance.app</a></p>
+  <p data-i18n-html="contact.direct.delay"><strong>Délai de réponse :</strong> sous 2 à 3 jours ouvrés en général. Les demandes relatives aux données personnelles sont traitées sous 30 jours (voir plus bas).</p>
+  <h3 data-i18n="contact.direct.includeTitle">Pour aller plus vite, précise :</h3>
+  <ul>
+    <li data-i18n="contact.direct.inc1">l'adresse e-mail de ton compte Sillance ;</li>
+    <li data-i18n="contact.direct.inc2">ton rôle (coach, athlète, club) ;</li>
+    <li data-i18n="contact.direct.inc3">pour un bug : ce que tu faisais, ce qui était attendu, ce qui s'est passé, et une capture d'écran si possible ;</li>
+    <li data-i18n="contact.direct.inc4">l'appareil et le navigateur utilisés (ex. iPhone / Safari, PC / Chrome).</li>
+  </ul>
+</div>
+
+<!-- ============================ RGPD ============================ -->
+<h2 data-i18n="contact.privacy.title">Tes données personnelles (RGPD)</h2>
+<div class="card orange">
+  <p data-i18n-html="contact.privacy.body">Pour exercer tes droits d'accès, de rectification, d'effacement, de portabilité, de limitation, d'opposition ou retirer un consentement, écris à <a href="mailto:contact@sillance.app">contact@sillance.app</a> (objet : « RGPD »). Réponse sous 30 jours. Le détail des traitements figure dans la <a href="legal.html#confidentialite">politique de confidentialité</a>.</p>
+  <p data-i18n-html="contact.privacy.cnil">Tu peux aussi introduire une réclamation auprès de la CNIL : <a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>.</p>
+</div>
+
+<!-- ============================ Adresse postale ============================ -->
+<h2 data-i18n="contact.postal.title">Adresse postale</h2>
+<div class="card">
+  <p data-i18n="contact.postal.intro">Pour tout courrier formel :</p>
+  <p>
+    <strong>Rowan Degraeve — Sillance</strong><br>
+    <span data-i18n="contact.postal.line1">2 allée Louise Bourgeois, appartement B16</span><br>
+    <span data-i18n="contact.postal.line2">31320 Auzeville-Tolosane, France</span><br>
+    <span data-i18n="contact.postal.line3">SIRET 108 626 847 00017</span>
+  </p>
+</div>
+
+<!-- ============================ Doc ============================ -->
+<h2 data-i18n="contact.doc.title">Avant de nous écrire : le guide</h2>
+<div class="card">
+  <p data-i18n="contact.doc.intro">La réponse à beaucoup de questions est déjà dans le guide d'utilisation :</p>
+  <p class="quick">
+    <a href="sillance-aide.html#connecter-montre" data-i18n="contact.doc.q1">Connecter une montre</a>
+    <a href="sillance-aide.html#import-fit" data-i18n="contact.doc.q2">Importer un fichier .FIT</a>
+    <a href="sillance-aide.html#gerer-abonnement" data-i18n="contact.doc.q3">Gérer son abonnement</a>
+    <a href="sillance-aide.html#checkin" data-i18n="contact.doc.q4">Faire son check-in du matin</a>
+  </p>
+  <p><a href="sillance-aide.html" data-i18n="contact.doc.all">→ Voir tout le guide d'utilisation</a></p>
+</div>
+</main>
+
+<footer>
+  <span data-i18n="contact.footerTag">Sillance : coaching triathlon, Hyrox &amp; endurance.</span>
+  <nav aria-label="Liens de bas de page" data-i18n-attr="aria-label:contact.footerNavAria">
+    <a href="index.html" data-i18n="contact.footer.home">Accueil</a>
+    <a href="sillance-aide.html" data-i18n="contact.footer.aide">Aide &amp; guide</a>
+    <a href="legal.html#mentions" data-i18n="contact.footer.mentions">Mentions légales</a>
+    <a href="legal.html#cgu" data-i18n="contact.footer.cgu">CGU / CGV</a>
+    <a href="legal.html#confidentialite" data-i18n="contact.footer.confidentialite">Confidentialité</a>
+  </nav>
+</footer>
+
+</div>
+<script src="./sillance-i18n.js"></script>
+<script src="./sillance-i18n-contact.js"></script>
+<script src="./sillance-contact.js"></script>
+<script src="./sillance-cookies.js"></script>
+<script src="./sillance-analytics.js"></script>
+</body>
+</html>

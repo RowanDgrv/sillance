@@ -19,8 +19,8 @@
     "legal.mentions.editorIntro": `Le site et l'application Sillance (ci-après « le Service ») sont édités par :`,
     "legal.mentions.li1": `<strong>Rowan Degraeve</strong>, micro-entreprise`,
     "legal.mentions.li2": `SIRET : 108 626 847 00017`,
-    "legal.mentions.li3": `Adresse : 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane`,
-    "legal.mentions.li4": `Contact : <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
+    "legal.mentions.li3": `Adresse : 2 allée Louise Bourgeois, appartement B16, 31320 Auzeville-Tolosane`,
+    "legal.mentions.li4": `Contact : <a href="mailto:contact@sillance.app">contact@sillance.app</a>`,
     "legal.mentions.li5": `Directeur de la publication : Rowan Degraeve`,
     "legal.mentions.li6": `TVA non applicable, article 293 B du CGI (franchise en base de TVA)`,
     "legal.mentions.hostingTitle": `Hébergement`,
@@ -116,7 +116,7 @@ avant toute action judiciaire ; les consommateurs peuvent recourir gratuitement 
 
     "legal.priv.title": `Politique de confidentialité (RGPD)`,
     "legal.priv.controller": `<strong>Responsable de traitement :</strong> Rowan Degraeve, micro-entreprise (SIRET 108 626 847 00017),
-contact : <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
+contact : <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
     "legal.priv.t1": `3.1 Données collectées et finalités`,
     "legal.priv.th1": `Données`,
     "legal.priv.th2": `Finalité`,
@@ -170,7 +170,7 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.p5": `Vous disposez des droits d'accès, de rectification, d'effacement, de portabilité, de limitation et d'opposition,
 ainsi que du droit de retirer votre consentement à tout moment (notamment pour les données de santé : le retrait
 désactive les fonctionnalités concernées, check-ins et analyse cardiaque). Pour les exercer :
-<a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>. Réponse sous 30 jours. Vous pouvez introduire une
+<a href="mailto:contact@sillance.app">contact@sillance.app</a>. Réponse sous 30 jours. Vous pouvez introduire une
 réclamation auprès de la CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Mineurs`,
     "legal.priv.p6": `Le traitement des données d'un mineur de moins de 15 ans requiert le consentement conjoint du titulaire de
@@ -206,7 +206,7 @@ moment via le bouton « cookies » affiché en bas de l'écran, ou en effaçant 
 rôle appliqué au niveau de la base de données (Row Level Security) ; paiements traités exclusivement par Stripe
 (certifié PCI-DSS). En cas de violation de données susceptible d'engendrer un risque pour vos droits, vous et la
 CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
-    "legal.footer": `Sillance, micro-entreprise · <a href="index.html">Retour au site</a>`,
+    "legal.footer": `Sillance, micro-entreprise · <a href="index.html">Accueil</a> · <a href="sillance-aide.html">Aide</a> · <a href="contact.html">Contact</a>`,
   };
 
   var en = {
@@ -225,8 +225,8 @@ CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
     "legal.mentions.editorIntro": `The Sillance site and application (hereafter "the Service") are published by:`,
     "legal.mentions.li1": `<strong>Rowan Degraeve</strong>, sole proprietorship (French "micro-entreprise")`,
     "legal.mentions.li2": `Business registration number (SIRET): 108 626 847 00017`,
-    "legal.mentions.li3": `Address: 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane, France`,
-    "legal.mentions.li4": `Contact: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
+    "legal.mentions.li3": `Address: 2 allée Louise Bourgeois, apartment B16, 31320 Auzeville-Tolosane, France`,
+    "legal.mentions.li4": `Contact: <a href="mailto:contact@sillance.app">contact@sillance.app</a>`,
     "legal.mentions.li5": `Publication director: Rowan Degraeve`,
     "legal.mentions.li6": `VAT not applicable, article 293 B of the French Tax Code (VAT exemption for small businesses)`,
     "legal.mentions.hostingTitle": `Hosting`,
@@ -322,7 +322,7 @@ before any legal action; consumers may use a consumer mediator free of charge
 
     "legal.priv.title": `Privacy policy (GDPR)`,
     "legal.priv.controller": `<strong>Data controller:</strong> Rowan Degraeve, sole proprietorship (SIRET 108 626 847 00017),
-contact: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
+contact: <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
     "legal.priv.t1": `3.1 Data collected and purposes`,
     "legal.priv.th1": `Data`,
     "legal.priv.th2": `Purpose`,
@@ -376,7 +376,7 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.p5": `You have the right to access, rectify, erase, port, restrict and object to processing,
 as well as the right to withdraw your consent at any time (notably for health data: withdrawal
 disables the related features, check-ins, cardiac analysis). To exercise these rights:
-<a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>. Response within 30 days. You can file a
+<a href="mailto:contact@sillance.app">contact@sillance.app</a>. Response within 30 days. You can file a
 complaint with the CNIL, the French data protection authority (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Minors`,
     "legal.priv.p6": `Processing the data of a minor under 15 requires the joint consent of the holder of
@@ -411,7 +411,7 @@ you individually, with no advertising tracker and no data resale. You can change
 role at the database level (Row Level Security); payments are processed exclusively by Stripe
 (PCI-DSS certified). In the event of a data breach likely to create a risk to your rights, you and the
 CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
-    "legal.footer": `Sillance, sole proprietorship · <a href="index.html">Back to site</a>`,
+    "legal.footer": `Sillance, sole proprietorship · <a href="index.html">Home</a> · <a href="sillance-aide.html">Help</a> · <a href="contact.html">Contact</a>`,
   };
 
   var es = {
@@ -430,8 +430,8 @@ CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
     "legal.mentions.editorIntro": `El sitio y la aplicación Sillance (en adelante «el Servicio») son editados por:`,
     "legal.mentions.li1": `<strong>Rowan Degraeve</strong>, micro-empresa (autónomo francés)`,
     "legal.mentions.li2": `Número de registro (SIRET): 108 626 847 00017`,
-    "legal.mentions.li3": `Dirección: 2 allée Louise Bourgeois, Bât. B16, 31320 Auzeville-Tolosane, Francia`,
-    "legal.mentions.li4": `Contacto: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>`,
+    "legal.mentions.li3": `Dirección: 2 allée Louise Bourgeois, apartamento B16, 31320 Auzeville-Tolosane, Francia`,
+    "legal.mentions.li4": `Contacto: <a href="mailto:contact@sillance.app">contact@sillance.app</a>`,
     "legal.mentions.li5": `Director de publicación: Rowan Degraeve`,
     "legal.mentions.li6": `IVA no aplicable, artículo 293 B del Código General de Impuestos francés (franquicia de IVA)`,
     "legal.mentions.hostingTitle": `Alojamiento`,
@@ -527,7 +527,7 @@ antes de cualquier acción judicial; los consumidores pueden recurrir gratuitame
 
     "legal.priv.title": `Política de privacidad (RGPD)`,
     "legal.priv.controller": `<strong>Responsable del tratamiento:</strong> Rowan Degraeve, micro-empresa (SIRET 108 626 847 00017),
-contacto: <a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>.`,
+contacto: <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
     "legal.priv.t1": `3.1 Datos recopilados y finalidades`,
     "legal.priv.th1": `Datos`,
     "legal.priv.th2": `Finalidad`,
@@ -581,7 +581,7 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.p5": `Dispones de los derechos de acceso, rectificación, supresión, portabilidad, limitación y oposición,
 así como del derecho a retirar tu consentimiento en cualquier momento (en particular para los datos de salud: la retirada
 desactiva las funcionalidades correspondientes: check-ins, análisis cardíaco). Para ejercerlos:
-<a href="mailto:rowandegraeve@gmail.com">rowandegraeve@gmail.com</a>. Respuesta en un plazo de 30 días. Puedes presentar una
+<a href="mailto:contact@sillance.app">contact@sillance.app</a>. Respuesta en un plazo de 30 días. Puedes presentar una
 reclamación ante la CNIL, la autoridad francesa de protección de datos (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Menores`,
     "legal.priv.p6": `El tratamiento de los datos de un menor de 15 años requiere el consentimiento conjunto del titular de
@@ -617,7 +617,7 @@ pantalla, o borrando los datos del sitio en tu navegador.`,
 rol aplicada a nivel de base de datos (Row Level Security); pagos procesados exclusivamente por Stripe
 (certificado PCI-DSS). En caso de violación de datos que pueda suponer un riesgo para tus derechos, tú y la
 CNIL seréis notificados conforme a los artículos 33 y 34 del RGPD.`,
-    "legal.footer": `Sillance, micro-empresa · <a href="index.html">Volver al sitio</a>`,
+    "legal.footer": `Sillance, micro-empresa · <a href="index.html">Inicio</a> · <a href="sillance-aide.html">Ayuda</a> · <a href="contact.html">Contacto</a>`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };

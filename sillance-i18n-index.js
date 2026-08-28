@@ -100,6 +100,7 @@
 
     "footer.tagline": `Entre dans le sillage : Triathlon · Hyrox · Course à pied`,
     "footer.aide": `Aide &amp; guide`,
+    "footer.contact": `Contact`,
     "footer.mentions": `Mentions légales`,
     "footer.cgu": `CGU / CGV`,
     "footer.confidentialite": `Politique de confidentialité`,
@@ -206,6 +207,7 @@
 
     "footer.tagline": `Enter the wake: Triathlon · Hyrox · Running`,
     "footer.aide": `Help &amp; guide`,
+    "footer.contact": `Contact`,
     "footer.mentions": `Legal notice`,
     "footer.cgu": `Terms of use`,
     "footer.confidentialite": `Privacy policy`,
@@ -312,6 +314,7 @@
 
     "footer.tagline": `Entra en la estela: Triatlón · Hyrox · Running`,
     "footer.aide": `Ayuda &amp; guía`,
+    "footer.contact": `Contacto`,
     "footer.mentions": `Aviso legal`,
     "footer.cgu": `Términos de uso`,
     "footer.confidentialite": `Política de privacidad`,

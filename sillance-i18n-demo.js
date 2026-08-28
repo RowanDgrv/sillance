@@ -42,7 +42,7 @@
     <span class="arrow">→</span> import des activités <span class="arrow">→</span>
     <b>external_activities</b> <span class="arrow">→</span> affichage « Activités synchronisées ».<br>
     Puis chaque nouvelle sortie est poussée en temps réel par <b>strava-webhook</b>.`,
-    "demo.footer": `Sillance, démo locale. Détails de mise en ligne : <code>~/pairform-backend/DEPLOY.md</code>.`,
+    "demo.footer": `Sillance — présentation. <a href="index.html">Accueil</a> · <a href="contact.html">Contact &amp; support</a> · <a href="legal.html">Mentions légales</a>`,
   };
   var en = {
     "demo.title": `Sillance · Demo (front + back-end)`,
@@ -86,7 +86,7 @@
     <span class="arrow">→</span> activity import <span class="arrow">→</span>
     <b>external_activities</b> <span class="arrow">→</span> "Synced activities" display.<br>
     Every new outing is then pushed in real time by <b>strava-webhook</b>.`,
-    "demo.footer": `Sillance, local demo. Deployment details: <code>~/pairform-backend/DEPLOY.md</code>.`,
+    "demo.footer": `Sillance — overview. <a href="index.html">Home</a> · <a href="contact.html">Contact &amp; support</a> · <a href="legal.html">Legal notice</a>`,
   };
   var es = {
     "demo.title": `Sillance · Demo (front + back-end)`,
@@ -130,7 +130,7 @@
     <span class="arrow">→</span> importación de actividades <span class="arrow">→</span>
     <b>external_activities</b> <span class="arrow">→</span> muestra «Actividades sincronizadas».<br>
     Luego cada nueva salida se envía en tiempo real por <b>strava-webhook</b>.`,
-    "demo.footer": `Sillance, demo local. Detalles de despliegue: <code>~/pairform-backend/DEPLOY.md</code>.`,
+    "demo.footer": `Sillance — presentación. <a href="index.html">Inicio</a> · <a href="contact.html">Contacto y soporte</a> · <a href="legal.html">Aviso legal</a>`,
   };
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
   Object.assign(window.SIL_I18N.fr, fr);

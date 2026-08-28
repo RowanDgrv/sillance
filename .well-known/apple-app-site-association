@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID_A_REMPLACER.app.sillance.mobile"],
+        "paths": ["/"]
+      }
+    ]
+  }
+}

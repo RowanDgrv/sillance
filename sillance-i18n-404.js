@@ -8,6 +8,7 @@
     "p404.text": `Cette page n'existe pas ou a été déplacée. Reviens dans le courant.`,
     "p404.home": `Retour à l'accueil`,
     "p404.demo": `Découvrir la démo`,
+    "p404.help": `Besoin d'aide ? <a href="./contact.html" style="color:var(--accent)">Contacte le support</a> ou écris à <a href="mailto:contact@sillance.app" style="color:var(--accent)">contact@sillance.app</a>.`,
   };
   var en = {
     "p404.title": `Page not found · Sillance`,
@@ -17,6 +18,7 @@
     "p404.text": `This page doesn't exist or has been moved. Get back into the current.`,
     "p404.home": `Back to home`,
     "p404.demo": `Try the demo`,
+    "p404.help": `Need help? <a href="./contact.html" style="color:var(--accent)">Contact support</a> or write to <a href="mailto:contact@sillance.app" style="color:var(--accent)">contact@sillance.app</a>.`,
   };
   var es = {
     "p404.title": `Página no encontrada · Sillance`,
@@ -26,6 +28,7 @@
     "p404.text": `Esta página no existe o ha sido movida. Vuelve a la corriente.`,
     "p404.home": `Volver al inicio`,
     "p404.demo": `Ver la demo`,
+    "p404.help": `¿Necesitas ayuda? <a href="./contact.html" style="color:var(--accent)">Contacta con el soporte</a> o escribe a <a href="mailto:contact@sillance.app" style="color:var(--accent)">contact@sillance.app</a>.`,
   };
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
   Object.assign(window.SIL_I18N.fr, fr);
