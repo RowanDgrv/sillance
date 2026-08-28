@@ -479,6 +479,7 @@
 
     "week.taperStart": `Début affûtage`, "week.createSessionThisDay": `Créer une séance ce jour`,
     "week.nSessionsPlural": `{n} séances`, "week.nSessionsSingular": `{n} séance`,
+    "week.realised": `Réalisé`,
 
     "taper.yourAthlete": `ton athlète`, "taper.you": `toi`, "taper.forYourAthlete": `pour ton athlète`,
     "taper.title": `Affûtage · {name}, J–{days}.`,
@@ -1806,6 +1807,7 @@
 
     "week.taperStart": `Taper start`, "week.createSessionThisDay": `Create a session this day`,
     "week.nSessionsPlural": `{n} sessions`, "week.nSessionsSingular": `{n} session`,
+    "week.realised": `Done`,
 
     "taper.yourAthlete": `your athlete`, "taper.you": `you`, "taper.forYourAthlete": `for your athlete`,
     "taper.title": `Taper · {name}, D–{days}.`,
@@ -3133,6 +3135,7 @@
 
     "week.taperStart": `Inicio del afinado`, "week.createSessionThisDay": `Crear una sesión este día`,
     "week.nSessionsPlural": `{n} sesiones`, "week.nSessionsSingular": `{n} sesión`,
+    "week.realised": `Hecho`,
 
     "taper.yourAthlete": `tu atleta`, "taper.you": `tú`, "taper.forYourAthlete": `para tu atleta`,
     "taper.title": `Afinado · {name}, D–{days}.`,

@@ -416,6 +416,7 @@ let weekOffset = 0;
 let mode = 'coach';
 let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
+const realised = {}; // clé "YYYY-MM-DD" -> [activités réalisées importées (Strava/Coros/…)], posées sur leur jour
 function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${String(m).padStart(2,'0')}`:`${m}min`; }
 
 /* ============================================================
@@ -1601,6 +1602,7 @@ function syncStrava(){
   if(window.PF?.user){
     PF.syncDevice('strava')
       .then(()=> refreshDeviceState())
+      .then(()=>{ if(window.__pf_loadPlanningFor) window.__pf_loadPlanningFor(window.__pf_app?.getCurrentAthleteId?.()); })
       .then(()=> toast(tr('sync.nActivitiesSynced', {n:stravaActivities.length})))
       .catch(e=>{ console.warn('[PF] syncDevice:',e); renderStravaCard(); toast(tr('toast.synchroStravaImpossible'), 'error'); });
     return;
@@ -2325,11 +2327,19 @@ function render(){
     const date = addDays(mon,i);
     const key = iso(date);
     const sessions = planning[key]||[];
+    const acts = realised[key]||[];
     const dayTss = sessions.reduce((a,s)=>a+s.tss,0);
     totalTss += dayTss;
     totalMin += sessions.reduce((a,s)=>a+s.dur,0);
     count += sessions.length;
     doneCount += sessions.filter(s=>s.done).length;
+
+    // volume réalisé du jour, ventilé par sport (couleur = discipline)
+    const actMinByDisc = {};
+    acts.forEach(a=>{ actMinByDisc[a.disc] = (actMinByDisc[a.disc]||0) + (a.dur||0); });
+    const dayVol = Object.entries(actMinByDisc)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([d,m])=>`<span class="dv" style="color:${(DISC[d]||{color:'var(--muted)'}).color}">${fmtDur(m)}</span>`).join('');
 
     // affûtage : ce jour est-il la course, ou dans la fenêtre d'affûtage ?
     const isRace = race && key===race.date;
@@ -2349,14 +2359,18 @@ function render(){
       ${mode==='coach'?`<button class="day-add" data-key="${key}" aria-label="${tr('week.createSessionThisDay')}">+</button>`:''}
       <div class="day-body"></div>
       <div class="day-load">
-        ${sessions.map(s=>`<div class="bar" style="background:${DISC[s.disc].color};height:${Math.max(8, s.tss/maxDayTss*30)}px"></div>`).join('')||'<div class="bar" style="background:var(--line);height:3px"></div>'}
+        ${sessions.map(s=>`<div class="bar" style="background:${DISC[s.disc].color};height:${Math.max(8, s.tss/maxDayTss*30)}px"></div>`).join('')}
+        ${acts.map(a=>`<div class="bar bar-real" style="background:${(DISC[a.disc]||{color:'var(--muted)'}).color};height:${Math.max(6, Math.min(30,(a.dur||0)/90*30))}px"></div>`).join('')}
+        ${(!sessions.length && !acts.length)?'<div class="bar" style="background:var(--line);height:3px"></div>':''}
         <span class="tss">${dayTss||'—'}</span>
-      </div>`;
+      </div>
+      ${dayVol?`<div class="day-vol">${dayVol}</div>`:''}`;
 
     const addBtn = day.querySelector('.day-add');
     if(addBtn) addBtn.addEventListener('click', ()=> openBuilder(key, null));
     const body = day.querySelector('.day-body');
     sessions.forEach(s=> body.appendChild(sessionCard(s, key)));
+    acts.forEach(a=> body.appendChild(realisedCard(a)));
 
     /* drop */
     day.addEventListener('dragover', e=>{e.preventDefault(); day.classList.add('dragover')});
@@ -2385,7 +2399,7 @@ function render(){
   document.getElementById('weekTss').innerHTML = `${totalTss}<em>TSS</em>`;
   document.getElementById('weekHours').innerHTML = `${(totalMin/60).toLocaleString(localeStr(),{minimumFractionDigits:1,maximumFractionDigits:1})}<em>h</em>`;
   document.getElementById('weekCount').textContent = tr(count>1?'week.nSessionsPlural':'week.nSessionsSingular', {n:count});
-  document.getElementById('compliance').innerHTML = `${count?Math.round(doneCount/count*100):0}<em>%</em>`;
+  document.getElementById('compliance').innerHTML = count?`${Math.round(doneCount/count*100)}<em>%</em>`:'<em>—</em>';
   renderWeekIntensity(mon);
   renderTaperHint(race, mon);
   renderWeekRiskHint(mon);
@@ -2729,6 +2743,33 @@ function sessionCard(s, dateKey){
     // ATHLÈTE : garde la fiche séance (détails, nutrition, mark-done).
     if(mode==='coach') revealAnalysis(s);
     else openModal(s, dateKey);
+  });
+  return el;
+}
+/* Carte "réalisé" : une activité importée (Strava/Coros/…) posée sur le jour
+   où elle a eu lieu. Pas d'édition (pas de drag, pas de suppression) — un clic
+   ouvre l'analyse détaillée seconde-par-seconde. */
+function realisedSrcLabel(s){
+  return s==='coros'?'Coros':s==='garmin'?'Garmin':s==='upload'?tr('sync.imported'):'Strava';
+}
+function realisedCard(act){
+  const D = DISC[act.disc] || {color:'var(--muted)'};
+  const el = document.createElement('div');
+  el.className = 'session real';
+  el.dataset.disc = act.disc||'';
+  el.style.setProperty('--c', D.color);
+  const bits = [];
+  if(act.dur) bits.push(fmtDur(act.dur));
+  if(act.dist) bits.push(`${act.dist} km`);
+  if(act.avgHr) bits.push(`${act.avgHr} bpm`);
+  if(act.avgPower) bits.push(`${act.avgPower} W`);
+  if(act.elev) bits.push(`${act.elev} m D+`);
+  el.innerHTML = `
+    <div class="real-tag"><i class="ic ic-check"></i> ${tr('week.realised')} · ${realisedSrcLabel(act.src)}</div>
+    <div class="t">${dispoSafe(act.name)||tr('sync.activity')}</div>
+    <div class="m">${bits.map(b=>`<span>${dispoSafe(b)}</span>`).join('')}</div>`;
+  el.addEventListener('click', ()=>{
+    if(typeof openStravaAnalysis==='function') openStravaAnalysis(act);
   });
   return el;
 }
@@ -5307,7 +5348,7 @@ if(typeof SillanceTour!=='undefined') SillanceTour.init();
    Supabase. Si rien ne se connecte, ce hook ne fait rien et l'app reste
    en mode démo avec ses données en dur. ------------------------------- */
 window.__pf_app = {
-  data: { RECORDS, checkin, planning, ATHLETE_REF, CLUB_ATHLETES, CLUB_GROUPS, CRENEAUX, VIDEOS },
+  data: { RECORDS, checkin, planning, realised, ATHLETE_REF, CLUB_ATHLETES, CLUB_GROUPS, CRENEAUX, VIDEOS },
   render, renderSidebar, renderClub, updateVideolibVisibility,
   refreshDevices: refreshDeviceState,
   getMode(){ return mode; },
@@ -9827,7 +9868,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') mentalOverlay.cla
    RÉSERVATION TEST LACTATE — formulaire par email
    CONFIG : remplacez l'adresse par votre email de réception
    ============================================================ */
-const LACTEST_EMAIL = 'contact@VOTRE-DOMAINE.fr';
+const LACTEST_EMAIL = 'contact@sillance.app';
 const lactestOverlay = document.getElementById('lactestOverlay');
 document.getElementById('lactestBtn').addEventListener('click', ()=> lactestOverlay.classList.add('open'));
 document.getElementById('lactestClose').addEventListener('click', ()=> lactestOverlay.classList.remove('open'));
