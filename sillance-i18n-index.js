@@ -13,6 +13,9 @@
     "nav.links.pricing": `Tarifs`,
     "nav.connexion": `Connexion`,
     "nav.demo": `Découvrir la démo`,
+    "nav.links.faq": `FAQ`,
+    "faq.kicker": `Questions fréquentes`,
+    "faq.title": `Avant de tester`,
 
     "hero.kicker": `Triathlon · Hyrox · Course à pied`,
     "hero.title": `Sillance,<br>ton <span class="alt2">sillage</span>`,
@@ -120,6 +123,9 @@
     "nav.links.pricing": `Pricing`,
     "nav.connexion": `Log in`,
     "nav.demo": `Try the demo`,
+    "nav.links.faq": `FAQ`,
+    "faq.kicker": `FAQ`,
+    "faq.title": `Before you try it`,
 
     "hero.kicker": `Triathlon · Hyrox · Running`,
     "hero.title": `Sillance,<br>your <span class="alt2">wake</span>`,
@@ -227,6 +233,9 @@
     "nav.links.pricing": `Precios`,
     "nav.connexion": `Iniciar sesión`,
     "nav.demo": `Ver la demo`,
+    "nav.links.faq": `FAQ`,
+    "faq.kicker": `Preguntas frecuentes`,
+    "faq.title": `Antes de probarlo`,
 
     "hero.kicker": `Triatlón · Hyrox · Running`,
     "hero.title": `Sillance,<br>tu <span class="alt2">estela</span>`,

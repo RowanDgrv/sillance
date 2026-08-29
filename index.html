@@ -47,6 +47,22 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"J'utilise déjà TrainingPeaks ou Strava premium. Pourquoi changer ?","acceptedAnswer":{"@type":"Answer","text":"Sillance réunit trois choses qu'aucun de ces outils ne fait ensemble : la planification coach, l'analyse de la donnée réelle de l'athlète (Garmin, Coros, fichier .FIT) et la facturation coach-athlète dans la même app. Et depuis que Strava a fermé l'accès des données d'un athlète à son coach (novembre 2024), la synchro par montre est le seul canal fiable pour qu'un coach voie vraiment ce que font ses athlètes."}},
+    {"@type":"Question","name":"Ça marche sans montre connectée ?","acceptedAnswer":{"@type":"Answer","text":"Oui. L'athlète peut importer manuellement ses fichiers .FIT ou saisir sa séance. La montre (Garmin, Coros) automatise seulement la remontée, elle n'est pas obligatoire."}},
+    {"@type":"Question","name":"Qu'est-ce que mes athlètes doivent installer ?","acceptedAnswer":{"@type":"Answer","text":"Rien d'obligatoire. Sillance est une plateforme web : l'athlète se connecte depuis son navigateur, consulte son plan et importe ses séances. Il autorise une fois la connexion à sa montre (OAuth), révocable quand il veut."}},
+    {"@type":"Question","name":"Les données de mes athlètes m'appartiennent-elles ?","acceptedAnswer":{"@type":"Answer","text":"Les données restent celles de l'athlète : il autorise leur accès et peut les retirer, et chaque athlète ne voit que sa propre progression. Le coach voit celles de ses athlètes suivis, pour les analyser. Hébergement en Europe, conformité RGPD, données de santé traitées uniquement sur consentement explicite."}},
+    {"@type":"Question","name":"Coach indépendant ou Club, lequel choisir ?","acceptedAnswer":{"@type":"Answer","text":"Coach indépendant : tu factures tes athlètes dans l'app, le palier suit ton nombre d'athlètes coachés (19, 29 ou 49 euros par mois). Club : licence à la saison pour une structure ou une box, au nombre d'athlètes réellement suivis, avec créneaux, adhérents et présences. Entraîneurs illimités dans les deux cas."}},
+    {"@type":"Question","name":"Le paiement en ligne, c'est pour quand ?","acceptedAnswer":{"@type":"Answer","text":"Sillance est en bêta. Tu peux déjà tout utiliser et tester la démo sans inscription. L'encaissement en ligne des abonnements sera activé prochainement ; d'ici là, l'accès n'est pas facturé."}},
+    {"@type":"Question","name":"Combien de temps pour mettre en place et faire venir mes athlètes ?","acceptedAnswer":{"@type":"Answer","text":"Créer ton espace et poser un premier plan prend quelques minutes. Chaque athlète reçoit une invitation, crée son accès et connecte sa montre en une fois. Essai gratuit de 14 jours pour te faire ton avis avant de t'engager."}},
+    {"@type":"Question","name":"Sillance gère le Hyrox, pas seulement l'endurance ?","acceptedAnswer":{"@type":"Answer","text":"Oui. La charge d'entraînement est calculée sur une métrique commune à la course, au vélo, à la natation et au Hyrox. Les box Hyrox utilisent l'espace Club : créneaux, groupes, présences, facturation adhérents."}}
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Perf (audit 03/08/2026, ajusté 04/08/2026) : la feuille Google Fonts bloquait
      le rendu avant même le <style> inline de ~2100 lignes qui suit. media="print"
@@ -241,6 +257,18 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 .legal-links{border-top:1px solid var(--line);margin-top:26px;padding-top:22px;display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--mono);font-size:12.5px;letter-spacing:.03em}
 .legal-links a{color:var(--muted)}
 .legal-links a:hover{color:var(--accent)}
+
+/* ---------- faq ---------- */
+.faq-list{display:flex;flex-direction:column;border-top:1px solid var(--line);max-width:900px}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item summary{list-style:none;cursor:pointer;padding:22px 0;display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  font-family:var(--display);font-weight:600;font-size:clamp(17px,2vw,20px);text-transform:uppercase;letter-spacing:-.005em;color:var(--text)}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";font-family:var(--mono);font-weight:400;color:var(--accent);flex:none}
+.faq-item[open] summary::after{content:"\2013"}
+.faq-a{padding:0 0 24px;max-width:64ch}
+.faq-a p{color:var(--soft);font-weight:300;line-height:1.6}
+.faq-a a{color:var(--accent)}
 </style></head>
 <body>
 
@@ -251,6 +279,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <a href="#how" data-i18n="nav.links.how">Comment ça marche</a>
     <a href="#data" data-i18n="nav.links.data">La plateforme</a>
     <a href="#pricing" data-i18n="nav.links.pricing">Tarifs</a>
+    <a href="#faq" data-i18n="nav.links.faq">FAQ</a>
   </div>
   <div class="nav-right">
     <div class="lang-switch" role="group" aria-label="Language / Langue / Idioma">
@@ -419,6 +448,51 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <div class="cta-row" style="margin-top:30px">
       <a class="btn primary" href="./sillance-club.html" data-i18n="pricing.cta1">Découvrir l'espace club</a>
       <a class="btn ghost" href="./sillance-app.html" data-i18n="pricing.cta2">Voir la démo coach</a>
+    </div>
+  </div></section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq"><div class="wrap">
+    <div class="sec-head">
+      <span class="kicker" data-i18n="faq.kicker">Questions fréquentes</span>
+      <h2 class="h2" data-i18n="faq.title">Avant de tester</h2>
+    </div>
+    <!-- Contenu FR uniquement pour l'instant. Traductions EN/ES à ajouter
+         (clés data-i18n + entrées dans sillance-i18n-index.js) dans un second temps.
+         Si tu modifies une réponse ici, reporte-la à l'identique dans le JSON-LD FAQPage du <head>. -->
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>J'utilise déjà TrainingPeaks ou Strava premium. Pourquoi changer ?</summary>
+        <div class="faq-a"><p>Sillance réunit trois choses qu'aucun de ces outils ne fait ensemble : la planification coach, l'analyse de la donnée réelle de l'athlète (Garmin, Coros, fichier .FIT) et la facturation coach-athlète dans la même app. Et depuis que Strava a fermé l'accès des données d'un athlète à son coach (novembre 2024), la synchro par montre est le seul canal fiable pour qu'un coach voie vraiment ce que font ses athlètes.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Ça marche sans montre connectée ?</summary>
+        <div class="faq-a"><p>Oui. L'athlète peut importer manuellement ses fichiers .FIT ou saisir sa séance. La montre (Garmin, Coros) automatise seulement la remontée, elle n'est pas obligatoire.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Qu'est-ce que mes athlètes doivent installer ?</summary>
+        <div class="faq-a"><p>Rien d'obligatoire. Sillance est une plateforme web : l'athlète se connecte depuis son navigateur, consulte son plan et importe ses séances. Il autorise une fois la connexion à sa montre (OAuth), révocable quand il veut.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Les données de mes athlètes m'appartiennent-elles ?</summary>
+        <div class="faq-a"><p>Les données restent celles de l'athlète : il autorise leur accès et peut les retirer, et chaque athlète ne voit que sa propre progression. Le coach voit celles de ses athlètes suivis, pour les analyser. Hébergement en Europe, conformité RGPD, données de santé traitées uniquement sur consentement explicite. Le détail est dans la <a href="./legal.html#confidentialite">politique de confidentialité</a>.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Coach indépendant ou Club, lequel choisir ?</summary>
+        <div class="faq-a"><p>Coach indépendant : tu factures tes athlètes dans l'app, le palier suit ton nombre d'athlètes coachés (19, 29 ou 49 &euro; par mois). Club : licence à la saison pour une structure ou une box, au nombre d'athlètes réellement suivis, avec créneaux, adhérents et présences. Entraîneurs illimités dans les deux cas.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Le paiement en ligne, c'est pour quand ?</summary>
+        <div class="faq-a"><p>Sillance est en bêta. Tu peux déjà tout utiliser et tester la démo sans inscription. L'encaissement en ligne des abonnements sera activé prochainement ; d'ici là, l'accès n'est pas facturé.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Combien de temps pour mettre en place et faire venir mes athlètes ?</summary>
+        <div class="faq-a"><p>Créer ton espace et poser un premier plan prend quelques minutes. Chaque athlète reçoit une invitation, crée son accès et connecte sa montre en une fois. Essai gratuit de 14 jours pour te faire ton avis avant de t'engager.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Sillance gère le Hyrox, pas seulement l'endurance ?</summary>
+        <div class="faq-a"><p>Oui. La charge d'entraînement est calculée sur une métrique commune à la course, au vélo, à la natation et au Hyrox. Les box Hyrox utilisent l'espace Club : créneaux, groupes, présences, facturation adhérents.</p></div>
+      </details>
     </div>
   </div></section>
 
