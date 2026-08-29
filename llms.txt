@@ -1,0 +1,27 @@
+# Sillance
+
+> Plateforme web de coaching pour le duo coach-athlète : planification des entraînements, analyse de la donnée réelle (Garmin, Coros, import de fichiers .FIT) et facturation coach-athlète intégrée. Pour le triathlon, le Hyrox et les sports d'endurance. Éditée par Rowan Degraeve (micro-entreprise, SIRET 108 626 847 00017, France). En bêta, en ligne sur https://sillance.app.
+
+## Comment ça marche
+
+Le coach planifie les séances (à la semaine ou par cycle), chaque athlète a son plan. L'athlète exécute : sa montre Garmin ou Coros, ou un fichier .FIT, fait remonter la séance réalisée. Sillance rend la donnée lisible (charge d'entraînement, fraîcheur, respect du plan) et un assistant IA en fait la synthèse. Le coach ajuste la suite sur du concret ; les athlètes le paient dans l'app. Trois rôles sur la même plateforme : coach indépendant, club ou box, athlète.
+
+## Pages
+
+- [Accueil](https://sillance.app/) : présentation, pour qui, fonctionnement, plateforme (charge d'entraînement multi-sports, multi-capteurs, assistant IA, découplage cardiaque), tarifs, FAQ
+- [Guide d'utilisation](https://sillance.app/sillance-aide.html) : 25 fiches pratiques (créer une séance, planifier dans le calendrier, attribuer un cycle à plusieurs athlètes, suivre l'adhérence, créer un groupe, gérer un créneau, faire son check-in, signaler une blessure, connecter une montre, importer un .FIT, éditer ses références physio, débrief de course, co-coaching, fiche de progression partageable)
+- [Contact et support](https://sillance.app/contact.html) : formulaire, e-mail contact@sillance.app, réponse sous 2 à 3 jours ouvrés
+- [Informations légales](https://sillance.app/legal.html) : mentions légales, CGU / CGV, politique de confidentialité (RGPD, données de santé sur consentement explicite, sous-traitants, cookies), hébergement en Europe
+
+## Tarifs
+
+- Coach indépendant : 19 €/mois pour 1 à 10 athlètes coachés, 29 €/mois pour 11 à 30, 49 €/mois pour 31 et plus. Essai gratuit de 14 jours. Options facultatives : Assistant IA 12 €/mois, Vidéos 3 €/mois par athlète activé. Frais de service de 2 % si les athlètes règlent leur suivi dans l'app.
+- Club ou box : 50 €/mois jusqu'à 50 athlètes activés, 112,50 €/mois jusqu'à 150, 150 €/mois jusqu'à 300. Entraîneurs illimités à tous les paliers. Engagement minimum de 3 mois. Tarif « clubs fondateurs » réservé aux 10 premiers de chaque palier.
+- Un « athlète activé » est un athlète placé dans un groupe d'entraînement qui reçoit son planning ; les licenciés non suivis ne comptent pas.
+
+## Bon à savoir
+
+- Sillance est en bêta : l'accès n'est pas facturé pour l'instant, l'encaissement en ligne des abonnements sera activé prochainement.
+- Synchronisation des montres : Garmin et Coros via OAuth (autorisation de l'athlète, révocable), ou import manuel de fichiers .FIT. Intégration Strava disponible.
+- L'analyse de charge est commune à la course à pied, au vélo, à la natation et au Hyrox.
+- Langues : français, anglais, espagnol.
