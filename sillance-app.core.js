@@ -1484,7 +1484,7 @@ function renderStravaCard(){
   const box=document.getElementById('stravaCard');
   if(!box) return;
   const stravaLogo=`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
-  const SRC={strava:'Strava',garmin:'Garmin',coros:'Coros'};
+  const SRC={strava:'Strava',garmin:'Garmin',coros:'Coros',intervals:'intervals.icu'};
   const providers = window.__pf_providers || [];
   if(!stravaConnected){
     box.innerHTML=`
@@ -1494,6 +1494,7 @@ function renderStravaCard(){
       <div class="dev-more">
         <button class="dev-mini" data-p="garmin">⌚ Garmin</button>
         <button class="dev-mini" data-p="coros">⌚ Coros</button>
+        <button class="dev-mini" data-p="intervals">🔗 intervals.icu</button>
         <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle')}"><i class="ic ic-upload"></i> ${tr('sync.importFile')}</button>
       </div>
       <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy')}</p>

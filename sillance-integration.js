@@ -720,7 +720,7 @@ async function onLoggedIn() {
    rien ne lisait ce paramètre — l'utilisateur ne voyait jamais la
    confirmation, et l'état de la carte Synchronisation ne se rafraîchissait
    pas tant qu'il ne rechargeait pas la page à la main. */
-const DEVICE_RETURN_PROVIDERS = { strava: "Strava", garmin: "Garmin", coros: "Coros" };
+const DEVICE_RETURN_PROVIDERS = { strava: "Strava", garmin: "Garmin", coros: "Coros", intervals: "intervals.icu" };
 
 function checkDeviceReturn() {
   const params = new URLSearchParams(location.search);
