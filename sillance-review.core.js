@@ -2214,12 +2214,15 @@ function render(){
     count += sessions.length;
     doneCount += sessions.filter(s=>s.done).length;
 
-    // volume réalisé du jour, ventilé par sport (couleur = discipline)
+    // volume réalisé du jour, ventilé par sport (couleur = discipline).
+    // Les barres réalisées ET la légende partagent le MÊME ordre (agrégé par
+    // discipline, durée décroissante) → chaque durée est alignée sous sa barre.
+    const actColor = d => (DISC[d]||{color:'var(--muted)'}).color;
     const actMinByDisc = {};
     acts.forEach(a=>{ actMinByDisc[a.disc] = (actMinByDisc[a.disc]||0) + (a.dur||0); });
-    const dayVol = Object.entries(actMinByDisc)
-      .sort((a,b)=>b[1]-a[1])
-      .map(([d,m])=>`<span class="dv" style="color:${(DISC[d]||{color:'var(--muted)'}).color}">${fmtDur(m)}</span>`).join('');
+    const actByDisc = Object.entries(actMinByDisc).sort((a,b)=>b[1]-a[1]);
+    const dayVol = actByDisc
+      .map(([d,m])=>`<span class="dv" style="color:${actColor(d)}">${fmtDur(m)}</span>`).join('');
 
     // affûtage : ce jour est-il la course, ou dans la fenêtre d'affûtage ?
     const isRace = race && key===race.date;
@@ -2240,7 +2243,7 @@ function render(){
       <div class="day-body"></div>
       <div class="day-load">
         ${sessions.map(s=>`<div class="bar" style="background:${DISC[s.disc].color};height:${Math.max(8, s.tss/maxDayTss*30)}px"></div>`).join('')}
-        ${acts.map(a=>`<div class="bar bar-real" style="background:${(DISC[a.disc]||{color:'var(--muted)'}).color};height:${Math.max(6, Math.min(30,(a.dur||0)/90*30))}px"></div>`).join('')}
+        ${actByDisc.map(([d,m])=>`<div class="bar bar-real" style="background:${actColor(d)};height:${Math.max(6, Math.min(30, m/90*30))}px"></div>`).join('')}
         ${(!sessions.length && !acts.length)?'<div class="bar" style="background:var(--line);height:3px"></div>':''}
         <span class="tss">${dayTss||'—'}</span>
       </div>
