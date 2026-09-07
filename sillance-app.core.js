@@ -1496,6 +1496,7 @@ function renderStravaCard(){
         <button class="dev-mini" data-p="coros">⌚ Coros</button>
         <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle')}"><i class="ic ic-upload"></i> ${tr('sync.importFile')}</button>
       </div>
+      <button class="dev-help" type="button" data-tour="coros">${tr('sync.corosHelp')}</button>
       <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy')}</p>
       <div class="strava-powered">${tr('sync.readOnly')}</div>`;
     document.getElementById('stravaConnectBtn').onclick=connectStrava;

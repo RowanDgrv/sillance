@@ -1,15 +1,38 @@
-/* Sillance — tuto interactif "guidé" (spotlight + flèche), création de séance.
+/* Sillance — tutoriels interactifs "guidés" (spotlight + flèche).
    Moteur DOM pur (sélecteurs CSS + événements réels), aucune dépendance sur
-   les variables internes de l'app — l'utilisateur clique vraiment, une vraie
-   séance est créée à la fin.
+   les variables internes de l'app — l'utilisateur clique vraiment.
+
+   Deux tutoriels enregistrés :
+     • 'session' : création de la première séance (coach). Auto-lancé une fois.
+     • 'coros'   : relier sa montre COROS (athlète). Lancé depuis le lien
+                    « Comment relier ma montre ? » de la carte Synchronisation
+                    (bouton [data-tour="coros"]).
+
    Usage : <script src="./sillance-tour.js"></script> puis SillanceTour.init()
-   après le premier render(). Le bouton #tutoBtn (topbar) appelle start(). */
+   après le premier render(). #tutoBtn → tour 'session'. Tout élément
+   [data-tour="<id>"] cliqué lance le tour correspondant. */
 (function(global){
   'use strict';
 
   function tr(key, vars){ return global.SilI18n ? global.SilI18n.t(key, vars) : key; }
+  function qs(sel){ return sel ? document.querySelector(sel) : null; }
+  function isCoachMode(){
+    var btn = document.getElementById('modeCoach');
+    return !!btn && btn.classList.contains('active');
+  }
+  function isAthleteMode(){
+    var btn = document.getElementById('modeAthlete');
+    return !!btn && btn.classList.contains('active');
+  }
+  function corosAlreadyLinked(){
+    var p = global.__pf_providers;
+    return Array.isArray(p) && p.indexOf('coros') !== -1;
+  }
 
-  var STEPS = [
+  // ---------------------------------------------------------------------------
+  //  Tutoriel 'session' — inchangé (création de séance côté coach)
+  // ---------------------------------------------------------------------------
+  var SESSION_STEPS = [
     { id:'welcome', target:null, get title(){return tr('tour.welcome.title')},
       get text(){return tr('tour.welcome.text')},
       get cta(){return tr('tour.welcome.cta')} },
@@ -33,13 +56,78 @@
       get text(){return tr('tour.save.text')}, wait:'click' }
   ];
 
+  function setHyroxOptionVisible(visible){
+    var opt = document.querySelector('#bDiscPick option[value="hyrox"]');
+    if(!opt) return;
+    opt.hidden = !visible;
+    opt.disabled = !visible;
+  }
+
+  // ---------------------------------------------------------------------------
+  //  Tutoriel 'coros' — relier sa montre COROS (athlète)
+  //  Toutes les étapes sont AVANT la redirection vers coros.com : la dernière
+  //  étape déclenche elle-même la connexion (clic du vrai bouton). Les cibles
+  //  absentes selon la surface (app / calendrier) sont `optional` → sautées.
+  // ---------------------------------------------------------------------------
+  var COROS_STEPS = [
+    { id:'welcome', target:null,
+      get title(){return tr('tour.coros.welcome.title')},
+      get text(){return tr('tour.coros.welcome.text')},
+      get cta(){return tr('tour.coros.welcome.cta')} },
+    { id:'stats', target:'.ath-tab[data-tab="stats"]', optional:true, wait:'click',
+      get title(){return tr('tour.coros.stats.title')},
+      get text(){return tr('tour.coros.stats.text')} },
+    { id:'card', target:'#stravaCard', optional:true,
+      get title(){return tr('tour.coros.card.title')},
+      get text(){return tr('tour.coros.card.text')},
+      get cta(){return tr('tour.next')} },
+    { id:'btn', target:'.dev-mini[data-p="coros"]', optional:false,
+      get title(){return tr('tour.coros.btn.title')},
+      get text(){return tr('tour.coros.btn.text')},
+      get cta(){return tr('tour.coros.btn.cta')},
+      action:function(){
+        var b = document.querySelector('.dev-mini[data-p="coros"]');
+        if(b) b.click();
+      } }
+  ];
+
+  // ---------------------------------------------------------------------------
+  //  Registre des tutoriels
+  // ---------------------------------------------------------------------------
+  var TOURS = {
+    session: {
+      id:'session',
+      steps: SESSION_STEPS,
+      doneKey:'sil_tour_done',
+      autoLaunch:true,
+      gate:isCoachMode,
+      get finishToast(){return tr('tour.finishToast')},
+      onStart:function(){
+        var ov = document.getElementById('builderOverlay');
+        if(ov && ov.classList.contains('open') && typeof global.closeBuilder === 'function'){ global.closeBuilder(); }
+        setHyroxOptionVisible(false);
+      },
+      onFinish:function(){ setHyroxOptionVisible(true); }
+    },
+    coros: {
+      id:'coros',
+      steps: COROS_STEPS,
+      doneKey:'sil_tour_coros_done',
+      autoLaunch:false, // déclenché par le lien [data-tour="coros"]
+      // Utile côté athlète, et seulement si la montre n'est pas déjà reliée.
+      gate:function(){ return !corosAlreadyLinked(); },
+      get finishToast(){return tr('tour.coros.finishToast')},
+      onStart:null,
+      onFinish:null
+    }
+  };
+
   var active = false;
+  var currentTour = null;
   var currentIndex = -1;
   var currentStep = null;
   var rafId = null;
   var veilEl, spotEl, calloutEl;
-
-  function qs(sel){ return sel ? document.querySelector(sel) : null; }
 
   function injectStyles(){
     if(document.getElementById('sil-tour-style')) return;
@@ -68,7 +156,9 @@
       + '.stc-cta{background:var(--accent,#46C2D8);color:#04121a;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}'
       + '.stc-cta:hover{filter:brightness(1.08)}'
       + '.stc-skip{background:none;border:none;color:var(--muted,#8B95AD);font-size:11.5px;cursor:pointer;text-decoration:underline;padding:4px 0;font-family:inherit}'
-      + '.stc-skip:hover{color:var(--soft,#C2CAD9)}';
+      + '.stc-skip:hover{color:var(--soft,#C2CAD9)}'
+      + '.dev-help{margin-top:9px;background:none;border:none;color:var(--accent,#46C2D8);font-size:12px;cursor:pointer;text-decoration:underline;padding:2px 0;font-family:inherit}'
+      + '.dev-help:hover{filter:brightness(1.1)}';
     var style = document.createElement('style');
     style.id = 'sil-tour-style';
     style.textContent = css;
@@ -91,16 +181,9 @@
     veilEl = spotEl = calloutEl = null;
   }
 
-  function setHyroxOptionVisible(visible){
-    var opt = document.querySelector('#bDiscPick option[value="hyrox"]');
-    if(!opt) return;
-    opt.hidden = !visible;
-    opt.disabled = !visible;
-  }
-
   function renderCallout(step){
-    var stepNo = currentIndex + 1;
-    var html = '<div class="stc-step">' + tr('tour.stepCounter', {n:stepNo, total:STEPS.length}) + '</div>'
+    var total = currentTour ? currentTour.steps.length : 0;
+    var html = '<div class="stc-step">' + tr('tour.stepCounter', {n:currentIndex + 1, total:total}) + '</div>'
       + '<div class="stc-title">' + step.title + '</div>'
       + '<div class="stc-text">' + step.text + '</div>';
     if(step.cta){
@@ -111,7 +194,10 @@
     }
     calloutEl.innerHTML = html;
     var ctaBtn = calloutEl.querySelector('[data-stc-cta]');
-    if(ctaBtn) ctaBtn.addEventListener('click', advance);
+    if(ctaBtn) ctaBtn.addEventListener('click', function(){
+      if(typeof currentStep.action === 'function'){ try{ currentStep.action(); }catch(e){ console.warn('[tour] action:', e); } }
+      advance();
+    });
     var skipBtn = calloutEl.querySelector('[data-stc-skip]');
     if(skipBtn) skipBtn.addEventListener('click', function(){ finishTour(false); });
   }
@@ -165,16 +251,16 @@
   function updatePosition(){
     rafId = null;
     if(!active || !currentStep) return;
-    if(!isCoachMode()){ finishTour(false); return; }
+    if(currentTour && currentTour.gate && !currentTour.gate()){ finishTour(false); return; }
     var el = qs(currentStep.target);
-    if(currentStep.target && !isRendered(el)){ finishTour(false); return; }
+    if(currentStep.target && !isRendered(el)){
+      if(currentStep.optional){ advance(); return; }
+      finishTour(false); return;
+    }
     positionFor(currentStep, el);
   }
   // Repositionne au resize/scroll plutôt qu'en boucle sur chaque frame (perf
-  // 04/08/2026) : l'ancienne version se rappelait via requestAnimationFrame
-  // indéfiniment tant qu'une étape attendait un clic — coûteux en reflow forcé
-  // (getBoundingClientRect + écritures de style à chaque frame), mesuré comme
-  // la première cause du TBT/LCP tardifs en audit Lighthouse.
+  // 04/08/2026).
   function scheduleReposition(){
     if(!active) return;
     if(rafId) cancelAnimationFrame(rafId);
@@ -185,15 +271,18 @@
     currentStep = step;
     renderCallout(step);
     var el = qs(step.target);
-    if(step.target && !isRendered(el)){ finishTour(false); return; }
+    if(step.target && !isRendered(el)){
+      if(step.optional){ advance(); return; }   // cible absente sur cette surface → on saute
+      finishTour(false); return;
+    }
     if(el && el.scrollIntoView) el.scrollIntoView({block:'center', inline:'nearest'});
     positionFor(step, el);
   }
 
   function advance(){
     currentIndex++;
-    if(currentIndex >= STEPS.length){ finishTour(true); return; }
-    activateStep(STEPS[currentIndex]);
+    if(!currentTour || currentIndex >= currentTour.steps.length){ finishTour(true); return; }
+    activateStep(currentTour.steps[currentIndex]);
   }
 
   function onDomEvent(e){
@@ -206,56 +295,51 @@
   }
 
   function finishTour(completed){
+    var tour = currentTour;
     active = false;
     currentStep = null;
+    currentTour = null;
     if(rafId) cancelAnimationFrame(rafId);
     rafId = null;
     teardownUI();
-    setHyroxOptionVisible(true);
-    try{ localStorage.setItem('sil_tour_done', completed ? '1' : 'skipped'); }catch(e){}
-    if(completed && typeof global.toast === 'function'){
-      global.toast(tr('tour.finishToast'));
+    if(tour && tour.onFinish){ try{ tour.onFinish(completed); }catch(e){} }
+    try{ if(tour) localStorage.setItem(tour.doneKey, completed ? '1' : 'skipped'); }catch(e){}
+    if(completed && tour && tour.finishToast && typeof global.toast === 'function'){
+      global.toast(tour.finishToast);
     }
   }
 
-  function start(){
+  function start(tourId){
     if(active) return;
+    var tour = TOURS[tourId || 'session'];
+    if(!tour) return;
     injectStyles();
     ensureUI();
-    var ov = document.getElementById('builderOverlay');
-    if(ov && ov.classList.contains('open') && typeof global.closeBuilder === 'function'){ global.closeBuilder(); }
-    setHyroxOptionVisible(false);
+    if(tour.onStart){ try{ tour.onStart(); }catch(e){} }
+    currentTour = tour;
     active = true;
     currentIndex = -1;
     advance();
   }
 
-  function isCoachMode(){
-    var btn = document.getElementById('modeCoach');
-    return !!btn && btn.classList.contains('active');
-  }
-
-  // L'écran d'accueil démo (#welcomeOverlay, z-index 200) est bien en dessous
-  // du voile du tuto (z-index 99997) : si l'auto-lancement tombait pendant que
-  // ce welcome est encore ouvert, le voile du tuto s'affichait par-dessus et
-  // rendait son bouton "Commencer à explorer" inatteignable — la page semblait
-  // bloquée (rapporté 25/08/2026). On attend sa fermeture avant de démarrer.
+  // L'écran d'accueil démo (#welcomeOverlay) doit être fermé avant l'auto-lancement.
   function welcomeOverlayOpen(){
     var ov = document.getElementById('welcomeOverlay');
     return !!ov && getComputedStyle(ov).display !== 'none';
   }
 
   function maybeAutoLaunch(){
-    try{
-      if(localStorage.getItem('sil_tour_done')) return;
-    }catch(e){ return; }
-    function attempt(){
-      if(active) return;
-      if(!isCoachMode()) return;
-      if(welcomeOverlayOpen()){ setTimeout(attempt, 400); return; }
-      start();
-    }
-    setTimeout(attempt, 900);
+    Object.keys(TOURS).forEach(function(id){
+      var tour = TOURS[id];
+      if(!tour.autoLaunch) return;
+      try{ if(localStorage.getItem(tour.doneKey)) return; }catch(e){ return; }
+      (function attempt(){
+        if(active) return;
+        if(tour.gate && !tour.gate()) return;
+        if(welcomeOverlayOpen()){ setTimeout(attempt, 400); return; }
+        start(id);
+      })();
+    });
   }
 
   function init(){
@@ -263,11 +347,18 @@
     document.addEventListener('click', onDomEvent, true);
     document.addEventListener('change', onDomEvent, true);
     document.addEventListener('input', onDomEvent, true);
+    // Tout élément [data-tour="<id>"] lance le tutoriel correspondant.
+    document.addEventListener('click', function(e){
+      var t = e.target && e.target.closest && e.target.closest('[data-tour]');
+      if(!t) return;
+      e.preventDefault();
+      start(t.getAttribute('data-tour'));
+    });
     window.addEventListener('resize', scheduleReposition);
     window.addEventListener('scroll', scheduleReposition, true);
     var btn = document.getElementById('tutoBtn');
-    if(btn) btn.addEventListener('click', start);
-    maybeAutoLaunch();
+    if(btn) btn.addEventListener('click', function(){ start('session'); });
+    setTimeout(maybeAutoLaunch, 900);
   }
 
   global.SillanceTour = { init: init, start: start };

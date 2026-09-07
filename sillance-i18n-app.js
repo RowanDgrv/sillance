@@ -1327,8 +1327,22 @@
     "tour.save.text": `Ta séance est prête ! Clique pour l'ajouter au calendrier.`,
     "tour.stepCounter": `Étape {n} / {total}`,
     "tour.skip": `Passer le tuto`,
+    "tour.next": `Suivant`,
     "tour.clickHighlighted": `Clique sur l'élément en surbrillance`,
     "tour.finishToast": `Bravo ! Ta première séance de course à pied est prête 🎉`,
+
+    "sync.corosHelp": `Comment relier ma montre COROS ?`,
+    "tour.coros.welcome.title": `Relie ta montre COROS`,
+    "tour.coros.welcome.text": `En 3 étapes, tes séances réalisées arriveront dans Sillance toutes seules — et ton coach les verra pour ajuster ton plan. Tes 3 dernières semaines d'activités sont importées d'un coup.`,
+    "tour.coros.welcome.cta": `C'est parti`,
+    "tour.coros.stats.title": `Ouvre « Statistiques »`,
+    "tour.coros.stats.text": `La synchronisation des montres se trouve dans ton onglet Statistiques. Clique dessus.`,
+    "tour.coros.card.title": `La zone Synchronisation`,
+    "tour.coros.card.text": `C'est ici que tu relies tes comptes (COROS, Garmin, Strava) et que tes activités importées s'affichent.`,
+    "tour.coros.btn.title": `Connecte COROS`,
+    "tour.coros.btn.text": `Clique sur « ⌚ Coros ». Tu arrives sur le site COROS : connecte-toi et autorise Sillance. Tu reviens ici automatiquement, tes activités en cours d'import. (Il faut être connecté à ton compte Sillance.)`,
+    "tour.coros.btn.cta": `Connecter COROS`,
+    "tour.coros.finishToast": `Direction COROS — autorise Sillance, puis reviens : tes activités arrivent 🎯`,
   };
 
   var en = {
@@ -2655,8 +2669,22 @@
     "tour.save.text": `Your session is ready! Click to add it to the calendar.`,
     "tour.stepCounter": `Step {n} / {total}`,
     "tour.skip": `Skip the tour`,
+    "tour.next": `Next`,
     "tour.clickHighlighted": `Click the highlighted element`,
     "tour.finishToast": `Nice work! Your first run session is ready 🎉`,
+
+    "sync.corosHelp": `How do I connect my COROS watch?`,
+    "tour.coros.welcome.title": `Connect your COROS watch`,
+    "tour.coros.welcome.text": `In 3 steps, your completed sessions will flow into Sillance on their own — and your coach will see them to adjust your plan. Your last 3 weeks of activities are imported at once.`,
+    "tour.coros.welcome.cta": `Let's go`,
+    "tour.coros.stats.title": `Open "Stats"`,
+    "tour.coros.stats.text": `Watch sync lives in your Stats tab. Click it.`,
+    "tour.coros.card.title": `The Sync area`,
+    "tour.coros.card.text": `This is where you link your accounts (COROS, Garmin, Strava) and where imported activities show up.`,
+    "tour.coros.btn.title": `Connect COROS`,
+    "tour.coros.btn.text": `Click "⌚ Coros". You'll land on the COROS site: sign in and authorize Sillance. You come straight back here with your activities importing. (You need to be signed in to your Sillance account.)`,
+    "tour.coros.btn.cta": `Connect COROS`,
+    "tour.coros.finishToast": `Off to COROS — authorize Sillance, then come back: your activities are on their way 🎯`,
   };
 
   var es = {
@@ -3983,8 +4011,22 @@
     "tour.save.text": `¡Tu sesión está lista! Haz clic para añadirla al calendario.`,
     "tour.stepCounter": `Paso {n} / {total}`,
     "tour.skip": `Saltar el tutorial`,
+    "tour.next": `Siguiente`,
     "tour.clickHighlighted": `Haz clic en el elemento resaltado`,
     "tour.finishToast": `¡Bien hecho! Tu primera sesión de carrera está lista 🎉`,
+
+    "sync.corosHelp": `¿Cómo conecto mi reloj COROS?`,
+    "tour.coros.welcome.title": `Conecta tu reloj COROS`,
+    "tour.coros.welcome.text": `En 3 pasos, tus sesiones realizadas llegarán a Sillance solas — y tu coach las verá para ajustar tu plan. Se importan de una vez tus últimas 3 semanas de actividades.`,
+    "tour.coros.welcome.cta": `Vamos`,
+    "tour.coros.stats.title": `Abre «Estadísticas»`,
+    "tour.coros.stats.text": `La sincronización de relojes está en tu pestaña Estadísticas. Haz clic.`,
+    "tour.coros.card.title": `La zona Sincronización`,
+    "tour.coros.card.text": `Aquí vinculas tus cuentas (COROS, Garmin, Strava) y aparecen tus actividades importadas.`,
+    "tour.coros.btn.title": `Conecta COROS`,
+    "tour.coros.btn.text": `Haz clic en «⌚ Coros». Irás al sitio de COROS: inicia sesión y autoriza Sillance. Vuelves aquí automáticamente con tus actividades importándose. (Debes haber iniciado sesión en tu cuenta Sillance.)`,
+    "tour.coros.btn.cta": `Conectar COROS`,
+    "tour.coros.finishToast": `Rumbo a COROS — autoriza Sillance y vuelve: tus actividades están en camino 🎯`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
