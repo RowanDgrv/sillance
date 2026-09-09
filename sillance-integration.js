@@ -397,6 +397,9 @@ async function loadPlanningFor(athleteId) {
   app.setAthleteZones?.(target, zones || null);
   app.render?.();
   app.renderSidebar?.();
+  // Indice de forme + panneau "aujourd'hui" : recalcul sur le planning réel
+  // qu'on vient de charger (sinon ils restent sur les valeurs d'amorçage).
+  app.refreshForm?.();
 }
 window.__pf_loadPlanningFor = (athleteId) => {
   loadPlanningFor(athleteId).catch((e) => console.error("[PF] loadPlanningFor échoué :", e));

@@ -3336,6 +3336,7 @@ function applyDemoAthlete(i){
   // matériel : celui que CET athlète a renseigné (vide = vide, on n'invente rien)
   if(typeof GEAR!=='undefined'){ GEAR = JSON.parse(JSON.stringify(a.gear||[])); renderGear(); }
   renderSidebar(); render();
+  try{ renderReadiness(); renderToday(); }catch(e){ console.warn('[PF] refresh forme (démo) :', e); }
   if(typeof renderCoachBand==='function') renderCoachBand();
 }
 /* Bandeau coach : identité de l'athlète suivi, forme du matin en anneau,
@@ -4821,6 +4822,10 @@ window.__pf_app = {
   data: { RECORDS, checkin, planning, realised, ATHLETE_REF, CLUB_ATHLETES, CLUB_GROUPS, CRENEAUX, VIDEOS },
   render, renderSidebar, renderClub, updateVideolibVisibility,
   refreshDevices: refreshDeviceState,
+  refreshForm(){
+    try{ if(typeof renderReadiness==='function') renderReadiness(); }catch(e){ console.warn('[PF] renderReadiness :', e); }
+    try{ if(typeof renderToday==='function') renderToday(); }catch(e){ console.warn('[PF] renderToday :', e); }
+  },
   getMode(){ return mode; },
   setMode(m){ mode = m; },
   replaceArray(arr, items){ arr.length = 0; for(const x of items) arr.push(x); },
@@ -8120,13 +8125,22 @@ renderRecords();
    par les vraies, calculées sur les activités Strava/Coros/Polar.
    ============================================================ */
 const READINESS = {
-  // valeurs dérivées des données iDO réelles (S24 = très grosse charge)
-  acwr: 1.62,          // charge aiguë très supérieure au chronique → zone de risque
-  // TSB dérivé de STRAVA_DEMO (CTL - ATL de la dernière semaine) → fortement négatif
-  get tsb(){ return STRAVA_DEMO.ctl.at(-1) - STRAVA_DEMO.atl.at(-1); },
-  // check-in subjectif : on réutilise l'objet `checkin` déjà présent
+  // Tous les signaux sont DÉRIVÉS du calendrier de l'athlète affiché (planning),
+  // via buildLoadWeeks() : réel s'il est connecté au cloud, démo sinon. Plus
+  // aucune valeur figée — le panneau "aujourd'hui" et l'indice de forme suivent
+  // la charge réelle. Fallback défensif sur STRAVA_DEMO si le calcul échoue.
+  get _weeks(){ try{ const w = buildLoadWeeks(); return (w && w.length) ? w : null; }catch(e){ return null; } },
+  get acwr(){ const w = this._weeks; return w ? Math.round(w[w.length-1].acwr*100)/100 : 1; },
+  get tsb(){ const w = this._weeks; return w ? w[w.length-1].tsb : (STRAVA_DEMO.ctl.at(-1) - STRAVA_DEMO.atl.at(-1)); },
   get subjective(){ return checkin; },
-  rpeRecent: [9, 7, 9] // RPE des 3 dernières séances qualité (VO2max HT, Actif, VO2max piste)
+  get rpeRecent(){
+    const out = [];
+    for(let i=0;i<14 && out.length<3;i++){
+      const k = iso(addDays(new Date(),-i));
+      (planning[k]||[]).forEach(s=>{ if(s.done && typeof s.rpe==='number' && s.rpe>0) out.push(s.rpe); });
+    }
+    return out.length ? out.slice(0,3) : [6,6,6];
+  }
 };
 
 function scoreReadiness(){
@@ -8253,11 +8267,13 @@ function renderToday(){
   } else { carbs='—'; nutHint=tr('today.nutRestHint'); }
 
   // 5. Heure idéale de coucher : réveil habituel - besoin de sommeil (ajusté si grosse séance demain)
-  const wake = 6.5;                       // réveil ~6h30 (démo)
+  const wake = 6.5;                       // réveil ~6h30 (référence par défaut)
   let need = 8;                            // besoin de base
   if(fraicheur<55) need += 0.5;           // fatigue → +30 min
-  // grosse séance demain ?
-  const tomorrowHard = true;              // démo
+  // grosse séance demain ? (Z4/Z5 ou intitulé qualité dans le planning du lendemain)
+  const kTom = iso(addDays(new Date(),1));
+  const tomorrowHard = (planning[kTom]||[]).some(x=>
+    ['Z4','Z5'].includes(x.zone) || /vma|seuil|vo2|fractionn|interval|tempo|sv2|lt2/i.test(x.title||''));
   if(tomorrowHard) need += 0.25;
   let bed = wake - need; if(bed<0) bed+=24;
   const bh = Math.floor(bed), bm = Math.round((bed-bh)*60);
