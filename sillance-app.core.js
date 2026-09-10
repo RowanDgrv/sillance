@@ -928,6 +928,7 @@ function renderSidebar(){
       <h2>${tr('sidebar.library')}</h2>
       <p class="hint">${tr('sidebar.libraryHint')}</p>
       <button class="create-btn" id="createSessionBtn">+ ${tr('sidebar.createSession')}</button>
+      <div id="premiumUpsell"></div>
       <div id="tplList" style="margin-top:12px"></div>
       <h2 style="margin-top:20px">${tr('sidebar.cycles')}</h2>
       <p class="hint">${tr('sidebar.cyclesHint')}</p>
@@ -940,6 +941,8 @@ function renderSidebar(){
       </div>
       <div class="lib-note" style="margin-top:14px"><i class="ic ic-credit-card"></i> ${tr('sidebar.accountMovedNote')}</div>`;
     buildTemplates(document.getElementById('tplList'));
+    renderPremiumUpsell();
+    loadSillanceLibrary();
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
     var _sgCta=document.getElementById('sgCta'); if(_sgCta) _sgCta.onclick=function(){ openBuilder(null,null); };
@@ -1683,6 +1686,85 @@ const ZONE_CATS=[
 const ZONE_COLORS={Z1:'#2FD9FF',Z2:'#39E6A3',Z3:'#FFD43D',Z4:'#FFB13D',Z5:'#FF5470','—':'#8B93A7'};
 let libSport='all', libZone='all';
 
+/* ------------------------------------------------------------------
+   BIBLIOTHÈQUE OFFICIELLE SILLANCE (offre Premium)
+   Les 100 séances-types sont fusionnées dans TEMPLATES avec un id
+   `lib_<code>` + official:true → elles héritent du drag/drop, des
+   cycles et des filtres. Éditer une fiche officielle = l'ouvrir dans
+   le builder (id remis à null) → le coach en sauve SA copie.
+   PREMIUM_OK : null = inconnu, false = pas d'accès (→ carte upsell),
+   true = accès (fiches chargées).
+   ------------------------------------------------------------------ */
+let PREMIUM_OK = null, LIBRARY_LOADED = false;
+function libTemplateFromRow(r){
+  return {
+    id: 'lib_' + r.code, official: true,
+    disc: r.disc, title: r.title, dur: r.dur || 0, dist: 0, tss: r.tss || 0,
+    zone: r.zone || '—',
+    category: r.category, structure: r.structure, objective: r.objective,
+    rationale: r.rationale, reference: r.reference,
+    durationLabel: r.duration_label, zoneLabel: r.zone_label || r.zone_hr,
+  };
+}
+async function loadSillanceLibrary(force){
+  if(!window.PF?.user) return;
+  if(LIBRARY_LOADED && !force) return;
+  LIBRARY_LOADED = true;
+  try{
+    PREMIUM_OK = await PF.myLibraryAccess();
+    if(PREMIUM_OK){
+      const rows = await PF.getLibrarySessions();
+      for(const r of rows){
+        const id = 'lib_' + r.code;
+        if(!TEMPLATES.some(t=>t.id===id)) TEMPLATES.push(libTemplateFromRow(r));
+      }
+    }
+  }catch(e){ console.warn('[PF] bibliothèque Sillance :', e); }
+  if(mode==='coach') renderSidebar();
+}
+function injectPremiumCss(){
+  if(document.getElementById('pf-premium-css')) return;
+  const st=document.createElement('style'); st.id='pf-premium-css';
+  st.textContent=`
+  .pf-premium-card{margin:12px 0;padding:14px 15px;border:1px solid var(--line);border-radius:12px;
+    background:linear-gradient(180deg,rgba(70,194,216,.10),rgba(70,194,216,.02))}
+  .pf-premium-card h3{margin:0 0 4px;font:600 14px/1.2 var(--font-display,inherit);display:flex;align-items:center;gap:6px}
+  .pf-premium-card p{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.5}
+  .pf-premium-card button{width:100%;padding:9px 0;border:0;border-radius:9px;background:var(--accent,#46C2D8);
+    color:#06222a;font-weight:700;font-size:13px;cursor:pointer}
+  .pf-premium-card .pf-premium-sec{margin-top:7px;font-size:11px;color:var(--muted);text-align:center}
+  .pf-premium-ok{margin:10px 0;font-size:11.5px;color:var(--good,#39E6A3);display:flex;align-items:center;gap:6px}
+  .tpl-off{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:99px;font-size:9.5px;font-weight:700;
+    letter-spacing:.04em;background:rgba(70,194,216,.16);color:var(--accent,#46C2D8);vertical-align:middle}`;
+  document.head.appendChild(st);
+}
+function renderPremiumUpsell(){
+  const box=document.getElementById('premiumUpsell'); if(!box) return;
+  injectPremiumCss();
+  const nLib = TEMPLATES.filter(t=>t.official).length;
+  if(PREMIUM_OK===true){
+    box.innerHTML = nLib ? `<div class="pf-premium-ok"><i class="ic ic-check"></i> ${tr('premium.unlocked', {n:nLib}) || (nLib+' séances Sillance débloquées')}</div>` : '';
+    return;
+  }
+  // Statut encore inconnu pour un compte connecté → rien (évite le flash d'upsell).
+  if(PREMIUM_OK===null && window.PF?.user){ box.innerHTML=''; return; }
+  // Démo (pas connecté) OU coach connecté sans Premium → carte d'appel.
+  const demo = !window.PF?.user;
+  box.innerHTML = `<div class="pf-premium-card">
+    <h3><i class="ic ic-sparkles"></i> ${tr('premium.title') || 'Sillance Premium'}</h3>
+    <p>${tr('premium.pitch') || '100 séances-types course &amp; vélo prêtes à poser (objectif, structure, zone, justification scientifique) + l’Assistant IA d’analyse.'}</p>
+    ${demo
+      ? `<div class="pf-premium-sec">${tr('premium.demoNote')||'Disponible une fois connecté à ton compte coach.'}</div>`
+      : `<button id="premiumCta">${tr('premium.cta')||'Activer Premium'}</button>
+         <div class="pf-premium-sec">${tr('premium.trialNote')||'Essai 14 jours · sans engagement'}</div>`}
+  </div>`;
+  const cta=document.getElementById('premiumCta');
+  if(cta) cta.onclick=()=>{
+    cta.disabled=true; cta.textContent=tr('premium.redirecting')||'Redirection…';
+    PF.subscribePremium().catch(e=>{ console.warn('[PF] subscribePremium:',e); cta.disabled=false; cta.textContent=tr('premium.cta')||'Activer Premium'; toast(tr('premium.error')||'Impossible d’ouvrir le paiement','error'); });
+  };
+}
+
 function buildTemplates(container){
   container.innerHTML='';
   const filt=document.createElement('div'); filt.className='lib-filters';
@@ -1725,7 +1807,8 @@ function tplCard(t, z){
   el.className='tpl'; el.draggable=true;
   el.dataset.disc=t.disc;
   el.style.setProperty('--c', D.color);
-  el.innerHTML = `<div class="t">${t.title}<span class="zb" style="color:${ZONE_COLORS[z]}">${z}</span></div>
+  const badge = t.official ? `<span class="tpl-off" title="${t.category||''} — ${(t.durationLabel||'')} ${(t.zoneLabel||'')}">Sillance</span>` : '';
+  el.innerHTML = `<div class="t">${t.title}${badge}<span class="zb" style="color:${ZONE_COLORS[z]}">${z}</span></div>
                   <div class="m">${t.dur}min · ${t.tss} TSS</div>
                   <button class="tpl-assign" title="${tr('lib.assignToMultiple')}" aria-label="${tr('lib.assignToMultipleAria')}"><i class="ic ic-users"></i></button>`;
   el.addEventListener('dragstart', e=>{

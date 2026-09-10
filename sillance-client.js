@@ -486,6 +486,32 @@ export const PF = {
     if (error) throw error; return data;
   },
 
+  // -------- BIBLIOTHÈQUE OFFICIELLE SILLANCE (offre Premium) --------
+  // 100 séances-types course & vélo. La RLS (my_library_access) ne renvoie de
+  // lignes QUE si le compte a Premium (coach, club, ou staff) → [] sinon.
+  async getLibrarySessions() {
+    const { data, error } = await sb.from("library_sessions").select("*")
+      .eq("published", true).order("sort");
+    if (error) { console.warn("[PF] library_sessions :", error.message); return []; }
+    return data ?? [];
+  },
+  // Bool explicite (pour l'upsell) — ne révèle que le statut de l'appelant.
+  async myLibraryAccess() {
+    const { data, error } = await sb.rpc("my_library_access");
+    if (error) { console.warn("[PF] my_library_access :", error.message); return false; }
+    return data === true;
+  },
+  // Checkout « Sillance Premium » (coach) → redirige vers Stripe.
+  async subscribePremium() {
+    const { url } = await this._invoke("premium-subscribe", {});
+    if (url) window.location.href = url;
+  },
+  // Checkout « Sillance Premium Club » (propriétaire du club) → redirige.
+  async subscribeClubPremium(clubId) {
+    const { url } = await this._invoke("club-premium-subscribe", { club_id: clubId });
+    if (url) window.location.href = url;
+  },
+
   // -------- COACH : roster d'athlètes --------
   async myAthletes() {
     const { data, error } = await sb.from("coach_athlete")
