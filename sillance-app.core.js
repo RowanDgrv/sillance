@@ -1754,7 +1754,7 @@ function renderPremiumUpsell(){
   const demo = !window.PF?.user;
   box.innerHTML = `<div class="pf-premium-card">
     <h3><i class="ic ic-sparkles"></i> ${T('premium.title','Assistant IA + 100 séances')}</h3>
-    <p>${T('premium.pitch','L’analyse IA de chaque séance + 100 séances-types course &amp; vélo prêtes à poser (zones, structure, justification). Fini la saisie une par une.')}</p>
+    <p>${T('premium.pitch','L’analyse IA de chaque séance + 100 séances-types course &amp; vélo prêtes à poser + tes vidéos éducatives. Fini la saisie une par une.')}</p>
     ${demo
       ? `<div class="pf-premium-sec">${T('premium.demoNote','Disponible une fois connecté à ton compte coach.')}</div>`
       : `<button id="premiumCta">${T('premium.cta','Activer l’option')}</button>
@@ -4107,15 +4107,18 @@ const CLUB_OFFERS = [
 const clubOffer = id => CLUB_OFFERS.find(o=>o.id===id) || CLUB_OFFERS[0];
 const COACH_OFFER = { get name(){return tr('coachOffer.name')}, price:99 };
 
-/* Abonnement Sillance du COACH (SaaS pour utiliser l'app) : 3 paliers selon
-   le nombre d'athlètes coachés, auto-déclarés (pas de compteur bloquant). */
+/* Abonnement Sillance du COACH (SaaS pour utiliser l'app) : prix unique et plat
+   (décision 10/09/2026 — fin des 3 paliers par nb d'athlètes). L'array garde 1
+   entrée pour ne rien casser en aval (settings, checkout, subscriptions.tier). */
 const COACH_TIERS = [
-  {id:1, get name(){return tr('coachTier.t1')},  price:19},
-  {id:2, get name(){return tr('coachTier.t2')}, price:29},
-  {id:3, get name(){return tr('coachTier.t3')},     price:49},
+  {id:1, get name(){return tr('coachTier.base')}, price:19},
 ];
-let selectedCoachTier = (ROSTER && ROSTER.length > 30) ? 3 : (ROSTER && ROSTER.length > 10) ? 2 : 1;
+let selectedCoachTier = 1;
 function coachTiersHTML(){
+  if(COACH_TIERS.length <= 1){
+    const t = COACH_TIERS[0];
+    return `<div class="csub-one"><span class="csub-price">${t.price} €<small>/${tr('sidebar.perMonth')}</small></span></div>`;
+  }
   return `<div class="csub-tiers">
     ${COACH_TIERS.map(t=>`<div class="csub-tier ${t.id===selectedCoachTier?'cur':''}" data-tier="${t.id}" role="button" tabindex="0">
       ${t.id===selectedCoachTier?`<span class="csub-badge">${tr('tier.selected')}</span>`:''}

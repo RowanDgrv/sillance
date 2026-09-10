@@ -249,7 +249,7 @@
     "sidebar.myAthletesTracking": `Suivi de mes athlètes`, "sidebar.inviteAthlete": `Inviter un athlète`,
     "sidebar.library": `Bibliothèque`, "sidebar.libraryHint": `Tes séances types, prêtes à réutiliser.`, "sidebar.createSession": `+ Créer une séance`,
     "premium.title": `Assistant IA + 100 séances`,
-    "premium.pitch": `L'analyse IA de chaque séance + 100 séances-types course & vélo prêtes à poser (zones, structure, justification scientifique). Fini la saisie une par une.`,
+    "premium.pitch": `L'analyse IA de chaque séance + 100 séances-types course & vélo prêtes à poser + tes vidéos éducatives. Fini la saisie une par une.`,
     "premium.cta": `Activer l'option`,
     "premium.trialNote": `Essai 14 jours · résiliable à tout moment`,
     "premium.demoNote": `Disponible une fois connecté à ton compte coach.`,
@@ -624,7 +624,7 @@
 
     "coachOffer.name": `Suivi coaching`,
 
-    "coachTier.t1": `1 à 10 athlètes`, "coachTier.t2": `11 à 30 athlètes`, "coachTier.t3": `31+ athlètes`,
+    "coachTier.base": `Abonnement Sillance`, "coachTier.t1": `1 à 10 athlètes`, "coachTier.t2": `11 à 30 athlètes`, "coachTier.t3": `31+ athlètes`,
 
     "clubTier.club.name": `Club`, "clubTier.club.cap": `jusqu'à 50 athlètes`,
     "clubTier.grand.name": `Grand club`, "clubTier.grand.cap": `jusqu'à 150 athlètes`,
@@ -1585,7 +1585,7 @@
     "sidebar.myAthletesTracking": `My athletes' tracking`, "sidebar.inviteAthlete": `Invite an athlete`,
     "sidebar.library": `Library`, "sidebar.libraryHint": `Your template sessions, ready to reuse.`, "sidebar.createSession": `+ Create a session`,
     "premium.title": `AI assistant + 100 sessions`,
-    "premium.pitch": `AI analysis of every session + 100 ready-made running & cycling sessions (zones, structure, scientific rationale). No more entering them one by one.`,
+    "premium.pitch": `AI analysis of every session + 100 ready-made running & cycling sessions + your technique videos. No more entering them one by one.`,
     "premium.cta": `Activate add-on`,
     "premium.trialNote": `14-day trial · cancel anytime`,
     "premium.demoNote": `Available once signed in to your coach account.`,
@@ -1960,7 +1960,7 @@
 
     "coachOffer.name": `Coaching tracking`,
 
-    "coachTier.t1": `1 to 10 athletes`, "coachTier.t2": `11 to 30 athletes`, "coachTier.t3": `31+ athletes`,
+    "coachTier.base": `Sillance subscription`, "coachTier.t1": `1 to 10 athletes`, "coachTier.t2": `11 to 30 athletes`, "coachTier.t3": `31+ athletes`,
 
     "clubTier.club.name": `Club`, "clubTier.club.cap": `up to 50 athletes`,
     "clubTier.grand.name": `Large club`, "clubTier.grand.cap": `up to 150 athletes`,
@@ -2921,7 +2921,7 @@
     "sidebar.myAthletesTracking": `Seguimiento de mis atletas`, "sidebar.inviteAthlete": `Invitar a un atleta`,
     "sidebar.library": `Biblioteca`, "sidebar.libraryHint": `Tus sesiones tipo, listas para reutilizar.`, "sidebar.createSession": `+ Crear una sesión`,
     "premium.title": `Asistente IA + 100 sesiones`,
-    "premium.pitch": `El análisis con IA de cada sesión + 100 sesiones tipo de carrera y ciclismo listas para usar (zonas, estructura, justificación científica). Se acabó introducirlas una a una.`,
+    "premium.pitch": `El análisis con IA de cada sesión + 100 sesiones tipo de carrera y ciclismo + tus vídeos de técnica. Se acabó introducirlas una a una.`,
     "premium.cta": `Activar opción`,
     "premium.trialNote": `Prueba de 14 días · cancela cuando quieras`,
     "premium.demoNote": `Disponible al iniciar sesión en tu cuenta de coach.`,
@@ -3296,7 +3296,7 @@
 
     "coachOffer.name": `Seguimiento coaching`,
 
-    "coachTier.t1": `1 a 10 atletas`, "coachTier.t2": `11 a 30 atletas`, "coachTier.t3": `31+ atletas`,
+    "coachTier.base": `Suscripción Sillance`, "coachTier.t1": `1 a 10 atletas`, "coachTier.t2": `11 a 30 atletas`, "coachTier.t3": `31+ atletas`,
 
     "clubTier.club.name": `Club`, "clubTier.club.cap": `hasta 50 atletas`,
     "clubTier.grand.name": `Club grande`, "clubTier.grand.cap": `hasta 150 atletas`,
