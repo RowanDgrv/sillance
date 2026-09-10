@@ -1742,26 +1742,28 @@ function renderPremiumUpsell(){
   const box=document.getElementById('premiumUpsell'); if(!box) return;
   injectPremiumCss();
   const nLib = TEMPLATES.filter(t=>t.official).length;
+  const T=(k,f,v)=>{ const s=tr(k,v); return (s===k)?f:s; };
   if(PREMIUM_OK===true){
-    box.innerHTML = nLib ? `<div class="pf-premium-ok"><i class="ic ic-check"></i> ${tr('premium.unlocked', {n:nLib}) || (nLib+' séances Sillance débloquées')}</div>` : '';
+    box.innerHTML = nLib ? `<div class="pf-premium-ok"><i class="ic ic-check"></i> ${T('premium.unlocked', nLib+' séances Sillance débloquées', {n:nLib})}</div>` : '';
     return;
   }
   // Statut encore inconnu pour un compte connecté → rien (évite le flash d'upsell).
   if(PREMIUM_OK===null && window.PF?.user){ box.innerHTML=''; return; }
-  // Démo (pas connecté) OU coach connecté sans Premium → carte d'appel.
+  // Démo (pas connecté) OU coach connecté sans l'add-on → carte d'appel.
+  // (T() ci-dessus : fallback en dur si sillance-i18n-app.js est en cache.)
   const demo = !window.PF?.user;
   box.innerHTML = `<div class="pf-premium-card">
-    <h3><i class="ic ic-sparkles"></i> ${tr('premium.title') || 'Sillance Premium'}</h3>
-    <p>${tr('premium.pitch') || '100 séances-types course &amp; vélo prêtes à poser (objectif, structure, zone, justification scientifique) + l’Assistant IA d’analyse.'}</p>
+    <h3><i class="ic ic-sparkles"></i> ${T('premium.title','Assistant IA + 100 séances')}</h3>
+    <p>${T('premium.pitch','L’analyse IA de chaque séance + 100 séances-types course &amp; vélo prêtes à poser (zones, structure, justification). Fini la saisie une par une.')}</p>
     ${demo
-      ? `<div class="pf-premium-sec">${tr('premium.demoNote')||'Disponible une fois connecté à ton compte coach.'}</div>`
-      : `<button id="premiumCta">${tr('premium.cta')||'Activer Premium'}</button>
-         <div class="pf-premium-sec">${tr('premium.trialNote')||'Essai 14 jours · sans engagement'}</div>`}
+      ? `<div class="pf-premium-sec">${T('premium.demoNote','Disponible une fois connecté à ton compte coach.')}</div>`
+      : `<button id="premiumCta">${T('premium.cta','Activer l’option')}</button>
+         <div class="pf-premium-sec">${T('premium.trialNote','Essai 14 jours · résiliable à tout moment')}</div>`}
   </div>`;
   const cta=document.getElementById('premiumCta');
   if(cta) cta.onclick=()=>{
-    cta.disabled=true; cta.textContent=tr('premium.redirecting')||'Redirection…';
-    PF.subscribePremium().catch(e=>{ console.warn('[PF] subscribePremium:',e); cta.disabled=false; cta.textContent=tr('premium.cta')||'Activer Premium'; toast(tr('premium.error')||'Impossible d’ouvrir le paiement','error'); });
+    cta.disabled=true; cta.textContent=T('premium.redirecting','Redirection…');
+    PF.subscribeAiAddon().catch(e=>{ console.warn('[PF] subscribeAiAddon:',e); cta.disabled=false; cta.textContent=T('premium.cta','Activer l’option'); toast(T('premium.error','Impossible d’ouvrir le paiement'),'error'); });
   };
 }
 
