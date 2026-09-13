@@ -7523,8 +7523,10 @@ function drawPower(data){
   const ftp=lapFTPval(); if(ftp>pMin&&ftp<pMax){ const yf=y(ftp); svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${yf}" y2="${yf}" stroke="var(--strength)" stroke-width="1" stroke-dasharray="4 3" opacity="0.75"/><text x="${W-P.r}" y="${yf-4}" fill="var(--strength)" font-size="9" font-family="var(--font-data)" text-anchor="end">FTP ${ftp}</text>`); }
   [pMin,(pMin+pMax)/2,pMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--bike)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${Math.round(v)}</text>`); });
   svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">W</text>`);
-  AN_CHARTS.power = {svg, pts, W, H, P, xs, y:(p)=>y(p.pw), color:'var(--bike)', label:(p)=>`${Math.round(p.pw)} W`};
+  AN_CHARTS.power = {svg, pts, W, H, P, xs, y:(p)=>y(p.pw), raw:(p)=>p.pw, color:'var(--bike)', label:(p)=>`${Math.round(p.pw)} W`};
   attachCursor('power');
+  const hit=AN_CHARTS.power.hit;
+  if(hit){ hit.style.cursor='zoom-in'; hit.onclick = ()=> openChartZoom('power'); }
 }
 
 /* ===== Comparateur de séances similaires (vélo · course · Hyrox) ===== */
@@ -7964,7 +7966,7 @@ function attachCursor(key){
   hit.addEventListener('touchmove',e=>{ move(e); });
   hit.addEventListener('mouseleave',hideAnCursor);
   hit.addEventListener('touchend',hideAnCursor);
-  C.line=line; C.dot=dot;
+  C.line=line; C.dot=dot; C.hit=hit;
 }
 
 /* synchronise le curseur vertical sur les 3 graphes à l'index i */
@@ -8002,6 +8004,121 @@ function showAnTip(evt, i){
   const y=(evt.clientY!==undefined?evt.clientY:evt.touches[0].clientY)+14;
   tip.style.left=Math.min(x, window.innerWidth-160)+'px';
   tip.style.top=y+'px'; tip.style.opacity='1';
+}
+
+/* ============================================================
+   ZOOM GRAPHE — vue détaillée d'un des graphes de AN_CHARTS
+   ------------------------------------------------------------
+   Molette = zoome autour du curseur (rétrécit la fenêtre d'index
+   affichée) ; glisser-déposer = déplace la fenêtre. L'axe Y se
+   recalcule sur le MIN/MAX du segment visible (pas celui de toute
+   l'activité) : c'est ce qui donne le détail plus fin en zoomant.
+   ============================================================ */
+const ZOOM_W=880, ZOOM_H=360, ZOOM_P={l:60,r:20,t:16,b:34};
+const ZOOM = {key:null, i0:0, i1:0, dragging:false, startX:0, startI0:0, startI1:0, xs:null, yFn:null, _wired:false};
+const ZOOM_TITLES = {power:'Puissance (W)', speed:tr('chart.speedHeading')||'Vitesse/allure', hr:tr('analysis.heartRate')||'Fréquence cardiaque', elev:"Profil d'altitude"};
+
+function openChartZoom(key){
+  const C=AN_CHARTS[key]; if(!C||!C.pts||C.pts.length<2) return;
+  ZOOM.key=key; ZOOM.i0=0; ZOOM.i1=C.pts.length-1;
+  document.getElementById('zoomTitle').textContent = ZOOM_TITLES[key] || '';
+  wireZoomOnce();
+  document.getElementById('zoomOverlay').classList.add('open');
+  drawZoom();
+}
+function closeChartZoom(){ document.getElementById('zoomOverlay').classList.remove('open'); }
+
+function wireZoomOnce(){
+  if(ZOOM._wired) return; ZOOM._wired=true;
+  const svg=document.getElementById('zoomSvg');
+  svg.addEventListener('wheel', e=>{
+    const C=AN_CHARTS[ZOOM.key]; if(!C) return;
+    e.preventDefault();
+    const total=C.pts.length, r=svg.getBoundingClientRect();
+    const mx=(e.clientX-r.left)/r.width*ZOOM_W;
+    const frac=Math.min(1,Math.max(0,(mx-ZOOM_P.l)/(ZOOM_W-ZOOM_P.l-ZOOM_P.r)));
+    const span=ZOOM.i1-ZOOM.i0;
+    const factor=e.deltaY<0?0.82:1.22;
+    const newSpan=Math.max(8,Math.min(total-1,Math.round(span*factor)));
+    const center=ZOOM.i0+frac*span;
+    let ni0=Math.round(center-frac*newSpan), ni1=ni0+newSpan;
+    if(ni0<0){ ni1-=ni0; ni0=0; }
+    if(ni1>total-1){ ni0-=(ni1-(total-1)); ni1=total-1; }
+    ZOOM.i0=Math.max(0,ni0); ZOOM.i1=Math.min(total-1,ni1);
+    drawZoom();
+  }, {passive:false});
+  svg.addEventListener('mousedown', e=>{
+    ZOOM.dragging=true; ZOOM.startX=e.clientX; ZOOM.startI0=ZOOM.i0; ZOOM.startI1=ZOOM.i1;
+    svg.classList.add('panning');
+  });
+  window.addEventListener('mousemove', e=>{
+    if(!ZOOM.dragging) return;
+    const C=AN_CHARTS[ZOOM.key]; if(!C) return;
+    const total=C.pts.length, r=svg.getBoundingClientRect();
+    const dxVb=(e.clientX-ZOOM.startX)/r.width*ZOOM_W;
+    const span=ZOOM.startI1-ZOOM.startI0;
+    const dIdx=Math.round(-dxVb/(ZOOM_W-ZOOM_P.l-ZOOM_P.r)*span);
+    let ni0=ZOOM.startI0+dIdx, ni1=ZOOM.startI1+dIdx;
+    if(ni0<0){ ni1-=ni0; ni0=0; }
+    if(ni1>total-1){ ni0-=(ni1-(total-1)); ni1=total-1; }
+    ZOOM.i0=Math.max(0,ni0); ZOOM.i1=Math.min(total-1,ni1);
+    drawZoom();
+  });
+  window.addEventListener('mouseup', ()=>{ if(ZOOM.dragging){ ZOOM.dragging=false; svg.classList.remove('panning'); } });
+  svg.addEventListener('mousemove', e=>{ if(!ZOOM.dragging) zoomTip(e); });
+  svg.addEventListener('mouseleave', hideZoomTip);
+  document.getElementById('zoomReset').onclick=()=>{ const C=AN_CHARTS[ZOOM.key]; if(C){ ZOOM.i0=0; ZOOM.i1=C.pts.length-1; drawZoom(); } };
+  document.getElementById('zoomClose').onclick=closeChartZoom;
+  document.getElementById('zoomOverlay').addEventListener('click', e=>{ if(e.target.id==='zoomOverlay') closeChartZoom(); });
+}
+
+function drawZoom(){
+  const C=AN_CHARTS[ZOOM.key]; if(!C) return;
+  const svg=document.getElementById('zoomSvg'); svg.innerHTML='';
+  const {i0,i1}=ZOOM, pts=C.pts, span=i1-i0;
+  const xs=i=>ZOOM_P.l+(i-i0)/span*(ZOOM_W-ZOOM_P.l-ZOOM_P.r);
+  const vals=[]; for(let i=i0;i<=i1;i++) vals.push(C.raw(pts[i]));
+  const lo=Math.min(...vals), hi=Math.max(...vals), pad=Math.max(1,(hi-lo)*0.08);
+  const vMax=hi+pad, vMin=Math.max(0,lo-pad);
+  const y=v=>ZOOM_H-ZOOM_P.b-(v-vMin)/(vMax-vMin||1)*(ZOOM_H-ZOOM_P.t-ZOOM_P.b);
+  for(let g=0; g<=4; g++){ const yv=ZOOM_P.t+g/4*(ZOOM_H-ZOOM_P.t-ZOOM_P.b); svg.insertAdjacentHTML('beforeend',`<line x1="${ZOOM_P.l}" x2="${ZOOM_W-ZOOM_P.r}" y1="${yv}" y2="${yv}" stroke="rgba(148,163,196,.12)"/>`); }
+  let path='';
+  for(let i=i0;i<=i1;i++){ const x=xs(i), yy=y(C.raw(pts[i])); path+=(i===i0?'M':'L')+x+' '+yy; }
+  const area=path+`L${xs(i1)} ${ZOOM_H-ZOOM_P.b}L${xs(i0)} ${ZOOM_H-ZOOM_P.b}Z`;
+  svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="${C.color}" opacity="0.12"/>`);
+  svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="${C.color}" stroke-width="2"/>`);
+  if(ZOOM.key==='power' && typeof lapFTPval==='function'){
+    const ftp=lapFTPval();
+    if(ftp>vMin && ftp<vMax){ const yf=y(ftp); svg.insertAdjacentHTML('beforeend',`<line x1="${ZOOM_P.l}" x2="${ZOOM_W-ZOOM_P.r}" y1="${yf}" y2="${yf}" stroke="var(--strength)" stroke-width="1" stroke-dasharray="4 3" opacity="0.75"/><text x="${ZOOM_W-ZOOM_P.r}" y="${yf-4}" fill="var(--strength)" font-size="10" font-family="var(--font-data)" text-anchor="end">FTP ${ftp}</text>`); }
+  }
+  [vMin,(vMin+vMax)/2,vMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${ZOOM_P.l-8}" y="${y(v)+4}" fill="${C.color}" font-size="11" font-family="var(--font-data)" text-anchor="end">${Math.round(v)}</text>`); });
+  [i0, Math.round((i0+i1)/2), i1].forEach(i=>{ svg.insertAdjacentHTML('beforeend',`<text x="${xs(i)}" y="${ZOOM_H-10}" fill="var(--muted)" font-size="10.5" font-family="var(--font-data)" text-anchor="middle">${fmtClock(pts[i].t)}</text>`); });
+  el('line',{id:'zoomCursorLine',y1:ZOOM_P.t,y2:ZOOM_H-ZOOM_P.b,stroke:'var(--muted)','stroke-dasharray':'3 3','pointer-events':'none'},svg).style.opacity=0;
+  el('circle',{id:'zoomCursorDot',r:4.5,fill:'var(--ink)',stroke:C.color,'stroke-width':2,'pointer-events':'none'},svg).style.opacity=0;
+  ZOOM.xs=xs; ZOOM.yFn=y;
+}
+function zoomTip(e){
+  const C=AN_CHARTS[ZOOM.key]; if(!C||!ZOOM.xs) return;
+  const svg=document.getElementById('zoomSvg'), r=svg.getBoundingClientRect();
+  const mx=(e.clientX-r.left)/r.width*ZOOM_W;
+  const span=ZOOM.i1-ZOOM.i0;
+  let i=Math.round(ZOOM.i0+(mx-ZOOM_P.l)/(ZOOM_W-ZOOM_P.l-ZOOM_P.r)*span);
+  i=Math.max(ZOOM.i0,Math.min(ZOOM.i1,i));
+  const p=C.pts[i];
+  let tip=document.getElementById('zoomTip');
+  if(!tip){ tip=document.createElement('div'); tip.id='zoomTip'; document.body.appendChild(tip);
+    tip.style.cssText='position:fixed;z-index:95;pointer-events:none;background:var(--panel-2);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:9px 12px;font-family:var(--font-data);font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .1s;white-space:nowrap'; }
+  tip.innerHTML=`<div style="color:var(--muted);margin-bottom:4px">⏱ ${fmtClock(p.t)}</div><div style="color:${C.color};font-weight:700">${C.label(p)}</div>`;
+  tip.style.left=Math.min(e.clientX+14, window.innerWidth-180)+'px';
+  tip.style.top=(e.clientY+14)+'px';
+  tip.style.opacity='1';
+  const line=document.getElementById('zoomCursorLine'), dot=document.getElementById('zoomCursorDot');
+  if(line&&dot&&ZOOM.yFn){ const x=ZOOM.xs(i); line.setAttribute('x1',x); line.setAttribute('x2',x); line.style.opacity=1; dot.setAttribute('cx',x); dot.setAttribute('cy',ZOOM.yFn(C.raw(p))); dot.style.opacity=1; }
+}
+function hideZoomTip(){
+  const tip=document.getElementById('zoomTip'); if(tip) tip.style.opacity='0';
+  const line=document.getElementById('zoomCursorLine'); if(line) line.style.opacity=0;
+  const dot=document.getElementById('zoomCursorDot'); if(dot) dot.style.opacity=0;
 }
 
 /* allure /100m (natation) : vitesse km/h → temps pour 100m */
@@ -8252,7 +8369,12 @@ function renderLaps(s, data, isSwim){
 
 document.getElementById('analysisClose').addEventListener('click', ()=> analysisOverlay.classList.remove('open'));
 analysisOverlay.addEventListener('click', e=>{ if(e.target===analysisOverlay) analysisOverlay.classList.remove('open'); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') analysisOverlay.classList.remove('open'); });
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return;
+  const zo=document.getElementById('zoomOverlay');
+  if(zo && zo.classList.contains('open')){ zo.classList.remove('open'); return; }
+  analysisOverlay.classList.remove('open');
+});
 
 /* petit toast de confirmation — différencié par sévérité (audit 03/08/2026:
    succès/erreur avaient exactement le même style visuel). type = 'ok' (déf.)
