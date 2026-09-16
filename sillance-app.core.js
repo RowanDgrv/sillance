@@ -958,7 +958,8 @@ function renderSidebar(){
     document.getElementById('createCycleBtn').addEventListener('click', ()=> openCycleBuilder(null));
   } else {
     const s = readinessScore(), adv = readinessAdvice(s);
-    sidebarContent.innerHTML = `
+    const checkinEl = document.getElementById('checkinWrap');
+    if(checkinEl) checkinEl.innerHTML = `
       <h2>${tr('checkin.title')}</h2>
       <p class="hint">${tr('checkin.hint')}</p>
       <div class="checkin">
@@ -1010,23 +1011,23 @@ function renderSidebar(){
           <div class="advice" id="readyAdvice" style="color:${adv.c}">${adv.t}</div>
         </div>
         <button class="btn checkin-validate" id="checkinValidate" style="width:100%;margin-top:10px">${tr('checkin.validate')}</button>
-      </div>
-      <div class="records">
-        <h2>${tr('records.title')}</h2>
-        ${RECORDS.length ? RECORDS.map(r=>`<div class="pb"><span class="d">${r.d}</span>${r.isNew?'<span class="new">NEW</span>':''}<span class="v">${r.v}</span></div>`).join('') : `<p class="club-hint">${tr('records.empty')}</p>`}
-      </div>
-      <div class="records" id="refsBlock">
-        <h2>${tr('refs.title')}</h2>
-        <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return tr('refs.never'); const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return tr('refs.lastUpdate', {days}) + (days>=90?' : '+tr('refs.retest'):''); })()}</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-          ${[['ftp','FTP','W'],['pma',tr('refs.map'),'W'],['cpBike',tr('refs.bikeCp'),'W'],['vma',tr('refs.vVo2max'),'km/h'],['cv','CV','km/h'],['seuilRun',tr('refs.threshold'),'s/km'],['css','CSS','s/100m'],['fcMax',tr('refs.maxHr'),'bpm'],['fcRepos',tr('refs.restHr'),'bpm']].map(([k,l,u])=>`
-          <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)"><span>${l} <em style="font-style:normal;opacity:.65">${u}</em></span>
-            <input type="number" step="any" data-ref="${k}" value="${ATHLETE_REF[k]??''}" style="width:100%;box-sizing:border-box"></label>`).join('')}
-        </div>
-        <button class="btn" id="refsSave" style="width:100%;margin-top:10px">${tr('refs.save')}</button>
       </div>`;
+    const recentRecordsEl = document.getElementById('recentRecordsCard');
+    if(recentRecordsEl) recentRecordsEl.innerHTML = `
+      <h2>${tr('records.title')}</h2>
+      ${RECORDS.length ? RECORDS.map(r=>`<div class="pb"><span class="d">${r.d}</span>${r.isNew?'<span class="new">NEW</span>':''}<span class="v">${r.v}</span></div>`).join('') : `<p class="club-hint">${tr('records.empty')}</p>`}`;
+    const refsEl = document.getElementById('refsBlock');
+    if(refsEl) refsEl.innerHTML = `
+      <h2>${tr('refs.title')}</h2>
+      <p class="club-hint" style="margin:2px 0 8px">${(()=>{ if(!ATHLETE_REF.updatedAt) return tr('refs.never'); const days=Math.floor((Date.now()-new Date(ATHLETE_REF.updatedAt).getTime())/86400000); return tr('refs.lastUpdate', {days}) + (days>=90?' : '+tr('refs.retest'):''); })()}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        ${[['ftp','FTP','W'],['pma',tr('refs.map'),'W'],['cpBike',tr('refs.bikeCp'),'W'],['vma',tr('refs.vVo2max'),'km/h'],['cv','CV','km/h'],['seuilRun',tr('refs.threshold'),'s/km'],['css','CSS','s/100m'],['fcMax',tr('refs.maxHr'),'bpm'],['fcRepos',tr('refs.restHr'),'bpm']].map(([k,l,u])=>`
+        <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)"><span>${l} <em style="font-style:normal;opacity:.65">${u}</em></span>
+          <input type="number" step="any" data-ref="${k}" value="${ATHLETE_REF[k]??''}" style="width:100%;box-sizing:border-box"></label>`).join('')}
+      </div>
+      <button class="btn" id="refsSave" style="width:100%;margin-top:10px">${tr('refs.save')}</button>`;
     renderAthleteBelow();
-    sidebarContent.querySelectorAll('input[type=range]').forEach(inp=>{
+    (checkinEl ? checkinEl.querySelectorAll('input[type=range]') : []).forEach(inp=>{
       inp.addEventListener('input', ()=>{
         checkin[inp.dataset.k] = +inp.value;
         document.getElementById('val-'+inp.dataset.k).textContent = inp.value+'/10';
@@ -1105,7 +1106,6 @@ function renderAthleteBelow(){
     <div class="records ath-below-card" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}
       ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn" style="margin-top:10px"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
     </div>
-    <div class="strava-card ath-below-card" id="stravaCard"></div>
     <div class="coach-sub ath-below-card" id="coachSubCard">
       <h2>${tr('coachSub.title')}</h2>
       <p class="hint" style="margin-bottom:10px">${tr('coachSub.text')}</p>
@@ -2227,6 +2227,7 @@ const DASH_WIDGET_LIST = [
   {key:'planningRadar', get label(){return tr('dash.widgetPlanningRadar')}},
   {key:'readyhub', get label(){return tr('dash.widgetReadyhub')}},
   {key:'advanced', get label(){return tr('dash.widgetAdvanced')}},
+  {key:'nutritionToday', get label(){return tr('dash.widgetNutritionToday')}},
 ];
 function settingsDashboardHtml(){
   const dw=dashWidgetPrefs();
@@ -2265,6 +2266,7 @@ function renderSettings(){
     const p=dashWidgetPrefs(); p[cb.dataset.dw]=cb.checked; saveDashWidgetPrefs(p);
     if(mode==='coach') renderSidebar();
     renderReadiness();
+    if(typeof renderToday==='function') renderToday();
   });
   const alertAdd=document.getElementById('dashAlertAdd');
   if(alertAdd) alertAdd.onclick=()=>{
@@ -2834,6 +2836,20 @@ function sessionCard(s, dateKey){
   });
   return el;
 }
+/* Ouvre l'analyse (repliée par défaut, sous le calendrier, mode coach
+   uniquement — côté athlète cette même analyse vit dans l'onglet Forme &
+   courses / Statistiques) et l'amène à l'écran. Déclenchée au clic sur une
+   séance à analyser. */
+function revealAnalysis(){
+  document.body.setAttribute('data-analysis','open');
+  const ap=document.getElementById('readyhub');
+  if(ap) setTimeout(()=>{ try{ ap.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }, 80);
+}
+(function wireAnalysisClose(){
+  const b=document.getElementById('analysisCollapseBtn'); if(!b) return;
+  b.onclick=()=>{ document.body.removeAttribute('data-analysis');
+    const cal=document.querySelector('.calendar'); if(cal){ try{ cal.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} } };
+})();
 /* Carte "réalisé" : une activité importée (Strava/Coros/…) posée sur le jour
    où elle a eu lieu. Pas d'édition (pas de drag, pas de suppression) — un clic
    ouvre l'analyse détaillée seconde-par-seconde. */
@@ -2861,18 +2877,6 @@ function realisedCard(act){
   });
   return el;
 }
-/* Ouvre la partie analyse (repliée par défaut, sous le calendrier) et l'amène
-   à l'écran. Déclenchée au clic sur une séance à analyser. */
-function revealAnalysis(){
-  document.body.setAttribute('data-analysis','open');
-  const ap=document.getElementById('athPanelStats');
-  if(ap) setTimeout(()=>{ try{ ap.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }, 80);
-}
-(function wireAnalysisClose(){
-  const b=document.getElementById('analysisClose'); if(!b) return;
-  b.onclick=()=>{ document.body.removeAttribute('data-analysis');
-    const cal=document.querySelector('.calendar'); if(cal){ try{ cal.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} } };
-})();
 
 /* ---- RPE ---- */
 function rpeColor(n){
@@ -6585,6 +6589,7 @@ function builderToSession(){
   // innerHTML sans ré-échapper, et la nutrition est explicitement montrée à
   // l'ATHLÈTE (fiche séance) — pas juste le coach qui l'a tapée.
   const pre=dispoSafe(document.getElementById('bNutriPre').value.trim());
+  const during=dispoSafe(document.getElementById('bNutriDuring').value.trim());
   const post=dispoSafe(document.getElementById('bNutriPost').value.trim());
   const s={
     disc: builderState.disc,
@@ -6595,12 +6600,12 @@ function builderToSession(){
     blocksV2: JSON.parse(JSON.stringify(builderState)),
     done:false, id:'s'+(uid++)
   };
-  if(pre||post){ s.nutrition = {pre, post, during:'', key: detectNutriKey(s)}; }
+  if(pre||post||during){ s.nutrition = {pre, post, during, key: detectNutriKey(s)}; }
   return s;
 }
 /* détecte le macro-clé pour la notif, à partir du contenu nutrition saisi */
 function detectNutriKey(s){
-  const txt=((s.nutrition?.post||'')+' '+(s.title||'')).toLowerCase();
+  const txt=((s.nutrition?.during||'')+' '+(s.nutrition?.post||'')+' '+(s.title||'')).toLowerCase();
   if(/glucide|sucre|gel|barre/.test(txt)) return 'glucides';
   if(/prot[eé]ine/.test(txt)) return 'protéines';
   // sinon, on retombe sur l'auto
@@ -6609,19 +6614,19 @@ function detectNutriKey(s){
 
 /* remplit les champs nutrition de l'éditeur (auto-suggestion) */
 function initBuilderNutrition(existing){
-  const pre=document.getElementById('bNutriPre'), post=document.getElementById('bNutriPost');
+  const pre=document.getElementById('bNutriPre'), during=document.getElementById('bNutriDuring'), post=document.getElementById('bNutriPost');
   const auto=document.getElementById('bNutriAuto');
   const fillAuto=()=>{
     // construit une séance provisoire pour calculer la suggestion
     const tmp={disc:builderState.disc, title:builderState.title, dur:builderTotals().min, zone:'Z3'};
     const n=nutritionForSession(tmp);
-    pre.placeholder=n.pre; post.placeholder=n.post;
+    pre.placeholder=n.pre; during.placeholder=n.during; post.placeholder=n.post;
     auto.textContent=tr('builder.autoSuggestion', {key:n.key});
   };
-  if(existing && existing.nutrition){ pre.value=existing.nutrition.pre||''; post.value=existing.nutrition.post||''; }
-  else { pre.value=''; post.value=''; }
+  if(existing && existing.nutrition){ pre.value=existing.nutrition.pre||''; during.value=existing.nutrition.during||''; post.value=existing.nutrition.post||''; }
+  else { pre.value=''; during.value=''; post.value=''; }
   fillAuto();
-  document.getElementById('bNutriReset').onclick=()=>{ pre.value=''; post.value=''; fillAuto(); };
+  document.getElementById('bNutriReset').onclick=()=>{ pre.value=''; during.value=''; post.value=''; fillAuto(); };
   // recalcul de la suggestion quand le sport change
   builderState._refreshNutri = fillAuto;
 }
@@ -9571,25 +9576,13 @@ function renderToday(){
   else if(s.done){ seance=tr('today.validated')+' <i class="ic ic-check"></i>'; scClass='ti-good'; scHint=s.title; }
   else { seance=tr('today.toDo'); scClass='ti-warn'; scHint=s.title; }
 
-  // 4. Nutrition recommandée (g glucides/h) selon durée & intensité de la séance
-  let carbs, nutHint;
-  if(s){
-    const long = (s.dur||0)>=120, hard=['Z4','Z5'].includes(s.zone)||/vma|seuil|vo2/i.test(s.title||'');
-    if(long){ carbs='80–90 g/h'; nutHint=tr('today.nutLongHint'); }
-    else if(hard){ carbs='60 g/h'; nutHint=tr('today.nutHardHint'); }
-    else { carbs='30 g/h'; nutHint=tr('today.nutEasyHint'); }
-  } else { carbs='—'; nutHint=tr('today.nutRestHint'); }
-
-  // 5. Heure idéale de coucher : réveil habituel - besoin de sommeil (ajusté si grosse séance demain)
-  const wake = 6.5;                       // réveil ~6h30 (démo)
-  let need = 8;                            // besoin de base
-  if(fraicheur<55) need += 0.5;           // fatigue → +30 min
-  // grosse séance demain ?
-  const tomorrowHard = true;              // démo
-  if(tomorrowHard) need += 0.25;
-  let bed = wake - need; if(bed<0) bed+=24;
-  const bh = Math.floor(bed), bm = Math.round((bed-bh)*60);
-  const bedStr = `${String(bh).padStart(2,'0')} h ${String(bm).padStart(2,'0')}`;
+  // 4. Nutrition recommandée : uniquement si le coach a choisi de l'afficher
+  // (réglage Paramètres > Tableau de bord) ET donne la consigne "pendant
+  // l'effort" de la séance (builder) — jamais un chiffre inventé par le site
+  // (retour coach 16/09 : le grammage de glucides doit venir du coach, pas
+  // d'un calcul automatique jugé peu fiable).
+  const showNutrition = !!dashWidgetPrefs().nutritionToday;
+  const nutriDuring = s ? nutritionForSession(s).during : '';
 
   const today = new Date();
   const dateStr = today.toLocaleDateString(localeStr(), {weekday:'long', day:'numeric', month:'long'});
@@ -9621,18 +9614,12 @@ function renderToday(){
         <div class="ti-value ${scClass}">${seance}</div>
         <div class="ti-hint">${scHint}</div>
       </div>
+      ${showNutrition ? `
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-cup"></i></div>
         <div class="ti-label">${tr('today.recommendedNutrition')}</div>
-        <div class="ti-value ti-info">${carbs}</div>
-        <div class="ti-hint">${nutHint}</div>
-      </div>
-      <div class="today-item">
-        <div class="ti-icon"><i class="ic ic-moon"></i></div>
-        <div class="ti-label">${tr('today.idealBedtime')}</div>
-        <div class="ti-value ti-info">${bedStr}</div>
-        <div class="ti-hint">${tr('today.sleepTargetHint', {h:need.toFixed(1).replace('.0','')})}</div>
-      </div>
+        <div class="ti-value ti-info ti-text">${nutriDuring || tr('today.nutRestHint')}</div>
+      </div>` : ''}
     </div>
     <div class="today-foot"><i class="ic ic-lightbulb"></i> ${todayAdvice(fraicheur, risque, s)}</div>
   </div>`;

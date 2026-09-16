@@ -973,7 +973,7 @@ body:not([data-athview]):not([data-clubview]) .gear-card .gear-del{display:none}
 
 /* ---------- Panneau "Aujourd'hui" (guide quotidien) ---------- */
 .today-panel{display:none;margin-bottom:18px}
-body[data-athview="home"] .today-panel{display:block}
+body[data-athview="forme"] .today-panel{display:block}
 .today-card{border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,var(--panel-2),var(--panel));
   padding:18px 20px;position:relative;overflow:hidden}
 .today-card::before{content:"";position:absolute;inset:0;background:
@@ -991,6 +991,7 @@ body[data-athview="home"] .today-panel{display:block}
 .today-item .ti-icon{font-size:18px;margin-bottom:7px}
 .today-item .ti-label{font-size:var(--fs-sm);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:5px}
 .today-item .ti-value{font-family:var(--font-data);font-size:var(--fs-2xl);font-weight:700;line-height:1.1}
+.today-item .ti-value.ti-text{font-family:inherit;font-size:var(--fs-md);font-weight:600;line-height:1.35}
 .today-item .ti-hint{font-size:var(--fs-sm);color:var(--muted);margin-top:var(--space-1);line-height:1.4}
 .ti-good{color:var(--good)} .ti-warn{color:var(--bike)} .ti-bad{color:var(--run)} .ti-info{color:var(--swim)}
 .today-foot{margin-top:14px;font-size:12.5px;color:var(--soft,#C4CCDE);background:rgba(47,217,255,.06);
@@ -1292,7 +1293,6 @@ body[data-clubview] .planner,
 body[data-clubview] #videolib,
 body[data-clubview] .mental,
 body[data-clubview] .lactest,
-body[data-clubview] #athPanelStats,
 body[data-clubview] .ath-tabs{display:none}
 .club-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:18px}
 .club-eyebrow{display:inline-flex;align-items:center;gap:var(--space-2);font-family:var(--font-data);font-size:var(--fs-sm);
@@ -1754,44 +1754,83 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .prof-row-del{background:transparent;border:1px solid var(--line-strong);color:var(--muted);border-radius:8px;width:32px;height:32px;flex:none;cursor:pointer}
 .prof-row-del:hover{color:var(--run);border-color:var(--run)}
 
-/* ---------- Onglets athlète (Accueil / Statistiques) ---------- */
+/* ---------- Onglets athlète (Accueil / Forme & courses / Calendrier / Statistiques / Outils) ---------- */
 .ath-tabs{display:none;gap:6px;margin:0 0 var(--space-1);padding:5px;background:var(--panel-2);border:1px solid var(--line);
-  border-radius:13px;width:fit-content}
+  border-radius:13px;width:fit-content;flex-wrap:wrap}
 body[data-athview] .ath-tabs{display:flex}
 .ath-tab{border:none;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;
   padding:9px 18px;border-radius:9px;cursor:pointer;transition:.15s}
 .ath-tab:hover{color:var(--text)}
 .ath-tab.active{background:linear-gradient(120deg,rgba(47,217,255,.18),rgba(157,123,255,.18));color:var(--text)}
-/* en vue Accueil : on masque le panneau stats + les stats techniques du bandeau */
-body[data-athview="home"] #athPanelStats{display:none}
-body[data-athview="home"] .stat-tech{display:none}
-/* en vue Stats : on masque le calendrier, la vidéothèque et les RDV */
-body[data-athview="stats"] .planner,
-body[data-athview="stats"] #videolib,
-body[data-athview="stats"] .mental,
-body[data-athview="stats"] .lactest,
-body[data-athview="stats"] .pulse-strip{display:none}
-/* en mode coach (ni athlète ni club), le panneau stats est visible */
-body:not([data-athview]):not([data-clubview]) #athPanelStats{display:block}
-/* Analyse repliée par défaut sous le calendrier (coach + accueil athlète) ;
-   s'ouvre au clic sur une séance → body[data-analysis="open"].
-   L'onglet Statistiques de l'athlète l'affiche toujours (inchangé). */
-body:not([data-athview]):not([data-clubview]):not([data-analysis="open"]) #athPanelStats{display:none}
-body[data-athview="home"][data-analysis="open"] #athPanelStats{display:block}
-/* Mode focus analyse : bandeau gauche masqué + calendrier pleine largeur,
-   pour que l'analyse soit collée sous le calendrier (Replier restaure tout). */
-body[data-analysis="open"]:not([data-athview="stats"]) .planner{grid-template-columns:1fr}
-body[data-analysis="open"]:not([data-athview="stats"]) .planner > .library{display:none}
+
+/* Groupe A — côté athlète, chaque section n'appartient qu'à un onglet :
+   masquée par défaut, un seul onglet l'affiche. Côté coach, readyhub/
+   analytics/analyticsEmpty/records/gear restent gérés par le Groupe C
+   ci-dessous (révélés au clic sur une séance, cf. revealAnalysis()). */
+#refsBlock,#readyhub,#checkinWrap,#athBelowGrid,
+#recentRecordsCard,#analytics,#analyticsEmpty,#records,
+#athToolsGrid,#gear{display:none}
+
+body[data-athview="home"] #refsBlock{display:block}
+body[data-athview="home"] #athBelowGrid{display:grid}
+
+body[data-athview="forme"] #readyhub,
+body[data-athview="forme"] #checkinWrap{display:block}
+
+body[data-athview="stats"] #recentRecordsCard,
+body[data-athview="stats"] #records{display:block}
+body[data-athview="stats"] #analytics:not([hidden]){display:block}
+body[data-athview="stats"] #analyticsEmpty:not([hidden]){display:block}
+
+body[data-athview="outils"] #athToolsGrid{display:grid}
+body[data-athview="outils"] #gear{display:block}
+
+/* Groupe C — mode coach uniquement (pas d'onglets athlète) : l'analyse
+   reste repliée par défaut sous le calendrier, et se révèle au clic sur une
+   séance (revealAnalysis() pose data-analysis="open" sur le body). */
 .analysis-bar{display:none;align-items:center;justify-content:space-between;gap:var(--space-3);margin:22px 0 var(--space-1);
   padding:var(--space-3) var(--space-4);border:1px solid var(--line-strong);border-radius:12px;
   background:linear-gradient(180deg,var(--panel-2),var(--panel))}
-body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:flex}
+body[data-analysis="open"]:not([data-athview]) .analysis-bar{display:flex}
 .analysis-bar .ab-t{font-family:var(--font-display);font-weight:600;font-size:var(--fs-lg);letter-spacing:.03em;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:9px}
 .analysis-bar .ab-t .ic{width:16px;height:16px;color:var(--accent)}
 .analysis-close{background:transparent;border:1px solid var(--line-strong);color:var(--soft);border-radius:8px;
   padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px}
 .analysis-close:hover{border-color:var(--accent);color:var(--ink)}
 .analysis-close .ic{width:13px;height:13px}
+body[data-analysis="open"]:not([data-athview]) #readyhub,
+body[data-analysis="open"]:not([data-athview]) #records,
+body[data-analysis="open"]:not([data-athview]) #gear{display:block}
+body[data-analysis="open"]:not([data-athview]) #analytics:not([hidden]){display:block}
+body[data-analysis="open"]:not([data-athview]) #analyticsEmpty:not([hidden]){display:block}
+/* Mode focus analyse (coach) : bandeau gauche masqué + calendrier pleine
+   largeur, pour que l'analyse soit collée sous le calendrier. */
+body[data-analysis="open"]:not([data-athview]) .planner{grid-template-columns:1fr}
+body[data-analysis="open"]:not([data-athview]) .planner > .library{display:none}
+
+/* Groupe B — sections déjà visibles en mode coach par défaut (planner,
+   vidéothèque, bandeau semaine) : on NE les masque PAS globalement, on les
+   masque seulement dans les onglets athlète où elles ne doivent pas
+   apparaître. Coach/club gardent le comportement actuel, inchangé. */
+body[data-athview="home"] .planner,
+body[data-athview="forme"] .planner,
+body[data-athview="stats"] .planner,
+body[data-athview="outils"] .planner,
+body[data-athview="home"] #videolib,
+body[data-athview="forme"] #videolib,
+body[data-athview="stats"] #videolib,
+body[data-athview="outils"] #videolib,
+body[data-athview="forme"] .pulse-strip,
+body[data-athview="calendrier"] .pulse-strip,
+body[data-athview="stats"] .pulse-strip,
+body[data-athview="outils"] .pulse-strip,
+body[data-athview="stats"] .lactest{display:none}
+body[data-athview="home"] .stat-tech{display:none}
+/* Côté athlète, la sidebar (#sidebarContent) ne reçoit plus rien — check-in/
+   records/références vivent maintenant dans leurs propres onglets — donc on
+   la masque et le calendrier prend toute la largeur (onglet Calendrier). */
+body[data-athview] .planner{grid-template-columns:1fr}
+body[data-athview] .planner > .library{display:none}
 
 /* ---------- Messagerie ---------- */
 .chat-fab{position:fixed;bottom:22px;right:22px;z-index:75;width:56px;height:56px;border-radius:50%;border:none;
@@ -2164,7 +2203,7 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .b-nutri{margin-top:var(--space-4);border:1px solid rgba(57,230,163,.25);border-radius:12px;background:rgba(57,230,163,.05);padding:13px 14px}
 .b-nutri-head{font-family:var(--font-data);font-size:var(--fs-sm);letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--good);margin-bottom:10px;display:flex;align-items:center;gap:var(--space-2)}
 .b-nutri-auto{font-size:9.5px;color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0}
-.b-nutri-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.b-nutri-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media (max-width:560px){.b-nutri-grid{grid-template-columns:1fr}}
 .b-nutri textarea{border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);
   font-family:var(--font-ui);font-size:12.5px;padding:var(--space-2) 10px;resize:vertical;width:100%}
@@ -2386,7 +2425,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <h2 id="welcomeH2">Bienvenue sur <b>Sillance</b></h2>
     <p class="welcome-sub">La démo de ma plateforme de coaching triathlon, Hyrox &amp; clubs. Tu peux tout explorer librement.</p>
     <div class="welcome-grid">
-      <div class="wel-item"><span><i class="ic ic-sun"></i></span><div><b>Ton point du jour</b><small>fraîcheur, risque, nutrition, coucher</small></div></div>
+      <div class="wel-item"><span><i class="ic ic-sun"></i></span><div><b>Ton point du jour</b><small>fraîcheur, risque, séance du jour</small></div></div>
       <div class="wel-item"><span><i class="ic ic-thermometer"></i></span><div><b>Impact des conditions</b><small>ce que chaleur, vent et D+ t'ont coûté</small></div></div>
       <div class="wel-item"><span><i class="ic ic-shoe"></i></span><div><b>Matériel</b><small>usure des chaussures + alertes km</small></div></div>
       <div class="wel-item"><span><i class="ic ic-landmark"></i></span><div><b>Vue Club</b><small>créneaux, groupes, présences</small></div></div>
@@ -2467,8 +2506,25 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
   <!-- ===================== ONGLETS ATHLÈTE ===================== -->
   <nav class="ath-tabs" id="athTabs" aria-label="Navigation athlète" data-i18n-attr="aria-label:nav.athleteNav">
     <button class="ath-tab active" data-tab="home"><i class="ic ic-home"></i><span data-i18n="nav.home">Accueil</span></button>
+    <button class="ath-tab" data-tab="forme"><i class="ic ic-zap"></i><span data-i18n="nav.forme">Forme &amp; courses</span></button>
+    <button class="ath-tab" data-tab="calendrier"><i class="ic ic-calendar"></i><span data-i18n="nav.calendrier">Calendrier</span></button>
     <button class="ath-tab" data-tab="stats"><i class="ic ic-chart"></i><span data-i18n="nav.stats">Statistiques</span></button>
+    <button class="ath-tab" data-tab="outils"><i class="ic ic-link"></i><span data-i18n="nav.outils">Outils</span></button>
   </nav>
+
+  <!-- ===================== ACCUEIL : références athlète (FTP, FC max…) ===================== -->
+  <div class="records ath-below-card" id="refsBlock" style="max-width:560px;margin-bottom:20px"></div>
+
+  <!-- ===================== FORME & COURSES : check-in du jour ===================== -->
+  <div class="ath-below-card" id="checkinWrap" style="max-width:560px;margin-bottom:20px"></div>
+
+  <!-- ===================== STATISTIQUES : records récents (résumé) ===================== -->
+  <div class="records ath-below-card" id="recentRecordsCard" style="max-width:560px;margin-bottom:20px"></div>
+
+  <!-- ===================== OUTILS : synchronisation des activités ===================== -->
+  <div class="ath-below-grid" id="athToolsGrid">
+    <div class="strava-card ath-below-card" id="stravaCard"></div>
+  </div>
 
   <!-- ===================== AUJOURD'HUI (guide quotidien) ===================== -->
   <section class="today-panel" id="todayPanel" aria-label="Ton point du jour" data-i18n-attr="aria-label:today.pointAria"></section>
@@ -2528,11 +2584,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
        cf. :empty) hors vue Athlète. -->
   <div class="ath-below-grid" id="athBelowGrid"></div>
 
-  <!-- ===== ANALYSE (repliée, s'ouvre au clic sur une séance) ===== -->
-  <div class="ath-panel-stats" id="athPanelStats">
-  <div class="analysis-bar">
+  <!-- ===== ANALYSE (repliée par défaut, mode coach uniquement — s'ouvre au
+       clic sur une séance ; côté athlète, cette même analyse vit dans les
+       onglets Forme & courses / Statistiques, toujours visible là-bas) ===== -->
+  <div class="analysis-bar" id="analysisBar">
     <span class="ab-t"><i class="ic ic-chart"></i><span data-i18n="perf.analysisBannerTitle">Analyse de la séance &amp; de la performance</span></span>
-    <button class="analysis-close" id="analysisClose"><i class="ic ic-x"></i><span data-i18n="perf.collapse">Replier</span></button>
+    <button class="analysis-close" id="analysisCollapseBtn"><i class="ic ic-x"></i><span data-i18n="perf.collapse">Replier</span></button>
   </div>
   <!-- ===================== IA · ÉTAT DE FORME ===================== -->
   <section class="readyhub" id="readyhub" aria-label="Analyse de l'état de forme" data-i18n-attr="aria-label:fitness.analysisAria">
@@ -2762,7 +2819,6 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     </div>
     <div class="rec-grid" id="recGrid"></div>
   </section>
-  </div><!-- /ath-panel-stats -->
 
   <!-- ===================== BIBLIOTHÈQUE VIDÉO ===================== -->
   <section class="videolib videolib-soon" id="videolib" aria-label="Bibliothèque vidéo" data-i18n-attr="aria-label:video.libraryAria">
@@ -3408,6 +3464,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
             <div class="b-nutri-head"><i class="ic ic-utensils"></i> Consignes nutrition <span id="bNutriAuto" class="b-nutri-auto"></span></div>
             <div class="b-nutri-grid">
               <div class="b-fld"><label for="bNutriPre" data-i18n="session.beforeSessionLabel">Avant la séance</label><textarea id="bNutriPre" rows="2" placeholder="Auto selon le type, ou écris ta consigne" data-i18n-attr="placeholder:session.notePh"></textarea></div>
+              <div class="b-fld"><label for="bNutriDuring" data-i18n="session.duringSessionLabel">Pendant l'effort</label><textarea id="bNutriDuring" rows="2" placeholder="Ex. 60–80 g de glucides/h" data-i18n-attr="placeholder:session.duringPh"></textarea></div>
               <div class="b-fld"><label for="bNutriPost" data-i18n="session.afterSessionLabel">Après la séance (récup)</label><textarea id="bNutriPost" rows="2" placeholder="Ex. protéines dans les 30 min + glucides" data-i18n-attr="placeholder:session.nutritionPh"></textarea></div>
             </div>
             <button class="b-nutri-reset" id="bNutriReset" type="button">↺ Regénérer automatiquement</button>
