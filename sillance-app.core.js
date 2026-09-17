@@ -1489,7 +1489,7 @@ let stravaDemoSet = 'triathlete';   // profil démo actif (changeable via le sé
 // seule plateforme était connectée, ce qui cachait les autres connecteurs.
 const DEVICE_CONNECTORS = [
   {key:'strava', name:'Strava', icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`},
-  {key:'garmin', name:'Garmin', icon:'⌚'},
+  {key:'polar', name:'Polar', icon:'⌚'},
   {key:'coros', name:'Coros', icon:'⌚'},
 ];
 function renderStravaCard(){
@@ -1511,7 +1511,7 @@ function renderStravaCard(){
     </div>`;
   }).join('');
 
-  const SRC={strava:'Strava',garmin:'Garmin',coros:'Coros'};
+  const SRC={strava:'Strava',garmin:'Garmin',coros:'Coros',polar:'Polar'};
   const escAct=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const actsHtml = anyConnected ? (stravaActivities.length? `<div class="strava-acts">${stravaActivities.slice(0,6).map((a,i)=>{
       const D=DISC[a.disc]||DISC.run;
@@ -2882,7 +2882,7 @@ function revealAnalysis(){
    où elle a eu lieu. Pas d'édition (pas de drag, pas de suppression) — un clic
    ouvre l'analyse détaillée seconde-par-seconde. */
 function realisedSrcLabel(s){
-  return s==='coros'?'Coros':s==='garmin'?'Garmin':s==='upload'?tr('sync.imported'):'Strava';
+  return s==='coros'?'Coros':s==='garmin'?'Garmin':s==='polar'?'Polar':s==='upload'?tr('sync.imported'):'Strava';
 }
 function realisedCard(act){
   const D = DISC[act.disc] || {color:'var(--muted)'};
