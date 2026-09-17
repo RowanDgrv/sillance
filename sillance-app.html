@@ -1890,6 +1890,22 @@ body[data-athview] .planner > .library{display:none}
 .strava-sync.syncing{opacity:.7}
 .strava-disconnect{width:100%;background:transparent;border:none;color:var(--muted);font-size:var(--fs-sm);padding:7px 0 0;cursor:pointer}
 .strava-disconnect:hover{color:var(--run)}
+.dev-connectors{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.dev-connector{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+  border:1px solid var(--line);border-radius:9px;background:var(--panel-2);padding:9px 12px}
+.dev-connector.connected{border-color:rgba(70,194,216,.35)}
+.dev-connector .dc-name{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600}
+.dev-connector .dc-name svg{flex:none}
+.dev-connector .dc-badge{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--good);margin-right:auto;margin-left:14px}
+.dc-connect{background:var(--swim);color:#fff;border:none;border-radius:7px;font-weight:700;font-size:12px;
+  padding:7px 12px;cursor:pointer;transition:.15s;white-space:nowrap}
+.dc-connect:hover{filter:brightness(1.1)}
+.dc-sync{background:transparent;border:1px solid var(--line-strong);color:var(--soft);border-radius:7px;
+  width:28px;height:28px;display:grid;place-items:center;cursor:pointer;flex:none}
+.dc-sync:hover{border-color:var(--swim);color:var(--swim)}
+.dc-sync .ic{width:14px;height:14px}
+.dc-disconnect{background:transparent;border:none;color:var(--muted);font-size:11.5px;cursor:pointer;padding:6px 4px}
+.dc-disconnect:hover{color:var(--run)}
 .strava-acts{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 .strava-act{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);padding:var(--space-2) 10px}
 .strava-act .ico{font-size:15px}

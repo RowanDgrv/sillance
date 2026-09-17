@@ -348,6 +348,7 @@
     "sync.connectingStrava": `Connexion à Strava…`, "sync.syncing": `Synchronisation…`,
     "sync.nActivitiesSynced": `{n} activités synchronisées`, "sync.nActivitiesImported": `{n} activités importées`,
     "sync.activity": `Activité`,
+    "devices.connected": `Connecté`, "devices.connectBtn": `Connecter {name}`, "devices.synced": `{name} synchronisé`,
 
     "date.today": `auj.`, "date.yesterday": `hier`, "date.daysAgo": `il y a {days} j`,
 
@@ -1691,6 +1692,7 @@
     "sync.connectingStrava": `Connecting to Strava…`, "sync.syncing": `Syncing…`,
     "sync.nActivitiesSynced": `{n} activities synced`, "sync.nActivitiesImported": `{n} activities imported`,
     "sync.activity": `Activity`,
+    "devices.connected": `Connected`, "devices.connectBtn": `Connect {name}`, "devices.synced": `{name} synced`,
 
     "date.today": `today`, "date.yesterday": `yesterday`, "date.daysAgo": `{days} days ago`,
 
@@ -3034,6 +3036,7 @@
     "sync.connectingStrava": `Conectando con Strava…`, "sync.syncing": `Sincronizando…`,
     "sync.nActivitiesSynced": `{n} actividades sincronizadas`, "sync.nActivitiesImported": `{n} actividades importadas`,
     "sync.activity": `Actividad`,
+    "devices.connected": `Conectado`, "devices.connectBtn": `Conectar {name}`, "devices.synced": `{name} sincronizado`,
 
     "date.today": `hoy`, "date.yesterday": `ayer`, "date.daysAgo": `hace {days} días`,
 
