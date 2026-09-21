@@ -413,6 +413,11 @@ const TEMPLATES = [
 
 /* ---- état (en mémoire — branchez votre backend ici) ---- */
 let weekOffset = 0;
+// Vue jour/semaine du calendrier (demande Rowan 18/09/2026, surtout pour
+// l'app mobile où 7 colonnes empilées sont peu lisibles). dayIndex = jour
+// affiché en vue "jour" (0=lundi..6=dimanche), init sur AUJOURD'HUI.
+let calViewMode = localStorage.getItem('sil_cal_view') || 'week';
+let dayIndex = (new Date().getDay()+6)%7;
 let mode = 'coach';
 let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
@@ -622,6 +627,7 @@ function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
 function iso(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 const DAYS = [tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort'),tr('day.sunShort')];
 const fmt = new Intl.DateTimeFormat(localeStr(),{day:'numeric',month:'short'});
+const fmtDayFull = new Intl.DateTimeFormat(localeStr(),{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
 const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null, cyclePhase:null, cycleDay:null };
@@ -2428,7 +2434,10 @@ function currentRace(){
 function render(){
   const mon = mondayOf(weekOffset);
   const sun = addDays(mon,6);
-  weekLabel.textContent = `${fmt.format(mon)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
+  weekLabel.textContent = (calViewMode==='day')
+    ? fmtDayFull.format(addDays(mon,dayIndex))
+    : `${fmt.format(mon)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
+  calGrid.classList.toggle('cal-grid-day', calViewMode==='day');
   calGrid.innerHTML='';
   const todayIso = iso(new Date());
   const race = currentRace();
@@ -2467,6 +2476,7 @@ function render(){
     const day = document.createElement('div');
     day.className = 'day'+(key===todayIso?' today':'')+(isRace?' day-race':'')+(inTaper?' day-taper':'');
     day.dataset.date = key;
+    if(calViewMode==='day' && i!==dayIndex) day.style.display='none';
     day.innerHTML = `
       <div class="day-head">
         <span class="dname">${DAYS[i]}</span>
@@ -3297,8 +3307,32 @@ window.__pf_lockModes = function(realMode){
 };
 
 /* ---- navigation & modes ---- */
-document.getElementById('prevWeek').onclick = ()=>{ weekOffset--; render() };
-document.getElementById('nextWeek').onclick = ()=>{ weekOffset++; render() };
+document.getElementById('prevWeek').onclick = ()=>{
+  if(calViewMode==='day'){ dayIndex--; if(dayIndex<0){ dayIndex=6; weekOffset--; } }
+  else weekOffset--;
+  render();
+};
+document.getElementById('nextWeek').onclick = ()=>{
+  if(calViewMode==='day'){ dayIndex++; if(dayIndex>6){ dayIndex=0; weekOffset++; } }
+  else weekOffset++;
+  render();
+};
+document.querySelectorAll('#calViewToggle .cvt-btn').forEach(b=>{
+  const on = b.dataset.view===calViewMode;
+  b.classList.toggle('active', on);
+  b.setAttribute('aria-selected', on ? 'true':'false');
+  b.addEventListener('click', ()=>{
+    if(b.dataset.view===calViewMode) return;
+    calViewMode = b.dataset.view;
+    localStorage.setItem('sil_cal_view', calViewMode);
+    document.querySelectorAll('#calViewToggle .cvt-btn').forEach(x=>{
+      x.classList.toggle('active', x===b);
+      x.setAttribute('aria-selected', x===b ? 'true':'false');
+    });
+    window.silHaptic?.('light');
+    render();
+  });
+});
 const mc = document.getElementById('modeCoach'), ma = document.getElementById('modeAthlete'), mcl = document.getElementById('modeClub');
 function setActiveMode(btn){
   [mc,ma,mcl].forEach(b=>b.classList.remove('active')); btn.classList.add('active');
@@ -4794,11 +4828,34 @@ function defaultRecap(type){
     });
     return {segments:segs, roxzone:{time:'', hr:''}};
   }
-  if(type==='tri') return {swim:{time:''}, bike:{time:'', watts:'', hr:''}, splits:[{km:1,time:'',hr:''}]};
+  if(type==='tri') return {
+    swim:{time:'', pace:'', hr:''}, t1:'',
+    bike:{time:'', watts:'', np:'', hr:'', hrMax:''}, t2:'',
+    splits:[{km:1,time:'',hr:''}], runHrMax:'',
+    rank:{scratch:'', total:'', cat:'', catLabel:''},
+    cond:{temp:'', wind:'', dplusBike:'', dplusRun:''},
+    nutrition:{pre:{carbs:'',liquid:'',note:''}, swim:{note:''}, bike:{carbs:'',liquid:'',note:''}, run:{carbs:'',liquid:'',note:''}},
+  };
   return {splits:[{km:1,time:'',hr:''}]};
 }
 function ensureRecap(race){
   if(!race.recap) race.recap = defaultRecap(race.type||'run');
+  // Rétro-compatibilité : un recap tri créé avant l'ajout de T1/T2/nutrition/
+  // classement/conditions n'a pas ces clés — on les complète sans écraser ce
+  // qui existe déjà, pour ne pas perdre les recaps déjà saisis.
+  if((race.type||'run')==='tri'){
+    const r=race.recap, d=defaultRecap('tri');
+    r.swim = Object.assign({}, d.swim, r.swim);
+    r.bike = Object.assign({}, d.bike, r.bike);
+    r.t1 = r.t1||''; r.t2 = r.t2||''; r.runHrMax = r.runHrMax||'';
+    r.rank = Object.assign({}, d.rank, r.rank);
+    r.cond = Object.assign({}, d.cond, r.cond);
+    r.nutrition = r.nutrition||{};
+    r.nutrition.pre = Object.assign({}, d.nutrition.pre, r.nutrition.pre);
+    r.nutrition.swim = Object.assign({}, d.nutrition.swim, r.nutrition.swim);
+    r.nutrition.bike = Object.assign({}, d.nutrition.bike, r.nutrition.bike);
+    r.nutrition.run = Object.assign({}, d.nutrition.run, r.nutrition.run);
+  }
   return race.recap;
 }
 function recapAllTimes(recap){
@@ -4808,11 +4865,14 @@ function recapAllTimes(recap){
   if(recap.bike && recap.bike.time){ const t=parseClock(recap.bike.time); if(t) times.push(t); }
   if(recap.segments) recap.segments.forEach(s=>{ const t=parseClock(s.time); if(t) times.push(t); });
   if(recap.roxzone && recap.roxzone.time){ const t=parseClock(recap.roxzone.time); if(t) times.push(t); }
+  if(recap.t1){ const t=parseClock(recap.t1); if(t) times.push(t); }
+  if(recap.t2){ const t=parseClock(recap.t2); if(t) times.push(t); }
   return times;
 }
 function recapAllHr(recap){
   const hrs=[];
   if(recap.splits) recap.splits.forEach(s=>{ if(s.hr) hrs.push(+s.hr); });
+  if(recap.swim && recap.swim.hr) hrs.push(+recap.swim.hr);
   if(recap.bike && recap.bike.hr) hrs.push(+recap.bike.hr);
   if(recap.segments) recap.segments.forEach(s=>{ if(s.hr) hrs.push(+s.hr); });
   if(recap.roxzone && recap.roxzone.hr) hrs.push(+recap.roxzone.hr);
@@ -4852,20 +4912,67 @@ function renderRecapBody(race){
   let html='';
   if(type==='tri'){
     html += `<div class="recap-section">
+      <h4><i class="ic ic-flag"></i> ${tr('recap.raceInfo')}</h4>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <label><span>${tr('recap.rankScratch')}</span><input type="number" min="0" placeholder="—" data-tri="rankScratch" value="${recap.rank.scratch}"></label>
+        <label><span>${tr('recap.rankTotal')}</span><input type="number" min="0" placeholder="—" data-tri="rankTotal" value="${recap.rank.total}"></label>
+        <label><span>${tr('recap.rankCat')}</span><input type="number" min="0" placeholder="—" data-tri="rankCat" value="${recap.rank.cat}"></label>
+        <label><span>${tr('recap.catLabel')}</span><input type="text" placeholder="V2H" data-tri="catLabel" value="${recap.rank.catLabel}"></label>
+      </div>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <label><span>${tr('recap.temp')}</span><input type="number" placeholder="—" data-tri="temp" value="${recap.cond.temp}"></label>
+        <label><span>${tr('recap.wind')}</span><input type="number" min="0" placeholder="—" data-tri="wind" value="${recap.cond.wind}"></label>
+        <label><span>${tr('recap.dplusBike')}</span><input type="number" min="0" placeholder="—" data-tri="dplusBike" value="${recap.cond.dplusBike}"></label>
+        <label><span>${tr('recap.dplusRun')}</span><input type="number" min="0" placeholder="—" data-tri="dplusRun" value="${recap.cond.dplusRun}"></label>
+      </div>
+    </div>`;
+    html += `<div class="recap-section">
+      <h4><i class="ic ic-utensils"></i> ${tr('recap.preRaceNutrition')}</h4>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 2fr">
+        <label><span>${tr('recap.carbs')}</span><input type="number" min="0" placeholder="90" data-tri="preCarbs" value="${recap.nutrition.pre.carbs}"></label>
+        <label><span>${tr('recap.liquid')}</span><input type="number" min="0" step="0.1" placeholder="0.5" data-tri="preLiquid" value="${recap.nutrition.pre.liquid}"></label>
+        <label><span>${tr('recap.note')}</span><input type="text" placeholder="${tr('recap.notePh')}" data-tri="preNote" value="${recap.nutrition.pre.note}"></label>
+      </div>
+    </div>`;
+    html += `<div class="recap-section">
       <h4><i class="ic ic-waves"></i> ${tr('recap.swim')}</h4>
-      <div class="recap-row" style="grid-template-columns:1fr">
-        <label><span>${tr('recap.time')}</span><input type="text" placeholder="18:30" data-tri="swimTime" value="${(recap.swim&&recap.swim.time)||''}"></label>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 1fr">
+        <label><span>${tr('recap.time')}</span><input type="text" placeholder="12:34" data-tri="swimTime" value="${recap.swim.time}"></label>
+        <label><span>${tr('recap.pace100')}</span><input type="text" placeholder="1:40" data-tri="swimPace" value="${recap.swim.pace}"></label>
+        <label><span>${tr('recap.hr')}</span><input type="number" min="0" max="230" placeholder="—" data-tri="swimHr" value="${recap.swim.hr}"></label>
+      </div>
+      <div class="recap-row" style="grid-template-columns:2fr 1fr">
+        <label><span>${tr('recap.nutritionNote')}</span><input type="text" placeholder="${tr('recap.notePh')}" data-tri="swimNote" value="${recap.nutrition.swim.note}"></label>
+        <label><span>T1</span><input type="text" placeholder="1:48" data-tri="t1" value="${recap.t1}"></label>
       </div>
     </div>`;
     html += `<div class="recap-section">
       <h4><i class="ic ic-bike"></i> ${tr('recap.bike')}</h4>
-      <div class="recap-row" style="grid-template-columns:1fr 1fr 1fr">
-        <label><span>${tr('recap.time')}</span><input type="text" placeholder="1:02:00" data-tri="bikeTime" value="${(recap.bike&&recap.bike.time)||''}"></label>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
+        <label><span>${tr('recap.time')}</span><input type="text" placeholder="33:12" data-tri="bikeTime" value="${(recap.bike&&recap.bike.time)||''}"></label>
         <label><span>${tr('recap.watts')}</span><input type="number" min="0" placeholder="—" data-tri="bikeWatts" value="${(recap.bike&&recap.bike.watts)||''}"></label>
+        <label><span>NP</span><input type="number" min="0" placeholder="—" data-tri="bikeNp" value="${recap.bike.np}"></label>
         <label><span>${tr('recap.hr')}</span><input type="number" min="0" max="230" placeholder="—" data-tri="bikeHr" value="${(recap.bike&&recap.bike.hr)||''}"></label>
+        <label><span>${tr('recap.hrMax')}</span><input type="number" min="0" max="230" placeholder="—" data-tri="bikeHrMax" value="${recap.bike.hrMax}"></label>
+      </div>
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 2fr">
+        <label><span>${tr('recap.carbs')}</span><input type="number" min="0" placeholder="45" data-tri="bikeCarbs" value="${recap.nutrition.bike.carbs}"></label>
+        <label><span>${tr('recap.liquid')}</span><input type="number" min="0" step="0.1" placeholder="0.4" data-tri="bikeLiquid" value="${recap.nutrition.bike.liquid}"></label>
+        <label><span>${tr('recap.note')}</span><input type="text" placeholder="${tr('recap.notePh')}" data-tri="bikeNote" value="${recap.nutrition.bike.note}"></label>
+      </div>
+      <div class="recap-row" style="grid-template-columns:1fr">
+        <label><span>T2</span><input type="text" placeholder="0:52" data-tri="t2" value="${recap.t2}"></label>
       </div>
     </div>`;
     html += splitsSectionHTML(recap.splits, 'recap.run', 'ic-run');
+    html += `<div class="recap-section">
+      <div class="recap-row" style="grid-template-columns:1fr 1fr 2fr 2fr">
+        <label><span>${tr('recap.hrMax')}</span><input type="number" min="0" max="230" placeholder="—" data-tri="runHrMax" value="${recap.runHrMax}"></label>
+        <label><span>${tr('recap.carbs')}</span><input type="number" min="0" placeholder="20" data-tri="runCarbs" value="${recap.nutrition.run.carbs}"></label>
+        <label><span>${tr('recap.liquid')}</span><input type="number" min="0" step="0.1" placeholder="0.15" data-tri="runLiquid" value="${recap.nutrition.run.liquid}"></label>
+        <label><span>${tr('recap.note')}</span><input type="text" placeholder="${tr('recap.notePh')}" data-tri="runNote" value="${recap.nutrition.run.note}"></label>
+      </div>
+    </div>`;
   } else if(type==='hyrox'){
     html += `<div class="recap-section">
       <h4><i class="ic ic-shoe"></i> ${tr('recap.roxzone')}</h4>
@@ -4893,12 +5000,28 @@ function renderRecapBody(race){
 function wireRecapBody(race){
   const recap=ensureRecap(race);
   const box=document.getElementById('recapBody');
+  const TRI_FIELDS = {
+    swimTime:['swim','time'], swimPace:['swim','pace'], swimHr:['swim','hr'],
+    bikeTime:['bike','time'], bikeWatts:['bike','watts'], bikeNp:['bike','np'],
+    bikeHr:['bike','hr'], bikeHrMax:['bike','hrMax'],
+    t1:null, t2:null, runHrMax:null,
+    rankScratch:['rank','scratch'], rankTotal:['rank','total'], rankCat:['rank','cat'], catLabel:['rank','catLabel'],
+    temp:['cond','temp'], wind:['cond','wind'], dplusBike:['cond','dplusBike'], dplusRun:['cond','dplusRun'],
+    preCarbs:['nutrition','pre','carbs'], preLiquid:['nutrition','pre','liquid'], preNote:['nutrition','pre','note'],
+    swimNote:['nutrition','swim','note'],
+    bikeCarbs:['nutrition','bike','carbs'], bikeLiquid:['nutrition','bike','liquid'], bikeNote:['nutrition','bike','note'],
+    runCarbs:['nutrition','run','carbs'], runLiquid:['nutrition','run','liquid'], runNote:['nutrition','run','note'],
+  };
   box.querySelectorAll('[data-tri]').forEach(inp=>inp.addEventListener('input',()=>{
     const f=inp.dataset.tri;
-    if(f==='swimTime'){ recap.swim=recap.swim||{}; recap.swim.time=inp.value; }
-    if(f==='bikeTime'){ recap.bike=recap.bike||{}; recap.bike.time=inp.value; }
-    if(f==='bikeWatts'){ recap.bike=recap.bike||{}; recap.bike.watts=inp.value; }
-    if(f==='bikeHr'){ recap.bike=recap.bike||{}; recap.bike.hr=inp.value; }
+    const path=TRI_FIELDS[f];
+    if(path===undefined){ /* champ inconnu, ignoré */ }
+    else if(path===null){ recap[f]=inp.value; }
+    else{
+      let node=recap;
+      for(let i=0;i<path.length-1;i++){ node[path[i]]=node[path[i]]||{}; node=node[path[i]]; }
+      node[path[path.length-1]]=inp.value;
+    }
     renderRecapSummary(race);
   }));
   box.querySelectorAll('[data-rox]').forEach(inp=>inp.addEventListener('input',()=>{
@@ -4927,15 +5050,246 @@ function wireRecapBody(race){
     renderRecapBody(race);
   });
 }
+/* Temps passé dans chaque zone (FC ou puissance) sur un segment, pondéré par
+   la durée RÉELLE entre points (pts[i].t en minutes, comme produit par
+   PFFit.buildData / _realData) — pas un comptage de points comme aiHrZone()
+   pour le bilan IA, qui fausserait la répartition avec un échantillonnage
+   irrégulier. Réutilise EXACTEMENT le référentiel de zones du reste de
+   l'app (zonesFor/INTENSITY_MODELS/ATHLETE_REF), donc respecte les zones
+   personnalisées d'un athlète si le coach en a défini.
+   N'invente rien : un intervalle sans hr/pw (capteur absent) est ignoré —
+   totalSec reste à 0 si aucune donnée valide, pour ne jamais deviner. */
+function zoneTimeDistribution(pts, modelKey, aid){
+  const model = INTENSITY_MODELS[modelKey];
+  const field = (modelKey==='ftp'||modelKey==='pma'||modelKey==='cpBike') ? 'pw' : 'hr';
+  const ref = model && model.ref ? model.ref() : null;
+  const zones = zonesFor(modelKey, aid);
+  const order = zones.map(z=>z[0]);
+  const seconds = {}; order.forEach(n=> seconds[n]=0);
+  let totalSec = 0;
+  if(ref && zones.length && Array.isArray(pts) && pts.length>1){
+    for(let i=0;i<pts.length-1;i++){
+      const a=pts[i], b=pts[i+1];
+      const dt=(b.t-a.t)*60; // minutes -> secondes
+      if(!(dt>0)) continue;
+      const va=a[field], vb=b[field];
+      if(!va || !vb) continue; // segment sans capteur : on ne devine pas
+      const pct = ((va+vb)/2)/ref*100;
+      for(const [name,lo,hi] of zones){
+        const zlo=Math.min(lo,hi), zhi=Math.max(lo,hi);
+        if(pct>=zlo && pct<=zhi){ seconds[name]+=dt; break; }
+      }
+      totalSec += dt;
+    }
+  }
+  const pct = {}; order.forEach(n=> pct[n] = totalSec ? Math.round(seconds[n]/totalSec*1000)/10 : 0);
+  return { seconds, pct, totalSec, order };
+}
+const RC_ZCOLORS = ['var(--z1)','var(--z2)','var(--z3)','var(--z4)','var(--z5)','var(--z6)'];
+function rcZoneBarHTML(pts, modelKey, aid, label){
+  if(!Array.isArray(pts) || !pts.length) return '';
+  const dist = zoneTimeDistribution(pts, modelKey, aid);
+  if(!dist.totalSec) return '';
+  const bars = dist.order.map((n,i)=>`<span style="width:${dist.pct[n]}%;background:${RC_ZCOLORS[i]||'var(--z6)'}"></span>`).join('');
+  const lbls = dist.order.map(n=>{
+    const m=Math.round(dist.seconds[n]/60);
+    return `<span>${n.replace(/^Z(\d)[^,]*/,'Z$1')}<b>${dist.pct[n]}%</b> · ${m} min</span>`;
+  }).join('');
+  return `<div class="rc-zblock"><div class="rc-zttl">${label}</div><div class="rc-zones">${bars}</div><div class="rc-zlbl">${lbls}</div></div>`;
+}
+
+/* Fiche de course en lecture seule ("vue Cockpit", DA validée 18-20/09/2026),
+   construite à partir des MÊMES données que le formulaire de saisie
+   (race.recap) — aucune saisie séparée à maintenir. Les barres de zones
+   n'apparaissent que si race._linkedActivities fournit un flux de points
+   réel pour le segment (branché quand l'association d'activité existera —
+   volontairement absent tant qu'aucune activité n'est liée, cf. principe
+   "on n'invente rien"). */
+function renderRecapCockpit(a, race){
+  const recap = ensureRecap(race);
+  const box = document.getElementById('recapCockpit');
+  const type = race.type||'run';
+  if(type!=='tri'){ box.innerHTML = `<p class="rc-empty">${tr('recap.cockpitTriOnly')}</p>`; return; }
+  const esc = s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const times = recapAllTimes(recap);
+  const total = times.length ? times.reduce((x,y)=>x+y,0) : null;
+  const runValid = (recap.splits||[]).map(s=>parseClock(s.time)).filter(Boolean);
+  const runTotal = runValid.length ? runValid.reduce((x,y)=>x+y,0) : null;
+  const runAvgPace = runValid.length ? runTotal/runValid.length : null;
+  const runHrs = (recap.splits||[]).map(s=>+s.hr).filter(Boolean);
+  const runHrAvg = runHrs.length ? Math.round(runHrs.reduce((x,y)=>x+y,0)/runHrs.length) : null;
+  const aid = a && a.id;
+  const linked = (race._linkedActivities)||{};
+
+  const telemetryCells = [];
+  if(recap.rank.scratch) telemetryCells.push({k:tr('recap.rankScratch'), v:recap.rank.scratch, s:recap.rank.total?`/${recap.rank.total}`:''});
+  if(recap.rank.cat) telemetryCells.push({k:tr('recap.rankCat'), v:recap.rank.cat, s:esc(recap.rank.catLabel)});
+  if(recap.cond.temp) telemetryCells.push({k:tr('recap.temp'), v:recap.cond.temp, s:'°C'});
+  if(recap.cond.wind) telemetryCells.push({k:tr('recap.wind'), v:recap.cond.wind, s:'km/h'});
+  const dplusTotal = (Number(recap.cond.dplusBike)||0)+(Number(recap.cond.dplusRun)||0);
+  if(dplusTotal) telemetryCells.push({k:tr('recap.dplusTotal'), v:dplusTotal, s:'m'});
+
+  let html = `<div class="rc-telemetry">${telemetryCells.length ? telemetryCells.map(c=>
+    `<div class="rc-tcell"><div class="tk">${c.k}</div><div class="tv rc-mono">${c.v}<small>${c.s}</small></div></div>`).join('')
+    : `<div class="rc-tcell" style="grid-column:1/-1"><span class="rc-note" style="margin:0">${tr('recap.noRankYet')}</span></div>`}</div>`;
+
+  html += `<div class="rc-route">
+    <div class="rc-leg" style="--c:var(--swim)"><div class="lk">${tr('recap.swim')}</div><div class="lv rc-mono">${esc(recap.swim.time)||'—'}</div><div class="ls rc-mono">${recap.swim.pace?tr('recap.pace100')+' '+esc(recap.swim.pace):''}${recap.swim.hr?' · FC '+recap.swim.hr:''}</div></div>
+    <div class="rc-trans"><div class="tk">T1</div><div class="tv rc-mono">${esc(recap.t1)||'—'}</div></div>
+    <div class="rc-leg" style="--c:var(--bike)"><div class="lk">${tr('recap.bike')}</div><div class="lv rc-mono">${esc(recap.bike.time)||'—'}</div><div class="ls rc-mono">${recap.bike.watts?recap.bike.watts+' W':''}${recap.bike.hr?' · FC '+recap.bike.hr:''}</div></div>
+    <div class="rc-trans"><div class="tk">T2</div><div class="tv rc-mono">${esc(recap.t2)||'—'}</div></div>
+    <div class="rc-leg" style="--c:var(--run)"><div class="lk">${tr('recap.run')}</div><div class="lv rc-mono">${runTotal!=null?fmtSecClock(runTotal):'—'}</div><div class="ls rc-mono">${runAvgPace!=null?fmtSecClock(runAvgPace)+'/km':''}${runHrAvg!=null?' · FC '+runHrAvg:''}</div></div>
+  </div>`;
+
+  if(recap.nutrition.pre.carbs || recap.nutrition.pre.liquid || recap.nutrition.pre.note){
+    html += `<div class="rc-panel"><h4><i class="ic ic-utensils"></i> ${tr('recap.preRaceNutrition')}</h4>
+      <div>${recap.nutrition.pre.carbs?`<span class="rc-pill">${recap.nutrition.pre.carbs} g</span>`:''}${recap.nutrition.pre.liquid?`<span class="rc-pill">${recap.nutrition.pre.liquid} L</span>`:''}</div>
+      ${recap.nutrition.pre.note?`<span class="rc-note">« ${esc(recap.nutrition.pre.note)} »</span>`:''}
+    </div>`;
+  }
+
+  const legPanel = (dotVar, title, rows, nut, zoneHtml) => `<div class="rc-panel">
+    <h4><span class="dot" style="background:var(${dotVar})"></span>${title}</h4>
+    ${rows.map(r=>`<div class="rc-row"><span class="k">${r.k}</span><span class="v rc-mono">${r.v}</span></div>`).join('')}
+    ${zoneHtml||''}
+    ${(nut.carbs||nut.liquid||nut.note)?`<div class="rc-fuel"><div class="fk">${tr('recap.nutritionNote')}</div>
+      ${nut.carbs?`<span class="rc-pill">${nut.carbs} g</span>`:''}${nut.liquid?`<span class="rc-pill">${nut.liquid} L</span>`:''}
+      ${nut.note?`<span class="rc-note">« ${esc(nut.note)} »</span>`:''}</div>`:''}
+  </div>`;
+
+  html += `<div class="rc-grid3">
+    ${legPanel('--swim', tr('recap.swim'), [
+      {k:tr('recap.time'), v:esc(recap.swim.time)||'—'},
+      {k:tr('recap.pace100'), v:esc(recap.swim.pace)||'—'},
+      {k:tr('recap.hr'), v:recap.swim.hr||'—'},
+    ], recap.nutrition.swim, rcZoneBarHTML(linked.swim, 'fc', aid, tr('recap.zoneHr')))}
+    ${legPanel('--bike', tr('recap.bike'), [
+      {k:tr('recap.time'), v:esc(recap.bike.time)||'—'},
+      {k:tr('recap.watts')+' / NP', v:`${recap.bike.watts||'—'} / ${recap.bike.np||'—'}`},
+      {k:tr('recap.hr')+' / '+tr('recap.hrMax'), v:`${recap.bike.hr||'—'} / ${recap.bike.hrMax||'—'}`},
+    ], recap.nutrition.bike, rcZoneBarHTML(linked.bike,'fc',aid,tr('recap.zoneHr')) + rcZoneBarHTML(linked.bike,'ftp',aid,tr('recap.zonePower')))}
+    ${legPanel('--run', tr('recap.run'), [
+      {k:tr('recap.time'), v:runTotal!=null?fmtSecClock(runTotal):'—'},
+      {k:tr('recap.avgPace'), v:runAvgPace!=null?fmtSecClock(runAvgPace)+'/km':'—'},
+      {k:tr('recap.hr')+' / '+tr('recap.hrMax'), v:`${runHrAvg??'—'} / ${recap.runHrMax||'—'}`},
+    ], recap.nutrition.run, rcZoneBarHTML(linked.run,'fc',aid,tr('recap.zoneHr')))}
+  </div>`;
+
+  html += `<div class="rc-cta"><button class="btn cy-ghost" id="rcCompareBtn">${tr('recap.compareBtn')}</button></div>`;
+
+  box.innerHTML = html;
+  const cmpBtn = document.getElementById('rcCompareBtn');
+  if(cmpBtn) cmpBtn.onclick = ()=>{ document.getElementById('raceRecapOverlay').classList.remove('open'); openRaceCompare(a, race); };
+}
+
+let _recapCurrentA=null, _recapCurrentRace=null;
+function setRecapView(view){
+  document.querySelectorAll('#recapViewToggle .rvt-btn').forEach(b=> b.classList.toggle('active', b.dataset.recapView===view));
+  document.getElementById('recapSummary').hidden = view!=='edit';
+  document.getElementById('recapBody').hidden = view!=='edit';
+  document.getElementById('recapCockpit').hidden = view!=='cockpit';
+  document.querySelector('.recap-modal').classList.toggle('recap-wide', view==='cockpit');
+  // La fiche visuelle est en lecture seule : la reconstruire à chaque bascule
+  // depuis race.recap (au lieu de la garder statique depuis l'ouverture)
+  // pour refléter les champs modifiés dans l'onglet Saisie entre-temps.
+  if(view==='cockpit' && _recapCurrentRace) renderRecapCockpit(_recapCurrentA, _recapCurrentRace);
+}
 function openRaceRecap(a, race){
+  _recapCurrentA=a; _recapCurrentRace=race;
   document.getElementById('recapRaceName').textContent = race.name;
   renderRecapBody(race);
+  setRecapView('edit');
   document.getElementById('raceRecapOverlay').classList.add('open');
 }
 (function initRaceRecap(){
   const ov=document.getElementById('raceRecapOverlay'); if(!ov) return;
   const close=()=>{ ov.classList.remove('open'); if(typeof renderSeasonList==='function') renderSeasonList(); };
   document.getElementById('raceRecapClose').addEventListener('click', close);
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
+  document.querySelectorAll('#recapViewToggle .rvt-btn').forEach(b=> b.addEventListener('click', ()=> setRecapView(b.dataset.recapView)));
+})();
+
+/* ============================================================
+   COMPARATEUR DE COURSES — demande Rowan 18-20/09/2026. Compare 2 courses
+   tri passées d'un même athlète (recap déjà rempli), écarts calculés en
+   vrai depuis race.recap (jamais posés à la main). ============ */
+function rcDeltaHTML(now, before, unit, lowerIsBetter){
+  if(now==null || before==null || isNaN(now) || isNaN(before)) return '';
+  const diff = now-before;
+  if(!diff) return '';
+  const good = lowerIsBetter ? diff<0 : diff>0;
+  const sign = diff>0?'+':'';
+  return `<span class="rc-delta ${good?'good':'bad'}">${sign}${unit==='clock'?fmtSecClock(Math.abs(diff)):Math.round(diff*10)/10}${unit==='clock'?'':unit}</span>`;
+}
+function rcCmpRow(label, a, b, unit, lowerIsBetter){
+  if(a==null && b==null) return '';
+  const fmt = v=> v==null?'—':(unit==='clock'?fmtSecClock(v):(Math.round(v*10)/10)+unit);
+  return `<tr><td>${label}</td><td class="num rc-mono">${fmt(a)}</td><td class="num rc-mono">${fmt(b)} ${rcDeltaHTML(b,a,unit,lowerIsBetter)}</td></tr>`;
+}
+function renderRaceCompareBody(a, raceA, raceB){
+  const box = document.getElementById('raceCompareBody');
+  const races = athRaces(a).filter(r=> r.days<0 && r.type==='tri' && r.recap);
+  const opts = (selId, selectedName)=> races.map(r=>`<option value="${r.name}" ${r.name===selectedName?'selected':''}>${r.name} · ${fmtRaceDate(r.days)}</option>`).join('');
+  let html = `<div class="rc-cmp-pick">
+    <select id="rcPickA">${opts('rcPickA', raceA && raceA.name)}</select>
+    <select id="rcPickB">${opts('rcPickB', raceB && raceB.name)}</select>
+  </div>`;
+  if(!raceA || !raceB || raceA===raceB){
+    html += `<p class="rc-empty">${tr('recap.pickTwoRaces')}</p>`;
+    box.innerHTML = html;
+    wireCompareSelects(a);
+    return;
+  }
+  const rA=ensureRecap(raceA), rB=ensureRecap(raceB);
+  const runTimeOf = r=>{ const v=(r.splits||[]).map(s=>parseClock(s.time)).filter(Boolean); return v.length?v.reduce((x,y)=>x+y,0):null; };
+  const runPaceOf = r=>{ const v=(r.splits||[]).map(s=>parseClock(s.time)).filter(Boolean); return v.length?v.reduce((x,y)=>x+y,0)/v.length:null; };
+  const totalOf = r=>{ const t=recapAllTimes(r); return t.length?t.reduce((x,y)=>x+y,0):null; };
+
+  html += `<div class="rc-cmp-head">
+    <div class="rc-cmp-card a"><h5>${raceA.name}</h5><div class="d">${fmtRaceDate(raceA.days)}${rA.rank.scratch?' · '+rA.rank.scratch+'e':''}</div></div>
+    <div class="rc-cmp-vs">${tr('common.vs')}</div>
+    <div class="rc-cmp-card"><h5>${raceB.name}</h5><div class="d">${fmtRaceDate(raceB.days)}${rB.rank.scratch?' · '+rB.rank.scratch+'e':''}</div></div>
+  </div>`;
+  html += `<div class="rc-cmp-sec">${tr('recap.swim')}</div><table class="rc-cmp">
+    ${rcCmpRow(tr('recap.time'), parseClock(rA.swim.time), parseClock(rB.swim.time), 'clock', true)}
+    ${rcCmpRow(tr('recap.hr'), +rA.swim.hr||null, +rB.swim.hr||null, '', true)}
+  </table>`;
+  html += `<div class="rc-cmp-sec">${tr('recap.bike')}</div><table class="rc-cmp">
+    ${rcCmpRow(tr('recap.time'), parseClock(rA.bike.time), parseClock(rB.bike.time), 'clock', true)}
+    ${rcCmpRow(tr('recap.watts'), +rA.bike.watts||null, +rB.bike.watts||null, 'W', false)}
+  </table>`;
+  html += `<div class="rc-cmp-sec">${tr('recap.run')}</div><table class="rc-cmp">
+    ${rcCmpRow(tr('recap.time'), runTimeOf(rA), runTimeOf(rB), 'clock', true)}
+    ${rcCmpRow(tr('recap.avgPace'), runPaceOf(rA), runPaceOf(rB), 'clock', true)}
+  </table>`;
+  html += `<div class="rc-cmp-sec">${tr('recap.transitions')}</div><table class="rc-cmp">
+    ${rcCmpRow('T1 + T2', (parseClock(rA.t1)||0)+(parseClock(rA.t2)||0)||null, (parseClock(rB.t1)||0)+(parseClock(rB.t2)||0)||null, 'clock', true)}
+  </table>`;
+  html += `<div class="rc-cmp-sec">${tr('recap.raceInfo')}</div><table class="rc-cmp">
+    ${rcCmpRow(tr('recap.rankScratch'), +rA.rank.scratch||null, +rB.rank.scratch||null, '', true)}
+    ${rcCmpRow(tr('recap.totalTime'), totalOf(rA), totalOf(rB), 'clock', true)}
+  </table>`;
+  box.innerHTML = html;
+  wireCompareSelects(a);
+}
+function wireCompareSelects(a){
+  const races = athRaces(a).filter(r=> r.days<0 && r.type==='tri' && r.recap);
+  const selA=document.getElementById('rcPickA'), selB=document.getElementById('rcPickB');
+  const byName = n=> races.find(r=>r.name===n);
+  const onChange=()=> renderRaceCompareBody(a, byName(selA.value), byName(selB.value));
+  if(selA) selA.onchange=onChange;
+  if(selB) selB.onchange=onChange;
+}
+function openRaceCompare(a, race){
+  const races = athRaces(a).filter(r=> r.days<0 && r.type==='tri' && r.recap);
+  const other = races.find(r=>r!==race);
+  renderRaceCompareBody(a, race, other||null);
+  document.getElementById('raceCompareOverlay').classList.add('open');
+}
+(function initRaceCompare(){
+  const ov=document.getElementById('raceCompareOverlay'); if(!ov) return;
+  const close=()=> ov.classList.remove('open');
+  document.getElementById('raceCompareClose').addEventListener('click', close);
   ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
 })();
 

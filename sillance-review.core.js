@@ -413,6 +413,11 @@ const TEMPLATES = [
 
 /* ---- état (en mémoire — branchez votre backend ici) ---- */
 let weekOffset = 0;
+// Vue jour/semaine du calendrier (demande Rowan 18/09/2026, surtout pour
+// l'app mobile où 7 colonnes empilées sont peu lisibles). dayIndex = jour
+// affiché en vue "jour" (0=lundi..6=dimanche), init sur AUJOURD'HUI.
+let calViewMode = localStorage.getItem('sil_cal_view') || 'week';
+let dayIndex = (new Date().getDay()+6)%7;
 let mode = 'coach';
 let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
@@ -608,6 +613,7 @@ function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
 function iso(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 const DAYS = [tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort'),tr('day.sunShort')];
 const fmt = new Intl.DateTimeFormat(localeStr(),{day:'numeric',month:'short'});
+const fmtDayFull = new Intl.DateTimeFormat(localeStr(),{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
 /* ---- état check-in & records (démo — à brancher au backend) ---- */
 const checkin = { sommeil:7, fatigue:4, motivation:8, poids:70, dispo:'ok', dispoNote:'', hrv:null, cyclePhase:null, cycleDay:null };
@@ -1485,56 +1491,68 @@ const STRAVA_DEMO_SETS = {
 const DEMO_SET_LABELS = { get triathlete(){return tr('demoSet.triathlete')}, get course(){return tr('demoSet.course')}, get hyrox(){return tr('demoSet.hyrox')}, get velo(){return tr('demoSet.velo')} };
 let stravaDemoSet = 'triathlete';   // profil démo actif (changeable via le sélecteur)
 
+// Chaque plateforme reste TOUJOURS visible avec son propre bouton
+// (Connecter / Connecté+Synchroniser+Déconnecter) — retour utilisateur
+// 17/09 : l'ancienne version basculait en mode "tout ou rien" dès qu'une
+// seule plateforme était connectée, ce qui cachait les autres connecteurs.
+const DEVICE_CONNECTORS = [
+  {key:'strava', name:'Strava', icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`},
+  {key:'polar', name:'Polar', icon:'⌚'},
+  {key:'coros', name:'Coros', icon:'⌚'},
+];
 function renderStravaCard(){
   const box=document.getElementById('stravaCard');
   if(!box) return;
-  const stravaLogo=`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
-  const SRC={strava:'Strava',garmin:'Garmin',coros:'Coros'};
-  const providers = window.__pf_providers || [];
-  if(!stravaConnected){
-    box.innerHTML=`
-      <h2>${tr('sync.title')}</h2>
-      <p class="hint" style="margin-bottom:10px">${tr('sync.connectWatch')}</p>
-      <button class="strava-connect" id="stravaConnectBtn">${stravaLogo} ${tr('sync.connectStrava')}</button>
-      <div class="dev-more">
-        <button class="dev-mini" data-p="garmin">⌚ Garmin</button>
-        <button class="dev-mini" data-p="coros">⌚ Coros</button>
-        <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle')}"><i class="ic ic-upload"></i> ${tr('sync.importFile')}</button>
-      </div>
-      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy')}</p>
-      <div class="strava-powered">${tr('sync.readOnly')}</div>`;
-    document.getElementById('stravaConnectBtn').onclick=connectStrava;
-    box.querySelectorAll('.dev-mini').forEach(b=> b.onclick=()=> connectProvider(b.dataset.p));
-  } else {
-    const escAct=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    const actsHtml = stravaActivities.length? `<div class="strava-acts">${stravaActivities.slice(0,6).map((a,i)=>{
+  const devices = window.__pf_devices || [];
+  const isConnected = p => window.PF?.user ? devices.some(d=>d.provider===p && d.connected) : (p==='strava' && stravaConnected);
+  const anyConnected = DEVICE_CONNECTORS.some(p=>isConnected(p.key));
+
+  const connectorsHtml = DEVICE_CONNECTORS.map(p=>{
+    const conn = isConnected(p.key);
+    return `<div class="dev-connector${conn?' connected':''}">
+      <span class="dc-name">${p.icon} ${p.name}</span>
+      ${conn ? `
+        <span class="dc-badge"><i class="ic ic-check"></i> ${tr('devices.connected')}</span>
+        <button class="dc-sync" data-p="${p.key}" title="${tr('sync.syncLatest')}"><i class="ic ic-refresh"></i></button>
+        <button class="dc-disconnect" data-p="${p.key}">${tr('sync.disconnect')}</button>`
+      : `<button class="dc-connect" data-p="${p.key}">${tr('devices.connectBtn',{name:p.name})}</button>`}
+    </div>`;
+  }).join('');
+
+  const SRC={strava:'Strava',garmin:'Garmin',coros:'Coros',polar:'Polar'};
+  const escAct=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const actsHtml = anyConnected ? (stravaActivities.length? `<div class="strava-acts">${stravaActivities.slice(0,6).map((a,i)=>{
       const D=DISC[a.disc]||DISC.run;
       const src = a.src? ` · ${escAct(SRC[a.src]||a.src)}` : '';
       const clickable = a.id && a.src==='strava';
       return `<div class="strava-act${clickable?' clickable':''}"${clickable?` data-idx="${i}" title="${tr('sync.seeDetailedAnalysis')}"`:''}><span class="ico">${discIcon(D)}</span><div class="ai"><div class="at">${escAct(a.name)}</div><div class="am">${fmtDur(a.dur)} · ${a.dist} km · ${escAct(a.date)}${src}</div></div></div>`;
-    }).join('')}</div>` : `<p class="hint" style="margin-top:9px">${tr('sync.noActivity')}</p>`;
-    const linked = providers.length? providers.map(p=>SRC[p]||p).join(' · ') : 'Strava';
-    box.innerHTML=`
-      <h2>${tr('sync.syncedActivities')}</h2>
-      <div class="strava-state">
-        <div class="sline"><span class="sdot"></span>${tr('sync.linkedAccounts')} : ${linked}</div>
-        <div class="smeta">${tr('sync.lastSync')} : ${stravaActivities.length?tr('sync.justNow'):tr('sync.never')}</div>
-        <button class="strava-sync" id="stravaSyncBtn">${stravaLogo} ${tr('sync.syncLatest')}</button>
-        <button class="strava-disconnect" id="stravaDisconnectBtn">${tr('sync.disconnect')}</button>
-        <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle2')}"><i class="ic ic-upload"></i> ${tr('sync.importFile2')}</button>
-      </div>
-      ${(!window.PF?.user)?`<div class="demo-pick"><span class="dp-lbl">${tr('sync.demoProfile')}</span>${Object.keys(STRAVA_DEMO_SETS).map(k=>`<button class="dp-chip${k===stravaDemoSet?' on':''}" data-set="${k}">${DEMO_SET_LABELS[k]}</button>`).join('')}</div>`:''}
-      ${actsHtml}
-      <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy2')}</p>
-      <div class="strava-powered">${tr('sync.poweredBy')}</div>`;
-    document.getElementById('stravaSyncBtn').onclick=syncStrava;
-    box.querySelectorAll('.strava-act.clickable').forEach(el=> el.onclick=()=>openStravaAnalysis(stravaActivities[+el.dataset.idx]));
-    box.querySelectorAll('.dp-chip').forEach(b=> b.onclick=()=>{ stravaDemoSet=b.dataset.set; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); });
-    document.getElementById('stravaDisconnectBtn').onclick=()=>{
-      if(window.PF?.user){ const p=providers[0]||'strava'; PF.disconnectDevice(p).then(()=>refreshDeviceState()).catch(e=>console.warn('[PF] disconnect:',e)); toast(tr('toast.compteDelie')); }
-      else { stravaConnected=false; stravaActivities=[]; renderStravaCard(); toast(tr('toast.stravaDeconnecte')); }
-    };
-  }
+    }).join('')}</div>` : `<p class="hint" style="margin-top:9px">${tr('sync.noActivity')}</p>`) : '';
+
+  box.innerHTML=`
+    <h2>${tr('sync.title')}</h2>
+    <p class="hint" style="margin-bottom:10px">${tr('sync.connectWatch')}</p>
+    <div class="dev-connectors">${connectorsHtml}</div>
+    <button class="dev-mini" id="importFitBtn" title="${tr('sync.importFileTitle2')}"><i class="ic ic-upload"></i> ${tr('sync.importFile2')}</button>
+    ${(!window.PF?.user)?`<div class="demo-pick"><span class="dp-lbl">${tr('sync.demoProfile')}</span>${Object.keys(STRAVA_DEMO_SETS).map(k=>`<button class="dp-chip${k===stravaDemoSet?' on':''}" data-set="${k}">${DEMO_SET_LABELS[k]}</button>`).join('')}</div>`:''}
+    ${actsHtml}
+    <p class="hint" style="margin-top:9px;font-size:11px;line-height:1.4">ℹ️ ${tr('sync.stravaPrivacy2')}</p>
+    <div class="strava-powered">${tr('sync.poweredBy')}</div>`;
+
+  box.querySelectorAll('.dc-connect').forEach(b=> b.onclick=()=>{
+    const p=b.dataset.p;
+    if(p==='strava') connectStrava(); else connectProvider(p);
+  });
+  box.querySelectorAll('.dc-sync').forEach(b=> b.onclick=()=>{
+    const p=b.dataset.p;
+    if(p==='strava'&&!window.PF?.user) syncStrava(); else syncProvider(p);
+  });
+  box.querySelectorAll('.dc-disconnect').forEach(b=> b.onclick=()=>{
+    const p=b.dataset.p;
+    if(!window.PF?.user){ stravaConnected=false; stravaActivities=[]; renderStravaCard(); toast(tr('toast.stravaDeconnecte')); return; }
+    disconnectProvider(p);
+  });
+  box.querySelectorAll('.strava-act.clickable').forEach(el=> el.onclick=()=>openStravaAnalysis(stravaActivities[+el.dataset.idx]));
+  box.querySelectorAll('.dp-chip').forEach(b=> b.onclick=()=>{ stravaDemoSet=b.dataset.set; stravaActivities=STRAVA_DEMO_SETS[stravaDemoSet].slice(); renderStravaCard(); });
   const ib=document.getElementById('importFitBtn'); if(ib) ib.onclick=()=>ensureFitInput().click();
 }
 
@@ -1627,6 +1645,7 @@ async function refreshDeviceState(){
     const devices = await PF.myDevices().catch(()=>[]);
     const providers = devices.filter(d=>d.connected).map(d=>d.provider);
     window.__pf_providers = providers;
+    window.__pf_devices = devices;
     stravaConnected = providers.length>0;
     if(stravaConnected){
       const acts = await PF.getActivities(8);
@@ -1649,6 +1668,21 @@ function connectProvider(p){
   if(!window.PF?.user){ toast(tr('toast.connecteToiCloudPuisReessaie')); return; }
   PF.connectDevice(p).then(r=>{ if(r&&r.pending) toast(r.message||tr('sync.integrationSoon')); })
     .catch(e=>{ console.warn('[PF] connectDevice:',e); toast(tr('toast.connexionImpossible'), 'error'); });
+}
+// Synchronisation / déconnexion génériques (n'importe quelle plateforme,
+// y compris Strava une fois réellement connecté) — chaque connecteur a son
+// propre bouton, plus un seul bouton "tout ou rien" pour toutes.
+function syncProvider(p){
+  if(!window.PF?.user){ toast(tr('toast.connecteToiCloudPuisReessaie')); return; }
+  toast(tr('sync.syncing'));
+  PF.syncDevice(p).then(()=>refreshDeviceState())
+    .then(()=>{ if(window.__pf_loadPlanningFor) window.__pf_loadPlanningFor(window.__pf_app?.getCurrentAthleteId?.()); })
+    .then(()=> toast(tr('devices.synced', {name:DEVICE_CONNECTORS.find(x=>x.key===p)?.name||p})))
+    .catch(e=>{ console.warn('[PF] syncDevice:',e); renderStravaCard(); toast(tr('toast.synchroStravaImpossible'), 'error'); });
+}
+function disconnectProvider(p){
+  PF.disconnectDevice(p).then(()=>refreshDeviceState()).then(()=>toast(tr('toast.compteDelie')))
+    .catch(e=>console.warn('[PF] disconnect:',e));
 }
 
 function fmtActDate(iso){
@@ -2267,7 +2301,10 @@ function currentRace(){
 function render(){
   const mon = mondayOf(weekOffset);
   const sun = addDays(mon,6);
-  weekLabel.textContent = `${fmt.format(mon)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
+  weekLabel.textContent = (calViewMode==='day')
+    ? fmtDayFull.format(addDays(mon,dayIndex))
+    : `${fmt.format(mon)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
+  calGrid.classList.toggle('cal-grid-day', calViewMode==='day');
   calGrid.innerHTML='';
   const todayIso = iso(new Date());
   const race = currentRace();
@@ -2306,6 +2343,7 @@ function render(){
     const day = document.createElement('div');
     day.className = 'day'+(key===todayIso?' today':'')+(isRace?' day-race':'')+(inTaper?' day-taper':'');
     day.dataset.date = key;
+    if(calViewMode==='day' && i!==dayIndex) day.style.display='none';
     day.innerHTML = `
       <div class="day-head">
         <span class="dname">${DAYS[i]}</span>
@@ -2706,7 +2744,7 @@ function sessionCard(s, dateKey){
    où elle a eu lieu. Pas d'édition (pas de drag, pas de suppression) — un clic
    ouvre l'analyse détaillée seconde-par-seconde. */
 function realisedSrcLabel(s){
-  return s==='coros'?'Coros':s==='garmin'?'Garmin':s==='upload'?tr('sync.imported'):'Strava';
+  return s==='coros'?'Coros':s==='garmin'?'Garmin':s==='polar'?'Polar':s==='upload'?tr('sync.imported'):'Strava';
 }
 function realisedCard(act){
   const D = DISC[act.disc] || {color:'var(--muted)'};
@@ -3133,8 +3171,32 @@ window.__pf_lockModes = function(realMode){
 };
 
 /* ---- navigation & modes ---- */
-document.getElementById('prevWeek').onclick = ()=>{ weekOffset--; render() };
-document.getElementById('nextWeek').onclick = ()=>{ weekOffset++; render() };
+document.getElementById('prevWeek').onclick = ()=>{
+  if(calViewMode==='day'){ dayIndex--; if(dayIndex<0){ dayIndex=6; weekOffset--; } }
+  else weekOffset--;
+  render();
+};
+document.getElementById('nextWeek').onclick = ()=>{
+  if(calViewMode==='day'){ dayIndex++; if(dayIndex>6){ dayIndex=0; weekOffset++; } }
+  else weekOffset++;
+  render();
+};
+document.querySelectorAll('#calViewToggle .cvt-btn').forEach(b=>{
+  const on = b.dataset.view===calViewMode;
+  b.classList.toggle('active', on);
+  b.setAttribute('aria-selected', on ? 'true':'false');
+  b.addEventListener('click', ()=>{
+    if(b.dataset.view===calViewMode) return;
+    calViewMode = b.dataset.view;
+    localStorage.setItem('sil_cal_view', calViewMode);
+    document.querySelectorAll('#calViewToggle .cvt-btn').forEach(x=>{
+      x.classList.toggle('active', x===b);
+      x.setAttribute('aria-selected', x===b ? 'true':'false');
+    });
+    window.silHaptic?.('light');
+    render();
+  });
+});
 const mc = document.getElementById('modeCoach'), ma = document.getElementById('modeAthlete'), mcl = document.getElementById('modeClub');
 function setActiveMode(btn){
   [mc,ma,mcl].forEach(b=>b.classList.remove('active')); btn.classList.add('active');
