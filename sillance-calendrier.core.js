@@ -4720,8 +4720,35 @@ function openMiniPrompt({title, label, value, textarea, inputType, onSave}){
    lieu, et résultat pour les courses passées (édité inline via
    openMiniPrompt). `a.races` alimente ; à défaut, on retombe sur le
    simple `a.race` déjà utilisé partout ailleurs (compat).
+   Persisté réellement (table `races`, migration 0049, 21/09/2026) — avant
+   ça, tout vivait uniquement dans ce ROSTER en mémoire et disparaissait au
+   rechargement, ce qui rendait aussi impossible le partage coach/athlète
+   pourtant demandé dès le départ. `race_date` (absolue) est convertie en
+   `days` (relatif à aujourd'hui) à CHAQUE chargement plutôt que figée une
+   fois pour toutes : elle ne dérive plus avec le temps qui passe.
    ============================================================ */
 let _seasonAth=null;
+function raceRowToObj(row){
+  const days = Math.round((new Date(row.race_date+'T00:00:00') - new Date(new Date().toDateString()))/86400000);
+  return { id:row.id, name:row.name, location:row.location, days, priority:row.priority, type:row.type, result:row.result, recap:row.recap||null };
+}
+async function ensureRacesLoaded(a){
+  if(a._racesLoaded) return;
+  if(!(window.PF && PF.user)){ a._racesLoaded = true; return; } // démo : garde le comportement mémoire existant
+  try{
+    const rows = await PF.getRaces(a.id);
+    a.races = rows.map(raceRowToObj);
+  }catch(e){ console.warn('[PF] getRaces:', e); }
+  a._racesLoaded = true;
+}
+let _recapSaveTimers = {};
+function scheduleRecapSave(race){
+  if(!race.id || !(window.PF && PF.user)) return; // course sans id serveur (démo/legacy) : rien à persister
+  clearTimeout(_recapSaveTimers[race.id]);
+  _recapSaveTimers[race.id] = setTimeout(()=>{
+    PF.updateRace(race.id, {recap: race.recap}).catch(e=>console.warn('[PF] updateRace (recap):', e));
+  }, 800);
+}
 function athRaces(a){
   if(Array.isArray(a.races) && a.races.length) return a.races;
   return a.race ? [{name:a.race.name, days:a.race.days, priority:'A', type:'run'}] : [];
@@ -4759,8 +4786,11 @@ function renderSeasonList(){
       openMiniPrompt({title:tr('season.resultFor', {name:r.name}), value:r.result||'', onSave:(v)=>{
         // retrouve l'entrée réelle dans a.races (ou la crée si on venait de a.race)
         if(!Array.isArray(a.races)) a.races = athRaces(a);
-        const target=a.races.find(x=>x.name===r.name && x.days===r.days);
-        if(target) target.result=v||null;
+        const target = r.id ? a.races.find(x=>x.id===r.id) : a.races.find(x=>x.name===r.name && x.days===r.days);
+        if(target){
+          target.result=v||null;
+          if(target.id && window.PF && PF.user) PF.updateRace(target.id, {result: target.result}).catch(e=>console.warn('[PF] updateRace (result):', e));
+        }
         renderSeasonList();
       }});
     };
@@ -4768,18 +4798,40 @@ function renderSeasonList(){
     if(rl) rl.onclick=(ev)=>{ ev.preventDefault(); openRaceRecap(a, r); };
   });
 }
-function openSeasonCalendar(a){
+async function openSeasonCalendar(a){
   _seasonAth=a;
   document.getElementById('seasonAthName').textContent=a.name;
   renderSeasonList();
   document.getElementById('seasonOverlay').classList.add('open');
+  await ensureRacesLoaded(a);
+  if(_seasonAth===a) renderSeasonList();
+}
+// Self-service athlète : jusqu'ici le calendrier de saison n'était ouvrable
+// que depuis la fiche coach (bandeau ROSTER[selectedAthleteIdx], masqué en
+// vue Athlète) — un athlète seul (avec ou sans coach) n'avait donc AUCUN
+// moyen d'ouvrir SON PROPRE calendrier. `myRacesBtn` (onglet Forme & courses)
+// corrige ça avec un objet athlète minimal construit depuis PF.user/profile,
+// mis en cache pour garder le même flag `_racesLoaded` d'un clic à l'autre.
+let _selfRaceAthlete=null;
+function selfRaceAthlete(){
+  if(!(window.PF && PF.user)) return null;
+  if(!_selfRaceAthlete || _selfRaceAthlete.id!==PF.user.id){
+    _selfRaceAthlete = { id: PF.user.id, name: (window.PF.profile && PF.profile.full_name) || tr('mode.athlete') };
+  }
+  return _selfRaceAthlete;
+}
+function myRacesAthlete(){
+  if(window.PF && PF.user) return selfRaceAthlete();
+  return ROSTER[selectedAthleteIdx] || null; // démo : même athlète que la vue Athlète démo
 }
 (function initSeasonCalendar(){
   const ov=document.getElementById('seasonOverlay'); if(!ov) return;
   const close=()=>ov.classList.remove('open');
   document.getElementById('seasonClose').addEventListener('click', close);
   ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
-  document.getElementById('seaAdd').addEventListener('click', ()=>{
+  const _mrb=document.getElementById('myRacesBtn');
+  if(_mrb) _mrb.onclick=()=>{ const a=myRacesAthlete(); if(a) openSeasonCalendar(a); };
+  document.getElementById('seaAdd').addEventListener('click', async ()=>{
     const a=_seasonAth; if(!a) return;
     const name=document.getElementById('seaName').value.trim();
     const loc=document.getElementById('seaLoc').value.trim();
@@ -4787,9 +4839,15 @@ function openSeasonCalendar(a){
     const type=document.getElementById('seaType').value;
     const prio=document.getElementById('seaPrio').value;
     if(!name || !dateVal){ toast(tr('season.fillNameDate'), 'error'); return; }
-    const days=Math.round((new Date(dateVal+'T00:00:00')-new Date(new Date().toDateString()))/86400000);
     if(!Array.isArray(a.races)) a.races = athRaces(a);
-    a.races.push({name, location:loc||null, days, priority:prio, type});
+    if(window.PF && PF.user){
+      const row = await PF.addRace({athleteId:a.id, name, location:loc||null, raceDate:dateVal, type, priority:prio});
+      if(!row){ toast(tr('season.saveError'), 'error'); return; }
+      a.races.push(raceRowToObj(row));
+    } else {
+      const days=Math.round((new Date(dateVal+'T00:00:00')-new Date(new Date().toDateString()))/86400000);
+      a.races.push({name, location:loc||null, days, priority:prio, type});
+    }
     document.getElementById('seaName').value=''; document.getElementById('seaLoc').value=''; document.getElementById('seaDate').value='';
     renderSeasonList();
     toast(tr('season.added'));
@@ -5022,32 +5080,32 @@ function wireRecapBody(race){
       for(let i=0;i<path.length-1;i++){ node[path[i]]=node[path[i]]||{}; node=node[path[i]]; }
       node[path[path.length-1]]=inp.value;
     }
-    renderRecapSummary(race);
+    renderRecapSummary(race); scheduleRecapSave(race);
   }));
   box.querySelectorAll('[data-rox]').forEach(inp=>inp.addEventListener('input',()=>{
     recap.roxzone=recap.roxzone||{};
     recap.roxzone[inp.dataset.rox]=inp.value;
-    renderRecapSummary(race);
+    renderRecapSummary(race); scheduleRecapSave(race);
   }));
   box.querySelectorAll('[data-seg-i]').forEach(row=>{
     const seg=recap.segments[+row.dataset.segI];
     row.querySelectorAll('[data-f]').forEach(inp=>inp.addEventListener('input',()=>{
-      seg[inp.dataset.f]=inp.value; renderRecapSummary(race);
+      seg[inp.dataset.f]=inp.value; renderRecapSummary(race); scheduleRecapSave(race);
     }));
   });
   box.querySelectorAll('[data-split-i]').forEach(row=>{
     const s=recap.splits[+row.dataset.splitI];
     row.querySelectorAll('[data-f]').forEach(inp=>inp.addEventListener('input',()=>{
-      s[inp.dataset.f]=inp.value; renderRecapSummary(race);
+      s[inp.dataset.f]=inp.value; renderRecapSummary(race); scheduleRecapSave(race);
     }));
   });
   box.querySelectorAll('[data-del-split]').forEach(b=>b.onclick=()=>{
     recap.splits.splice(+b.dataset.delSplit,1);
-    renderRecapBody(race);
+    renderRecapBody(race); scheduleRecapSave(race);
   });
   box.querySelectorAll('[data-add-split]').forEach(b=>b.onclick=()=>{
     recap.splits.push({km:recap.splits.length+1, time:'', hr:''});
-    renderRecapBody(race);
+    renderRecapBody(race); scheduleRecapSave(race);
   });
 }
 /* Temps passé dans chaque zone (FC ou puissance) sur un segment, pondéré par

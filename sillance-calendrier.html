@@ -1854,7 +1854,7 @@ body[data-athview] .ath-tabs{display:flex}
    masquée par défaut, un seul onglet l'affiche. Côté coach, readyhub/
    analytics/analyticsEmpty/records/gear restent gérés par le Groupe C
    ci-dessous (révélés au clic sur une séance, cf. revealAnalysis()). */
-#refsBlock,#readyhub,#checkinWrap,#athBelowGrid,
+#refsBlock,#readyhub,#checkinWrap,#seasonCard,#athBelowGrid,
 #recentRecordsCard,#analytics,#analyticsEmpty,#records,
 #athToolsGrid,#gear{display:none}
 
@@ -1862,7 +1862,8 @@ body[data-athview="home"] #refsBlock{display:block}
 body[data-athview="home"] #athBelowGrid{display:grid}
 
 body[data-athview="forme"] #readyhub,
-body[data-athview="forme"] #checkinWrap{display:block}
+body[data-athview="forme"] #checkinWrap,
+body[data-athview="forme"] #seasonCard{display:block}
 
 body[data-athview="stats"] #recentRecordsCard,
 body[data-athview="stats"] #records{display:block}
@@ -2559,6 +2560,19 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 
   <!-- ===================== FORME & COURSES : check-in du jour ===================== -->
   <div class="ath-below-card" id="checkinWrap" style="max-width:560px;margin-bottom:20px"></div>
+
+  <!-- Calendrier de saison + fiche de course, côté athlète (self-service) :
+       jusqu'ici accessible seulement depuis la fiche coach — chaque athlète
+       gère maintenant ses propres courses ici. -->
+  <div class="ath-below-card" id="seasonCard" style="max-width:560px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div>
+        <div class="ai-badge" style="margin-bottom:6px"><span class="ai-dot"></span><span data-i18n="season.myRaces">Mes courses</span></div>
+        <p class="rh-sub" style="margin:0" data-i18n="season.openMine">Voir mon calendrier de saison</p>
+      </div>
+      <button class="btn cy-ghost" id="myRacesBtn" type="button"><i class="ic ic-calendar"></i> <span data-i18n="season.btn">Saison</span></button>
+    </div>
+  </div>
 
   <!-- ===================== STATISTIQUES : records récents (résumé) ===================== -->
   <div class="records ath-below-card" id="recentRecordsCard" style="max-width:560px;margin-bottom:20px"></div>

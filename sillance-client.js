@@ -470,6 +470,40 @@ export const PF = {
     if (error) throw error; return data;
   },
 
+  // -------- CALENDRIER DE SAISON + FICHE DE COURSE (table races, migration 0049) --------
+  // athleteId par défaut = soi-même (vue Athlète) ; le coach passe l'id de
+  // l'athlète depuis la fiche athlète — la RLS (is_coach_of) fait la garde,
+  // pas de filtre athlete_id côté client sur update/delete (le coach doit
+  // pouvoir écrire sur des lignes qui ne sont pas les siennes).
+  async getRaces(athleteId = this.user.id) {
+    const { data, error } = await sb.from("races")
+      .select("id, name, location, race_date, type, priority, result, recap")
+      .eq("athlete_id", athleteId).order("race_date", { ascending: true });
+    if (error) { console.warn("[PF] getRaces:", error.message); return []; }
+    return data ?? [];
+  },
+  // r = { athleteId, name, location?, raceDate ('AAAA-MM-JJ'), type?, priority? }.
+  async addRace(r) {
+    const { data, error } = await sb.from("races")
+      .insert({ athlete_id: r.athleteId, name: r.name, location: r.location ?? null,
+                race_date: r.raceDate, type: r.type ?? "run", priority: r.priority ?? "C" })
+      .select().single();
+    if (error) { console.warn("[PF] addRace:", error.message); return null; }
+    return data;
+  },
+  // patch = { name?, location?, race_date?, type?, priority?, result?, recap? }.
+  async updateRace(id, patch) {
+    const { error } = await sb.from("races")
+      .update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id);
+    if (error) console.warn("[PF] updateRace:", error.message);
+    return !error;
+  },
+  async deleteRace(id) {
+    const { error } = await sb.from("races").delete().eq("id", id);
+    if (error) console.warn("[PF] deleteRace:", error.message);
+    return !error;
+  },
+
   // -------- BIBLIOTHÈQUE DE SÉANCES (coach) --------
   async getTemplates() {
     const { data, error } = await sb.from("sessions").select("*")
