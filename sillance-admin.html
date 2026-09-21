@@ -66,22 +66,48 @@
   .pill.status-none{background:var(--panel-2);color:var(--muted)}
   .pill.banned{background:rgba(255,107,129,.18);color:var(--bad)}
   .mono{font-family:ui-monospace,monospace;font-size:12px}
-  .athletes-list{font-size:12px;color:var(--muted);margin-top:3px}
-  .athletes-list summary{cursor:pointer;color:var(--accent);font-size:12px}
-  .notes-box{margin-top:6px}
-  .note-row{font-size:11.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:4px;margin-top:4px}
-  .actions{display:flex;flex-direction:column;gap:5px;min-width:150px}
-  .actions .row2{display:flex;gap:5px}
-  .actions select,.actions input[type=number]{flex:1;padding:5px 7px;font-size:12px}
-  .actions .btn{font-size:11.5px;padding:5px 8px}
+  .sync-tag{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:var(--muted);margin-top:4px}
+  .sync-tag.stripe{color:var(--good)}
+  .sync-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .manage-btn{width:100%}
   .toast{position:fixed;bottom:22px;right:22px;background:var(--panel);border:1px solid var(--line-strong);
     border-radius:10px;padding:12px 16px;font-size:13px;max-width:360px;box-shadow:0 20px 50px rgba(0,0,0,.5);
-    display:none;z-index:50}
+    display:none;z-index:80}
   .toast.err{border-color:var(--bad);color:var(--bad)}
   .toast.show{display:block}
-  #linkBox{margin-top:6px;font-size:11px;word-break:break-all;color:var(--accent)}
   [hidden]{display:none!important}
   .empty{text-align:center;color:var(--muted);padding:40px}
+
+  /* ---- Panneau de détail (piloter un compte) ---- */
+  .scrim{position:fixed;inset:0;background:rgba(4,8,18,.6);z-index:60;display:none}
+  .scrim.open{display:block}
+  .panel{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--panel);
+    border-left:1px solid var(--line-strong);z-index:61;transform:translateX(100%);transition:transform .22s ease;
+    display:flex;flex-direction:column;box-shadow:-30px 0 60px rgba(0,0,0,.4)}
+  .panel.open{transform:translateX(0)}
+  .panel-hd{padding:22px 22px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start}
+  .panel-hd .name{font-size:17px;font-weight:800}
+  .panel-hd .email{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .panel-close{background:transparent;border:none;color:var(--muted);font-size:20px;line-height:1;padding:2px 6px}
+  .panel-close:hover{color:var(--text)}
+  .panel-body{flex:1;overflow-y:auto;padding:20px 22px 30px}
+  .psec{margin-bottom:26px}
+  .psec h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin:0 0 10px}
+  .psec-hint{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;padding:9px 11px;
+    background:var(--panel-2);border-radius:8px;border:1px solid var(--line)}
+  .psec-hint.stripe{color:var(--good);border-color:rgba(62,207,142,.3)}
+  .psec-hint.manual{color:var(--accent2);border-color:rgba(255,154,61,.3)}
+  .field-row{display:flex;gap:8px}
+  .field-row select,.field-row input{flex:1}
+  .field-row .btn{flex:none}
+  .athlete-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+  .athlete-row:last-child{border-bottom:none}
+  .note-item{font-size:12.5px;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .note-item:last-child{border-bottom:none}
+  .note-item .when{color:var(--muted);font-size:10.5px;margin-top:2px}
+  .note-empty{color:var(--muted);font-size:12px;font-style:italic}
+  #linkBox{margin-top:8px;font-size:11px;word-break:break-all;color:var(--accent);background:var(--panel-2);
+    border-radius:6px;padding:8px 10px}
 </style>
 </head>
 <body>
@@ -120,7 +146,7 @@
   <table>
     <thead>
       <tr>
-        <th>Compte</th><th>Rôle</th><th>Créé le</th><th>Forfait</th><th>Athlètes</th><th>Notes</th><th>Actions</th>
+        <th>Compte</th><th>Rôle</th><th>Créé le</th><th>Forfait</th><th>Athlètes</th><th></th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
@@ -129,6 +155,46 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" aria-hidden="true">
+  <div class="panel-hd">
+    <div>
+      <div class="name" id="pName"></div>
+      <div class="email" id="pEmail"></div>
+    </div>
+    <button class="panel-close" id="panelClose" aria-label="Fermer">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="psec">
+      <h3>Forfait</h3>
+      <div id="pPlanHint" class="psec-hint"></div>
+      <div class="field-row">
+        <select id="pPlanSel"></select>
+        <button class="btn primary" id="pPlanSave">Enregistrer</button>
+      </div>
+    </div>
+    <div class="psec">
+      <h3>Compte</h3>
+      <div class="field-row">
+        <button class="btn" id="pSuspendBtn" style="flex:1"></button>
+        <button class="btn" id="pResendBtn" style="flex:1">Renvoyer un lien de connexion</button>
+      </div>
+      <div id="pLinkBox"></div>
+    </div>
+    <div class="psec" id="pAthleteSec" hidden>
+      <h3>Athlètes suivis (<span id="pAthleteCount"></span>)</h3>
+      <div id="pAthleteList"></div>
+    </div>
+    <div class="psec">
+      <h3>Notes internes</h3>
+      <div id="pNotes"></div>
+      <div class="field-row" style="margin-top:10px">
+        <input type="text" id="pNoteInp" placeholder="Ajouter une note… (Entrée pour valider)">
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script type="module">
@@ -197,22 +263,33 @@ function fmtDate(iso) {
 }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
-function planLabel(sub) {
-  if (!sub) return `<span class="pill status-none">Aucun</span>`;
-  const tier = sub.tier ? ` · palier ${sub.tier}` : "";
-  return `<span class="pill status-${sub.status}">${esc(sub.plan)}${tier} · ${esc(sub.status)}</span>`;
+// Reflète exactement la grille tarifaire de index.html#pricing (21/09/2026).
+// plan (subscriptions.plan_kind) + tier (subscriptions.tier, coach/club
+// seulement) → un seul choix humain plutôt que deux contrôles à combiner
+// de tête. "athlete" n'a pas de palier (l'app est gratuite pour l'athlète,
+// c'est son coach qui paie).
+const PLAN_OPTIONS = [
+  { plan: "coach", tier: 1, label: "Coach solo · 19 €/mois (1–10 athlètes)" },
+  { plan: "coach", tier: 2, label: "Coach solo · 29 €/mois (11–30 athlètes)" },
+  { plan: "coach", tier: 3, label: "Coach solo · 49 €/mois (31+ athlètes)" },
+  { plan: "club", tier: 1, label: "Club · 50 €/mois (≤ 50 athlètes)" },
+  { plan: "club", tier: 2, label: "Grand club · 112,50 €/mois (≤ 150 athlètes)" },
+  { plan: "club", tier: 3, label: "Club illimité · 150 €/mois (≤ 300 athlètes)" },
+  { plan: "athlete", tier: null, label: "Athlète (gratuit)" },
+];
+function planKey(plan, tier) { return `${plan}|${tier || ""}`; }
+function planOptionLabel(plan, tier) {
+  const found = PLAN_OPTIONS.find((o) => o.plan === plan && (o.tier || null) === (tier || null));
+  return found ? found.label : `${plan}${tier ? " · palier " + tier : ""}`;
+}
+
+function planBadge(sub) {
+  if (!sub) return `<span class="pill status-none">Aucun forfait</span>`;
+  return `<span class="pill status-${sub.status}">${esc(planOptionLabel(sub.plan, sub.tier))}</span>
+    <div class="sync-tag ${sub.stripe_subscription_id ? "stripe" : ""}"><span class="dot"></span>${sub.stripe_subscription_id ? "Géré par Stripe" : "Accès manuel"}</div>`;
 }
 
 function rowHTML(u) {
-  const athletesHtml = u.athleteCount
-    ? `<details class="athletes-list"><summary>${u.athleteCount} athlète${u.athleteCount > 1 ? "s" : ""}</summary>
-        ${u.athletes.map((a) => `<div>${esc(a.full_name || a.email || a.id)}</div>`).join("")}
-       </details>`
-    : `<span class="athletes-list">—</span>`;
-  const notesHtml = `<div class="notes-box">
-    ${u.notes.slice(0, 3).map((n) => `<div class="note-row">${esc(n.note)} <i>· ${fmtDate(n.created_at)}</i></div>`).join("")}
-    ${u.notes.length > 3 ? `<div class="note-row">+ ${u.notes.length - 3} autre(s)</div>` : ""}
-  </div>`;
   return `<tr data-id="${u.id}">
     <td>
       <div class="name">${esc(u.full_name || "—")} ${u.banned ? `<span class="pill banned">suspendu</span>` : ""}</div>
@@ -220,32 +297,9 @@ function rowHTML(u) {
     </td>
     <td><span class="pill role-${u.role}">${esc(u.role)}</span></td>
     <td class="mono">${fmtDate(u.created_at)}</td>
-    <td>${planLabel(u.subscription)}<div class="mono" style="color:var(--muted);margin-top:3px">${u.subscription ? "depuis " + fmtDate(u.subscription.created_at) : ""}</div></td>
-    <td>${athletesHtml}</td>
-    <td>
-      ${notesHtml}
-      <div style="margin-top:5px"><input type="text" placeholder="+ note…" class="noteInp" style="width:100%;font-size:11.5px;padding:4px 6px"></div>
-    </td>
-    <td>
-      <div class="actions">
-        <div class="row2">
-          <select class="planSel">
-            <option value="">Plan…</option>
-            <option value="coach" ${u.subscription?.plan === "coach" ? "selected" : ""}>coach</option>
-            <option value="athlete" ${u.subscription?.plan === "athlete" ? "selected" : ""}>athlete</option>
-            <option value="club" ${u.subscription?.plan === "club" ? "selected" : ""}>club</option>
-          </select>
-          <button class="btn setPlanBtn">OK</button>
-        </div>
-        <div class="row2">
-          <input type="number" min="1" max="3" placeholder="Palier" class="tierInp" value="${u.subscription?.tier ?? ""}">
-          <button class="btn setTierBtn">OK</button>
-        </div>
-        <button class="btn ${u.banned ? "" : "danger"} suspendBtn">${u.banned ? "Réactiver" : "Suspendre"}</button>
-        <button class="btn resendBtn">Renvoyer email</button>
-        <div id="link-${u.id}"></div>
-      </div>
-    </td>
+    <td>${planBadge(u.subscription)}</td>
+    <td>${u.athleteCount || "—"}</td>
+    <td><button class="btn manage-btn manageBtn">Gérer →</button></td>
   </tr>`;
 }
 
@@ -261,39 +315,125 @@ function renderRows() {
 
 function wireRowActions() {
   document.querySelectorAll("#rows tr").forEach((tr) => {
-    const id = tr.dataset.id;
-    tr.querySelector(".setPlanBtn").onclick = async () => {
-      const plan = tr.querySelector(".planSel").value;
-      if (!plan) return toast("Choisis un plan d'abord.", true);
-      try { const r = await callAdmin("setPlan", { userId: id, plan }); toast(r.warning || "Plan mis à jour."); await load(); }
-      catch (e) { toast(e.message, true); }
-    };
-    tr.querySelector(".setTierBtn").onclick = async () => {
-      const tier = +tr.querySelector(".tierInp").value || null;
-      try { await callAdmin("setTier", { userId: id, tier }); toast("Palier mis à jour."); await load(); }
-      catch (e) { toast(e.message, true); }
-    };
-    tr.querySelector(".suspendBtn").onclick = async () => {
-      const willSuspend = tr.querySelector(".suspendBtn").textContent.trim() === "Suspendre";
-      if (!confirm(willSuspend ? "Suspendre ce compte ?" : "Réactiver ce compte ?")) return;
-      try { await callAdmin("suspend", { userId: id, suspend: willSuspend }); toast(willSuspend ? "Compte suspendu." : "Compte réactivé."); await load(); }
-      catch (e) { toast(e.message, true); }
-    };
-    tr.querySelector(".resendBtn").onclick = async () => {
-      try {
-        const r = await callAdmin("resendEmail", { userId: id, type: "recovery" });
-        const box = document.getElementById(`link-${id}`);
-        box.innerHTML = `<div id="linkBox">Lien (au cas où l'email n'arrive pas) : <a href="${r.actionLink}" target="_blank" rel="noopener">ouvrir</a></div>`;
-        toast("Lien généré — l'envoi automatique dépend du SMTP configuré côté Auth.");
-      } catch (e) { toast(e.message, true); }
-    };
-    tr.querySelector(".noteInp").addEventListener("keydown", async (e) => {
-      if (e.key !== "Enter" || !e.target.value.trim()) return;
-      try { await callAdmin("addNote", { userId: id, note: e.target.value.trim() }); e.target.value = ""; toast("Note ajoutée."); await load(); }
-      catch (err) { toast(err.message, true); }
-    });
+    tr.querySelector(".manageBtn").onclick = () => openPanel(tr.dataset.id);
   });
 }
+
+// ---------------------------------------------------------------------
+// Panneau "Gérer un compte" — un seul endroit pour piloter forfait,
+// suspension, renvoi d'email et notes internes, avec le lien Stripe
+// explicite (évite de deviner si une modif de forfait va "tenir").
+// ---------------------------------------------------------------------
+let panelUserId = null;
+
+function closePanel() {
+  document.getElementById("scrim").classList.remove("open");
+  document.getElementById("panel").classList.remove("open");
+  panelUserId = null;
+}
+
+function openPanel(userId) {
+  panelUserId = userId;
+  renderPanel();
+  document.getElementById("scrim").classList.add("open");
+  document.getElementById("panel").classList.add("open");
+}
+
+function renderPanel() {
+  const u = USERS.find((x) => x.id === panelUserId);
+  if (!u) return closePanel();
+
+  document.getElementById("pName").textContent = u.full_name || "(sans nom)";
+  document.getElementById("pEmail").textContent = u.email || "—";
+
+  const sub = u.subscription;
+  const hintEl = document.getElementById("pPlanHint");
+  if (!sub) {
+    hintEl.className = "psec-hint";
+    hintEl.textContent = "Aucun forfait pour ce compte. Choisir un forfait ci-dessous en créera un manuellement (sans passer par Stripe).";
+  } else if (sub.stripe_subscription_id) {
+    hintEl.className = "psec-hint stripe";
+    hintEl.textContent = `Géré par un vrai abonnement Stripe (depuis ${fmtDate(sub.created_at)}). Un changement ici est temporaire : le prochain événement Stripe (renouvellement…) réécrira le forfait. Pour un changement durable, passe par Stripe.`;
+  } else {
+    hintEl.className = "psec-hint manual";
+    hintEl.textContent = `Forfait accordé manuellement (pas de paiement Stripe associé), depuis ${fmtDate(sub.created_at)}.`;
+  }
+
+  const sel = document.getElementById("pPlanSel");
+  sel.innerHTML = PLAN_OPTIONS.map((o) =>
+    `<option value="${planKey(o.plan, o.tier)}" ${sub && planKey(sub.plan, sub.tier) === planKey(o.plan, o.tier) ? "selected" : ""}>${o.label}</option>`
+  ).join("");
+  if (!sub) sel.selectedIndex = -1;
+
+  const suspendBtn = document.getElementById("pSuspendBtn");
+  suspendBtn.textContent = u.banned ? "Réactiver le compte" : "Suspendre le compte";
+  suspendBtn.className = "btn" + (u.banned ? "" : " danger");
+  document.getElementById("pLinkBox").innerHTML = "";
+
+  const athSec = document.getElementById("pAthleteSec");
+  if (u.athleteCount) {
+    athSec.hidden = false;
+    document.getElementById("pAthleteCount").textContent = u.athleteCount;
+    document.getElementById("pAthleteList").innerHTML = u.athletes
+      .map((a) => `<div class="athlete-row"><span>${esc(a.full_name || "(sans nom)")}</span><span class="mono" style="color:var(--muted)">${esc(a.email || "")}</span></div>`)
+      .join("");
+  } else {
+    athSec.hidden = true;
+  }
+
+  const notesEl = document.getElementById("pNotes");
+  notesEl.innerHTML = u.notes.length
+    ? u.notes.map((n) => `<div class="note-item">${esc(n.note)}<div class="when">${fmtDate(n.created_at)}</div></div>`).join("")
+    : `<div class="note-empty">Aucune note pour l'instant.</div>`;
+}
+
+document.getElementById("panelClose").addEventListener("click", closePanel);
+document.getElementById("scrim").addEventListener("click", closePanel);
+
+document.getElementById("pPlanSave").addEventListener("click", async () => {
+  const sel = document.getElementById("pPlanSel");
+  const opt = PLAN_OPTIONS[sel.selectedIndex];
+  if (!opt) return toast("Choisis un forfait.", true);
+  try {
+    const r = await callAdmin("setPlan", { userId: panelUserId, plan: opt.plan, tier: opt.tier });
+    toast(r.warning || "Forfait mis à jour.");
+    await load();
+    renderPanel();
+  } catch (e) { toast(e.message, true); }
+});
+
+document.getElementById("pSuspendBtn").addEventListener("click", async () => {
+  const u = USERS.find((x) => x.id === panelUserId);
+  const willSuspend = !u.banned;
+  if (!confirm(willSuspend ? "Suspendre ce compte ?" : "Réactiver ce compte ?")) return;
+  try {
+    await callAdmin("suspend", { userId: panelUserId, suspend: willSuspend });
+    toast(willSuspend ? "Compte suspendu." : "Compte réactivé.");
+    await load();
+    renderPanel();
+  } catch (e) { toast(e.message, true); }
+});
+
+document.getElementById("pResendBtn").addEventListener("click", async () => {
+  try {
+    const r = await callAdmin("resendEmail", { userId: panelUserId, type: "recovery" });
+    document.getElementById("pLinkBox").innerHTML =
+      `<div id="linkBox">Lien (au cas où l'email n'arrive pas) : <a href="${r.actionLink}" target="_blank" rel="noopener">ouvrir</a></div>`;
+    toast("Lien généré — l'envoi automatique dépend du SMTP configuré côté Auth.");
+  } catch (e) { toast(e.message, true); }
+});
+
+document.getElementById("pNoteInp").addEventListener("keydown", async (e) => {
+  if (e.key !== "Enter" || !e.target.value.trim()) return;
+  const val = e.target.value.trim();
+  e.target.value = "";
+  try {
+    await callAdmin("addNote", { userId: panelUserId, note: val });
+    toast("Note ajoutée.");
+    await load();
+    renderPanel();
+  } catch (err) { toast(err.message, true); }
+});
 
 async function load() {
   try {
