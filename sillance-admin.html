@@ -92,7 +92,7 @@
   <div class="fld"><label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username"></div>
   <div class="fld"><label for="lgPass">Mot de passe</label><input id="lgPass" type="password" autocomplete="current-password"></div>
   <div id="cf-turnstile"></div>
-  <button class="btn primary" id="lgBtn">Se connecter</button>
+  <button class="btn primary" id="lgBtn" disabled>Vérification en cours…</button>
   <div id="loginErr"></div>
 </div>
 
@@ -139,19 +139,35 @@ const TURNSTILE_SITE_KEY = "0x4AAAAAAEaRDnprER4n9rck";
 let turnstileToken = "", turnstileWidgetId = null;
 let USERS = [];
 
+// Le bouton reste désactivé tant qu'aucun jeton n'est prêt : Turnstile
+// (mode "managed") se résout tout seul en arrière-plan après le rendu, ça
+// prend un instant — envoyer captchaToken vide fait échouer signInWithPassword
+// côté Supabase Auth (constaté 21/09/2026 : "no captcha_token found").
+function setLoginReady(ready, label) {
+  const btn = document.getElementById("lgBtn");
+  btn.disabled = !ready;
+  btn.textContent = label || (ready ? "Se connecter" : "Vérification en cours…");
+}
 function renderTurnstile() {
   const el = document.getElementById("cf-turnstile");
-  if (!el || typeof window.turnstile === "undefined") return;
+  if (!el || typeof window.turnstile === "undefined") return false;
   try {
     turnstileWidgetId = window.turnstile.render(el, {
       sitekey: TURNSTILE_SITE_KEY,
-      callback: (t) => { turnstileToken = t; },
-      "error-callback": () => { turnstileToken = ""; },
-      "expired-callback": () => { turnstileToken = ""; },
+      callback: (t) => { turnstileToken = t; setLoginReady(true); },
+      "error-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification échouée — réessaie"); },
+      "expired-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification expirée — réessaie"); },
     });
-  } catch (e) { console.warn("[admin] turnstile:", e); }
+    return true;
+  } catch (e) { console.warn("[admin] turnstile:", e); return false; }
 }
-window.addEventListener("load", () => setTimeout(renderTurnstile, 300));
+// window.turnstile (chargé async/defer) n'est pas forcément prêt à window.load :
+// on retente toutes les 200 ms plutôt que de parier sur un délai fixe.
+(function waitForTurnstile(triesLeft) {
+  if (renderTurnstile()) return;
+  if (triesLeft <= 0) { setLoginReady(false, "Vérification indisponible — recharge la page"); return; }
+  setTimeout(() => waitForTurnstile(triesLeft - 1), 200);
+})(40); // ~8 s max
 
 function toast(msg, isErr) {
   const t = document.getElementById("toast");
@@ -303,6 +319,8 @@ document.getElementById("lgBtn").addEventListener("click", async () => {
   const errEl = document.getElementById("loginErr");
   errEl.textContent = "";
   if (!email || !password) { errEl.textContent = "Email et mot de passe requis."; return; }
+  if (!turnstileToken) { errEl.textContent = "Vérification anti-robot pas encore prête, réessaie dans un instant."; return; }
+  setLoginReady(false, "Connexion…");
   try {
     await PF.signIn({ email, password, captchaToken: turnstileToken });
     document.getElementById("whoEmail").textContent = PF.user.email;
@@ -311,6 +329,10 @@ document.getElementById("lgBtn").addEventListener("click", async () => {
     await load();
   } catch (e) {
     errEl.textContent = e.message || "Connexion échouée.";
+    // Le jeton vient d'être consommé (accepté ou non par Auth) : on en
+    // redemande un avant d'autoriser une nouvelle tentative.
+    turnstileToken = "";
+    setLoginReady(false, "Nouvelle vérification…");
     if (window.turnstile && turnstileWidgetId != null) window.turnstile.reset(turnstileWidgetId);
   }
 });
