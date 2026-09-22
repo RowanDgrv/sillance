@@ -3562,12 +3562,103 @@ function openInviteAthlete(){
     }
   };
 }
+
+/* Point d'entrée unique "Ajouter un athlète" depuis le sélecteur : propose
+   plusieurs façons de l'ajouter plutôt que de sauter direct sur l'email — un
+   coach qui gère un club (window.__pf_ownsClub) veut souvent piocher parmi
+   ses membres déjà inscrits sur Sillance plutôt que leur renvoyer un lien. */
+function openAddAthleteChoice(){
+  const el=document.createElement('div'); el.className='adh-overlay';
+  const hasClub = !!window.__pf_ownsClub;
+  el.innerHTML = `<div class="adh-modal" role="dialog" aria-label="Ajouter un athlète" style="max-width:480px">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>Ajouter un athlète</h3>
+    <p class="adh-sub">Choisis comment tu veux l'ajouter à ton suivi.</p>
+    <div class="addath-choices">
+      <button class="addath-choice" id="addathEmail" type="button">
+        <i class="ic ic-send"></i>
+        <span><span class="addath-t">Inviter par email</span><span class="addath-s" style="display:block">Il reçoit un lien, voit son plan une fois inscrit.</span></span>
+      </button>
+      ${hasClub?`<button class="addath-choice" id="addathClub" type="button">
+        <i class="ic ic-users"></i>
+        <span><span class="addath-t">Depuis mon club</span><span class="addath-s" style="display:block">Ajoute un membre déjà inscrit sur Sillance.</span></span>
+      </button>`:''}
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close;
+  el.addEventListener('click', e=>{ if(e.target===el) close(); });
+  document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
+  document.getElementById('addathEmail').onclick=()=>{ close(); openInviteAthlete(); };
+  const clubBtn=document.getElementById('addathClub');
+  if(clubBtn) clubBtn.onclick=()=>{ close(); openAddFromClub(); };
+}
+
+/* Liste les membres du club (inscrits sur Sillance, pas encore dans le
+   roster de ce coach) et les rattache en un clic via PF.linkAthlete
+   (coach_athlete) — évite de réinviter par email quelqu'un déjà présent. */
+async function openAddFromClub(){
+  const el=document.createElement('div'); el.className='adh-overlay';
+  el.innerHTML = `<div class="adh-modal" role="dialog" aria-label="Ajouter depuis mon club" style="max-width:480px">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>Depuis mon club</h3>
+    <p class="adh-sub">Membres inscrits sur Sillance, pas encore dans ton suivi.</p>
+    <div class="addath-memberlist" id="addathMemberList"><div class="addath-empty">Chargement…</div></div>
+  </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close;
+  el.addEventListener('click', e=>{ if(e.target===el) close(); });
+  document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
+
+  const listEl=document.getElementById('addathMemberList');
+  try{
+    const clubs = await PF.myClubs();
+    const club = clubs[0];
+    if(!club){ listEl.innerHTML=`<div class="addath-empty">Aucun club trouvé.</div>`; return; }
+    const { data: members, error } = await PF.sb.from('club_members')
+      .select('id, athlete_id, display_name, profiles:athlete_id(full_name,email)')
+      .eq('club_id', club.id);
+    if(error) throw error;
+    const already = new Set(ROSTER.map(a=>a.id));
+    const linkable = (members||[]).filter(m=>m.athlete_id && !already.has(m.athlete_id));
+    if(!linkable.length){ listEl.innerHTML=`<div class="addath-empty">Tous les membres inscrits sont déjà dans ton suivi.</div>`; return; }
+    listEl.innerHTML = linkable.map(m=>{
+      const name = esc(m.profiles?.full_name || m.display_name || '—');
+      const email = esc(m.profiles?.email || '');
+      return `<div class="addath-member">
+        <span><span class="addath-mname">${name}</span>${email?`<span class="addath-memail" style="display:block">${email}</span>`:''}</span>
+        <button class="btn sm cy-ghost" data-add="${m.athlete_id}" type="button">+ Ajouter</button>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-add]').forEach(btn=>{
+      btn.onclick=async ()=>{
+        btn.disabled=true; btn.textContent='…';
+        try{
+          await PF.linkAthlete(btn.dataset.add);
+          toast('Athlète ajouté à ton suivi.');
+          setTimeout(()=>location.reload(), 700);
+        }catch(e){
+          console.warn('[PF] linkAthlete:',e);
+          toast("Impossible d'ajouter cet athlète.", 'error');
+          btn.disabled=false; btn.textContent='+ Ajouter';
+        }
+      };
+    });
+  }catch(e){ console.warn('[PF] openAddFromClub:',e); listEl.innerHTML=`<div class="addath-empty">Erreur de chargement.</div>`; }
+}
+
+const ADD_ATH_ROW = `<div class="ap-row-add" id="apAddAthlete"><i class="ic ic-send"></i> + Ajouter un athlète</div>`;
 function renderAthPicker(){
   const btn=document.getElementById('apBtn'), menu=document.getElementById('apMenu');
   if(!btn || !menu) return;
   if(!ROSTER.length){
     btn.innerHTML = `<span>Aucun athlète</span><span class="ap-chev"></span>`;
-    menu.innerHTML = `<div class="ap-head">Aucun athlète lié. Invite ton premier athlète pour le suivre ici.</div>`;
+    menu.innerHTML = `<div class="ap-head">Aucun athlète lié pour l'instant.</div>` + ADD_ATH_ROW;
+    document.getElementById('apAddAthlete').onclick=openAddAthleteChoice;
     return;
   }
   const a = ROSTER[selectedAthleteIdx];
@@ -3577,8 +3668,9 @@ function renderAthPicker(){
     <span class="ap-forme" style="--fc:${athFormeColor(forme)}">${forme==null?'—':forme+'%'}</span>
     <span class="ap-chev"></span>`;
   menu.innerHTML = `<div class="ap-head">Mes athlètes · forme du check-in de ce matin</div>` +
-    ROSTER.map((x,i)=>apRowHtml(x,i)).join('');
+    ROSTER.map((x,i)=>apRowHtml(x,i)).join('') + ADD_ATH_ROW;
   menu.querySelectorAll('.ap-row').forEach(r=> r.onclick=()=>selectAthlete(+r.dataset.idx));
+  document.getElementById('apAddAthlete').onclick=openAddAthleteChoice;
 }
 function selectAthlete(i){
   selectedAthleteIdx = i;
