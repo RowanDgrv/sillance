@@ -4399,35 +4399,26 @@ function clubBills(){
   return bills;
 }
 
+// Pas de CA/tarifs ici (club de triathlon, pas Hyrox pour l'instant — demande
+// du 22/09/2026) : l'encaissement par formule ne s'applique pas à un club qui
+// fonctionne à la licence FFTri, ça n'aurait été qu'une info parasite pour le
+// gérant et ses adhérents.
 function renderClubDash(){
   const box=document.getElementById('clubViewDash'); if(!box) return;
   const fills=CRENEAUX.map(c=>Math.round(100*c.attendees.length/c.cap));
   const avgFill=fills.length?Math.round(fills.reduce((a,b)=>a+b,0)/fills.length):0;
   const totalIns=CRENEAUX.reduce((a,c)=>a+c.attendees.length,0);
-  const bills=clubBills();
-  const rev=bills.filter(b=>b.ok).reduce((a,b)=>a+b.amt,0);
-  const coachN=CLUB_ATHLETES.filter(a=>a.offer==='coach').length;
   const kpis=[
     {v:avgFill+'%', k:tr('clubDash.avgFill'), c:'acc'},
     {v:totalIns, k:tr('clubDash.activeRegistrations'), c:''},
-    {v:rev+' €', k:tr('clubDash.monthRevenue'), c:'good'},
-    {v:CLUB_ATHLETES.length, k:tr('clubDash.members'), c:'str', d:tr('clubDash.nInCoachPlus', {n:coachN})}
+    {v:CLUB_ATHLETES.length, k:tr('clubDash.members'), c:'str'}
   ];
   const top=CRENEAUX.slice().sort((a,b)=>(b.attendees.length/b.cap)-(a.attendees.length/a.cap)).slice(0,4);
-  const mix=CLUB_OFFERS.map(o=>({o, n:CLUB_ATHLETES.filter(a=>a.offer===o.id).length}));
-  const tot=CLUB_ATHLETES.length||1;
   box.innerHTML=`
-    <div class="cdash-kpis">${kpis.map(k=>`<div class="cdash-kpi"><div class="v ${k.c}">${k.v}</div><div class="k">${k.k}</div>${k.d?`<div class="d">${k.d}</div>`:''}</div>`).join('')}</div>
-    <div class="cdash-cols">
-      <div class="cdash-card">
-        <h4>${tr('clubDash.fullestSlots')}</h4>
-        ${top.map(c=>{const D=DISC[c.disc];const pct=Math.round(100*c.attendees.length/c.cap);return `<div class="cdash-slot"><span class="ci" style="color:${D.color}">${discIcon(D)}</span><div class="cs-b"><div class="cs-t">${c.title}</div><div class="cs-m">${CLUB_DAYS[c.day]} ${c.time} · ${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</div><div class="cs-fill ${pct>=85?'hot':''}"><i style="width:${pct}%"></i></div></div><span class="cprice ${c.price>0?'paid':'free'}">${c.price>0?c.price+' €':tr('clubDash.included')}</span></div>`;}).join('')}
-      </div>
-      <div class="cdash-card">
-        <h4>${tr('clubDash.planBreakdown')}</h4>
-        ${mix.map(({o,n})=>{const pct=Math.round(100*n/tot);const col=o.id==='coach'?'var(--accent)':o.id==='sub'?'var(--good)':'var(--bike)';return `<div class="cmix"><div class="cmix-h"><span><b>${o.name}</b> · ${o.price}€</span><span style="color:var(--muted)">${n} · ${pct}%</span></div><div class="cs-fill"><i style="width:${pct}%;background:${col}"></i></div></div>`;}).join('')}
-        <p class="cdash-note">${tr('clubDash.coachPlusMarginNote')}</p>
-      </div>
+    <div class="cdash-kpis cols3">${kpis.map(k=>`<div class="cdash-kpi"><div class="v ${k.c}">${k.v}</div><div class="k">${k.k}</div>${k.d?`<div class="d">${k.d}</div>`:''}</div>`).join('')}</div>
+    <div class="cdash-card">
+      <h4>${tr('clubDash.fullestSlots')}</h4>
+      ${top.map(c=>{const D=DISC[c.disc];const pct=Math.round(100*c.attendees.length/c.cap);return `<div class="cdash-slot"><span class="ci" style="color:${D.color}">${discIcon(D)}</span><div class="cs-b"><div class="cs-t">${c.title}</div><div class="cs-m">${CLUB_DAYS[c.day]} ${c.time} · ${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</div><div class="cs-fill ${pct>=85?'hot':''}"><i style="width:${pct}%"></i></div></div></div>`;}).join('')}
     </div>`;
 }
 
