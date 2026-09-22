@@ -4260,9 +4260,8 @@ function wireClubSillance(){
   if(tgl) tgl.onchange=()=>{ clubFounder=tgl.checked; renderClubBill(); };
   const btn=document.getElementById('clubChooseBtn');
   if(btn) btn.onclick=()=>{
-    const t=clubTierFor(clubActivated()), p=fmtEuroClub(clubTierPrice(t));
-    toast(tr('clubSub.planChosenToast', {name:t.name, p, founder: clubFounder?tr('clubSub.founderSuffix'):''}));
-    if(window.PF?.user && window.__pf_clubId && PF.saveClubPlan) PF.saveClubPlan(window.__pf_clubId, t.id, clubFounder).catch(e=>console.warn('saveClubPlan',e));
+    if(window.PF?.user && window.__pf_clubId) PF.subscribeClubPremium(window.__pf_clubId).catch(e=>{console.warn('subscribeClubPremium',e);toast(tr('toast.stripeIndisponible'), 'error');});
+    else toast(tr('toast.connecteEspaceClubPourRelier'));
   };
 }
 

@@ -499,8 +499,15 @@ body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 .season-recap-link{display:inline-block;margin-top:5px;font-size:11px;font-weight:600;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .season-result{flex:none;font-size:12.5px;font-weight:600;text-align:right;max-width:150px}
 .season-add-result{color:var(--accent);text-decoration:underline;text-underline-offset:2px;font-weight:500}
-.season-form{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 0.6fr auto;gap:8px}
-@media (max-width:560px){.season-form{grid-template-columns:1fr 1fr}}
+.season-form{display:flex;flex-wrap:wrap;gap:8px}
+.season-form input,.season-form select{min-width:0;flex:1 1 110px}
+.season-form #seaName{flex:2 1 160px}
+.season-form #seaLoc{flex:1 1 90px}
+.season-form #seaDate{flex:1 1 130px}
+.season-form #seaType{flex:1 1 120px}
+.season-form #seaPrio{flex:0 1 56px}
+.season-form #seaAdd{flex:1 1 100%;justify-content:center}
+@media (min-width:480px){.season-form #seaAdd{flex:0 0 auto}}
 
 /* ---------- Analyse de course (recap manuel : km/segments/ateliers) ---------- */
 .recap-modal{width:min(640px,100%)}

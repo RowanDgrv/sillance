@@ -758,6 +758,7 @@ const PAYMENT_RETURN_PARAMS = {
   creneau: { successValue: "paid", cancelValue: "cancel", successKey: "payReturn.creneau.success", cancelKey: "payReturn.creneau.cancel" },
   coach_connect: { successValue: "done", cancelValue: "refresh", successKey: "payReturn.coachConnect.success", cancelKey: "payReturn.coachConnect.cancel" },
   club_connect: { successValue: "done", cancelValue: "refresh", successKey: "payReturn.clubConnect.success", cancelKey: "payReturn.clubConnect.cancel" },
+  premium: { successValue: "success", cancelValue: "cancel", successKey: "payReturn.premium.success", cancelKey: "payReturn.premium.cancel" },
 };
 // Retours sans message dédié (rien de décisif ne s'est produit) : on nettoie
 // juste l'URL pour ne pas laisser un ?portal=return disgracieux dans la barre.

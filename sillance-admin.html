@@ -230,7 +230,15 @@ function renderTurnstile() {
       callback: (t) => { turnstileToken = t; setLoginReady(true); },
       "error-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification échouée — réessaie"); },
       "expired-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification expirée — réessaie"); },
+      "timeout-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification expirée — réessaie"); },
     });
+    // Filet de sécurité : render() peut réussir sans qu'aucun callback (succès,
+    // erreur, expiration) ne se déclenche jamais ensuite — observé 22/09/2026,
+    // bouton bloqué sur "Vérification en cours…" à l'infini pour un compte pas
+    // déjà connecté. Sans jeton au bout de 12s, on sort de force cet état.
+    setTimeout(() => {
+      if (!turnstileToken) setLoginReady(false, "Vérification indisponible — recharge la page");
+    }, 12000);
     return true;
   } catch (e) { console.warn("[admin] turnstile:", e); return false; }
 }
