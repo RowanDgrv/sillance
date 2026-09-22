@@ -213,6 +213,14 @@ async function hydrate() {
   // pouvait cliquer librement sur les 3 portes — pensées pour la démo/preview
   // publique, pas pour un compte connecté. Doit tourner APRÈS "coachAthletes"
   // puisque __pf_lockModes lit window.__pf_selfCoached calculé ci-dessus.
+  // Club : un coach qui possède aussi un club (clubs.owner_id) cumule les deux
+  // vues, comme l'auto-coaching débloque Athlète ci-dessus (ex. Quentin Salmon,
+  // 22/09/2026 : coach de ses athlètes + gérant de son club). Doit être connu
+  // AVANT __pf_lockModes puisque celle-ci lit window.__pf_ownsClub.
+  if (PF.profile?.role === "coach") {
+    try { window.__pf_ownsClub = (await PF.myClubs()).length > 0; }
+    catch (e) { console.warn("[PF] myClubs (lockModes) :", e); }
+  }
   if (typeof window.__pf_lockModes === "function" && PF.profile?.role) {
     const realMode = PF.profile.role === "club_admin" ? "club" : PF.profile.role;
     window.__pf_lockModes(realMode);

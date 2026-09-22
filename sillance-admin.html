@@ -193,6 +193,14 @@
       <h3>Athlètes suivis (<span id="pAthleteCount"></span>)</h3>
       <div id="pAthleteList"></div>
     </div>
+    <div class="psec" id="pClubSec" hidden>
+      <h3>Club géré</h3>
+      <div id="pClubHasBox"></div>
+      <div class="field-row" id="pClubCreateBox">
+        <input type="text" id="pClubNameInp" placeholder="Nom du club">
+        <button class="btn primary" id="pClubCreateBtn">+ Créer</button>
+      </div>
+    </div>
     <div class="psec">
       <h3>Notes internes</h3>
       <div id="pNotes"></div>
@@ -403,6 +411,24 @@ function renderPanel() {
     athSec.hidden = true;
   }
 
+  // Club géré : cumul possible avec le rôle coach (Quentin Salmon coache ses
+  // athlètes ET gère son club, 22/09/2026) — masqué pour les comptes athlète.
+  const clubSec = document.getElementById("pClubSec");
+  clubSec.hidden = u.role !== "coach";
+  if (u.role === "coach") {
+    const hasBox = document.getElementById("pClubHasBox");
+    const createBox = document.getElementById("pClubCreateBox");
+    if (u.club) {
+      hasBox.innerHTML = `<div class="psec-hint manual">Gère le club <b>${esc(u.club.name)}</b>.</div>`;
+      hasBox.hidden = false;
+      createBox.hidden = true;
+    } else {
+      hasBox.hidden = true;
+      createBox.hidden = false;
+      document.getElementById("pClubNameInp").value = "";
+    }
+  }
+
   const notesEl = document.getElementById("pNotes");
   notesEl.innerHTML = u.notes.length
     ? u.notes.map((n) => `<div class="note-item">${esc(n.note)}<div class="when">${fmtDate(n.created_at)}</div></div>`).join("")
@@ -419,6 +445,17 @@ document.getElementById("pPlanSave").addEventListener("click", async () => {
   try {
     const r = await callAdmin("setPlan", { userId: panelUserId, plan: opt.plan, tier: opt.tier });
     toast(r.warning || "Forfait mis à jour.");
+    await load();
+    renderPanel();
+  } catch (e) { toast(e.message, true); }
+});
+
+document.getElementById("pClubCreateBtn").addEventListener("click", async () => {
+  const name = document.getElementById("pClubNameInp").value.trim();
+  if (!name) return toast("Donne un nom au club.", true);
+  try {
+    await callAdmin("createClub", { userId: panelUserId, name });
+    toast("Club créé — accessible depuis l'onglet Club de l'app.");
     await load();
     renderPanel();
   } catch (e) { toast(e.message, true); }

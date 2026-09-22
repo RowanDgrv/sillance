@@ -3288,7 +3288,8 @@ function realRoleMode(){
 function guardModeSwitch(target){
   const real = realRoleMode();
   const selfCoachAllowed = real==='coach' && target==='athlete' && window.__pf_selfCoached;
-  if(real && real!==target && !selfCoachAllowed){
+  const ownsClubAllowed = real==='coach' && target==='club' && window.__pf_ownsClub;
+  if(real && real!==target && !selfCoachAllowed && !ownsClubAllowed){
     toast(tr('mode.notAvailable'));
     return false;
   }
@@ -3297,8 +3298,12 @@ function guardModeSwitch(target){
 window.__pf_lockModes = function(realMode){
   const map = {coach:mc, athlete:ma, club:mcl};
   const selfCoachUnlock = realMode==='coach' && window.__pf_selfCoached;
+  // Un coach qui possède aussi un club (clubs.owner_id) garde la vue Club
+  // accessible en plus de la sienne — cumul coach + gérant de club (ex.
+  // Quentin Salmon, 22/09/2026), même logique que l'auto-coaching ci-dessus.
+  const ownsClubUnlock = realMode==='coach' && window.__pf_ownsClub;
   Object.entries(map).forEach(([k,btn])=>{
-    const locked = k!==realMode && !(selfCoachUnlock && k==='athlete');
+    const locked = k!==realMode && !(selfCoachUnlock && k==='athlete') && !(ownsClubUnlock && k==='club');
     btn.classList.toggle('mode-locked', locked);
     btn.title = locked ? tr('mode.reservedOther') : '';
   });
