@@ -5680,11 +5680,38 @@ document.getElementById('inviteSimulate').onclick=()=>{
   toast(tr('join.newRequestReceived', {name}));
 };
 
+// Pointage manuel du coach (demande du 22/09/2026 : "si le membre ne le fait
+// pas lui-même") — affiche TOUS les adhérents du club par créneau, pas
+// seulement ceux déjà pointés, avec un clic pour bascule présent/absent.
+// Écriture réelle via PF.setPresence (creneau_attendees, RLS "club owner
+// all") quand un vrai club est chargé ; sinon (démo) juste en mémoire.
+function togglePresenceChip(creneauId, memberId){
+  const c = CRENEAUX.find(x=>x.id===creneauId); if(!c) return;
+  const i = c.attendees.indexOf(memberId);
+  const nowPresent = i===-1;
+  if(nowPresent) c.attendees.push(memberId); else c.attendees.splice(i,1);
+  renderPresence();
+  if(window.PF?.user && window.__pf_clubId){
+    PF.setPresence(creneauId, memberId, nowPresent).catch(e=>{
+      console.warn('[PF] setPresence:', e);
+      toast('Pointage impossible, réessaie.', 'error');
+      // revert optimiste en cas d'échec réel
+      const c2 = CRENEAUX.find(x=>x.id===creneauId); if(!c2) return;
+      const j = c2.attendees.indexOf(memberId);
+      if(nowPresent && j>-1) c2.attendees.splice(j,1);
+      else if(!nowPresent && j===-1) c2.attendees.push(memberId);
+      renderPresence();
+    });
+  }
+}
 function renderPresence(){
   const box=document.getElementById('presenceSummary');
   box.innerHTML = CRENEAUX.slice().sort((a,b)=>a.day-b.day).map(c=>{
     const D=DISC[c.disc];
-    const chips = c.attendees.map(id=>{ const a=CLUB_ATHLETES.find(x=>x.id===id); return a?`<span class="pres-chip"><span class="pcdot"></span>${a.name}</span>`:''; }).join('');
+    const chips = CLUB_ATHLETES.map(a=>{
+      const present = c.attendees.includes(a.id);
+      return `<span class="pres-chip toggle ${present?'':'off'}" data-cid="${c.id}" data-mid="${a.id}"><span class="pcdot"></span>${a.name}</span>`;
+    }).join('');
     return `<div class="pres-card">
       <div class="pres-head">
         <span class="pres-title">${discIcon(D)} ${c.title} <span style="color:var(--muted);font-weight:400">· ${CLUB_DAYS[c.day]} ${c.time}</span></span>
@@ -5693,6 +5720,9 @@ function renderPresence(){
       <div class="pres-list">${chips||`<span class="pres-empty">${tr('presence.noOneYet')}</span>`}</div>
     </div>`;
   }).join('');
+  box.querySelectorAll('.pres-chip.toggle').forEach(chip=>{
+    chip.onclick=()=>togglePresenceChip(chip.dataset.cid, chip.dataset.mid);
+  });
 }
 
 function switchClubView(){

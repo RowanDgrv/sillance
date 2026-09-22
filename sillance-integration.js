@@ -331,14 +331,19 @@ async function hydrate() {
       }
       const club = clubs[0];
       window.__pf_clubId = club.id;   // exposé pour les écritures (création créneau)
-      const [members, creneaux] = await Promise.all([
+      const [members, creneaux, attendance] = await Promise.all([
         PF.getClubMembers(club.id),
         PF.getCreneaux(club.id),
+        PF.getClubAttendance(club.id),
       ]);
       app.replaceArray(app.data.CLUB_ATHLETES, members.map(mapMember));
       const groups = await PF.sb.from("club_groups").select("*").eq("club_id", club.id);
       if (groups.data) app.replaceArray(app.data.CLUB_GROUPS, groups.data.map(mapGroup));
-      app.replaceArray(app.data.CRENEAUX, creneaux.map(mapCreneau));
+      // Présences réelles (audit 22/09/2026 : mapCreneau posait attendees:[]
+      // en dur, aucun pointage n'était donc jamais visible pour un vrai club).
+      const attByCreneau = {};
+      for (const a of attendance) (attByCreneau[a.creneau_id] ||= []).push(a.athlete_id);
+      app.replaceArray(app.data.CRENEAUX, creneaux.map((c) => ({ ...mapCreneau(c), attendees: attByCreneau[c.id] || [] })));
       // titre du club affiché
       const clubNameEl = document.getElementById("clubName");
       if (clubNameEl) clubNameEl.textContent = club.name;

@@ -652,6 +652,31 @@ export const PF = {
     if (error) console.warn("[PF] lecture creneaux échouée :", error.message);
     return data ?? [];
   },
+  // Présences de TOUS les créneaux du club en un appel (jointure via creneaux
+  // pour filtrer par club_id, creneau_attendees n'a pas cette colonne).
+  async getClubAttendance(clubId) {
+    const { data, error } = await sb.from("creneau_attendees")
+      .select("creneau_id, athlete_id, creneaux!inner(club_id)")
+      .eq("creneaux.club_id", clubId);
+    if (error) console.warn("[PF] lecture creneau_attendees échouée :", error.message);
+    return data ?? [];
+  },
+  // Pointage manuel par le gérant du club (RLS : "attendees: club owner all"
+  // — le membre lui-même n'a pas encore de policy d'écriture ici, cf. audit
+  // 22/09/2026 : le pointage n'était jusque-là jamais persisté, CRENEAUX
+  // arrivait toujours avec attendees:[] côté hydrate).
+  async setPresence(creneauId, memberId, present) {
+    if (present) {
+      const { error } = await sb.from("creneau_attendees")
+        .upsert({ creneau_id: creneauId, athlete_id: memberId }, { onConflict: "creneau_id,athlete_id" });
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from("creneau_attendees")
+        .delete().eq("creneau_id", creneauId).eq("athlete_id", memberId);
+      if (error) throw error;
+    }
+    return true;
+  },
   // -------- CLUB : groupes & affectation des membres --------
   async getGroups(clubId) {
     const { data, error } = await sb.from("club_groups").select("*").eq("club_id", clubId);
