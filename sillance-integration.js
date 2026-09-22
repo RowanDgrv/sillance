@@ -290,6 +290,28 @@ async function hydrate() {
       await loadPlanningFor(defaultAthleteId);
     }),
 
+    // Prochaine course réelle (calendrier de saison, migration 0049) — sans ça,
+    // currentRace() retombait sur la course de démo codée en dur (« Gorillaman
+    // J-22 ») pour TOUT compte réel n'ayant pas encore de course renseignée,
+    // affûtage inclus. Précharge la sienne (athlète) + celle de l'athlète par
+    // défaut du coach, pour que le bandeau soit juste dès l'ouverture.
+    section("races", async () => {
+      const mapRaceRow = (row) => {
+        const days = Math.round((new Date(row.race_date + "T00:00:00") - new Date(new Date().toDateString())) / 86400000);
+        return { id: row.id, name: row.name, location: row.location, days, priority: row.priority, type: row.type, result: row.result, recap: row.recap || null };
+      };
+      try {
+        window.__pf_selfRaces = (await PF.getRaces()).map(mapRaceRow);
+      } catch (e) { console.warn("[PF] getRaces (self) :", e); }
+      if (PF.profile?.role === "coach" && defaultAthleteId && defaultAthleteId !== uid && Array.isArray(window.ROSTER)) {
+        try {
+          const rows = await PF.getRaces(defaultAthleteId);
+          const entry = window.ROSTER.find((r) => r.id === defaultAthleteId);
+          if (entry) entry.races = rows.map(mapRaceRow);
+        } catch (e) { console.warn("[PF] getRaces (default athlete) :", e); }
+      }
+    }),
+
     section("videos", async () => {
       const vids = await PF.getVideos();
       if (vids.length) app.replaceArray(app.data.VIDEOS, vids.map(mapVideo));

@@ -478,6 +478,7 @@ const COACH_ROSTER = [
   gear:[]},
 ];
 let ROSTER = COACH_ROSTER;     // remplacé par le roster réel une fois connecté
+window.ROSTER = ROSTER;        // alias lecture/écriture pour sillance-integration.js (précharge des courses)
 let rosterIsReal = false;
 let selectedAthleteIdx = 0;
 let currentAthleteId = null;   // id Supabase (mode réel uniquement)
@@ -531,6 +532,7 @@ function setCoachAthletes(list, defaultId){
   ROSTER = (list||[]).map(a=>({ id:a.id, name:a.name,
     ini:(a.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
     color:'#46C2D8', checkin:a.checkin||null, race:null, refsUpdatedAt:a.refsUpdatedAt||null }));
+  window.ROSTER = ROSTER;
   rosterIsReal = true;
   selectedAthleteIdx = ROSTER.length ? Math.max(0, ROSTER.findIndex(a=>a.id===defaultId)) : 0;
   currentAthleteId = defaultId || (ROSTER[0] && ROSTER[0].id) || null;
@@ -2417,8 +2419,24 @@ function taperDaysFor(name){
   return 10;
 }
 function taperVolCut(days){ return days>=18?55 : days>=13?50 : days>=9?45 : 35; }
-/* course cible de l'athlète affiché, avec date absolue + fenêtre d'affûtage */
+/* course cible de l'athlète affiché, avec date absolue + fenêtre d'affûtage.
+   Compte réel (window.PF.user) : puise dans les VRAIES courses (calendrier de
+   saison, table races) — jamais dans UPCOMING_RACES, qui reste une donnée de
+   démo (Gorillaman J-22) pour l'aperçu marketing non connecté uniquement. */
 function currentRace(){
+  if(window.PF && window.PF.user){
+    const races = (typeof mode!=='undefined' && mode==='coach' && typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx])
+      ? ROSTER[selectedAthleteIdx].races
+      : window.__pf_selfRaces;
+    if(!Array.isArray(races) || !races.length) return null;
+    const upcoming = races.filter(r=>r.days!=null && r.days>=0).sort((a,b)=>a.days-b.days)[0];
+    if(!upcoming) return null;
+    const days = upcoming.days;
+    const date = iso(addDays(new Date(), days));
+    const taper = taperDaysFor(upcoming.name);
+    return { name:upcoming.name, days, date, taperDays:taper, taperStart: iso(addDays(new Date(), days-taper)), volCut: taperVolCut(taper) };
+  }
+  // démo (non connecté) : comportement historique inchangé
   let r=null;
   if(typeof mode!=='undefined' && mode==='coach' && typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].race){
     r = ROSTER[selectedAthleteIdx].race;
