@@ -1582,10 +1582,10 @@ function importActivityFile(file){
 function openStravaAnalysis(act){
   if(!act || !act.id){ return; }
   toast(tr('toast.chargementDetail'));
-  PF.getActivityStreams(act.id).then(points=>{
+  PF.getActivityStreams(act.id).then(({points, laps})=>{
     if(!points || !points.length){ toast(tr('toast.pasDetailSecondeParSeconde')); return; }
     const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
-    const res = PFFit.buildFromRaw(points, act.disc, [], {ftp});
+    const res = PFFit.buildFromRaw(points, act.disc, laps||[], {ftp});
     if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
     openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
   }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(tr('toast.recuperationDetailStravaImpossible'), 'error'); });
@@ -8689,21 +8689,29 @@ function injectLapCss(){
   .lapcol.on .box{background:var(--accent);border-color:var(--accent);color:#06222a}
   /* Cartes par lap façon Nolio (25/08/2026) : une petite carte par lap avec
      toutes les métriques cochées en un coup d'œil, plutôt qu'un tableau à
-     faire défiler horizontalement — plus lisible pour le coach en visu rapide. */
-  .an-laps .lap-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:10px}
-  .an-laps .lap-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:11px 13px;display:flex;flex-direction:column;gap:9px}
+     faire défiler horizontalement — plus lisible pour le coach en visu rapide.
+     Durée + allure/vitesse mises en avant dans l'en-tête de carte (23/09/2026 :
+     ce sont les 2 métriques qu'on scanne en premier sur une séance
+     fractionnée, ex. 15x30s — les sortir du reste évite d'avoir à les
+     chercher dans la grille pour chaque intervalle). */
+  .an-laps .lap-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px}
+  .an-laps .lap-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
   .an-laps .lap-card.hard{border-color:rgba(255,84,112,.4);background:rgba(255,84,112,.05)}
   .an-laps .lap-card-total{border-color:var(--accent);background:rgba(70,194,216,.07)}
   .an-laps .lap-card-total .lc-n{background:var(--accent);color:#06222a;font-size:14px}
   .an-laps .lap-card-total .lc-label{color:var(--accent)}
-  .an-laps .lc-head{display:flex;align-items:center;gap:8px}
-  .an-laps .lc-n{flex:none;width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:rgba(150,165,200,.14);font-family:var(--font-data);font-weight:700;font-size:12px}
+  .an-laps .lc-head{display:flex;align-items:center;gap:9px}
+  .an-laps .lc-n{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:rgba(150,165,200,.14);font-family:var(--font-data);font-weight:700;font-size:12.5px}
   .an-laps .lap-card.hard .lc-n{background:rgba(255,84,112,.22);color:var(--run)}
-  .an-laps .lc-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
-  .an-laps .lc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px 10px}
+  .an-laps .lc-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  .an-laps .lc-headline{display:flex;align-items:baseline;gap:9px;padding-bottom:9px;border-bottom:1px dashed var(--line)}
+  .an-laps .lc-hl-time{font-family:var(--font-data);font-size:17px;font-weight:800}
+  .an-laps .lc-hl-speed{font-family:var(--font-data);font-size:13px;color:var(--accent);font-weight:700}
+  .an-laps .lc-hl-speed small{color:var(--muted);font-weight:500;font-size:10px;font-family:var(--font-ui,inherit)}
+  .an-laps .lc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px 11px}
   .an-laps .lc-m{display:flex;flex-direction:column;gap:1px;min-width:0}
-  .an-laps .lc-k{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-  .an-laps .lc-v{font-family:var(--font-data);font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .an-laps .lc-k{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .an-laps .lc-v{font-family:var(--font-data);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .an-laps .lc-v small{color:var(--muted);font-weight:500;font-size:10px;font-family:var(--font-ui,inherit)}
   @media (max-width:480px){.an-laps .lc-metrics{grid-template-columns:1fr 1fr 1fr}}
   .an-laps .lc-lactate{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px;padding-top:8px;border-top:1px dashed var(--line)}
@@ -8791,21 +8799,28 @@ function lapLactateHTML(s, l){
   return `<label class="lc-lactate"><span class="lc-k">${tr('lactate.label')}</span>
     <input type="number" step="0.1" min="0" max="30" placeholder="—" data-lac-lap="${l.n}" value="${v}"></label>`;
 }
+function lapHeadlineHTML(l, disc){
+  const speed = disc==='bike'?l.avgSpeed.toFixed(1)+'<small> km/h</small>':(disc==='run'?paceFromSpeed(l.avgSpeed)+'<small>/km</small>':paceFromSpeed2(l.avgSpeed)+'<small>/100m</small>');
+  return `<div class="lc-headline"><span class="lc-hl-time">${fmtLapTime(l.durMin)}</span><span class="lc-hl-speed">${speed}</span></div>`;
+}
 function renderLaps(s, data, isSwim){
   const box=document.getElementById('anLaps'); const disc=data.disc; injectLapCss();
   document.getElementById('anLapHint').textContent = (isSwim?tr('lapCol.perSet'):tr('lapCol.autoSplits'))+' · '+tr('lapCol.chooseColumns');
   const cols=LAP_COLS.filter(c=>colApplies(c.app,disc));
   const sel=lapColSet(disc);
   const lbl=c=>typeof c.label==='function'?c.label(disc):c.label;
-  const tools=cols.map(c=>`<button class="lapcol ${sel.has(c.key)?'on':''}" data-k="${c.key}"><span class="box">${sel.has(c.key)?'<i class="ic ic-check"></i>':''}</span>${lbl(c)}</button>`).join('');
-  const vis=cols.filter(c=>sel.has(c.key));
+  const toggleable=cols.filter(c=>c.key!=='time'&&c.key!=='speed');
+  const tools=toggleable.map(c=>`<button class="lapcol ${sel.has(c.key)?'on':''}" data-k="${c.key}"><span class="box">${sel.has(c.key)?'<i class="ic ic-check"></i>':''}</span>${lbl(c)}</button>`).join('');
+  const vis=toggleable.filter(c=>sel.has(c.key));
   const totLap = sessionTotalsPseudoLap(data, disc);
   const totalCard = `<div class="lap-card lap-card-total">
       <div class="lc-head"><span class="lc-n">Σ</span><span class="lc-label">${tr('lapCol.sessionTotal')}</span></div>
+      ${lapHeadlineHTML(totLap, disc)}
       <div class="lc-metrics">${vis.filter(c=>c.key!=='zone'&&c.key!=='temp').map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(totLap,data,disc)}</span></div>`).join('')}</div>
     </div>`;
   const cards=data.laps.map(l=>`<div class="lap-card ${l.hard?'hard':''}">
       <div class="lc-head"><span class="lc-n">${l.n}</span><span class="lc-label">Lap ${l.n}</span></div>
+      ${lapHeadlineHTML(l, disc)}
       <div class="lc-metrics">${vis.map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(l,data,disc)}</span></div>`).join('')}</div>
       ${lapLactateHTML(s,l)}
     </div>`).join('');
