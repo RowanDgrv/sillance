@@ -7292,9 +7292,11 @@ function classifyLapTypes(laps){
     // une séance réelle 15x30s : un lap de récup à allure encore rapide était
     // mal classé "Course" par l'allure seule, correct par la durée). L'allure
     // ne tranche qu'en zone grise (± 15 % autour de la durée médiane).
-    const durRatio=l.durMin/medDur;
-    if(durRatio<0.85) return 'work';
-    if(durRatio>1.15) return 'recovery';
+    // Comparaison stricte à la médiane (pas de zone grise à tolérance fixe :
+    // un split 30s/40s est à ±14% de sa médiane, une bande ±15% le ratait).
+    // L'allure ne tranche qu'en cas d'égalité exacte (rare).
+    if(l.durMin<medDur) return 'work';
+    if(l.durMin>medDur) return 'recovery';
     return l.avgSpeed>=medSpeed ? 'work' : 'recovery';
   });
 }
