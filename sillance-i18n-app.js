@@ -825,6 +825,8 @@
     "decouple.warmupAbbr": `échauf.`,
     "decouple.half1": `1ʳᵉ ½`, "decouple.half2": `2ᵉ ½`, "decouple.trend": `Tendance`,
     "decouple.hintBike": `Puissance / FC (Pw:Hr)`, "decouple.hintRun": `Allure corrigée / FC (Pa:Hr)`,
+    "decouple.whatBike": `Compare ta puissance par battement de cœur entre la 1ʳᵉ et la 2ᵉ moitié de la sortie : si elle baisse, ton corps a dû forcer plus le cœur pour tenir le même effort — signe de fatigue.`,
+    "decouple.whatRun": `Compare ton allure par battement de cœur entre la 1ʳᵉ et la 2ᵉ moitié de la séance : si elle baisse, ton cœur a dû accélérer pour tenir la même allure — signe de fatigue.`,
 
     "ai.plannedVsDone": `Prévu {planned} · réalisé {done} ({sign}{pct}%)`,
     "ai.recoShortened": `Séance écourtée par rapport au plan : vérifier fatigue ou contrainte horaire, replanifier le volume manquant si besoin.`,
@@ -876,6 +878,8 @@
     "lapCol.notEnoughLaps": `Pas assez de laps pour un visuel.`,
     "lapCol.paceSpeedLap": `Allure/vitesse · lap {n}`, "lapCol.avgHrLap": `FC moyenne · lap {n}`,
     "lapCol.perSet": `par série`, "lapCol.autoSplits": `splits automatiques`, "lapCol.chooseColumns": `colonnes au choix`,
+    "lapCol.lap": `Tour`, "lapCol.cumTime": `Temps total`, "lapCol.best": `Meilleur tour`,
+    "lapType.warmup": `Échauffement`, "lapType.work": `Course`, "lapType.recovery": `Retour au calme`,
 
     "runTile.strideLen": `Longueur de foulée`, "runTile.strideLenDetail": `à {cad} pas/min`,
     "runTile.runPower": `Puissance de course`, "runTile.runPowerDetail": `si capteur type Stryd`,
@@ -2186,6 +2190,8 @@
     "decouple.warmupAbbr": `warm-up`,
     "decouple.half1": `1st ½`, "decouple.half2": `2nd ½`, "decouple.trend": `Trend`,
     "decouple.hintBike": `Power / HR (Pw:Hr)`, "decouple.hintRun": `Grade-adjusted pace / HR (Pa:Hr)`,
+    "decouple.whatBike": `Compares your power per heartbeat between the 1st and 2nd half of the ride: if it drops, your heart had to work harder to hold the same effort — a sign of fatigue.`,
+    "decouple.whatRun": `Compares your pace per heartbeat between the 1st and 2nd half of the session: if it drops, your heart had to speed up to hold the same pace — a sign of fatigue.`,
 
     "ai.plannedVsDone": `Planned {planned} · done {done} ({sign}{pct}%)`,
     "ai.recoShortened": `Session cut short vs plan: check fatigue or time constraints, reschedule the missing volume if needed.`,
@@ -2237,6 +2243,8 @@
     "lapCol.notEnoughLaps": `Not enough laps for a visual.`,
     "lapCol.paceSpeedLap": `Pace/speed · lap {n}`, "lapCol.avgHrLap": `Average HR · lap {n}`,
     "lapCol.perSet": `per set`, "lapCol.autoSplits": `automatic splits`, "lapCol.chooseColumns": `choose columns`,
+    "lapCol.lap": `Lap`, "lapCol.cumTime": `Total time`, "lapCol.best": `Best lap`,
+    "lapType.warmup": `Warm-up`, "lapType.work": `Active`, "lapType.recovery": `Recovery`,
 
     "runTile.strideLen": `Stride length`, "runTile.strideLenDetail": `at {cad} steps/min`,
     "runTile.runPower": `Running power`, "runTile.runPowerDetail": `if using a Stryd-type sensor`,
@@ -3545,6 +3553,8 @@
     "decouple.warmupAbbr": `calent.`,
     "decouple.half1": `1ª ½`, "decouple.half2": `2ª ½`, "decouple.trend": `Tendencia`,
     "decouple.hintBike": `Potencia / FC (Pw:Hr)`, "decouple.hintRun": `Ritmo corregido / FC (Pa:Hr)`,
+    "decouple.whatBike": `Compara tu potencia por latido entre la 1ª y la 2ª mitad de la salida: si baja, tu corazón tuvo que esforzarse más para mantener el mismo esfuerzo — señal de fatiga.`,
+    "decouple.whatRun": `Compara tu ritmo por latido entre la 1ª y la 2ª mitad de la sesión: si baja, tu corazón tuvo que acelerar para mantener el mismo ritmo — señal de fatiga.`,
 
     "ai.plannedVsDone": `Previsto {planned} · realizado {done} ({sign}{pct}%)`,
     "ai.recoShortened": `Sesión acortada respecto al plan: comprueba fatiga o restricción horaria, replanifica el volumen que falta si es necesario.`,
@@ -3596,6 +3606,8 @@
     "lapCol.notEnoughLaps": `No hay suficientes laps para un visual.`,
     "lapCol.paceSpeedLap": `Ritmo/velocidad · lap {n}`, "lapCol.avgHrLap": `FC media · lap {n}`,
     "lapCol.perSet": `por serie`, "lapCol.autoSplits": `splits automáticos`, "lapCol.chooseColumns": `columnas a elegir`,
+    "lapCol.lap": `Vuelta`, "lapCol.cumTime": `Tiempo total`, "lapCol.best": `Mejor vuelta`,
+    "lapType.warmup": `Calentamiento`, "lapType.work": `Carrera`, "lapType.recovery": `Recuperación`,
 
     "runTile.strideLen": `Longitud de zancada`, "runTile.strideLenDetail": `a {cad} pasos/min`,
     "runTile.runPower": `Potencia de carrera`, "runTile.runPowerDetail": `si usas un sensor tipo Stryd`,

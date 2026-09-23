@@ -83,13 +83,20 @@
   // 85=step_length (dynamiques de course, présent seulement sur les montres
   // avec capteur RD type Coros/Garmin — jamais inventé si absent du fichier).
   const REC_FIELDS = { 253:'timestamp', 0:'lat', 1:'lon', 2:'alt', 78:'ealt', 3:'hr', 4:'cad', 5:'dist', 6:'spd', 73:'espd', 7:'pw', 85:'steplen' };
-  // Message "lap" (global msg 19) : on ne lit que sa timestamp (253), qui
-  // marque la FIN du lap dans le protocole FIT — posée par la montre à
-  // chaque lap manuel ou auto (ex. chaque phase d'un entraînement fractionné
-  // structuré : échauffement / gammes / répétition / récup ont chacune leur
-  // message lap). Sans ça on retombait sur un découpage régulier qui mélange
-  // effort et récup dans le même lap (signalé 25/08/2026).
-  const LAP_FIELDS = { 253:'timestamp' };
+  // Message "lap" (global msg 19) : timestamp (253) marque la FIN du lap dans
+  // le protocole FIT — posée par la montre à chaque lap manuel ou auto (ex.
+  // chaque phase d'un entraînement fractionné structuré : échauffement /
+  // gammes / répétition / récup ont chacune leur message lap). Sans ça on
+  // retombait sur un découpage régulier qui mélange effort et récup dans le
+  // même lap (signalé 25/08/2026).
+  // 23/09/2026 : on lit aussi les stats déjà calculées par la montre pour
+  // CE lap (total_timer_time = temps de mouvement, hors pause — 8 ; distance
+  // — 9 ; FC/vitesse/puissance/cadence moy. — 15/13/19/17 ; D+ — 21), pour
+  // les préférer au recalcul par différence brute de temps entre points dans
+  // buildLaps() : ce recalcul explose dès qu'une pause réelle tombe dans un
+  // lap (temps "écoulé" ≠ temps "de mouvement" — même bug que côté Strava,
+  // cf. normalizeStravaLaps côté backend).
+  const LAP_FIELDS = { 253:'timestamp', 7:'elapsedTime', 8:'timerTime', 9:'totalDist', 13:'avgSpeed', 15:'avgHr', 16:'maxHr', 17:'avgCad', 19:'avgPower', 21:'ascent' };
 
   function readFitArrayBuffer(buf) {
     const view = new DataView(buf);
@@ -104,6 +111,7 @@
     const localDefs = {};
     const raw = [];
     const lapEnds = []; // timestamps FIT (secondes) de fin de chaque lap réel
+    const lapStats = []; // stats officielles de la montre, parallèle à lapEnds
     let lastTimestamp = null; // secondes FIT, pour les en-têtes "compressed timestamp"
     let sportMsg = null;
 
@@ -230,7 +238,19 @@
       }
       if (def.globalMsgNum === 19) {
         const ts = rec.timestamp != null ? rec.timestamp : lastTimestamp;
-        if (ts != null) { lapEnds.push(ts); lastTimestamp = ts; }
+        if (ts != null) {
+          lapEnds.push(ts); lastTimestamp = ts;
+          lapStats.push({
+            durS: rec.timerTime != null ? rec.timerTime / 1000 : (rec.elapsedTime != null ? rec.elapsedTime / 1000 : undefined),
+            distM: rec.totalDist != null ? rec.totalDist / 100 : undefined,
+            avgHr: (rec.avgHr != null && rec.avgHr < 255) ? rec.avgHr : undefined,
+            maxHr: (rec.maxHr != null && rec.maxHr < 255) ? rec.maxHr : undefined,
+            avgSpeedMs: rec.avgSpeed != null ? rec.avgSpeed / 1000 : undefined,
+            avgWatts: (rec.avgPower != null && rec.avgPower < 65535) ? rec.avgPower : undefined,
+            avgCad: (rec.avgCad != null && rec.avgCad < 255) ? rec.avgCad : undefined,
+            elevGain: rec.ascent != null ? rec.ascent : undefined,
+          });
+        }
       }
     }
     if (!raw.length) throw new Error("aucun point d'activité (message 'record') trouvé dans le fichier");
@@ -240,14 +260,16 @@
     // buildLaps() applique alors son repli habituel.
     let lapsRaw = [];
     if (lapEnds.length) {
-      const sortedEnds = lapEnds.slice().sort((a, b) => a - b);
+      // paire {timestamp, stats} avant tri, pour garder les stats officielles
+      // alignées sur le bon lap même si des messages lap arrivaient désordonnés
+      const sortedLaps = lapEnds.map((ts, i) => ({ ts, stats: lapStats[i] })).sort((a, b) => a.ts - b.ts);
       let start = 0;
-      sortedEnds.forEach((endFitSec) => {
+      sortedLaps.forEach(({ ts: endFitSec, stats }) => {
         const endMs = (endFitSec + FIT_EPOCH_OFFSET) * 1000;
         let idx = raw.length;
         for (let i = start; i < raw.length; i++) { if (raw[i].time >= endMs) { idx = i; break; } }
         const boundEnd = Math.max(idx, start + 1);
-        if (boundEnd > start) lapsRaw.push({ start, end: Math.min(boundEnd, raw.length) });
+        if (boundEnd > start) lapsRaw.push({ start, end: Math.min(boundEnd, raw.length), ...stats });
         start = Math.min(boundEnd, raw.length);
       });
       if (start < raw.length) lapsRaw.push({ start, end: raw.length });
@@ -431,7 +453,11 @@
     const avgGap = avg(pts.map((p) => p.gap));
     const dist = cumKm;
     const laps = buildLaps(pts, lapsRaw, disc, ftp, avgHr, maxHr);
-    return { pts, laps, dplus: Math.round(dplus), dist, avgHr, maxHr, avgSpeed, avgGap, disc, cond: NEUTRAL_COND };
+    // realLaps : true si ce découpage vient de vrais laps (montre/fichier),
+    // false si c'est le repli auto au km/temps régulier de buildLaps() — sert
+    // à savoir si ça a du sens d'étiqueter "Échauffement/Course/Retour au
+    // calme" (un auto-split au km n'a pas cette structure).
+    return { pts, laps, dplus: Math.round(dplus), dist, avgHr, maxHr, avgSpeed, avgGap, disc, cond: NEUTRAL_COND, realLaps: !!(lapsRaw && lapsRaw.length) };
   }
 
   function buildLaps(pts, lapsRaw, disc, ftp, gAvgHr, gMaxHr) {
@@ -460,23 +486,33 @@
     return bounds.map((b, i) => {
       const seg = pts.slice(b.start, b.end);
       if (!seg.length) return null;
-      const durMin = seg[seg.length - 1].t - seg[0].t;
-      const distSeg = (seg[seg.length - 1]._cum - seg[0]._cum);
+      // Stats "officielles" du lap (moving_time Strava, ou champs lap FIT 19)
+      // quand fournies par l'appelant — PRÉFÉRÉES au recalcul par différence
+      // brute de temps entre 1er/dernier point du segment (23/09/2026 : ce
+      // recalcul explose dès qu'une pause réelle tombe dans le lap — temps
+      // "écoulé" énorme alors que le temps "de mouvement", ce qu'affichent
+      // Coros/Strava/Garmin, reste correct). Repli sur le calcul par points
+      // uniquement si la donnée officielle manque (TCX, ancien cache, découpage
+      // auto au km synthétique).
+      const durMin = b.durS != null ? b.durS / 60 : (seg[seg.length - 1].t - seg[0].t);
+      const distSeg = b.distM != null ? b.distM / 1000 : (seg[seg.length - 1]._cum - seg[0]._cum);
       const hrSeg = seg.filter((p) => p.hr > 0);
-      const avgHr = hrSeg.length ? Math.round(avg(hrSeg.map((p) => p.hr))) : 0;
-      const maxHr = hrSeg.length ? Math.max(...hrSeg.map((p) => p.hr)) : 0;
+      const avgHr = b.avgHr != null ? b.avgHr : (hrSeg.length ? Math.round(avg(hrSeg.map((p) => p.hr))) : 0);
+      const maxHr = b.maxHr != null ? b.maxHr : (hrSeg.length ? Math.max(...hrSeg.map((p) => p.hr)) : 0);
       const pwSeg = seg.filter((p) => p.pw > 0).map((p) => p.pw);
-      const avgPower = pwSeg.length ? Math.round(avg(pwSeg)) : 0;
+      const avgPower = b.avgWatts != null ? b.avgWatts : (pwSeg.length ? Math.round(avg(pwSeg)) : 0);
       const np = pwSeg.length ? Math.round(Math.pow(avg(pwSeg.map((w) => Math.pow(w, 4))), 0.25)) : 0;
+      const avgSpeed = b.avgSpeedMs != null ? b.avgSpeedMs * 3.6 : avg(seg.map((p) => p.sp));
+      const cad = b.avgCad != null ? b.avgCad : Math.round(avg(seg.map((p) => p.cad || 0)));
       // "hard" = série de qualité : forte FC (%FCmax) ou puissance > seuil
       const hard = (avgHr && avgHr / fcMax > 0.85) || (avgPower && avgPower > ftp * 0.95);
       return {
         n: i + 1, dist: distSeg, durMin,
-        avgSpeed: avg(seg.map((p) => p.sp)), avgGap: avg(seg.map((p) => p.gap)),
-        avgHr, maxHr, avgPower, np, cad: Math.round(avg(seg.map((p) => p.cad || 0))),
+        avgSpeed, avgGap: avg(seg.map((p) => p.gap)),
+        avgHr, maxHr, avgPower, np, cad,
         if: (np && ftp) ? +(np / ftp).toFixed(2) : 0,
         kj: avgPower ? Math.round(avgPower * durMin * 60 / 1000) : 0,
-        dplus: 0, hard: !!hard,
+        dplus: b.elevGain != null ? b.elevGain : 0, hard: !!hard,
       };
     }).filter(Boolean);
   }

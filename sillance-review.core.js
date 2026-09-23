@@ -6776,11 +6776,19 @@ function injectDecoupleCss(){
   if(document.getElementById('pf-dc-css')) return;
   const st=document.createElement('style'); st.id='pf-dc-css';
   st.textContent=`
-  #anDecoupleKpi{display:flex;align-items:center;gap:16px;margin:2px 0 12px;flex-wrap:wrap}
+  /* Stat (chiffre + pill) à gauche, explication détachée dans son propre
+     encadré à droite (23/09/2026 : l'ancienne version fourrait le texte
+     d'interprétation dans la même ligne flex que le %, il finissait écrasé/
+     coupé — perçu comme "trop abstrait". Explication maintenant en 2 lignes
+     nettes : ce que le découplage mesure, puis ce qu'il indique pour ce run). */
+  #anDecoupleKpi{display:flex;align-items:stretch;gap:16px;margin:2px 0 12px;flex-wrap:wrap}
+  .an-dc-stat{display:flex;align-items:center;gap:14px;flex:none}
   .an-dc-big{font-family:var(--font-data);font-size:32px;font-weight:700;line-height:1;color:var(--dcv,var(--good))}
   .an-dc-pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:99px;background:color-mix(in srgb,var(--dcv,var(--good)) 14%,transparent);color:var(--dcv,var(--good));border:1px solid color-mix(in srgb,var(--dcv,var(--good)) 42%,transparent)}
   .an-dc-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--dcv,var(--good));box-shadow:0 0 8px var(--dcv,var(--good))}
-  .an-dc-txt{font-size:12.5px;color:var(--soft);max-width:430px;line-height:1.45}
+  .an-dc-box{flex:1;min-width:260px;border:1px solid var(--line);border-left:3px solid var(--dcv,var(--good));border-radius:9px;background:var(--panel-2);padding:9px 13px;display:flex;flex-direction:column;gap:4px;justify-content:center}
+  .an-dc-what{font-size:11.5px;color:var(--muted);line-height:1.4}
+  .an-dc-txt{font-size:12.5px;color:var(--soft);line-height:1.45;font-weight:600}
   .an-dc-trend{display:flex;align-items:flex-end;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
   .an-dc-tlabel{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;align-self:center}
   .an-dc-bar{display:flex;flex-direction:column;align-items:center;gap:5px;font-family:var(--font-data);font-size:9.5px;color:var(--muted)}
@@ -6844,9 +6852,15 @@ function renderDecouple(s, data){
   const v=decoupleVerdict(dc.pct);
   const kpi=document.getElementById('anDecoupleKpi');
   kpi.style.setProperty('--dcv', v.c);
-  kpi.innerHTML=`<span class="an-dc-big">${dc.pct>=0?'':'−'}${Math.abs(dc.pct).toFixed(1)}%</span>`+
-    `<span class="an-dc-pill"><span class="dot"></span>${v.lbl}</span>`+
-    `<span class="an-dc-txt">${decoupleInterp(type, dc.pct, s.disc)}</span>`;
+  const what = s.disc==='bike' ? tr('decouple.whatBike') : tr('decouple.whatRun');
+  kpi.innerHTML=`<span class="an-dc-stat">`+
+      `<span class="an-dc-big">${dc.pct>=0?'':'−'}${Math.abs(dc.pct).toFixed(1)}%</span>`+
+      `<span class="an-dc-pill"><span class="dot"></span>${v.lbl}</span>`+
+    `</span>`+
+    `<span class="an-dc-box">`+
+      `<span class="an-dc-what">${what}</span>`+
+      `<span class="an-dc-txt">${decoupleInterp(type, dc.pct, s.disc)}</span>`+
+    `</span>`;
   document.getElementById('anDecoupleHint').textContent = s.disc==='bike'?tr('decouple.hintBike'):tr('decouple.hintRun');
   drawDecouple(data, s.disc, dc);
   renderDecoupleTrend(s.disc, type, dc.pct);
@@ -7236,38 +7250,47 @@ function injectLapCss(){
   .lapcol:hover{color:var(--text)} .lapcol.on{color:var(--text);border-color:var(--accent);background:rgba(70,194,216,.10)}
   .lapcol .box{width:13px;height:13px;border-radius:4px;border:1.5px solid currentColor;display:grid;place-items:center;font-size:9px;line-height:1}
   .lapcol.on .box{background:var(--accent);border-color:var(--accent);color:#06222a}
-  /* Cartes par lap façon Nolio : une petite carte par lap avec toutes les
-     métriques cochées en un coup d'œil, plutôt qu'un tableau à faire défiler
-     horizontalement — plus lisible pour le coach en visu rapide. Durée +
-     allure/vitesse mises en avant dans l'en-tête de carte (23/09/2026 : ce
-     sont les 2 métriques qu'on scanne en premier sur une séance fractionnée,
-     ex. 15x30s — les sortir du reste évite d'avoir à les chercher dans la
-     grille pour chaque intervalle). */
-  .an-laps .lap-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px}
-  .an-laps .lap-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-  .an-laps .lap-card.hard{border-color:rgba(255,84,112,.4);background:rgba(255,84,112,.05)}
-  .an-laps .lap-card-total{border-color:var(--accent);background:rgba(70,194,216,.07)}
-  .an-laps .lap-card-total .lc-n{background:var(--accent);color:#06222a;font-size:14px}
-  .an-laps .lap-card-total .lc-label{color:var(--accent)}
-  .an-laps .lc-head{display:flex;align-items:center;gap:9px}
-  .an-laps .lc-n{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:rgba(150,165,200,.14);font-family:var(--font-data);font-weight:700;font-size:12.5px}
-  .an-laps .lap-card.hard .lc-n{background:rgba(255,84,112,.22);color:var(--run)}
-  .an-laps .lc-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
-  .an-laps .lc-headline{display:flex;align-items:baseline;gap:9px;padding-bottom:9px;border-bottom:1px dashed var(--line)}
-  .an-laps .lc-hl-time{font-family:var(--font-data);font-size:17px;font-weight:800}
-  .an-laps .lc-hl-speed{font-family:var(--font-data);font-size:13px;color:var(--accent);font-weight:700}
-  .an-laps .lc-hl-speed small{color:var(--muted);font-weight:500;font-size:10px;font-family:var(--font-ui,inherit)}
-  .an-laps .lc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px 11px}
-  .an-laps .lc-m{display:flex;flex-direction:column;gap:1px;min-width:0}
-  .an-laps .lc-k{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-  .an-laps .lc-v{font-family:var(--font-data);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .an-laps .lc-v small{color:var(--muted);font-weight:500;font-size:10px;font-family:var(--font-ui,inherit)}
-  @media (max-width:480px){.an-laps .lc-metrics{grid-template-columns:1fr 1fr 1fr}}
-  .an-laps .lc-lactate{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px;padding-top:8px;border-top:1px dashed var(--line)}
-  .an-laps .lc-lactate .lc-k{margin:0}
-  .an-laps .lc-lactate input{width:58px;text-align:right;padding:4px 7px;font-size:12.5px}
+  /* Tableau façon Coros (23/09/2026, remplace les cartes : sur une séance
+     fractionnée à beaucoup de laps courts — ex. 15x30s — un tableau dense se
+     scanne bien plus vite qu'une grille de cartes, et se rapproche de ce que
+     montrent Coros/Strava natifs). Numéro de tour + étiquette Échauffement/
+     Course/Retour au calme (heuristique par allure relative, seulement sur de
+     VRAIS laps — cf. data.realLaps), temps de lap ET temps cumulé, tour le
+     plus rapide surligné comme "Meilleur tour". */
+  .an-laps .lap-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  .lap-table{width:100%;min-width:620px;border-collapse:collapse;font-size:12.5px}
+  .lap-table th{position:sticky;top:0;background:var(--panel-2);text-align:right;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 12px;white-space:nowrap;border-bottom:1px solid var(--line-strong)}
+  .lap-table td{padding:8px 12px;text-align:right;font-family:var(--font-data);white-space:nowrap;border-bottom:1px solid var(--line)}
+  .lap-table th:first-child,.lap-table td:first-child{text-align:left}
+  .lap-table tbody tr:last-child td{border-bottom:none}
+  .lap-table tbody tr:hover td{background:rgba(150,165,200,.06)}
+  .lap-table tr.total td{background:rgba(70,194,216,.07);font-weight:700;border-bottom:2px solid var(--accent)}
+  .lap-table tr.best td{background:rgba(57,230,163,.09)}
+  .lap-table tr.hard td{background:rgba(255,84,112,.05)}
+  .lt-cell{display:flex;flex-direction:column;gap:1px;align-items:flex-start}
+  .lt-n{font-weight:700}
+  .lt-type{font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600}
+  .lt-type.work{color:var(--accent)}
+  .lt-type.recovery,.lt-type.warmup,.lt-type.cooldown{color:var(--muted)}
+  tr.best .lt-type{color:var(--good);font-weight:700}
+  .lap-table input[type=number]{width:56px;text-align:right;padding:4px 7px;font-size:12px}
   .zbadge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid}`;
   document.head.appendChild(st);
+}
+function median(arr){ if(!arr.length) return 0; const s=arr.slice().sort((a,b)=>a-b); const m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+function classifyLapTypes(laps){
+  if(!laps || laps.length<3) return laps.map(()=>null);
+  const medSpeed=median(laps.map(l=>l.avgSpeed||0).filter(v=>v>0));
+  const medDur=median(laps.map(l=>l.durMin||0));
+  if(!medSpeed) return laps.map(()=>null);
+  return laps.map((l,i)=>{
+    const edge=i===0||i===laps.length-1;
+    if(edge && medDur>0 && l.durMin>medDur*2.2 && l.avgSpeed<=medSpeed*1.08) return i===0?'warmup':'cooldown';
+    return l.avgSpeed>=medSpeed ? 'work' : 'recovery';
+  });
+}
+function lapTypeLabel(t){
+  return t==='warmup'?tr('lapType.warmup'):t==='work'?tr('lapType.work'):(t==='recovery'||t==='cooldown')?tr('lapType.recovery'):'';
 }
 function lapColSet(disc){
   try{ const s=JSON.parse(localStorage.getItem('pf_lapcols_'+disc)||'null'); if(s) return new Set(s); }catch(e){}
@@ -7343,12 +7366,7 @@ function sessionTotalsPseudoLap(data, disc){
    directement sur la carte du lap. */
 function lapLactateHTML(s, l){
   const v = s._lactate && s._lactate[l.n]!=null ? s._lactate[l.n] : '';
-  return `<label class="lc-lactate"><span class="lc-k">${tr('lactate.label')}</span>
-    <input type="number" step="0.1" min="0" max="30" placeholder="—" data-lac-lap="${l.n}" value="${v}"></label>`;
-}
-function lapHeadlineHTML(l, disc){
-  const speed = disc==='bike'?l.avgSpeed.toFixed(1)+'<small> km/h</small>':(disc==='run'?paceFromSpeed(l.avgSpeed)+'<small>/km</small>':paceFromSpeed2(l.avgSpeed)+'<small>/100m</small>');
-  return `<div class="lc-headline"><span class="lc-hl-time">${fmtLapTime(l.durMin)}</span><span class="lc-hl-speed">${speed}</span></div>`;
+  return `<input type="number" step="0.1" min="0" max="30" placeholder="—" data-lac-lap="${l.n}" value="${v}">`;
 }
 function renderLaps(s, data, isSwim){
   const box=document.getElementById('anLaps'); const disc=data.disc; injectLapCss();
@@ -7356,22 +7374,32 @@ function renderLaps(s, data, isSwim){
   const cols=LAP_COLS.filter(c=>colApplies(c.app,disc));
   const sel=lapColSet(disc);
   const lbl=c=>typeof c.label==='function'?c.label(disc):c.label;
-  const toggleable=cols.filter(c=>c.key!=='time'&&c.key!=='speed');
+  const distCol=cols.find(c=>c.key==='dist'), speedCol=cols.find(c=>c.key==='speed');
+  const toggleable=cols.filter(c=>c.key!=='time'&&c.key!=='speed'&&c.key!=='dist');
   const tools=toggleable.map(c=>`<button class="lapcol ${sel.has(c.key)?'on':''}" data-k="${c.key}"><span class="box">${sel.has(c.key)?'<i class="ic ic-check"></i>':''}</span>${lbl(c)}</button>`).join('');
   const vis=toggleable.filter(c=>sel.has(c.key));
   const totLap = sessionTotalsPseudoLap(data, disc);
-  const totalCard = `<div class="lap-card lap-card-total">
-      <div class="lc-head"><span class="lc-n">Σ</span><span class="lc-label">${tr('lapCol.sessionTotal')}</span></div>
-      ${lapHeadlineHTML(totLap, disc)}
-      <div class="lc-metrics">${vis.filter(c=>c.key!=='zone'&&c.key!=='temp').map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(totLap,data,disc)}</span></div>`).join('')}</div>
-    </div>`;
-  const cards=data.laps.map(l=>`<div class="lap-card ${l.hard?'hard':''}">
-      <div class="lc-head"><span class="lc-n">${l.n}</span><span class="lc-label">Lap ${l.n}</span></div>
-      ${lapHeadlineHTML(l, disc)}
-      <div class="lc-metrics">${vis.map(c=>`<div class="lc-m"><span class="lc-k">${lbl(c)}</span><span class="lc-v">${c.v(l,data,disc)}</span></div>`).join('')}</div>
-      ${lapLactateHTML(s,l)}
-    </div>`).join('');
-  box.innerHTML=`<div class="lapcols">${tools}</div><div class="lap-cards">${totalCard}${cards}</div>`;
+  const types = data.realLaps ? classifyLapTypes(data.laps) : data.laps.map(()=>null);
+  let bestI=-1, bestSpeed=-1;
+  types.forEach((t,i)=>{ if(t==='work' && data.laps[i].avgSpeed>bestSpeed){ bestSpeed=data.laps[i].avgSpeed; bestI=i; } });
+  const head=`<tr><th>${tr('lapCol.lap')}</th><th>${tr('simMetric.dist2')}</th><th>${tr('modal.duration')}</th><th>${tr('lapCol.cumTime')}</th><th>${lbl(speedCol)}</th>${vis.map(c=>`<th>${lbl(c)}</th>`).join('')}<th>${tr('lactate.label')}</th></tr>`;
+  const totalRow=`<tr class="total">
+      <td><div class="lt-cell"><span class="lt-n">Σ</span><span class="lt-type">${tr('lapCol.sessionTotal')}</span></div></td>
+      <td>${distCol.v(totLap,data,disc)}</td><td>${fmtLapTime(totLap.durMin)}</td><td>—</td><td>${speedCol.v(totLap,data,disc)}</td>
+      ${vis.map(c=>`<td>${c.v(totLap,data,disc)}</td>`).join('')}<td></td>
+    </tr>`;
+  let cum=0;
+  const rows=data.laps.map((l,i)=>{
+    cum+=l.durMin;
+    const type=types[i], isBest=i===bestI;
+    const rowCls=[isBest?'best':'', !type&&l.hard?'hard':''].filter(Boolean).join(' ');
+    return `<tr class="${rowCls}">
+      <td><div class="lt-cell"><span class="lt-n">${l.n}</span>${isBest?`<span class="lt-type work">${tr('lapCol.best')}</span>`:(type?`<span class="lt-type ${type}">${lapTypeLabel(type)}</span>`:'')}</div></td>
+      <td>${distCol.v(l,data,disc)}</td><td>${fmtLapTime(l.durMin)}</td><td>${fmtLapTime(cum)}</td><td>${speedCol.v(l,data,disc)}</td>
+      ${vis.map(c=>`<td>${c.v(l,data,disc)}</td>`).join('')}<td>${lapLactateHTML(s,l)}</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML=`<div class="lapcols">${tools}</div><div class="lap-table-wrap"><table class="lap-table"><thead>${head}</thead><tbody>${totalRow}${rows}</tbody></table></div>`;
   box.querySelectorAll('.lapcol').forEach(b=>b.onclick=()=>{
     const k=b.dataset.k; sel.has(k)?sel.delete(k):sel.add(k);
     try{ localStorage.setItem('pf_lapcols_'+disc, JSON.stringify([...sel])); }catch(e){}
