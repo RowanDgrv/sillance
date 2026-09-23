@@ -1053,12 +1053,6 @@ function renderSidebar(){
       <div class="records" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}</div>
       ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
       <div class="strava-card" id="stravaCard"></div>
-      <div class="coach-sub" id="coachSubCard">
-        <h2>${tr('coachSub.title')}</h2>
-        <p class="hint" style="margin-bottom:10px">${tr('coachSub.text')}</p>
-        <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/${tr('sidebar.perMonth')}</small></span></div>
-        <button class="btn coach-sub-btn" id="coachSubBtn">${tr('coachSub.subscribe')}</button>
-      </div>
       <div class="morning-card">
         <h2>${tr('morning.title')}</h2>
         <p class="hint" style="margin-bottom:10px">${tr('morning.text')}</p>
@@ -1124,11 +1118,6 @@ function renderSidebar(){
     })();
     buildMorningPreview();
     renderStravaCard();
-    const csb=document.getElementById('coachSubBtn');
-    if(csb) csb.onclick=()=>{
-      if(window.PF?.user) PF.subscribeToCoach().catch(e=>{console.warn('subscribeToCoach',e);toast(tr('toast.suiviIndisponibleDemo'), 'error');});
-      else toast(tr('toast.suiviCoachingDisponibleFoisConnecte'));
-    };
     const cv = document.getElementById('checkinValidate');
     if(cv) cv.addEventListener('click', ()=> submitCheckin());
     const rs = document.getElementById('refsSave');

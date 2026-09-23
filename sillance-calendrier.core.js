@@ -1082,11 +1082,6 @@ function renderSidebar(){
     })();
     buildMorningPreview();
     renderStravaCard();
-    const csb=document.getElementById('coachSubBtn');
-    if(csb) csb.onclick=()=>{
-      if(window.PF?.user) PF.subscribeToCoach().catch(e=>{console.warn('subscribeToCoach',e);toast(tr('toast.suiviIndisponibleDemo'), 'error');});
-      else toast(tr('toast.suiviCoachingDisponibleFoisConnecte'));
-    };
     const cv = document.getElementById('checkinValidate');
     if(cv) cv.addEventListener('click', ()=> submitCheckin());
     const rs = document.getElementById('refsSave');
@@ -1114,12 +1109,6 @@ function renderAthleteBelow(){
     </div>
     <div class="records ath-below-card" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}
       ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn" style="margin-top:10px"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
-    </div>
-    <div class="coach-sub ath-below-card" id="coachSubCard">
-      <h2>${tr('coachSub.title')}</h2>
-      <p class="hint" style="margin-bottom:10px">${tr('coachSub.text')}</p>
-      <div class="cs-offer"><span class="cs-name">${COACH_OFFER.name}</span><span class="cs-price">${COACH_OFFER.price} €<small>/${tr('sidebar.perMonth')}</small></span></div>
-      <button class="btn coach-sub-btn" id="coachSubBtn">${tr('coachSub.subscribe')}</button>
     </div>
     <div class="morning-card ath-below-card" id="morningCard">
       <h2>${tr('morning.title')}</h2>
