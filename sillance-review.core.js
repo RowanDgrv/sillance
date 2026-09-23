@@ -7282,10 +7282,19 @@ function classifyLapTypes(laps){
   if(!laps || laps.length<3) return laps.map(()=>null);
   const medSpeed=median(laps.map(l=>l.avgSpeed||0).filter(v=>v>0));
   const medDur=median(laps.map(l=>l.durMin||0));
-  if(!medSpeed) return laps.map(()=>null);
+  if(!medSpeed || !medDur) return laps.map(()=>null);
   return laps.map((l,i)=>{
     const edge=i===0||i===laps.length-1;
-    if(edge && medDur>0 && l.durMin>medDur*2.2 && l.avgSpeed<=medSpeed*1.08) return i===0?'warmup':'cooldown';
+    if(edge && l.durMin>medDur*2.2 && l.avgSpeed<=medSpeed*1.08) return i===0?'warmup':'cooldown';
+    // Durée du lap = signal principal : dans un protocole d'intervalles la
+    // durée travail/récup est fixée d'avance, alors que l'allure dérive avec
+    // la fatigue et peut faire basculer un lap de récup à tort (vérifié sur
+    // une séance réelle 15x30s : un lap de récup à allure encore rapide était
+    // mal classé "Course" par l'allure seule, correct par la durée). L'allure
+    // ne tranche qu'en zone grise (± 15 % autour de la durée médiane).
+    const durRatio=l.durMin/medDur;
+    if(durRatio<0.85) return 'work';
+    if(durRatio>1.15) return 'recovery';
     return l.avgSpeed>=medSpeed ? 'work' : 'recovery';
   });
 }
