@@ -2883,9 +2883,14 @@ function sessionCard(s, dateKey){
       return;
     }
     if(e.target.closest('.video-chip') && vid){ openVideo(vid); return; }
-    // COACH : cliquer une séance ouvre l'analyse SOUS le calendrier (pas de pop-up).
+    // COACH sur une séance FAITE : la vraie fenêtre d'analyse (laps, courbes,
+    // meilleurs efforts...) — revealAnalysis() ne faisait que dérouler le
+    // widget générique "forme du jour" sous le calendrier, sans jamais
+    // afficher les données de LA séance cliquée (bug trouvé le 23/09/2026,
+    // s passé en argument mais ignoré par la fonction). Séance pas encore
+    // faite : rien à analyser, on garde le comportement précédent.
     // ATHLÈTE : garde la fiche séance (détails, nutrition, mark-done).
-    if(mode==='coach') revealAnalysis(s);
+    if(mode==='coach'){ if(s.done) openAnalysis(s); else revealAnalysis(); }
     else openModal(s, dateKey);
   });
   return el;
