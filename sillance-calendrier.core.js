@@ -531,7 +531,8 @@ function setCoachAthletes(list, defaultId){
   // athlètes de démonstration (Léa, Marc…) comme si c'étaient les siens.
   ROSTER = (list||[]).map(a=>({ id:a.id, name:a.name,
     ini:(a.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
-    color:'#46C2D8', checkin:a.checkin||null, race:null, refsUpdatedAt:a.refsUpdatedAt||null }));
+    color:'#46C2D8', checkin:a.checkin||null, race:null, refsUpdatedAt:a.refsUpdatedAt||null,
+    group:a.group||null }));
   window.ROSTER = ROSTER;
   rosterIsReal = true;
   selectedAthleteIdx = ROSTER.length ? Math.max(0, ROSTER.findIndex(a=>a.id===defaultId)) : 0;

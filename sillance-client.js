@@ -547,7 +547,22 @@ export const PF = {
       .select("athlete_id, status, profiles:athlete_id(full_name, email)")
       .eq("coach_id", this.user.id).eq("status", "active");
     if (error) console.warn("[PF] lecture coach_athlete échouée :", error.message);
-    return data ?? [];
+    const rows = data ?? [];
+    // Groupe d'entraînement (club_groups) : un coach qui gère aussi un club
+    // peut avoir rangé certains de ses athlètes suivis dans un groupe — sans
+    // ça, openAssign() (assigner une séance/un cycle à tout un groupe) ne
+    // proposait jamais aucun groupe pour un vrai compte, alors que la
+    // fonctionnalité existe déjà côté UI (audit 23/09/2026).
+    if (rows.length) {
+      const { data: members, error: mErr } = await sb.from("club_members")
+        .select("athlete_id, group_id, clubs!inner(owner_id)")
+        .eq("clubs.owner_id", this.user.id)
+        .not("athlete_id", "is", null);
+      if (mErr) console.warn("[PF] lecture club_members (groupes) échouée :", mErr.message);
+      const groupByAthlete = new Map((members ?? []).map((m) => [m.athlete_id, m.group_id]));
+      for (const r of rows) r.group_id = groupByAthlete.get(r.athlete_id) ?? null;
+    }
+    return rows;
   },
   async linkAthlete(athleteId) {
     const { data, error } = await sb.from("coach_athlete")

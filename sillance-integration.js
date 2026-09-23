@@ -197,6 +197,7 @@ async function hydrate() {
       name: esc(r.profiles?.full_name || r.profiles?.email) || tr("mode.athlete"),
       checkin: ckByAth[r.athlete_id] || null,
       refsUpdatedAt: refsByAth[r.athlete_id] || null,
+      group: r.group_id || null,
     }));
     // Un coach avec des athlètes liés planifie par défaut pour le premier
     // (plus utile que "pour soi-même" dans le cas d'usage réel).
