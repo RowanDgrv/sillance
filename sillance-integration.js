@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260923g";
+import { PF } from "./sillance-client.js?v=20260924a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -398,6 +398,131 @@ async function section(name, fn) {
   catch (e) { console.error(`[PF] hydrate ${name} échoué :`, e); }
 }
 
+/* ===========================================================================
+ *  INVITE RESSENTI + MATÉRIEL — activité synchronisée (24/09/2026)
+ *  ---------------------------------------------------------------------------
+ *  Dès qu'une activité synchronisée (Strava/Coros/…) n'a pas encore de
+ *  ressenti renseigné, elle est présentée à l'athlète à sa prochaine
+ *  connexion via une pop-up BLOQUANTE (choix explicite, pas une bannière) :
+ *  RPE 1-10 + note libre + matériel utilisé (chaussures/vélo, table `gear`
+ *  déjà existante — incrémente son kilométrage au passage). Ne concerne que
+ *  les activités synchronisées APRÈS la mise en place de cette fonctionnalité
+ *  (colonne feeling_required, migration 0051) — jamais l'historique déjà
+ *  synchronisé avant. Déclenchée depuis loadPlanningFor(), uniquement quand
+ *  target === PF.user.id (jamais côté coach consultant un athlète suivi).
+ * ========================================================================= */
+const DISC_MINI = {
+  run:      { color: "var(--run)",      icon: "ic-run",     gearType: "shoe" },
+  bike:     { color: "var(--bike)",     icon: "ic-bike",    gearType: "bike" },
+  swim:     { color: "var(--swim)",     icon: "ic-waves",   gearType: null },
+  strength: { color: "var(--strength)", icon: "ic-dumbbell", gearType: null },
+  hyrox:    { color: "#FF8A3D",         icon: "ic-zap",     gearType: null },
+};
+let feelQueue = [];        // activités (lignes brutes external_activities) restant à traiter
+let feelQueueTotal = 0;    // taille initiale de la file, pour l'indicateur "n sur total"
+let feelGear = [];         // matériel de l'athlète (mappé), pour filtrer par discipline
+let feelQueueActive = false;
+
+function injectFeelOverlay() {
+  if (document.getElementById("pf-feel-overlay")) return;
+  const ov = document.createElement("div");
+  ov.id = "pf-feel-overlay";
+  ov.innerHTML = `<div class="pf-feel-card"></div>`;
+  document.body.appendChild(ov);
+  // Volontairement AUCUN handler de clic hors-carte ni d'Échap : bloquant.
+}
+function fmtActDate(iso) {
+  if (!iso) return "";
+  try { return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }); }
+  catch (e) { return ""; }
+}
+function fmtActDur(durationS) {
+  if (!durationS) return "";
+  const m = Math.round(durationS / 60);
+  return m >= 60 ? `${Math.floor(m / 60)}h${String(m % 60).padStart(2, "0")}` : `${m} min`;
+}
+// Vert (facile) → rouge (maximal) — même esprit que rpeColor() côté core.js,
+// dupliqué ici car sillance-integration.js n'a pas accès aux closures du core.
+function feelRpeColor(n) {
+  const hues = [140, 120, 95, 75, 55, 40, 25, 12, 2, 350];
+  return `hsl(${hues[Math.max(0, Math.min(9, n - 1))]},70%,52%)`;
+}
+function renderFeelingPrompt() {
+  const item = feelQueue[0];
+  if (!item) { closeFeelingOverlay(); return; }
+  injectFeelOverlay();
+  const card = document.querySelector("#pf-feel-overlay .pf-feel-card");
+  const D = DISC_MINI[item.disc] || DISC_MINI.run;
+  const gearList = D.gearType ? feelGear.filter((g) => g.type === D.gearType) : [];
+  let rpe = null, gearId = gearList.length ? undefined : null; // null = pas de matériel concerné/enregistré, ne bloque pas
+  const total = feelQueueTotal;
+  const pos = total - feelQueue.length + 1;
+  card.style.setProperty("--c", D.color);
+  card.innerHTML = `
+    ${total > 1 ? `<div class="pf-feel-progress">${tr("feel.progress", { n: pos, total })}</div>` : ""}
+    <span class="pf-feel-disc"><i class="ic ${D.icon}"></i> ${tr("disc." + item.disc) || item.disc}</span>
+    <h2>${esc(item.name) || tr("sync.activity")}</h2>
+    <p class="pf-feel-meta">${fmtActDate(item.start_time)} · ${fmtActDur(item.duration_s)}${item.distance_m ? ` · ${(item.distance_m / 1000).toFixed(1)} km` : ""}</p>
+    <div class="pf-feel-lbl"><i class="ic ic-zap"></i> ${tr("feel.rpeLabel")}</div>
+    <div class="pf-feel-rpe-grid" id="feelRpe">${Array.from({ length: 10 }, (_, i) => `<button data-r="${i + 1}" style="--rc:${feelRpeColor(i + 1)}">${i + 1}</button>`).join("")}</div>
+    <div class="pf-feel-scale"><span>${tr("rpe.veryEasy")}</span><span>${tr("rpe.allOut")}</span></div>
+    <textarea class="pf-feel-note" placeholder="${tr("feel.notePlaceholder")}"></textarea>
+    ${gearList.length ? `
+      <div class="pf-feel-lbl"><i class="ic ic-shoe"></i> ${tr("feel.gearLabel")}</div>
+      <div class="pf-feel-gear-grid" id="feelGear">${gearList.map((g) => `<button data-g="${g.id}">${g.name}<small>${g.km} km</small></button>`).join("")}</div>
+    ` : (D.gearType ? `
+      <div class="pf-feel-lbl">${tr("feel.gearLabel")}</div>
+      <p class="pf-feel-hint">${tr(D.gearType === "shoe" ? "feel.noShoes" : "feel.noBike")}</p>
+    ` : "")}
+    <button class="pf-feel-save" id="feelSave" disabled>${tr("feel.validate")} <i class="ic ic-check"></i></button>`;
+  const save = card.querySelector("#feelSave");
+  const checkReady = () => { save.disabled = !(rpe && gearId !== undefined); };
+  card.querySelectorAll("#feelRpe button").forEach((b) => {
+    b.onclick = () => {
+      card.querySelectorAll("#feelRpe button").forEach((x) => x.classList.remove("sel"));
+      b.classList.add("sel"); rpe = +b.dataset.r; checkReady();
+    };
+  });
+  card.querySelectorAll("#feelGear button").forEach((b) => {
+    b.onclick = () => {
+      card.querySelectorAll("#feelGear button").forEach((x) => x.classList.remove("sel"));
+      b.classList.add("sel"); gearId = b.dataset.g; checkReady();
+    };
+  });
+  checkReady();
+  save.onclick = async () => {
+    if (!rpe) return;
+    save.disabled = true; save.textContent = "…";
+    const note = card.querySelector(".pf-feel-note").value.trim();
+    const chosenGearId = gearId || null;
+    await PF.logActivityFeeling(item.id, { rpe, note: note || null, gearId: chosenGearId })
+      .catch((e) => console.warn("[PF] logActivityFeeling :", e));
+    if (chosenGearId && item.distance_m) {
+      const g = feelGear.find((x) => x.id === chosenGearId);
+      if (g) PF.updateGear(g.id, { km: Math.round((g.km + item.distance_m / 1000) * 10) / 10 })
+        .catch((e) => console.warn("[PF] updateGear :", e));
+    }
+    feelQueue.shift();
+    renderFeelingPrompt();
+  };
+}
+function closeFeelingOverlay() {
+  document.getElementById("pf-feel-overlay")?.classList.remove("open");
+  document.body.style.overflow = "";
+  feelQueueActive = false;
+}
+function queueFeelingPrompts(pendingRaw, gearMapped) {
+  if (feelQueueActive || !pendingRaw.length) return; // déjà en cours (ex. re-render pendant la saisie)
+  feelQueue = pendingRaw.slice().sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  feelQueueTotal = feelQueue.length;
+  feelGear = gearMapped;
+  feelQueueActive = true;
+  injectFeelOverlay();
+  document.getElementById("pf-feel-overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  renderFeelingPrompt();
+}
+
 // (Re)charge le planning ET le matériel d'un athlète donné (null = soi-même),
 // puis re-render. Utilisé au chargement ET quand le coach change d'athlète.
 async function loadPlanningFor(athleteId) {
@@ -433,6 +558,13 @@ async function loadPlanningFor(athleteId) {
   app.setAthleteZones?.(target, zones || null);
   app.render?.();
   app.renderSidebar?.();
+  // Invite ressenti + matériel — uniquement quand on regarde SES PROPRES
+  // activités (jamais côté coach en train de consulter un athlète suivi :
+  // target vaudrait alors l'id de cet athlète, pas PF.user.id).
+  if (target === PF.user.id) {
+    const pending = acts.filter((a) => a.feeling_required && !a.feeling_logged_at);
+    if (pending.length) queueFeelingPrompts(pending, gearRows.map(mapGear));
+  }
 }
 window.__pf_loadPlanningFor = (athleteId) => {
   loadPlanningFor(athleteId).catch((e) => console.error("[PF] loadPlanningFor échoué :", e));
@@ -482,7 +614,38 @@ function injectStyles() {
   .dp-lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8a949e;margin-right:2px}
   .dp-chip{padding:5px 10px;border:1px solid #2a2f37;border-radius:99px;background:#0c0f13;
     color:#cfd6de;font-size:12px;font-weight:600;cursor:pointer}
-  .dp-chip.on{border-color:#46C2D8;color:#46C2D8;background:rgba(70,194,216,.10)}`;
+  .dp-chip.on{border-color:#46C2D8;color:#46C2D8;background:rgba(70,194,216,.10)}
+  /* Invite ressenti + matériel — activité synchronisée non encore complétée
+     (24/09/2026). Bloquante par choix explicite : pas de croix, pas de clic
+     en dehors, pas d'Échap — voir openFeelingPrompt/closeFeelingOverlay. */
+  #pf-feel-overlay{position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);
+    display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:20px;overflow-y:auto}
+  #pf-feel-overlay.open{display:flex}
+  .pf-feel-card{width:420px;max-width:100%;background:#11151a;border:1px solid #262c34;border-radius:16px;
+    padding:26px 24px;color:#e7edf3;font-family:system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .pf-feel-progress{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8a949e;margin-bottom:8px}
+  .pf-feel-disc{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;padding:4px 10px;border-radius:99px;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent)}
+  .pf-feel-card h2{margin:10px 0 2px;font:700 20px/1.2 'Oswald',system-ui;letter-spacing:.3px}
+  .pf-feel-meta{margin:0 0 16px;color:#8a949e;font-size:12.5px}
+  .pf-feel-lbl{font-size:12px;font-weight:700;color:#cfd6de;margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+  .pf-feel-rpe-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .pf-feel-rpe-grid button{padding:10px 0;border-radius:9px;border:1px solid #2a2f37;background:#0c0f13;
+    color:#cfd6de;font:700 14px/1 var(--font-data,system-ui);cursor:pointer;transition:border-color .15s,background .15s}
+  .pf-feel-rpe-grid button.sel{border-color:var(--rc);background:color-mix(in srgb,var(--rc) 22%,#0c0f13);color:#fff}
+  .pf-feel-scale{display:flex;justify-content:space-between;margin-top:5px;font-size:10.5px;color:#6b7480}
+  .pf-feel-note{width:100%;box-sizing:border-box;margin-top:14px;background:#0c0f13;border:1px solid #2a2f37;
+    color:#e7edf3;border-radius:9px;padding:10px 11px;font-size:13px;font-family:inherit;resize:vertical;min-height:56px}
+  .pf-feel-gear-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .pf-feel-gear-grid button{padding:9px 13px;border-radius:9px;border:1px solid #2a2f37;background:#0c0f13;
+    color:#cfd6de;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+  .pf-feel-gear-grid button small{color:#6b7480;font-weight:500;font-size:10.5px}
+  .pf-feel-gear-grid button.sel{border-color:#46C2D8;color:#46C2D8;background:rgba(70,194,216,.10)}
+  .pf-feel-gear-grid button.sel small{color:#46C2D8}
+  .pf-feel-hint{margin:0;font-size:12px;color:#8a949e;line-height:1.5}
+  .pf-feel-save{width:100%;margin-top:20px;background:#46C2D8;color:#06222a;border:0;
+    border-radius:10px;padding:12px;font:700 14px/1 system-ui;cursor:pointer;transition:opacity .15s}
+  .pf-feel-save:disabled{opacity:.5;cursor:not-allowed}`;
   const st = document.createElement("style");
   st.id = "pf-auth-style"; st.textContent = css;
   document.head.appendChild(st);

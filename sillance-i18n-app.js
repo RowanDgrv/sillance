@@ -539,6 +539,14 @@
     "rpe.validateSession": `Valider la séance`,
     "rpe.kmAssigned": `+{dist} km attribués à tes {name} ({km}/{max} km) · modifiable dans Matériel`,
 
+    "feel.progress": `Activité {n} sur {total}`,
+    "feel.rpeLabel": `Ressenti de l'effort (RPE)`,
+    "feel.notePlaceholder": `Un mot sur cette séance ? (facultatif)`,
+    "feel.gearLabel": `Matériel utilisé`,
+    "feel.noShoes": `Aucune chaussure enregistrée — tu pourras en ajouter dans Outils · Matériel.`,
+    "feel.noBike": `Aucun vélo enregistré — tu pourras en ajouter dans Outils · Matériel.`,
+    "feel.validate": `Valider`,
+
     "zoneEd.zoneName": `Nom de la zone`, "zoneEd.from": `de`, "zoneEd.to": `à`, "zoneEd.upperBound": `Borne haute`,
     "zoneEd.deleteZone": `Supprimer la zone`, "zoneEd.custom": `personnalisé`, "zoneEd.standard": `standard`,
     "zoneEd.reset": `Réinitialiser`, "zoneEd.addZone": `Ajouter une zone`, "zoneEd.newZone": `Nouvelle zone`,
@@ -1904,6 +1912,14 @@
     "rpe.validateSession": `Confirm session`,
     "rpe.kmAssigned": `+{dist} km assigned to your {name} ({km}/{max} km) · editable in Gear`,
 
+    "feel.progress": `Activity {n} of {total}`,
+    "feel.rpeLabel": `Effort feeling (RPE)`,
+    "feel.notePlaceholder": `A note about this session? (optional)`,
+    "feel.gearLabel": `Gear used`,
+    "feel.noShoes": `No shoes registered — you can add some in Tools · Gear.`,
+    "feel.noBike": `No bike registered — you can add one in Tools · Gear.`,
+    "feel.validate": `Save`,
+
     "zoneEd.zoneName": `Zone name`, "zoneEd.from": `from`, "zoneEd.to": `to`, "zoneEd.upperBound": `Upper bound`,
     "zoneEd.deleteZone": `Delete zone`, "zoneEd.custom": `custom`, "zoneEd.standard": `standard`,
     "zoneEd.reset": `Reset`, "zoneEd.addZone": `Add a zone`, "zoneEd.newZone": `New zone`,
@@ -3266,6 +3282,14 @@
     "rpe.notePlaceholder": `¿Algo para tu coach? (sensaciones, dolores, condiciones…)`,
     "rpe.validateSession": `Validar la sesión`,
     "rpe.kmAssigned": `+{dist} km asignados a tus {name} ({km}/{max} km) · modificable en Material`,
+
+    "feel.progress": `Actividad {n} de {total}`,
+    "feel.rpeLabel": `Sensación de esfuerzo (RPE)`,
+    "feel.notePlaceholder": `¿Algo que añadir sobre esta sesión? (opcional)`,
+    "feel.gearLabel": `Material utilizado`,
+    "feel.noShoes": `No hay zapatillas registradas — podrás añadirlas en Herramientas · Material.`,
+    "feel.noBike": `No hay bici registrada — podrás añadirla en Herramientas · Material.`,
+    "feel.validate": `Guardar`,
 
     "zoneEd.zoneName": `Nombre de la zona`, "zoneEd.from": `de`, "zoneEd.to": `a`, "zoneEd.upperBound": `Límite superior`,
     "zoneEd.deleteZone": `Eliminar la zona`, "zoneEd.custom": `personalizado`, "zoneEd.standard": `estándar`,

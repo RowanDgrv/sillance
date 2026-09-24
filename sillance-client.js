@@ -796,6 +796,17 @@ export const PF = {
     const { data } = await q;
     return data ?? [];
   },
+  // Ressenti (RPE 1-10 + note libre) + matériel utilisé pour une activité
+  // synchronisée — flux bloquant à la connexion (cf. sillance-integration.js
+  // queueFeelingPrompts). patch = { rpe, note?, gearId? }.
+  async logActivityFeeling(activityId, patch) {
+    const { error } = await sb.from("external_activities").update({
+      rpe: patch.rpe, feeling_note: patch.note ?? null, gear_id: patch.gearId ?? null,
+      feeling_logged_at: new Date().toISOString(),
+    }).eq("id", activityId).eq("user_id", this.user.id);
+    if (error) console.warn("logActivityFeeling:", error.message);
+    return !error;
+  },
   // Détail seconde-par-seconde d'une activité Strava (GPS/FC/allure/puissance),
   // récupéré à la demande et mis en cache côté serveur. Renvoie la même forme
   // que window.PFFit (points bruts) pour rejouer le modal d'analyse.
