@@ -10379,6 +10379,10 @@ const SHOE_CATALOG = [
 ];
 const SHOE_CAT_LABEL = {get daily(){return tr('shoeCat.daily')}, get tempo(){return tr('shoeCat.tempo')}, get race(){return tr('shoeCat.race')}, get trail(){return tr('shoeCat.trail')}};
 const SHOE_CAT_ICON  = {daily:'ic-run', tempo:'ic-zap', race:'ic-flag', trail:'ic-mountain'};
+// Usages d'entraînement à choix multiple (migration 0053, 24/09/2026) — une
+// paire peut cocher plusieurs cases (ex. Novablast = interval + tempo),
+// distinct de gear.cat (single, catalogue). Préféré par recommendShoe().
+const SESSION_TYPE_LABEL = {get easy(){return tr('sessionType.easy')}, get interval(){return tr('sessionType.interval')}, get tempo(){return tr('sessionType.tempo')}, get race(){return tr('sessionType.race')}};
 const SHOE_CAT_COLOR = {daily:'var(--good)', tempo:'var(--bike)', race:'var(--run)', trail:'var(--strength)'};
 
 /* Retrouve la fiche catalogue d'un équipement persisté (par nom "Marque Modèle"). */
@@ -10393,18 +10397,31 @@ let GEAR = [
 ];
 
 /* — Conseiller de paire : quelle chaussure pour la séance ? — */
+/* Recommandation auto de chaussure par type de séance (24/09/2026, refonte
+   demande Rowan) : priorité aux tags gear.session_types (choix multiple,
+   ex. Novablast = interval+tempo) — repli sur l'ancien gear.cat (single,
+   daily/tempo/race) pour le matériel jamais retaggé. want distingue
+   maintenant fractionné (interval) du seuil/tempo (tempo), physiologiquement
+   différents (VO2max/anaérobie court vs effort soutenu). */
 function recommendShoe(s){
   const shoes = GEAR.filter(g=>g.type==='shoe' && g.km < g.max);   // paires encore vivantes
   if(!shoes.length || !s || s.disc!=='run') return null;
   const title=(s.title||'').toLowerCase();
   let want;
   if(/comp[ée]t|course|marathon|semi|10k|5k|race/.test(title)) want='race';
-  else if(/vma|seuil|vo2|fractionn|interval|tempo|dynamique|allure/.test(title) || s.zone==='Z4' || s.zone==='Z5') want='tempo';
-  else want='daily';
-  // meilleure paire de la catégorie voulue (la moins usée), sinon repli daily→tempo
-  const order = want==='race' ? ['race','tempo','daily'] : want==='tempo' ? ['tempo','daily','race'] : ['daily','tempo'];
-  for(const c of order){
-    const cand = shoes.filter(g=>(g.cat||catalogFor(g)?.cat)===c).sort((a,b)=>(a.km/a.max)-(b.km/b.max))[0];
+  else if(/vma|fractionn|interval|r[ée]p[ée]tition/.test(title) || s.zone==='Z5') want='interval';
+  else if(/seuil|tempo|vo2|dynamique|allure/.test(title) || s.zone==='Z4') want='tempo';
+  else want='easy';
+  const hasType=(g,t)=>Array.isArray(g.sessionTypes)&&g.sessionTypes.includes(t);
+  const legacyCat=(g)=>g.cat||catalogFor(g)?.cat;
+  const PREDS = {
+    race:    [g=>hasType(g,'race'), g=>hasType(g,'tempo'), g=>legacyCat(g)==='race', g=>legacyCat(g)==='tempo'],
+    interval:[g=>hasType(g,'interval'), g=>hasType(g,'tempo'), g=>hasType(g,'race'), g=>legacyCat(g)==='tempo'],
+    tempo:   [g=>hasType(g,'tempo'), g=>hasType(g,'interval'), g=>legacyCat(g)==='tempo', g=>legacyCat(g)==='daily'],
+    easy:    [g=>hasType(g,'easy'), g=>legacyCat(g)==='daily', g=>hasType(g,'tempo')],
+  };
+  for(const pred of PREDS[want]){
+    const cand = shoes.filter(pred).sort((a,b)=>(a.km/a.max)-(b.km/b.max))[0];
     if(cand) return {shoe:cand, want};
   }
   return {shoe:shoes[0], want};
@@ -10511,7 +10528,7 @@ function renderGear(){
     const rec = recommendShoe(target);
     const recHtml = rec ? `<div class="gear-advice">
       <i class="ic ic-sparkles ga-ico"></i>
-      <div>${tr('gear.recommendedPairFor', {when, profile:SHOE_CAT_LABEL[rec.want], name:rec.shoe.name, km:rec.shoe.km, max:rec.shoe.max})}</div></div>` : '';
+      <div>${tr('gear.recommendedPairFor', {when, profile:SESSION_TYPE_LABEL[rec.want], name:rec.shoe.name, km:rec.shoe.km, max:rec.shoe.max})}</div></div>` : '';
     const forecasts = raceGearForecast();
     const fcHtml = forecasts.map(f=>`<div class="gear-advice warn"><i class="ic ic-flag ga-ico"></i><div>${f.msg}</div></div>`).join('');
     advisor.innerHTML = recHtml + fcHtml;

@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260924d";
+import { PF } from "./sillance-client.js?v=20260924e";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -99,7 +99,8 @@ const mapCreneau = (c) => ({ id: c.id, disc: c.disc, title: esc(c.title), day: c
   price: Number(c.price) || 0, group: c.group_id, attendees: [] });
 const mapGear = (g) => ({ id: g.id, type: g.type, name: esc(g.name), brand: esc(g.brand) || "",
   km: Number(g.km) || 0, max: Number(g.max_km) || 1000,
-  cat: g.cat || null, price: g.price != null ? Number(g.price) : null,
+  cat: g.cat || null, sessionTypes: g.session_types || [],
+  price: g.price != null ? Number(g.price) : null,
   notified: g.notified || [] });
 // Activité réalisée (external_activities) → forme attendue par realisedCard()
 // dans le core (et compatible openStravaAnalysis : {id, disc, name, dur}).
@@ -418,6 +419,18 @@ const DISC_MINI = {
   strength: { color: "var(--strength)", icon: "ic-dumbbell", gearType: null },
   hyrox:    { color: "#FF8A3D",         icon: "ic-zap",     gearType: null },
 };
+// Usages d'entraînement à choix multiple pour le matériel (migration 0053) —
+// une paire peut cocher plusieurs cases (ex. Novablast = interval + tempo).
+const SESSION_TYPES = ["easy", "interval", "tempo", "race"];
+// Repli vers l'ancienne colonne gear.cat (single, daily/tempo/race/trail) —
+// garde le badge d'usure existant sur la page Matériel cohérent pour le
+// matériel ajouté ici, priorité course > seuil/fractionné > endurance.
+function deriveLegacyCat(types) {
+  if (types.includes("race")) return "race";
+  if (types.includes("tempo") || types.includes("interval")) return "tempo";
+  if (types.includes("easy")) return "daily";
+  return null;
+}
 let feelQueue = [];        // activités (lignes brutes external_activities) restant à traiter
 let feelQueueTotal = 0;    // taille initiale de la file, pour l'indicateur "n sur total"
 let feelGear = [];         // matériel de l'athlète (mappé), pour filtrer par discipline
@@ -517,12 +530,10 @@ function renderFeelingPrompt() {
       ${!gearList.length ? `<p class="pf-feel-hint">${tr(D.gearType === "shoe" ? "feel.noShoes" : "feel.noBike")}</p>` : ""}
       <div class="pf-feel-gear-form" id="feelGearForm" hidden>
         <input type="text" id="feelGearName" placeholder="${D.gearType === "shoe" ? tr("feel.gearNamePh") : tr("feel.bikeNamePh")}">
-        ${D.gearType === "shoe" ? `<select id="feelGearCat">
-          <option value="daily">${tr("shoeCat.daily")}</option>
-          <option value="tempo">${tr("shoeCat.tempo")}</option>
-          <option value="race">${tr("shoeCat.race")}</option>
-          <option value="trail">${tr("shoeCat.trail")}</option>
-        </select>` : ""}
+        ${D.gearType === "shoe" ? `
+          <p class="pf-feel-gear-types-hint">${tr("feel.gearTypesHint")}</p>
+          <div class="pf-feel-gear-types" id="feelGearTypes">${SESSION_TYPES.map((t) => `<button type="button" data-t="${t}">${tr("sessionType." + t)}</button>`).join("")}</div>
+        ` : ""}
         <button type="button" id="feelGearSave">${tr("feel.addGearSave")}</button>
       </div>`;
     wrap.querySelectorAll("#feelGear button[data-g]").forEach((b) => {
@@ -533,16 +544,18 @@ function renderFeelingPrompt() {
     });
     const form = wrap.querySelector("#feelGearForm");
     wrap.querySelector("#feelGearAddBtn").onclick = () => { form.hidden = !form.hidden; if (!form.hidden) wrap.querySelector("#feelGearName")?.focus(); };
+    wrap.querySelectorAll("#feelGearTypes button").forEach((b) => { b.onclick = () => b.classList.toggle("sel"); });
     wrap.querySelector("#feelGearSave").onclick = async () => {
       const name = wrap.querySelector("#feelGearName").value.trim();
       if (!name) return;
-      const cat = wrap.querySelector("#feelGearCat")?.value || null;
+      const sessionTypes = [...wrap.querySelectorAll("#feelGearTypes button.sel")].map((b) => b.dataset.t);
+      const cat = deriveLegacyCat(sessionTypes);
       const btn = wrap.querySelector("#feelGearSave");
       btn.disabled = true; btn.textContent = "…";
-      const row = await PF.addGear({ type: D.gearType, name, cat }).catch((e) => { console.warn("[PF] addGear :", e); return null; });
+      const row = await PF.addGear({ type: D.gearType, name, cat, sessionTypes }).catch((e) => { console.warn("[PF] addGear :", e); return null; });
       btn.disabled = false; btn.textContent = tr("feel.addGearSave");
       if (!row) return;
-      const g = { id: row.id, type: row.type, name: row.name, km: Number(row.km) || 0, cat: row.cat || null };
+      const g = { id: row.id, type: row.type, name: row.name, km: Number(row.km) || 0, cat: row.cat || null, sessionTypes: row.session_types || [] };
       feelGear.push(g); gearList.push(g); gearId = g.id;
       renderGearWrap();
       checkReady();
@@ -725,13 +738,17 @@ function injectStyles() {
   .pf-feel-gear-add{padding:9px 13px;border-radius:9px;border:1px dashed #2a2f37;background:transparent;
     color:#8a949e;font-size:12.5px;font-weight:600;cursor:pointer}
   .pf-feel-gear-add:hover{border-color:#46C2D8;color:#46C2D8}
-  .pf-feel-gear-form{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .pf-feel-gear-form{display:flex;flex-direction:column;gap:8px;margin-top:8px}
   .pf-feel-gear-form[hidden]{display:none}
-  .pf-feel-gear-form input,.pf-feel-gear-form select{background:#0c0f13;border:1px solid #2a2f37;color:#e7edf3;
+  .pf-feel-gear-form input{background:#0c0f13;border:1px solid #2a2f37;color:#e7edf3;
     border-radius:9px;padding:8px 10px;font-size:12.5px;font-family:inherit}
-  .pf-feel-gear-form input{flex:1;min-width:120px}
-  .pf-feel-gear-form button{padding:8px 14px;border-radius:9px;border:0;background:#46C2D8;color:#06222a;
-    font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}`;
+  .pf-feel-gear-types-hint{margin:2px 0 0;font-size:11px;color:#8a949e}
+  .pf-feel-gear-types{display:flex;flex-wrap:wrap;gap:6px}
+  .pf-feel-gear-types button{padding:6px 11px;border-radius:99px;border:1px solid #2a2f37;background:#0c0f13;
+    color:#8a949e;font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+  .pf-feel-gear-types button.sel{border-color:#46C2D8;color:#46C2D8;background:rgba(70,194,216,.10)}
+  .pf-feel-gear-form>#feelGearSave{align-self:flex-start;padding:8px 14px;border-radius:9px;border:0;
+    background:#46C2D8;color:#06222a;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}`;
   const st = document.createElement("style");
   st.id = "pf-auth-style"; st.textContent = css;
   document.head.appendChild(st);
