@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260924e";
+import { PF } from "./sillance-client.js?v=20260924f";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -482,7 +482,12 @@ function renderFeelingPrompt() {
   const card = document.querySelector("#pf-feel-overlay .pf-feel-card");
   const D = DISC_MINI[item.disc] || DISC_MINI.run;
   let gearList = D.gearType ? feelGear.filter((g) => g.type === D.gearType) : [];
-  let rpe = null, mood = null, gearId = gearList.length ? undefined : null; // null = pas de matériel concerné/enregistré, ne bloque pas
+  // gearId toujours facultatif (24/09/2026, bug remonté par Rowan : quand
+  // l'athlète a déjà du matériel enregistré, une sélection EXPLICITE était
+  // exigée pour débloquer Valider, sans aucune indication visuelle du
+  // pourquoi — RPE + sensation cochés mais bouton figé, lu comme "rien ne
+  // marche"). Ne bloque plus jamais checkReady().
+  let rpe = null, mood = null, gearId = null;
   const total = feelQueueTotal;
   const pos = total - feelQueue.length + 1;
   card.style.setProperty("--c", D.color);
@@ -499,9 +504,11 @@ function renderFeelingPrompt() {
     <div class="pf-feel-scale"><span>${tr("feel.moodLow")}</span><span>${tr("feel.moodHigh")}</span></div>
     <textarea class="pf-feel-note" placeholder="${tr("feel.notePlaceholder")}"></textarea>
     ${D.gearType ? `<div class="pf-feel-lbl"><i class="ic ic-shoe"></i> ${tr("feel.gearLabel")}</div><div id="feelGearWrap"></div>` : ""}
-    <button class="pf-feel-save" id="feelSave" disabled>${tr("feel.validate")} <i class="ic ic-check"></i></button>`;
+    <button class="pf-feel-save" id="feelSave" disabled>${tr("feel.validate")} <i class="ic ic-check"></i></button>
+    <button class="pf-feel-skip" id="feelSkip">${tr("feel.skip")}</button>`;
   const save = card.querySelector("#feelSave");
-  const checkReady = () => { save.disabled = !(rpe && mood && gearId !== undefined); };
+  const checkReady = () => { save.disabled = !(rpe && mood); };
+  card.querySelector("#feelSkip").onclick = () => { feelQueue.shift(); renderFeelingPrompt(); };
   card.querySelectorAll("#feelRpe button").forEach((b) => {
     b.onclick = () => {
       card.querySelectorAll("#feelRpe button").forEach((x) => x.classList.remove("sel"));
@@ -719,6 +726,12 @@ function injectStyles() {
   .pf-feel-save{width:100%;margin-top:20px;background:#46C2D8;color:#06222a;border:0;
     border-radius:10px;padding:12px;font:700 14px/1 system-ui;cursor:pointer;transition:opacity .15s}
   .pf-feel-save:disabled{opacity:.5;cursor:not-allowed}
+  /* "Plus tard" (24/09/2026, demandé par Rowan) : passe à l'activité
+     suivante sans enregistrer — celle-ci redemandée à la prochaine
+     connexion (feeling_logged_at reste NULL). Discret, sous Valider. */
+  .pf-feel-skip{width:100%;margin-top:8px;background:transparent;color:#6b7480;border:0;
+    padding:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .pf-feel-skip:hover{color:#8a949e}
   /* "Sensation" (bien-être, distinct du RPE) — smileys façon Nolio/iDO,
      recherché le 24/09/2026 : Nolio sépare explicitement RPE (effort,
      objectif, alimente la charge) et sensation (bien-être, subjectif,
