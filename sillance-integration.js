@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260924a";
+import { PF } from "./sillance-client.js?v=20260924b";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -447,6 +447,21 @@ function feelRpeColor(n) {
   const hues = [140, 120, 95, 75, 55, 40, 25, 12, 2, 350];
   return `hsl(${hues[Math.max(0, Math.min(9, n - 1))]},70%,52%)`;
 }
+// Smiley "sensation" (bien-être, 1 mauvaise → 5 excellente) — SVG inline
+// (jamais d'emoji brut dans l'app, cf. convention design) : même visage
+// (cercle + 2 yeux), seule la courbe de bouche change. Corners fixes en
+// (7,15)/(17,15), point de contrôle qui monte (fronce) ou descend (sourit).
+const MOOD_COLORS = ["#FF5470", "#FFB13D", "#8a949e", "#A8E063", "#39E6A3"];
+const MOOD_CTRL_Y = [9, 11.5, 15, 18.5, 20.5];
+function moodFaceSvg(level) {
+  const cy = MOOD_CTRL_Y[level - 1];
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="8.2" cy="10" r="1.1" fill="currentColor" stroke="none"/>
+    <circle cx="15.8" cy="10" r="1.1" fill="currentColor" stroke="none"/>
+    <path d="M7,15 Q12,${cy} 17,15"/>
+  </svg>`;
+}
 function renderFeelingPrompt() {
   const item = feelQueue[0];
   if (!item) { closeFeelingOverlay(); return; }
@@ -454,7 +469,7 @@ function renderFeelingPrompt() {
   const card = document.querySelector("#pf-feel-overlay .pf-feel-card");
   const D = DISC_MINI[item.disc] || DISC_MINI.run;
   const gearList = D.gearType ? feelGear.filter((g) => g.type === D.gearType) : [];
-  let rpe = null, gearId = gearList.length ? undefined : null; // null = pas de matériel concerné/enregistré, ne bloque pas
+  let rpe = null, mood = null, gearId = gearList.length ? undefined : null; // null = pas de matériel concerné/enregistré, ne bloque pas
   const total = feelQueueTotal;
   const pos = total - feelQueue.length + 1;
   card.style.setProperty("--c", D.color);
@@ -466,6 +481,9 @@ function renderFeelingPrompt() {
     <div class="pf-feel-lbl"><i class="ic ic-zap"></i> ${tr("feel.rpeLabel")}</div>
     <div class="pf-feel-rpe-grid" id="feelRpe">${Array.from({ length: 10 }, (_, i) => `<button data-r="${i + 1}" style="--rc:${feelRpeColor(i + 1)}">${i + 1}</button>`).join("")}</div>
     <div class="pf-feel-scale"><span>${tr("rpe.veryEasy")}</span><span>${tr("rpe.allOut")}</span></div>
+    <div class="pf-feel-lbl"><i class="ic ic-star"></i> ${tr("feel.moodLabel")}</div>
+    <div class="pf-feel-mood-grid" id="feelMood">${[1, 2, 3, 4, 5].map((n) => `<button data-m="${n}" style="--mc:${MOOD_COLORS[n - 1]}" aria-label="${n}/5">${moodFaceSvg(n)}</button>`).join("")}</div>
+    <div class="pf-feel-scale"><span>${tr("feel.moodLow")}</span><span>${tr("feel.moodHigh")}</span></div>
     <textarea class="pf-feel-note" placeholder="${tr("feel.notePlaceholder")}"></textarea>
     ${gearList.length ? `
       <div class="pf-feel-lbl"><i class="ic ic-shoe"></i> ${tr("feel.gearLabel")}</div>
@@ -476,11 +494,17 @@ function renderFeelingPrompt() {
     ` : "")}
     <button class="pf-feel-save" id="feelSave" disabled>${tr("feel.validate")} <i class="ic ic-check"></i></button>`;
   const save = card.querySelector("#feelSave");
-  const checkReady = () => { save.disabled = !(rpe && gearId !== undefined); };
+  const checkReady = () => { save.disabled = !(rpe && mood && gearId !== undefined); };
   card.querySelectorAll("#feelRpe button").forEach((b) => {
     b.onclick = () => {
       card.querySelectorAll("#feelRpe button").forEach((x) => x.classList.remove("sel"));
       b.classList.add("sel"); rpe = +b.dataset.r; checkReady();
+    };
+  });
+  card.querySelectorAll("#feelMood button").forEach((b) => {
+    b.onclick = () => {
+      card.querySelectorAll("#feelMood button").forEach((x) => x.classList.remove("sel"));
+      b.classList.add("sel"); mood = +b.dataset.m; checkReady();
     };
   });
   card.querySelectorAll("#feelGear button").forEach((b) => {
@@ -491,11 +515,11 @@ function renderFeelingPrompt() {
   });
   checkReady();
   save.onclick = async () => {
-    if (!rpe) return;
+    if (!rpe || !mood) return;
     save.disabled = true; save.textContent = "…";
     const note = card.querySelector(".pf-feel-note").value.trim();
     const chosenGearId = gearId || null;
-    await PF.logActivityFeeling(item.id, { rpe, note: note || null, gearId: chosenGearId })
+    await PF.logActivityFeeling(item.id, { rpe, mood, note: note || null, gearId: chosenGearId })
       .catch((e) => console.warn("[PF] logActivityFeeling :", e));
     if (chosenGearId && item.distance_m) {
       const g = feelGear.find((x) => x.id === chosenGearId);
@@ -645,7 +669,16 @@ function injectStyles() {
   .pf-feel-hint{margin:0;font-size:12px;color:#8a949e;line-height:1.5}
   .pf-feel-save{width:100%;margin-top:20px;background:#46C2D8;color:#06222a;border:0;
     border-radius:10px;padding:12px;font:700 14px/1 system-ui;cursor:pointer;transition:opacity .15s}
-  .pf-feel-save:disabled{opacity:.5;cursor:not-allowed}`;
+  .pf-feel-save:disabled{opacity:.5;cursor:not-allowed}
+  /* "Sensation" (bien-être, distinct du RPE) — smileys façon Nolio/iDO,
+     recherché le 24/09/2026 : Nolio sépare explicitement RPE (effort,
+     objectif, alimente la charge) et sensation (bien-être, subjectif,
+     smileys, hors calcul de charge). */
+  .pf-feel-mood-grid{display:flex;justify-content:space-between;gap:6px}
+  .pf-feel-mood-grid button{flex:1;padding:8px 0;border-radius:9px;border:1px solid #2a2f37;background:#0c0f13;
+    color:#6b7480;cursor:pointer;transition:border-color .15s,background .15s,color .15s;display:flex;align-items:center;justify-content:center}
+  .pf-feel-mood-grid button svg{width:26px;height:26px}
+  .pf-feel-mood-grid button.sel{border-color:var(--mc);background:color-mix(in srgb,var(--mc) 18%,#0c0f13);color:var(--mc)}`;
   const st = document.createElement("style");
   st.id = "pf-auth-style"; st.textContent = css;
   document.head.appendChild(st);

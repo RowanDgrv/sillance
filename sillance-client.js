@@ -796,12 +796,14 @@ export const PF = {
     const { data } = await q;
     return data ?? [];
   },
-  // Ressenti (RPE 1-10 + note libre) + matériel utilisé pour une activité
-  // synchronisée — flux bloquant à la connexion (cf. sillance-integration.js
-  // queueFeelingPrompts). patch = { rpe, note?, gearId? }.
+  // Ressenti (RPE 1-10 effort + sensation 1-5 bien-être, distincts façon
+  // Nolio/iDO + note libre) + matériel utilisé pour une activité synchronisée
+  // — flux bloquant à la connexion (cf. sillance-integration.js
+  // queueFeelingPrompts). patch = { rpe, mood?, note?, gearId? }.
   async logActivityFeeling(activityId, patch) {
     const { error } = await sb.from("external_activities").update({
-      rpe: patch.rpe, feeling_note: patch.note ?? null, gear_id: patch.gearId ?? null,
+      rpe: patch.rpe, feeling_mood: patch.mood ?? null,
+      feeling_note: patch.note ?? null, gear_id: patch.gearId ?? null,
       feeling_logged_at: new Date().toISOString(),
     }).eq("id", activityId).eq("user_id", this.user.id);
     if (error) console.warn("logActivityFeeling:", error.message);

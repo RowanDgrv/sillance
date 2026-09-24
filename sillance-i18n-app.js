@@ -546,6 +546,8 @@
     "feel.noShoes": `Aucune chaussure enregistrée — tu pourras en ajouter dans Outils · Matériel.`,
     "feel.noBike": `Aucun vélo enregistré — tu pourras en ajouter dans Outils · Matériel.`,
     "feel.validate": `Valider`,
+    "feel.moodLabel": `Comment tu as vécu cette séance ?`,
+    "feel.moodLow": `Ressenti difficile`, "feel.moodHigh": `Que du plaisir`,
 
     "zoneEd.zoneName": `Nom de la zone`, "zoneEd.from": `de`, "zoneEd.to": `à`, "zoneEd.upperBound": `Borne haute`,
     "zoneEd.deleteZone": `Supprimer la zone`, "zoneEd.custom": `personnalisé`, "zoneEd.standard": `standard`,
@@ -1919,6 +1921,8 @@
     "feel.noShoes": `No shoes registered — you can add some in Tools · Gear.`,
     "feel.noBike": `No bike registered — you can add one in Tools · Gear.`,
     "feel.validate": `Save`,
+    "feel.moodLabel": `How did this session feel?`,
+    "feel.moodLow": `Rough`, "feel.moodHigh": `Loved it`,
 
     "zoneEd.zoneName": `Zone name`, "zoneEd.from": `from`, "zoneEd.to": `to`, "zoneEd.upperBound": `Upper bound`,
     "zoneEd.deleteZone": `Delete zone`, "zoneEd.custom": `custom`, "zoneEd.standard": `standard`,
@@ -3290,6 +3294,8 @@
     "feel.noShoes": `No hay zapatillas registradas — podrás añadirlas en Herramientas · Material.`,
     "feel.noBike": `No hay bici registrada — podrás añadirla en Herramientas · Material.`,
     "feel.validate": `Guardar`,
+    "feel.moodLabel": `¿Cómo has vivido esta sesión?`,
+    "feel.moodLow": `Difícil`, "feel.moodHigh": `Un placer`,
 
     "zoneEd.zoneName": `Nombre de la zona`, "zoneEd.from": `de`, "zoneEd.to": `a`, "zoneEd.upperBound": `Límite superior`,
     "zoneEd.deleteZone": `Eliminar la zona`, "zoneEd.custom": `personalizado`, "zoneEd.standard": `estándar`,
