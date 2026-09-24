@@ -548,6 +548,8 @@
     "feel.validate": `Valider`,
     "feel.moodLabel": `Comment tu as vécu cette séance ?`,
     "feel.moodLow": `Ressenti difficile`, "feel.moodHigh": `Que du plaisir`,
+    "feel.addGear": `Nouveau matériel`, "feel.addGearSave": `Ajouter`,
+    "feel.gearNamePh": `ex. Novablast 5 coloris vert`, "feel.bikeNamePh": `ex. Canyon Ultimate CF`,
 
     "zoneEd.zoneName": `Nom de la zone`, "zoneEd.from": `de`, "zoneEd.to": `à`, "zoneEd.upperBound": `Borne haute`,
     "zoneEd.deleteZone": `Supprimer la zone`, "zoneEd.custom": `personnalisé`, "zoneEd.standard": `standard`,
@@ -1923,6 +1925,8 @@
     "feel.validate": `Save`,
     "feel.moodLabel": `How did this session feel?`,
     "feel.moodLow": `Rough`, "feel.moodHigh": `Loved it`,
+    "feel.addGear": `New gear`, "feel.addGearSave": `Add`,
+    "feel.gearNamePh": `e.g. Novablast 5 green colorway`, "feel.bikeNamePh": `e.g. Canyon Ultimate CF`,
 
     "zoneEd.zoneName": `Zone name`, "zoneEd.from": `from`, "zoneEd.to": `to`, "zoneEd.upperBound": `Upper bound`,
     "zoneEd.deleteZone": `Delete zone`, "zoneEd.custom": `custom`, "zoneEd.standard": `standard`,
@@ -3296,6 +3300,8 @@
     "feel.validate": `Guardar`,
     "feel.moodLabel": `¿Cómo has vivido esta sesión?`,
     "feel.moodLow": `Difícil`, "feel.moodHigh": `Un placer`,
+    "feel.addGear": `Nuevo material`, "feel.addGearSave": `Añadir`,
+    "feel.gearNamePh": `ej. Novablast 5 color verde`, "feel.bikeNamePh": `ej. Canyon Ultimate CF`,
 
     "zoneEd.zoneName": `Nombre de la zona`, "zoneEd.from": `de`, "zoneEd.to": `a`, "zoneEd.upperBound": `Límite superior`,
     "zoneEd.deleteZone": `Eliminar la zona`, "zoneEd.custom": `personalizado`, "zoneEd.standard": `estándar`,

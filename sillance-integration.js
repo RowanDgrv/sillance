@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260924b";
+import { PF } from "./sillance-client.js?v=20260924c";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -468,7 +468,7 @@ function renderFeelingPrompt() {
   injectFeelOverlay();
   const card = document.querySelector("#pf-feel-overlay .pf-feel-card");
   const D = DISC_MINI[item.disc] || DISC_MINI.run;
-  const gearList = D.gearType ? feelGear.filter((g) => g.type === D.gearType) : [];
+  let gearList = D.gearType ? feelGear.filter((g) => g.type === D.gearType) : [];
   let rpe = null, mood = null, gearId = gearList.length ? undefined : null; // null = pas de matériel concerné/enregistré, ne bloque pas
   const total = feelQueueTotal;
   const pos = total - feelQueue.length + 1;
@@ -485,13 +485,7 @@ function renderFeelingPrompt() {
     <div class="pf-feel-mood-grid" id="feelMood">${[1, 2, 3, 4, 5].map((n) => `<button data-m="${n}" style="--mc:${MOOD_COLORS[n - 1]}" aria-label="${n}/5">${moodFaceSvg(n)}</button>`).join("")}</div>
     <div class="pf-feel-scale"><span>${tr("feel.moodLow")}</span><span>${tr("feel.moodHigh")}</span></div>
     <textarea class="pf-feel-note" placeholder="${tr("feel.notePlaceholder")}"></textarea>
-    ${gearList.length ? `
-      <div class="pf-feel-lbl"><i class="ic ic-shoe"></i> ${tr("feel.gearLabel")}</div>
-      <div class="pf-feel-gear-grid" id="feelGear">${gearList.map((g) => `<button data-g="${g.id}">${g.name}<small>${g.km} km</small></button>`).join("")}</div>
-    ` : (D.gearType ? `
-      <div class="pf-feel-lbl">${tr("feel.gearLabel")}</div>
-      <p class="pf-feel-hint">${tr(D.gearType === "shoe" ? "feel.noShoes" : "feel.noBike")}</p>
-    ` : "")}
+    ${D.gearType ? `<div class="pf-feel-lbl"><i class="ic ic-shoe"></i> ${tr("feel.gearLabel")}</div><div id="feelGearWrap"></div>` : ""}
     <button class="pf-feel-save" id="feelSave" disabled>${tr("feel.validate")} <i class="ic ic-check"></i></button>`;
   const save = card.querySelector("#feelSave");
   const checkReady = () => { save.disabled = !(rpe && mood && gearId !== undefined); };
@@ -507,12 +501,54 @@ function renderFeelingPrompt() {
       b.classList.add("sel"); mood = +b.dataset.m; checkReady();
     };
   });
-  card.querySelectorAll("#feelGear button").forEach((b) => {
-    b.onclick = () => {
-      card.querySelectorAll("#feelGear button").forEach((x) => x.classList.remove("sel"));
-      b.classList.add("sel"); gearId = b.dataset.g; checkReady();
+  // Section matériel : liste enregistrée (filtrée par type shoe/bike) + un
+  // bouton "+ Ajouter une paire" qui déplie un mini-formulaire (nom + catégorie
+  // pour les chaussures) — persisté dans la vraie table `gear`, donc réutilisé
+  // immédiatement par recommendShoe() (déjà existant) pour les recommandations
+  // automatiques par type de séance (24/09/2026, demande Rowan).
+  function renderGearWrap() {
+    const wrap = card.querySelector("#feelGearWrap");
+    if (!wrap) return;
+    wrap.innerHTML = `
+      <div class="pf-feel-gear-grid" id="feelGear">
+        ${gearList.map((g) => `<button data-g="${g.id}" class="${g.id === gearId ? "sel" : ""}">${g.name}<small>${g.km} km</small></button>`).join("")}
+        <button id="feelGearAddBtn" class="pf-feel-gear-add">+ ${tr("feel.addGear")}</button>
+      </div>
+      ${!gearList.length ? `<p class="pf-feel-hint">${tr(D.gearType === "shoe" ? "feel.noShoes" : "feel.noBike")}</p>` : ""}
+      <div class="pf-feel-gear-form" id="feelGearForm" hidden>
+        <input type="text" id="feelGearName" placeholder="${D.gearType === "shoe" ? tr("feel.gearNamePh") : tr("feel.bikeNamePh")}">
+        ${D.gearType === "shoe" ? `<select id="feelGearCat">
+          <option value="daily">${tr("shoeCat.daily")}</option>
+          <option value="tempo">${tr("shoeCat.tempo")}</option>
+          <option value="race">${tr("shoeCat.race")}</option>
+          <option value="trail">${tr("shoeCat.trail")}</option>
+        </select>` : ""}
+        <button type="button" id="feelGearSave">${tr("feel.addGearSave")}</button>
+      </div>`;
+    wrap.querySelectorAll("#feelGear button[data-g]").forEach((b) => {
+      b.onclick = () => {
+        wrap.querySelectorAll("#feelGear button[data-g]").forEach((x) => x.classList.remove("sel"));
+        b.classList.add("sel"); gearId = b.dataset.g; checkReady();
+      };
+    });
+    const form = wrap.querySelector("#feelGearForm");
+    wrap.querySelector("#feelGearAddBtn").onclick = () => { form.hidden = !form.hidden; if (!form.hidden) wrap.querySelector("#feelGearName")?.focus(); };
+    wrap.querySelector("#feelGearSave").onclick = async () => {
+      const name = wrap.querySelector("#feelGearName").value.trim();
+      if (!name) return;
+      const cat = wrap.querySelector("#feelGearCat")?.value || null;
+      const btn = wrap.querySelector("#feelGearSave");
+      btn.disabled = true; btn.textContent = "…";
+      const row = await PF.addGear({ type: D.gearType, name, cat }).catch((e) => { console.warn("[PF] addGear :", e); return null; });
+      btn.disabled = false; btn.textContent = tr("feel.addGearSave");
+      if (!row) return;
+      const g = { id: row.id, type: row.type, name: row.name, km: Number(row.km) || 0, cat: row.cat || null };
+      feelGear.push(g); gearList.push(g); gearId = g.id;
+      renderGearWrap();
+      checkReady();
     };
-  });
+  }
+  renderGearWrap();
   checkReady();
   save.onclick = async () => {
     if (!rpe || !mood) return;
@@ -678,7 +714,23 @@ function injectStyles() {
   .pf-feel-mood-grid button{flex:1;padding:8px 0;border-radius:9px;border:1px solid #2a2f37;background:#0c0f13;
     color:#6b7480;cursor:pointer;transition:border-color .15s,background .15s,color .15s;display:flex;align-items:center;justify-content:center}
   .pf-feel-mood-grid button svg{width:26px;height:26px}
-  .pf-feel-mood-grid button.sel{border-color:var(--mc);background:color-mix(in srgb,var(--mc) 18%,#0c0f13);color:var(--mc)}`;
+  .pf-feel-mood-grid button.sel{border-color:var(--mc);background:color-mix(in srgb,var(--mc) 18%,#0c0f13);color:var(--mc)}
+  /* Ajout de matériel inline (24/09/2026) — "+ Ajouter une paire" déplie un
+     mini-formulaire nom + catégorie, persisté dans la vraie table gear. */
+  .pf-feel-gear-grid button[data-g]{padding:9px 13px;border-radius:9px;border:1px solid #2a2f37;background:#0c0f13;
+    color:#cfd6de;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+  .pf-feel-gear-grid button[data-g] small{color:#6b7480;font-weight:500;font-size:10.5px}
+  .pf-feel-gear-grid button[data-g].sel{border-color:#46C2D8;color:#46C2D8;background:rgba(70,194,216,.10)}
+  .pf-feel-gear-grid button[data-g].sel small{color:#46C2D8}
+  .pf-feel-gear-add{padding:9px 13px;border-radius:9px;border:1px dashed #2a2f37;background:transparent;
+    color:#8a949e;font-size:12.5px;font-weight:600;cursor:pointer}
+  .pf-feel-gear-add:hover{border-color:#46C2D8;color:#46C2D8}
+  .pf-feel-gear-form{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .pf-feel-gear-form input,.pf-feel-gear-form select{background:#0c0f13;border:1px solid #2a2f37;color:#e7edf3;
+    border-radius:9px;padding:8px 10px;font-size:12.5px;font-family:inherit}
+  .pf-feel-gear-form input{flex:1;min-width:120px}
+  .pf-feel-gear-form button{padding:8px 14px;border-radius:9px;border:0;background:#46C2D8;color:#06222a;
+    font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}`;
   const st = document.createElement("style");
   st.id = "pf-auth-style"; st.textContent = css;
   document.head.appendChild(st);
