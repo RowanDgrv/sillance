@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260924c";
+import { PF } from "./sillance-client.js?v=20260924d";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -726,6 +726,7 @@ function injectStyles() {
     color:#8a949e;font-size:12.5px;font-weight:600;cursor:pointer}
   .pf-feel-gear-add:hover{border-color:#46C2D8;color:#46C2D8}
   .pf-feel-gear-form{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .pf-feel-gear-form[hidden]{display:none}
   .pf-feel-gear-form input,.pf-feel-gear-form select{background:#0c0f13;border:1px solid #2a2f37;color:#e7edf3;
     border-radius:9px;padding:8px 10px;font-size:12.5px;font-family:inherit}
   .pf-feel-gear-form input{flex:1;min-width:120px}
