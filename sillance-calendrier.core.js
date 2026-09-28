@@ -418,6 +418,12 @@ let weekOffset = 0;
 // affiché en vue "jour" (0=lundi..6=dimanche), init sur AUJOURD'HUI.
 let calViewMode = localStorage.getItem('sil_cal_view') || 'week';
 let dayIndex = (new Date().getDay()+6)%7;
+// Nombre de semaines empilées affichées en vue "semaine" (demande Rowan
+// 28/09/2026 : Quentin ne trouvait pas comment planifier au-delà de la
+// semaine courante). 1 par défaut, sinon 3/5/10 — on scrolle la PAGE, pas
+// un panneau interne, cf. .cal-grid-multi.
+const WEEKS_SHOWN_OPTIONS = [1,3,5,10];
+let weeksShown = WEEKS_SHOWN_OPTIONS.includes(+localStorage.getItem('sil_cal_weeks')) ? +localStorage.getItem('sil_cal_weeks') : 1;
 let mode = 'coach';
 let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
@@ -2436,14 +2442,12 @@ function currentRace(){
   return { name:r.name, days, date, taperDays:taper, taperStart: iso(addDays(new Date(), days-taper)), volCut: taperVolCut(taper) };
 }
 
-function render(){
-  const mon = mondayOf(weekOffset);
-  const sun = addDays(mon,6);
-  weekLabel.textContent = (calViewMode==='day')
-    ? fmtDayFull.format(addDays(mon,dayIndex))
-    : `${fmt.format(mon)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
-  calGrid.classList.toggle('cal-grid-day', calViewMode==='day');
-  calGrid.innerHTML='';
+/* Construit UNE rangée de 7 jours (semaine démarrant à `mon`) — extrait de
+   render() pour pouvoir en empiler plusieurs (voir weeksShown). Renvoie
+   l'élément DOM de la rangée + les totaux de CETTE semaine (utilisés par
+   render() seulement pour la semaine de tête, les cartes stats/sidebar
+   restant celles d'UNE semaine de référence). */
+function buildWeekRow(mon){
   const todayIso = iso(new Date());
   const race = currentRace();
   let totalTss=0, totalMin=0, count=0, doneCount=0;
@@ -2451,6 +2455,8 @@ function render(){
     const s = planning[iso(addDays(mon,i))]||[];
     return s.reduce((a,x)=>a+x.tss,0);
   }));
+  const row = document.createElement('div');
+  row.className = 'week-row';
 
   for(let i=0;i<7;i++){
     const date = addDays(mon,i);
@@ -2525,16 +2531,44 @@ function render(){
       }
       render();
     });
-    calGrid.appendChild(day);
+    row.appendChild(day);
+  }
+  return { el: row, totalTss, totalMin, count, doneCount, race };
+}
+
+function render(){
+  const mon = mondayOf(weekOffset);
+  const nWeeks = calViewMode==='day' ? 1 : weeksShown;
+  const sun = addDays(mon, nWeeks*7-1);
+  weekLabel.textContent = (calViewMode==='day')
+    ? fmtDayFull.format(addDays(mon,dayIndex))
+    : `${fmt.format(mon)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
+  calGrid.classList.toggle('cal-grid-day', calViewMode==='day');
+  calGrid.classList.toggle('cal-grid-multi', nWeeks>1);
+  calGrid.innerHTML='';
+
+  let primary = null;
+  for(let w=0; w<nWeeks; w++){
+    const wMon = addDays(mon, w*7);
+    const built = buildWeekRow(wMon);
+    if(nWeeks>1){
+      const label = document.createElement('div');
+      label.className = 'week-row-label';
+      label.textContent = `${fmt.format(wMon)} → ${fmt.format(addDays(wMon,6))}`;
+      calGrid.appendChild(label);
+    }
+    calGrid.appendChild(built.el);
+    if(w===0) primary = built;
   }
 
-  /* stats */
-  document.getElementById('weekTss').innerHTML = `${totalTss}<em>TSS</em>`;
-  document.getElementById('weekHours').innerHTML = `${(totalMin/60).toLocaleString(localeStr(),{minimumFractionDigits:1,maximumFractionDigits:1})}<em>h</em>`;
-  document.getElementById('weekCount').textContent = tr(count>1?'week.nSessionsPlural':'week.nSessionsSingular', {n:count});
-  document.getElementById('compliance').innerHTML = count?`${Math.round(doneCount/count*100)}<em>%</em>`:'<em>—</em>';
+  /* stats — toujours celles de la semaine de tête (mon), inchangé même
+     quand plusieurs semaines sont affichées sous elle */
+  document.getElementById('weekTss').innerHTML = `${primary.totalTss}<em>TSS</em>`;
+  document.getElementById('weekHours').innerHTML = `${(primary.totalMin/60).toLocaleString(localeStr(),{minimumFractionDigits:1,maximumFractionDigits:1})}<em>h</em>`;
+  document.getElementById('weekCount').textContent = tr(primary.count>1?'week.nSessionsPlural':'week.nSessionsSingular', {n:primary.count});
+  document.getElementById('compliance').innerHTML = primary.count?`${Math.round(primary.doneCount/primary.count*100)}<em>%</em>`:'<em>—</em>';
   renderWeekIntensity(mon);
-  renderTaperHint(race, mon);
+  renderTaperHint(primary.race, mon);
   renderWeekRiskHint(mon);
   renderWeekPulse(mon);
   if(typeof wireSessionVideos==='function') wireSessionVideos();
@@ -3373,10 +3407,26 @@ document.querySelectorAll('#calViewToggle .cvt-btn').forEach(b=>{
       x.classList.toggle('active', x===b);
       x.setAttribute('aria-selected', x===b ? 'true':'false');
     });
+    syncWeeksSelectVisibility();
     window.silHaptic?.('light');
     render();
   });
 });
+/* sélecteur "1/3/5/10 semaines" — n'a de sens qu'en vue Semaine (masqué en
+   vue Jour, qui affiche toujours un seul jour). */
+const calWeeksSelect = document.getElementById('calWeeksSelect');
+function syncWeeksSelectVisibility(){
+  if(calWeeksSelect) calWeeksSelect.hidden = (calViewMode==='day');
+}
+if(calWeeksSelect){
+  calWeeksSelect.value = String(weeksShown);
+  syncWeeksSelectVisibility();
+  calWeeksSelect.addEventListener('change', ()=>{
+    weeksShown = WEEKS_SHOWN_OPTIONS.includes(+calWeeksSelect.value) ? +calWeeksSelect.value : 1;
+    localStorage.setItem('sil_cal_weeks', String(weeksShown));
+    render();
+  });
+}
 const mc = document.getElementById('modeCoach'), ma = document.getElementById('modeAthlete'), mcl = document.getElementById('modeClub');
 function setActiveMode(btn){
   [mc,ma,mcl].forEach(b=>b.classList.remove('active')); btn.classList.add('active');
