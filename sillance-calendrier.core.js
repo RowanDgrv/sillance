@@ -2873,16 +2873,50 @@ function sessionCard(s, dateKey){
     }
     if(e.target.closest('.video-chip') && vid){ openVideo(vid); return; }
     // COACH sur une séance FAITE : la vraie fenêtre d'analyse (laps, courbes,
-    // meilleurs efforts...) — revealAnalysis() ne faisait que dérouler le
-    // widget générique "forme du jour" sous le calendrier, sans jamais
-    // afficher les données de LA séance cliquée (bug trouvé le 23/09/2026,
-    // s passé en argument mais ignoré par la fonction). Séance pas encore
-    // faite : rien à analyser, on garde le comportement précédent.
+    // meilleurs efforts...). Séance pas encore faite : rien à analyser, on
+    // ouvre le menu d'actions (modifier / bibliothèque / autre athlète /
+    // supprimer) — cliquer une séance prévue ne faisait jusqu'ici RIEN de
+    // ce que le coach en attend (retour Rowan 28/09/2026).
     // ATHLÈTE : garde la fiche séance (détails, nutrition, mark-done).
-    if(mode==='coach'){ if(s.done) openAnalysis(s); else revealAnalysis(); }
+    if(mode==='coach'){ if(s.done) openAnalysis(s); else openSessionActions(s, dateKey); }
     else openModal(s, dateKey);
   });
   return el;
+}
+/* Menu d'actions sur une séance PRÉVUE (pas encore faite), coach uniquement :
+   modifier / ranger en bibliothèque / programmer pour un autre athlète ou
+   groupe / supprimer. Avant ça, cliquer une séance prévue n'ouvrait rien
+   d'exploitable côté coach (revealAnalysis() sur une séance vide). */
+function openSessionActions(s, dateKey){
+  const el=document.createElement('div'); el.className='adh-overlay';
+  el.innerHTML = `<div class="adh-modal" role="dialog" aria-label="Actions sur la séance" style="max-width:400px">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${dispoSafe(s.title||'')}</h3>
+    <p class="adh-sub">${fmtDur(s.dur)} · ${s.tss} TSS · ${s.zone||''}</p>
+    <div class="addath-choices">
+      <button class="addath-choice" data-act="edit" type="button"><i class="ic ic-edit"></i> <span class="addath-t">${tr('builder.editSession')}</span></button>
+      <button class="addath-choice" data-act="lib" type="button"><i class="ic ic-book"></i> <span class="addath-t">Enregistrer dans la bibliothèque</span></button>
+      <button class="addath-choice" data-act="assign" type="button"><i class="ic ic-users"></i> <span class="addath-t">Programmer pour un autre athlète</span></button>
+      <button class="addath-choice" data-act="del" type="button" style="color:var(--danger,#e5484d)"><i class="ic ic-x"></i> <span class="addath-t">Supprimer la séance prévue</span></button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close;
+  el.addEventListener('click', e=>{ if(e.target===el) close(); });
+  document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
+  el.querySelector('[data-act="edit"]').onclick=()=>{ close(); openBuilder(dateKey, s); };
+  el.querySelector('[data-act="lib"]').onclick=()=>{
+    saveSessionToLibrary(s); close();
+    toast(tr('toast.seanceRangeeEnBibliotheque'));
+  };
+  el.querySelector('[data-act="assign"]').onclick=()=>{ close(); openAssign('session', s); };
+  el.querySelector('[data-act="del"]').onclick=()=>{
+    if(window.PF?.user && s.id){ PF.deleteScheduled(s.id).catch(err=>console.warn('[PF] deleteScheduled', err)); }
+    planning[dateKey] = (planning[dateKey]||[]).filter(x=>x.id!==s.id);
+    close(); render();
+  };
 }
 /* Ouvre l'analyse (repliée par défaut, sous le calendrier, mode coach
    uniquement — côté athlète cette même analyse vit dans l'onglet Forme &
@@ -6240,6 +6274,9 @@ function wireSessionVideos(){
    ============================================================ */
 let builderState = null;
 let builderUid = 1;
+// non-null pendant l'édition d'une séance déjà planifiée : bSaveCal met à
+// jour cette séance en place au lieu d'en créer une nouvelle (voir openBuilder).
+let builderEditing = null;
 
 const LINE_TYPES = {
   warmup:   {get l(){return tr('lineType.warmup')}, c:'#39E6A3'},
@@ -6446,9 +6483,26 @@ function exactToText(ex){
 }
 
 function openBuilder(dateKey, existing){
+  builderEditing = (existing && existing.id) ? {id:existing.id, dateKey:dateKey} : null;
+  // programmer pour un groupe / ranger en bibliothèque en même temps n'a de
+  // sens qu'à la création d'une séance neuve, pour un coach qui gère un club.
+  const hasClub = !!window.__pf_ownsClub;
+  const libWrap=document.getElementById('bAlsoLibWrap'), grpBtn=document.getElementById('bSaveGroup');
+  if(libWrap) libWrap.style.display = (hasClub && !builderEditing) ? 'flex' : 'none';
+  if(grpBtn) grpBtn.style.display = (hasClub && !builderEditing) ? '' : 'none';
+  const alsoLibBox = document.getElementById('bAlsoLib');
+  if(alsoLibBox) alsoLibBox.checked = false;
   const disc = existing?.disc || 'bike';
-  if(existing && existing.blocksV2){
+  if(existing && existing.blocksV2 && existing.blocksV2.blocks && existing.blocksV2.blocks.length){
+    // Une séance de la bibliothèque (TEMPLATES) porte un blocksV2 déjà complet
+    // (créé par builderToSession) ; une séance réelle chargée depuis
+    // scheduled_sessions n'a que { blocks } (voir sillance-integration.js) —
+    // titre/sport/références manquent et doivent être repris du haut niveau,
+    // sinon le sélecteur de sport et les références de la séance s'ouvrent vides.
     builderState = JSON.parse(JSON.stringify(existing.blocksV2));
+    builderState.title = builderState.title || existing.title || '';
+    builderState.disc = builderState.disc || existing.disc || disc;
+    builderState.activeRefs = builderState.activeRefs || defaultActiveRefs(builderState.disc);
     builderState.targetDate = dateKey || null;
   } else {
     builderState = {
@@ -7129,17 +7183,29 @@ document.getElementById('bDiscPick').addEventListener('change', e=>{
     if(builderState._refreshNutri) builderState._refreshNutri();
 });
 document.getElementById('bAddBlock').addEventListener('click', ()=>{ builderState.blocks.push(defaultBlockNew(builderState.disc)); renderBlocks(); });
-document.getElementById('bSaveLib').addEventListener('click', ()=>{
-  const s=builderToSession();
+// Rangée en bibliothèque : utilisée par le bouton dédié (bSaveLib) ET par la
+// case "Aussi en bibliothèque" du bouton bSaveGroup — même logique, pas de
+// fermeture/toast ici, c'est l'appelant qui gère (il peut enchaîner d'autres
+// actions, ex. ouvrir l'attribution par groupe juste après).
+function saveSessionToLibrary(s){
   TEMPLATES.push({id:'tpl'+(builderUid++), disc:s.disc, title:s.title, dur:s.dur, tss:s.tss, zone:s.zone, desc:s.desc, blocksV2:s.blocksV2});
-  // Persistance backend (si connecté) — non bloquant.
   if(window.PF?.user){
     PF.saveTemplate({ disc:s.disc, title:s.title, dur:s.dur, dist:s.dist||0, tss:s.tss,
       zone:s.zone, activeRefs:builderState.activeRefs, blocks:(s.blocksV2&&s.blocksV2.blocks)||builderState.blocks })
       .catch(e=> console.warn('[PF] saveTemplate échoué :', e));
   }
-  closeBuilder(); if(mode==='coach') renderSidebar();
+  if(mode==='coach') renderSidebar();
+}
+document.getElementById('bSaveLib').addEventListener('click', ()=>{
+  saveSessionToLibrary(builderToSession());
+  closeBuilder();
   toast(tr('toast.seanceRangeeEnBibliotheque'));
+});
+document.getElementById('bSaveGroup').addEventListener('click', ()=>{
+  const s=builderToSession();
+  if(document.getElementById('bAlsoLib')?.checked) saveSessionToLibrary(s);
+  closeBuilder();
+  openAssign('session', s);
 });
 document.getElementById('bShorthandGo').addEventListener('click', ()=>{
   const input=document.getElementById('bShorthandInput');
@@ -7162,6 +7228,25 @@ document.getElementById('bShorthandGo').addEventListener('click', ()=>{
 document.getElementById('bSaveCal').addEventListener('click', ()=>{
   const s=builderToSession();
   const key=builderState.targetDate || iso(mondayOf(weekOffset));
+  if(builderEditing){
+    // Édition d'une séance déjà planifiée : remplace en place plutôt que
+    // d'empiler un doublon. La date ne bouge pas (le builder ne l'affiche pas
+    // en édition) — seul le contenu (titre/sport/blocs/nutrition) change.
+    const { id, dateKey } = builderEditing;
+    s.id = id;
+    const list = planning[dateKey] || [];
+    const i = list.findIndex(x=>x.id===id);
+    if(i>-1) list[i] = s; else list.push(s);
+    if(window.PF?.user){
+      PF.updateScheduled(id, { disc:s.disc, title:s.title, dur:s.dur,
+        dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
+        .catch(e=> console.warn('[PF] updateScheduled échoué :', e));
+    }
+    builderEditing = null;
+    closeBuilder(); render();
+    toast('Séance modifiée');
+    return;
+  }
   (planning[key] ||= []).push(s);
   // Persistance backend (si connecté) — récupère l'id DB pour les futurs done/rpe.
   if(window.PF?.user){

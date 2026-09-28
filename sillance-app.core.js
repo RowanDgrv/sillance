@@ -2881,16 +2881,50 @@ function sessionCard(s, dateKey){
     }
     if(e.target.closest('.video-chip') && vid){ openVideo(vid); return; }
     // COACH sur une séance FAITE : la vraie fenêtre d'analyse (laps, courbes,
-    // meilleurs efforts...) — revealAnalysis() ne faisait que dérouler le
-    // widget générique "forme du jour" sous le calendrier, sans jamais
-    // afficher les données de LA séance cliquée (bug trouvé le 23/09/2026,
-    // s passé en argument mais ignoré par la fonction). Séance pas encore
-    // faite : rien à analyser, on garde le comportement précédent.
+    // meilleurs efforts...). Séance pas encore faite : rien à analyser, on
+    // ouvre le menu d'actions (modifier / bibliothèque / autre athlète /
+    // supprimer) — cliquer une séance prévue ne faisait jusqu'ici RIEN de
+    // ce que le coach en attend (retour Rowan 28/09/2026).
     // ATHLÈTE : garde la fiche séance (détails, nutrition, mark-done).
-    if(mode==='coach'){ if(s.done) openAnalysis(s); else revealAnalysis(); }
+    if(mode==='coach'){ if(s.done) openAnalysis(s); else openSessionActions(s, dateKey); }
     else openModal(s, dateKey);
   });
   return el;
+}
+/* Menu d'actions sur une séance PRÉVUE (pas encore faite), coach uniquement :
+   modifier / ranger en bibliothèque / programmer pour un autre athlète ou
+   groupe / supprimer. Avant ça, cliquer une séance prévue n'ouvrait rien
+   d'exploitable côté coach (revealAnalysis() sur une séance vide). */
+function openSessionActions(s, dateKey){
+  const el=document.createElement('div'); el.className='adh-overlay';
+  el.innerHTML = `<div class="adh-modal" role="dialog" aria-label="Actions sur la séance" style="max-width:400px">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${dispoSafe(s.title||'')}</h3>
+    <p class="adh-sub">${fmtDur(s.dur)} · ${s.tss} TSS · ${s.zone||''}</p>
+    <div class="addath-choices">
+      <button class="addath-choice" data-act="edit" type="button"><i class="ic ic-edit"></i> <span class="addath-t">${tr('builder.editSession')}</span></button>
+      <button class="addath-choice" data-act="lib" type="button"><i class="ic ic-book"></i> <span class="addath-t">Enregistrer dans la bibliothèque</span></button>
+      <button class="addath-choice" data-act="assign" type="button"><i class="ic ic-users"></i> <span class="addath-t">Programmer pour un autre athlète</span></button>
+      <button class="addath-choice" data-act="del" type="button" style="color:var(--danger,#e5484d)"><i class="ic ic-x"></i> <span class="addath-t">Supprimer la séance prévue</span></button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close;
+  el.addEventListener('click', e=>{ if(e.target===el) close(); });
+  document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
+  el.querySelector('[data-act="edit"]').onclick=()=>{ close(); openBuilder(dateKey, s); };
+  el.querySelector('[data-act="lib"]').onclick=()=>{
+    saveSessionToLibrary(s); close();
+    toast(tr('toast.seanceRangeeEnBibliotheque'));
+  };
+  el.querySelector('[data-act="assign"]').onclick=()=>{ close(); openAssign('session', s); };
+  el.querySelector('[data-act="del"]').onclick=()=>{
+    if(window.PF?.user && s.id){ PF.deleteScheduled(s.id).catch(err=>console.warn('[PF] deleteScheduled', err)); }
+    planning[dateKey] = (planning[dateKey]||[]).filter(x=>x.id!==s.id);
+    close(); render();
+  };
 }
 /* Ouvre l'analyse (repliée par défaut, sous le calendrier, mode coach
    uniquement — côté athlète cette même analyse vit dans l'onglet Forme &
@@ -3583,6 +3617,10 @@ function openAddAthleteChoice(){
         <i class="ic ic-users"></i>
         <span><span class="addath-t">Depuis mon club</span><span class="addath-s" style="display:block">Ajoute un membre déjà inscrit sur Sillance.</span></span>
       </button>`:''}
+      ${hasClub?`<button class="addath-choice" id="addathClubInvite" type="button">
+        <i class="ic ic-send"></i>
+        <span><span class="addath-t">Nouveau membre du club</span><span class="addath-s" style="display:block">Il reçoit un email pour rejoindre le club (pas encore inscrit sur Sillance).</span></span>
+      </button>`:''}
     </div>
   </div>`;
   document.body.appendChild(el);
@@ -3594,6 +3632,8 @@ function openAddAthleteChoice(){
   document.getElementById('addathEmail').onclick=()=>{ close(); openInviteAthlete(); };
   const clubBtn=document.getElementById('addathClub');
   if(clubBtn) clubBtn.onclick=()=>{ close(); openAddFromClub(); };
+  const clubInviteBtn=document.getElementById('addathClubInvite');
+  if(clubInviteBtn) clubInviteBtn.onclick=()=>{ close(); openInviteClubMember(); };
 }
 
 /* Liste les membres du club (inscrits sur Sillance, pas encore dans le
@@ -3627,8 +3667,8 @@ async function openAddFromClub(){
     const linkable = (members||[]).filter(m=>m.athlete_id && !already.has(m.athlete_id));
     if(!linkable.length){ listEl.innerHTML=`<div class="addath-empty">Tous les membres inscrits sont déjà dans ton suivi.</div>`; return; }
     listEl.innerHTML = linkable.map(m=>{
-      const name = esc(m.profiles?.full_name || m.display_name || '—');
-      const email = esc(m.profiles?.email || '');
+      const name = dispoSafe(m.profiles?.full_name || m.display_name || '—');
+      const email = dispoSafe(m.profiles?.email || '');
       return `<div class="addath-member">
         <span><span class="addath-mname">${name}</span>${email?`<span class="addath-memail" style="display:block">${email}</span>`:''}</span>
         <button class="btn sm cy-ghost" data-add="${m.athlete_id}" type="button">+ Ajouter</button>
@@ -3649,6 +3689,50 @@ async function openAddFromClub(){
       };
     });
   }catch(e){ console.warn('[PF] openAddFromClub:',e); listEl.innerHTML=`<div class="addath-empty">Erreur de chargement.</div>`; }
+}
+
+/* Invite un NOUVEAU membre (pas encore inscrit sur Sillance) à rejoindre le
+   club — distinct d'openInviteAthlete() : celui-là ne crée qu'un lien
+   coach_athlete perso, jamais une ligne club_members, donc le lien "inviter
+   dans le club" ne faisait jamais rejoindre le club (bug remonté 28/09/2026).
+   Email uniquement (pas de WhatsApp ici) — toujours envoyé depuis
+   contact@sillance.app côté edge function invite-club-member. */
+async function openInviteClubMember(){
+  const clubs = await PF.myClubs().catch(()=>[]);
+  const club = clubs[0];
+  if(!club){ toast('Aucun club trouvé.', 'error'); return; }
+  const formHTML=()=>`<div class="adh-modal" role="dialog" aria-label="Inviter dans le club">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>Inviter dans ${dispoSafe(club.name)}</h3>
+    <p class="adh-sub">Il reçoit un email (envoyé par contact@sillance.app) pour créer son compte et rejoindre le club directement.</p>
+    <div class="invite-linkrow">
+      <input type="email" id="clubInvEmail" placeholder="${tr('invite.emailPh')}" autocomplete="email">
+      <button class="cc-btn" id="clubInvSend">${tr('invite.send')}</button>
+    </div>
+    <div id="clubInvResult"></div>
+  </div>`;
+  const el=document.createElement('div'); el.className='adh-overlay';
+  el.innerHTML=formHTML();
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close;
+  el.addEventListener('click', e=>{ if(e.target===el) close(); });
+  document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
+  document.getElementById('clubInvSend').onclick=async ()=>{
+    const email=document.getElementById('clubInvEmail').value.trim();
+    if(!email || !email.includes('@')){ toast(tr('toast.entreEMailValide')); return; }
+    const btn=document.getElementById('clubInvSend'); btn.disabled=true;
+    try{
+      const {emailed} = await PF.inviteClubMember(club.id, email);
+      document.getElementById('clubInvResult').innerHTML = emailed
+        ? `<div class="cc-s" style="color:#39e6a3;margin-top:8px"><i class="ic ic-check"></i> Email envoyé à ${dispoSafe(email)}.</div>`
+        : `<div class="cc-s" style="color:#e5484d;margin-top:8px">Envoi impossible pour le moment (email non configuré). Réessaie plus tard.</div>`;
+    }catch(e){
+      console.warn('[PF] inviteClubMember:', e);
+      document.getElementById('clubInvResult').innerHTML = `<div class="cc-s" style="color:#e5484d;margin-top:8px">Invitation impossible (déjà membre, ou erreur temporaire).</div>`;
+    }finally{ btn.disabled=false; }
+  };
 }
 
 const ADD_ATH_ROW = `<div class="ap-row-add" id="apAddAthlete"><i class="ic ic-send"></i> + Ajouter un athlète</div>`;
@@ -4219,7 +4303,8 @@ const CLUB_ATHLETES = [
   {id:'a5', name:'Tom Variable', disc:'bike', since:'2025', group:'g6', offer:'sub', level:'debutant'},
   {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, level:'debutant', guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12', licence:{fed:'FFTri', num:'4587654', medCertUntil:'2027-04-01'}},
   {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie', level:'competition', licence:{fed:'FFTri', num:'4523456', medCertUntil:'2026-12-15'}},
-  {id:'a8', name:'Marie Girard', disc:'bike', since:'2025', group:'g6', offer:'sub', level:'confirme'}
+  {id:'a8', name:'Marie Girard', disc:'bike', since:'2025', group:'g6', offer:'sub', level:'confirme'},
+  {id:'a9', name:'Nolan Faure', disc:'tri', since:'2025', group:'g2', offer:'sub', minor:true, level:'debutant', guardian:{name:'Sabrina Faure', email:'sabrina.faure@example.com'}, consentAt:'2026-02-03', licence:{fed:'FFTri', num:'4591122', medCertUntil:'2027-03-05'}}
 ];
 const CLUB_LEVELS = [
   {id:'debutant', get name(){return tr('level.debutant')}},
@@ -4244,6 +4329,52 @@ let CRENEAUX = [
   {id:'c3', disc:'bike', get title(){return tr('cre.c3.title')}, day:5, time:'19:00', dur:150, place:'Départ Vélodrome, Muret', cap:12, coach:'Karim', price:0, attendees:['a3','a5','a8']},
   {id:'c4', disc:'bike', get title(){return tr('cre.c4.title')}, day:6, time:'08:00', dur:180, place:'Départ Base de loisirs, Muret', cap:30, coach:'Éric', price:0, attendees:['a1','a4','a7']}
 ];
+/* ============================================================
+   SUIVI JEUNE — chronos de référence (natation / course à pied)
+   ------------------------------------------------------------
+   Prototype front uniquement (pas de table backend pour l'instant).
+   Épreuves fixes volontairement : ce sont les tests que les clubs
+   font vraiment passer à leurs jeunes (100/200/400m nage libre,
+   1km/2km course à pied). backend réel plus tard : PF.saveTestTime(...).
+   ============================================================ */
+const TEST_EVENTS = {
+  swim: ['100m NL','200m NL','400m NL'],
+  run: ['1 km','2 km']
+};
+let TEST_TIMES = [
+  {id:'tt1', athleteId:'a6', date:'2026-01-20', disc:'swim', event:'100m NL', time:'1:38.40'},
+  {id:'tt2', athleteId:'a6', date:'2026-04-14', disc:'swim', event:'100m NL', time:'1:32.10'},
+  {id:'tt3', athleteId:'a6', date:'2026-06-09', disc:'swim', event:'100m NL', time:'1:28.75'},
+  {id:'tt4', athleteId:'a6', date:'2026-04-14', disc:'run', event:'1 km', time:'4:52'},
+  {id:'tt5', athleteId:'a6', date:'2026-06-09', disc:'run', event:'1 km', time:'4:37'},
+  {id:'tt6', athleteId:'a9', date:'2026-02-10', disc:'swim', event:'200m NL', time:'3:25.00'},
+  {id:'tt7', athleteId:'a9', date:'2026-05-18', disc:'swim', event:'200m NL', time:'3:11.60'},
+  {id:'tt8', athleteId:'a9', date:'2026-05-18', disc:'run', event:'2 km', time:'10:48'}
+];
+
+/* ============================================================
+   COMPÉTITIONS OBJECTIF — le coach fixe des compétitions dans
+   l'année (départemental → régional → France si qualifié), les
+   jeunes (ou leurs parents) confirment ou déclinent leur
+   participation. Prototype front : le coach simule la réponse
+   athlète/parent pendant la démo. Backend réel plus tard : table
+   proche de `races` (0049_races.sql) + une table de réponses,
+   RLS coach écrit / athlète répond / lien public pour le parent
+   d'un mineur, sur le modèle de spectateur.html.
+   ============================================================ */
+let COMPETITIONS = [
+  {id:'cp1', name:'Sélectif départemental CAP', date:'2026-10-18', level:'departemental', targetGroupId:'g1'},
+  {id:'cp2', name:'Championnat régional triathlon jeunes', date:'2026-11-22', level:'regional', targetGroupId:'g2'}
+];
+/* clé "compId:athleteId" -> {status:'pending'|'confirmed'|'declined'} */
+let COMPETITION_RESPONSES = {
+  'cp1:a6': {status:'confirmed'},
+  'cp2:a7': {status:'pending'},
+  'cp2:a9': {status:'pending'}
+};
+function compResponseKey(compId, athleteId){ return compId+':'+athleteId; }
+function competitionTargets(comp){ return CLUB_ATHLETES.filter(a=>a.group===comp.targetGroupId); }
+
 const ME_CLUB_ID = 'a1'; // l'athlète "moi" (pour la démo d'inscription)
 let clubView = 'dash';
 
@@ -4790,6 +4921,194 @@ function saveLicence(){
   document.getElementById('licSave').addEventListener('click', saveLicence);
   document.getElementById('licenceClose').addEventListener('click', ()=> ov.classList.remove('open'));
   ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+})();
+
+/* ============================================================
+   SUIVI JEUNE — rendu + modale d'ajout de chrono
+   ============================================================ */
+function parseTimeToSeconds(str){
+  const m = String(str||'').trim().match(/^(\d+):([0-5]?\d)(?:\.(\d{1,2}))?$/);
+  if(!m) return null;
+  const min=+m[1], sec=+m[2], cent=m[3]?+((m[3]+'00').slice(0,2)):0;
+  return min*60+sec+cent/100;
+}
+function formatSecondsDelta(sec){
+  const sign = sec<0 ? '-' : '+';
+  return sign+Math.abs(sec).toFixed(2)+'s';
+}
+let suiviFilterGroup = 'g1,g2';
+function initSuiviFilter(){
+  const sel=document.getElementById('suiviFilterGroup'); if(!sel || sel.dataset.init) return;
+  sel.dataset.init='1';
+  sel.innerHTML = `<option value="g1,g2" data-i18n="clubFilter.allGroups">Groupes jeunes (Loisir + Compétition)</option>`
+    + CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  sel.onchange=()=>{ suiviFilterGroup=sel.value; renderSuivi(); };
+}
+/* Pas de graphique ici volontairement (retour Rowan 27/09) : une courbe de
+   temps qui descend quand l'athlète progresse se lit comme une dégradation
+   au premier coup d'œil. On préfère des chiffres explicites : meilleur temps,
+   gain vs le test précédent, gain total depuis le premier test. */
+function renderSuivi(){
+  initSuiviFilter();
+  const groupIds = suiviFilterGroup.split(',');
+  const athletes = CLUB_ATHLETES.filter(a=> groupIds.includes(a.group));
+  const box = document.getElementById('suiviList');
+  box.innerHTML = athletes.length ? athletes.map(a=>{
+    const g = a.group ? clubGroup(a.group) : null;
+    const tests = TEST_TIMES.filter(t=>t.athleteId===a.id);
+    const events = [...new Set(tests.map(t=>t.event))];
+    const eventsHtml = events.length ? events.map(ev=>{
+      const list = tests.filter(t=>t.event===ev).sort((x,y)=> x.date.localeCompare(y.date));
+      const best = list.reduce((b,t)=> (parseTimeToSeconds(t.time) < parseTimeToSeconds(b.time) ? t : b), list[0]);
+      const first = list[0];
+      const last = list.at(-1);
+      const prev = list.length>1 ? list.at(-2) : null;
+      const delta = prev ? parseTimeToSeconds(last.time) - parseTimeToSeconds(prev.time) : null;
+      const totalGain = list.length>1 ? parseTimeToSeconds(last.time) - parseTimeToSeconds(first.time) : null;
+      const detail = list.length>1
+        ? `<span class="suivi-event-delta ${delta<0?'better':'worse'}">${formatSecondsDelta(delta)} ${tr('suivi.vsLastTest')}</span>`
+          + ` · <span class="suivi-event-total ${totalGain<0?'better':'worse'}">${formatSecondsDelta(totalGain)} ${tr('suivi.sinceFirstTest', {date:fmtDateFr(new Date(first.date+'T12:00:00')), n:list.length})}</span>`
+        : `<span class="club-hint">${tr('suivi.firstTestRecorded')}</span>`;
+      return `<div class="suivi-event">
+        <div class="suivi-event-top">
+          <span class="suivi-event-name">${ev}</span>
+          <span class="suivi-event-best" title="${tr('suivi.bestLabel')}">${best.time}</span>
+        </div>
+        <div class="suivi-event-detail">${detail}</div>
+      </div>`;
+    }).join('') : `<p class="club-hint">${tr('suivi.noTest')}</p>`;
+    return `<div class="suivi-card">
+      <div class="club-ath-head">
+        <div class="club-ath-av">${initials(a.name)}</div>
+        <div class="club-ath-i">
+          <div class="club-ath-n">${a.name}</div>
+          <div class="club-ath-m">${g?g.name:''}</div>
+        </div>
+      </div>
+      <p class="club-hint" style="margin:6px 0 0" data-i18n="suivi.lowerIsBetter">Plus bas = plus rapide ; un gain négatif = progrès</p>
+      <div class="suivi-events">${eventsHtml}</div>
+      <button class="btn" style="padding:6px 12px;font-size:11.5px;margin-top:4px" data-suivi-add="${a.id}">${tr('suivi.addTest')}</button>
+    </div>`;
+  }).join('') : `<p class="club-hint">${tr('clubAthList.noAthleteFound')}</p>`;
+  box.querySelectorAll('[data-suivi-add]').forEach(b=> b.onclick=()=> openTestTime(b.dataset.suiviAdd));
+}
+let testTimeAthleteId = null;
+function refreshTestTimeEventOptions(){
+  const disc = document.getElementById('ttDisc').value;
+  document.getElementById('ttEvent').innerHTML = TEST_EVENTS[disc].map(ev=>`<option value="${ev}">${ev}</option>`).join('');
+}
+function openTestTime(athleteId){
+  testTimeAthleteId = athleteId;
+  const a = CLUB_ATHLETES.find(x=>x.id===athleteId); if(!a) return;
+  document.getElementById('testTimeAthName').textContent = a.name;
+  document.getElementById('ttDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('ttDisc').value = 'swim';
+  refreshTestTimeEventOptions();
+  document.getElementById('ttTime').value = '';
+  document.getElementById('ttNote').value = '';
+  document.getElementById('testTimeOverlay').classList.add('open');
+}
+function saveTestTime(){
+  const date = document.getElementById('ttDate').value;
+  const disc = document.getElementById('ttDisc').value;
+  const event = document.getElementById('ttEvent').value;
+  const time = document.getElementById('ttTime').value.trim();
+  if(parseTimeToSeconds(time)==null){ toast(tr('testTime.invalidTime')); return; }
+  TEST_TIMES.push({id:'tt'+Date.now(), athleteId:testTimeAthleteId, date, disc, event, time});
+  /* backend réel plus tard : PF.saveTestTime({athleteId:testTimeAthleteId, date, disc, event, time}) */
+  document.getElementById('testTimeOverlay').classList.remove('open');
+  const a = CLUB_ATHLETES.find(x=>x.id===testTimeAthleteId);
+  toast(tr('testTime.savedFor', {name:a?a.name:''}));
+  renderSuivi();
+}
+(function initTestTime(){
+  const ov=document.getElementById('testTimeOverlay'); if(!ov) return;
+  document.getElementById('ttDisc').addEventListener('change', refreshTestTimeEventOptions);
+  document.getElementById('ttSave').addEventListener('click', saveTestTime);
+  document.getElementById('testTimeClose').addEventListener('click', ()=> ov.classList.remove('open'));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+})();
+
+/* ============================================================
+   COMPÉTITIONS OBJECTIF — rendu + modale de création + réponses
+   ============================================================ */
+const COMP_LEVEL_LABEL = {
+  get departemental(){return tr('competition.level.departemental')},
+  get regional(){return tr('competition.level.regional')},
+  get france(){return tr('competition.level.france')}
+};
+function renderCompetitions(){
+  const box = document.getElementById('competitionsList');
+  box.innerHTML = COMPETITIONS.length ? COMPETITIONS.map(comp=>{
+    const targets = competitionTargets(comp);
+    const rows = targets.map(a=>{
+      const key = compResponseKey(comp.id, a.id);
+      const resp = COMPETITION_RESPONSES[key] || {status:'pending'};
+      const statusLabel = resp.status==='confirmed' ? tr('competition.statusConfirmed')
+        : resp.status==='declined' ? tr('competition.statusDeclined') : tr('competition.statusPending');
+      const pendingActions = resp.status==='pending' ? `
+        <button class="btn" style="padding:5px 12px;font-size:11.5px" data-comp-confirm="${comp.id}" data-aid="${a.id}">${tr('competition.confirm')}</button>
+        <button class="group-edit" style="padding:5px 12px;font-size:11.5px" data-comp-decline="${comp.id}" data-aid="${a.id}">${tr('competition.decline')}</button>
+        <span class="comp-simulate">${tr('competition.simulateNote')}</span>` : '';
+      const guardianNote = (resp.status==='pending' && a.minor && a.guardian?.email)
+        ? `<span class="club-hint">${tr('competition.waitingGuardian', {email:a.guardian.email})}</span>` : '';
+      return `<div class="comp-row">
+        <span class="club-ath-av">${initials(a.name)}</span>
+        <span>${a.name}</span>
+        <span class="comp-status ${resp.status}">${statusLabel}</span>
+        ${guardianNote}
+        ${pendingActions}
+      </div>`;
+    }).join('') || `<p class="club-hint">${tr('clubAthList.noAthleteFound')}</p>`;
+    return `<div class="comp-card">
+      <div class="comp-head">
+        <span class="comp-name">${comp.name}</span>
+        <span class="comp-date">${fmtDateFr(new Date(comp.date+'T12:00:00'))}</span>
+        <span class="comp-level ${comp.level}">${COMP_LEVEL_LABEL[comp.level]}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('') : `<p class="club-hint">${tr('competition.noComp')}</p>`;
+  box.querySelectorAll('[data-comp-confirm]').forEach(b=> b.onclick=()=> respondCompetition(b.dataset.compConfirm, b.dataset.aid, 'confirmed'));
+  box.querySelectorAll('[data-comp-decline]').forEach(b=> b.onclick=()=> respondCompetition(b.dataset.compDecline, b.dataset.aid, 'declined'));
+}
+function respondCompetition(compId, athleteId, decision){
+  COMPETITION_RESPONSES[compResponseKey(compId, athleteId)] = {status:decision};
+  /* backend réel plus tard : PF.respondToCompetition(compId, {athleteId, status:decision}) */
+  const a = CLUB_ATHLETES.find(x=>x.id===athleteId);
+  toast(tr(decision==='confirmed'?'competition.respondedConfirmed':'competition.respondedDeclined', {name:a?a.name:''}));
+  renderCompetitions();
+}
+function openCompetition(){
+  document.getElementById('cpName').value = '';
+  document.getElementById('cpDate').value = '';
+  document.getElementById('cpLevel').value = 'departemental';
+  document.getElementById('cpGroup').innerHTML = CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  document.getElementById('competitionOverlay').classList.add('open');
+}
+function saveCompetition(){
+  const name = document.getElementById('cpName').value.trim();
+  const date = document.getElementById('cpDate').value;
+  const level = document.getElementById('cpLevel').value;
+  const targetGroupId = document.getElementById('cpGroup').value;
+  if(!name || !date){ toast(tr('competition.missingFields')); return; }
+  const comp = {id:'cp'+Date.now(), name, date, level, targetGroupId};
+  COMPETITIONS.push(comp);
+  /* backend réel plus tard : PF.createObjectiveCompetition(comp) */
+  CLUB_ATHLETES.filter(a=>a.group===targetGroupId).forEach(a=>{
+    COMPETITION_RESPONSES[compResponseKey(comp.id, a.id)] = {status:'pending'};
+  });
+  document.getElementById('competitionOverlay').classList.remove('open');
+  toast(tr('competition.savedToast'));
+  renderCompetitions();
+}
+(function initCompetition(){
+  const ov=document.getElementById('competitionOverlay'); if(!ov) return;
+  document.getElementById('cpSave').addEventListener('click', saveCompetition);
+  document.getElementById('competitionClose').addEventListener('click', ()=> ov.classList.remove('open'));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+  const addBtn = document.getElementById('clubAddCompetition');
+  if(addBtn) addBtn.addEventListener('click', openCompetition);
 })();
 
 /* ---- Modale générique de saisie rapide (remplace les prompt() natifs) ---- */
@@ -5731,6 +6050,8 @@ function switchClubView(){
   document.getElementById('clubViewCreneaux').hidden = clubView!=='creneaux';
   document.getElementById('clubViewGroupes').hidden = clubView!=='groupes';
   document.getElementById('clubViewAthletes').hidden = clubView!=='athletes';
+  document.getElementById('clubViewSuivi').hidden = clubView!=='suivi';
+  document.getElementById('clubViewCompetitions').hidden = clubView!=='competitions';
   document.getElementById('clubViewPresence').hidden = clubView!=='presence';
   document.getElementById('clubViewBill').hidden = clubView!=='bill';
   document.getElementById('clubViewOffres').hidden = clubView!=='offres';
@@ -5738,6 +6059,8 @@ function switchClubView(){
   if(clubView==='creneaux') renderCreneaux();
   if(clubView==='groupes') renderGroups();
   if(clubView==='athletes') renderClubAthletes();
+  if(clubView==='suivi') renderSuivi();
+  if(clubView==='competitions') renderCompetitions();
   if(clubView==='presence') renderPresence();
   if(clubView==='bill') renderClubBill();
   if(clubView==='offres') renderClubOffres();
@@ -6365,6 +6688,9 @@ function wireSessionVideos(){
    ============================================================ */
 let builderState = null;
 let builderUid = 1;
+// non-null pendant l'édition d'une séance déjà planifiée : bSaveCal met à
+// jour cette séance en place au lieu d'en créer une nouvelle (voir openBuilder).
+let builderEditing = null;
 
 const LINE_TYPES = {
   warmup:   {get l(){return tr('lineType.warmup')}, c:'#39E6A3'},
@@ -6571,9 +6897,26 @@ function exactToText(ex){
 }
 
 function openBuilder(dateKey, existing){
+  builderEditing = (existing && existing.id) ? {id:existing.id, dateKey:dateKey} : null;
+  // programmer pour un groupe / ranger en bibliothèque en même temps n'a de
+  // sens qu'à la création d'une séance neuve, pour un coach qui gère un club.
+  const hasClub = !!window.__pf_ownsClub;
+  const libWrap=document.getElementById('bAlsoLibWrap'), grpBtn=document.getElementById('bSaveGroup');
+  if(libWrap) libWrap.style.display = (hasClub && !builderEditing) ? 'flex' : 'none';
+  if(grpBtn) grpBtn.style.display = (hasClub && !builderEditing) ? '' : 'none';
+  const alsoLibBox = document.getElementById('bAlsoLib');
+  if(alsoLibBox) alsoLibBox.checked = false;
   const disc = existing?.disc || 'bike';
-  if(existing && existing.blocksV2){
+  if(existing && existing.blocksV2 && existing.blocksV2.blocks && existing.blocksV2.blocks.length){
+    // Une séance de la bibliothèque (TEMPLATES) porte un blocksV2 déjà complet
+    // (créé par builderToSession) ; une séance réelle chargée depuis
+    // scheduled_sessions n'a que { blocks } (voir sillance-integration.js) —
+    // titre/sport/références manquent et doivent être repris du haut niveau,
+    // sinon le sélecteur de sport et les références de la séance s'ouvrent vides.
     builderState = JSON.parse(JSON.stringify(existing.blocksV2));
+    builderState.title = builderState.title || existing.title || '';
+    builderState.disc = builderState.disc || existing.disc || disc;
+    builderState.activeRefs = builderState.activeRefs || defaultActiveRefs(builderState.disc);
     builderState.targetDate = dateKey || null;
   } else {
     builderState = {
@@ -7254,17 +7597,29 @@ document.getElementById('bDiscPick').addEventListener('change', e=>{
     if(builderState._refreshNutri) builderState._refreshNutri();
 });
 document.getElementById('bAddBlock').addEventListener('click', ()=>{ builderState.blocks.push(defaultBlockNew(builderState.disc)); renderBlocks(); });
-document.getElementById('bSaveLib').addEventListener('click', ()=>{
-  const s=builderToSession();
+// Rangée en bibliothèque : utilisée par le bouton dédié (bSaveLib) ET par la
+// case "Aussi en bibliothèque" du bouton bSaveGroup — même logique, pas de
+// fermeture/toast ici, c'est l'appelant qui gère (il peut enchaîner d'autres
+// actions, ex. ouvrir l'attribution par groupe juste après).
+function saveSessionToLibrary(s){
   TEMPLATES.push({id:'tpl'+(builderUid++), disc:s.disc, title:s.title, dur:s.dur, tss:s.tss, zone:s.zone, desc:s.desc, blocksV2:s.blocksV2});
-  // Persistance backend (si connecté) — non bloquant.
   if(window.PF?.user){
     PF.saveTemplate({ disc:s.disc, title:s.title, dur:s.dur, dist:s.dist||0, tss:s.tss,
       zone:s.zone, activeRefs:builderState.activeRefs, blocks:(s.blocksV2&&s.blocksV2.blocks)||builderState.blocks })
       .catch(e=> console.warn('[PF] saveTemplate échoué :', e));
   }
-  closeBuilder(); if(mode==='coach') renderSidebar();
+  if(mode==='coach') renderSidebar();
+}
+document.getElementById('bSaveLib').addEventListener('click', ()=>{
+  saveSessionToLibrary(builderToSession());
+  closeBuilder();
   toast(tr('toast.seanceRangeeEnBibliotheque'));
+});
+document.getElementById('bSaveGroup').addEventListener('click', ()=>{
+  const s=builderToSession();
+  if(document.getElementById('bAlsoLib')?.checked) saveSessionToLibrary(s);
+  closeBuilder();
+  openAssign('session', s);
 });
 document.getElementById('bShorthandGo').addEventListener('click', ()=>{
   const input=document.getElementById('bShorthandInput');
@@ -7287,6 +7642,25 @@ document.getElementById('bShorthandGo').addEventListener('click', ()=>{
 document.getElementById('bSaveCal').addEventListener('click', ()=>{
   const s=builderToSession();
   const key=builderState.targetDate || iso(mondayOf(weekOffset));
+  if(builderEditing){
+    // Édition d'une séance déjà planifiée : remplace en place plutôt que
+    // d'empiler un doublon. La date ne bouge pas (le builder ne l'affiche pas
+    // en édition) — seul le contenu (titre/sport/blocs/nutrition) change.
+    const { id, dateKey } = builderEditing;
+    s.id = id;
+    const list = planning[dateKey] || [];
+    const i = list.findIndex(x=>x.id===id);
+    if(i>-1) list[i] = s; else list.push(s);
+    if(window.PF?.user){
+      PF.updateScheduled(id, { disc:s.disc, title:s.title, dur:s.dur,
+        dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
+        .catch(e=> console.warn('[PF] updateScheduled échoué :', e));
+    }
+    builderEditing = null;
+    closeBuilder(); render();
+    toast('Séance modifiée');
+    return;
+  }
   (planning[key] ||= []).push(s);
   // Persistance backend (si connecté) — récupère l'id DB pour les futurs done/rpe.
   if(window.PF?.user){

@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260924f";
+import { PF } from "./sillance-client.js?v=20260928b";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -1023,6 +1023,9 @@ async function onLoggedIn() {
   // Accepte une éventuelle invitation présente dans l'URL (?invite=...).
   const tok = PF.pendingInviteToken?.();
   if (tok) { try { await PF.acceptInvite(tok); } catch (e) { console.warn("[PF] invite:", e); } }
+  // Idem pour une invitation à rejoindre un CLUB (?club_invite=...).
+  const clubTok = PF.pendingClubInviteToken?.();
+  if (clubTok) { try { await PF.acceptClubInvite(clubTok); } catch (e) { console.warn("[PF] club invite:", e); } }
   await hydrate();
   checkPaymentReturn();
   checkDeviceReturn();

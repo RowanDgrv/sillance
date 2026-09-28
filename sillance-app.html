@@ -1832,6 +1832,32 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .club-ath-licence.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
 .club-ath-licence.soon{background:rgba(255,177,61,.14);color:var(--bike);border-color:rgba(255,177,61,.5)}
 .club-ath-licence.ok{background:rgba(57,230,163,.12);color:var(--good);border-color:rgba(57,230,163,.4)}
+
+/* suivi jeune : carte test + sparkline */
+.suivi-card{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+.suivi-events{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.suivi-event{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px dashed var(--line)}
+.suivi-event:first-child{border-top:none;padding-top:0}
+.suivi-event-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.suivi-event-name{font-weight:700;font-size:12.5px}
+.suivi-event-best{font-family:var(--font-data);font-size:14.5px;color:var(--good)}
+.suivi-event-detail{font-size:11px;color:var(--muted)}
+.suivi-event-delta.better,.suivi-event-total.better{color:var(--good);font-weight:600}
+.suivi-event-delta.worse,.suivi-event-total.worse{color:var(--run);font-weight:600}
+
+/* compétitions objectif : carte + statut par athlète */
+.comp-card{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px}
+.comp-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.comp-name{font-weight:800;font-size:15px}
+.comp-date{font-size:12.5px;color:var(--muted)}
+.comp-level{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--line-strong);color:var(--muted)}
+.comp-level.regional{background:rgba(70,194,216,.14);color:var(--accent);border-color:transparent}
+.comp-level.france{background:rgba(255,177,61,.16);color:var(--bike);border-color:transparent}
+.comp-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 0;border-top:1px dashed var(--line)}
+.comp-status{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;border:1px solid var(--line-strong);color:var(--muted)}
+.comp-status.confirmed{background:rgba(57,230,163,.12);color:var(--good);border-color:rgba(57,230,163,.4)}
+.comp-status.declined{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
+.comp-simulate{font-size:10.5px;color:var(--muted);font-style:italic}
 .consent-note{font-size:var(--fs-base);line-height:1.5;color:var(--soft);background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 13px;margin:var(--space-1) 0 2px}
 .consent-check{display:flex;gap:9px;align-items:flex-start;width:100%;font-size:12.5px;line-height:1.45;color:var(--soft);cursor:pointer;margin-top:var(--space-2)}
 .consent-check input[type="checkbox"]{width:auto;flex:none;margin-top:2px}
@@ -3023,6 +3049,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <button class="club-tab" data-ct="presence"><i class="ic ic-check"></i><span data-i18n="club.tabAttendance">Présences</span></button>
       <button class="club-tab" data-ct="athletes"><i class="ic ic-users"></i><span data-i18n="club.tabMembers">Adhérents</span></button>
       <button class="club-tab" data-ct="groupes"><i class="ic ic-shirt"></i><span data-i18n="club.tabGroups">Groupes</span></button>
+      <button class="club-tab" data-ct="suivi"><i class="ic ic-chart"></i><span data-i18n="club.tabSuivi">Suivi jeune</span></button>
+      <button class="club-tab" data-ct="competitions"><i class="ic ic-flag"></i><span data-i18n="club.tabCompetitions">Compétitions</span></button>
     </div>
 
     <!-- Onglet créneaux -->
@@ -3041,6 +3069,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <div class="club-actions">
         <button class="btn club-add" id="clubAddGroup">+ Créer un groupe</button>
         <span class="club-hint">Organise tes licenciés par niveau ou objectif (jeunes, compétition, distance M, Ironman…).</span>
+        <button class="group-edit" id="tutoBtnGroupes"><i class="ic ic-lightbulb"></i> <span data-i18n="tour.groupes.btn">Tuto</span></button>
       </div>
       <div class="group-list" id="groupList"></div>
     </div>
@@ -3074,6 +3103,26 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         <select id="clubFilterLevel" class="club-filter-sel" aria-label="Filtrer par niveau"></select>
       </div>
       <div class="club-athletes" id="clubAthletesList"></div>
+    </div>
+
+    <!-- Onglet suivi jeune (chronos de référence) -->
+    <div class="club-view" id="clubViewSuivi" hidden>
+      <div class="club-actions">
+        <span class="club-hint" data-i18n="suivi.hint">Chronos de référence des jeunes du club, sur l'année. Filtré par défaut sur les groupes jeunes.</span>
+        <select id="suiviFilterGroup" class="club-filter-sel" aria-label="Filtrer par groupe"></select>
+        <button class="group-edit" id="tutoBtnSuivi"><i class="ic ic-lightbulb"></i> <span data-i18n="tour.suivi.btn">Tuto</span></button>
+      </div>
+      <div class="club-athletes" id="suiviList"></div>
+    </div>
+
+    <!-- Onglet compétitions objectif -->
+    <div class="club-view" id="clubViewCompetitions" hidden>
+      <div class="club-actions">
+        <button class="btn club-add" id="clubAddCompetition" data-i18n="competition.add">+ Nouvelle compétition</button>
+        <span class="club-hint" data-i18n="competition.hint">Compétitions objectif de la saison : le coach les crée, l'athlète (ou son parent si mineur) confirme sa participation.</span>
+        <button class="group-edit" id="tutoBtnCompetitions"><i class="ic ic-lightbulb"></i> <span data-i18n="tour.competitions.btn">Tuto</span></button>
+      </div>
+      <div id="competitionsList"></div>
     </div>
 
     <!-- Onglet présences -->
@@ -3208,6 +3257,54 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <p class="consent-note">Le certificat médical (ou le questionnaire de santé qui en tient lieu selon les règles de ta fédération) est une donnée de santé, traitée selon la <a href="./legal.html#confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
     </div>
     <button class="btn" id="licSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Enregistrer</button>
+  </div>
+</div>
+
+<!-- Modal ajout d'un chrono de test (suivi jeune) -->
+<div class="overlay" id="testTimeOverlay" role="dialog" aria-modal="true" aria-label="Ajouter un chrono">
+  <div class="modal group-modal">
+    <button class="close" id="testTimeClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--swim)"><i class="ic ic-chart"></i> Suivi jeune</span>
+    <h3>Nouveau chrono · <span id="testTimeAthName"></span></h3>
+    <div class="cr-form">
+      <div class="cr-row">
+        <div class="b-fld"><label for="ttDate" data-i18n="testTime.dateLabel">Date du test</label><input type="date" id="ttDate"></div>
+        <div class="b-fld"><label for="ttDisc" data-i18n="testTime.discLabel">Discipline</label>
+          <select id="ttDisc">
+            <option value="swim">Natation</option>
+            <option value="run">Course à pied</option>
+          </select>
+        </div>
+      </div>
+      <div class="b-fld"><label for="ttEvent" data-i18n="testTime.eventLabel">Épreuve</label><select id="ttEvent"></select></div>
+      <div class="b-fld"><label for="ttTime" data-i18n="testTime.timeLabel">Temps (mm:ss ou mm:ss.cc)</label><input type="text" id="ttTime" placeholder="Ex. 1:42.30" data-i18n-attr="placeholder:testTime.timePh"></div>
+      <div class="b-fld"><label for="ttNote" data-i18n="testTime.noteLabel">Note (optionnel)</label><input type="text" id="ttNote" placeholder="Ex. Bassin 25m, conditions normales" data-i18n-attr="placeholder:testTime.notePh"></div>
+    </div>
+    <button class="btn" id="ttSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> <span data-i18n="testTime.save">Enregistrer le chrono</span></button>
+  </div>
+</div>
+
+<!-- Modal création d'une compétition objectif -->
+<div class="overlay" id="competitionOverlay" role="dialog" aria-modal="true" aria-label="Nouvelle compétition">
+  <div class="modal group-modal">
+    <button class="close" id="competitionClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
+    <span class="badge" style="background:var(--run)"><i class="ic ic-flag"></i> Compétition</span>
+    <h3 data-i18n="competition.modalTitle">Nouvelle compétition objectif</h3>
+    <div class="cr-form">
+      <div class="b-fld"><label for="cpName" data-i18n="competition.nameLabel">Nom de la compétition</label><input type="text" id="cpName" placeholder="Ex. Sélectif régional CAP" data-i18n-attr="placeholder:competition.namePh"></div>
+      <div class="cr-row">
+        <div class="b-fld"><label for="cpDate" data-i18n="competition.dateLabel">Date</label><input type="date" id="cpDate"></div>
+        <div class="b-fld"><label for="cpLevel" data-i18n="competition.levelLabel">Niveau</label>
+          <select id="cpLevel">
+            <option value="departemental" data-i18n="competition.level.departemental">Départemental</option>
+            <option value="regional" data-i18n="competition.level.regional">Régional</option>
+            <option value="france" data-i18n="competition.level.france">Championnat de France</option>
+          </select>
+        </div>
+      </div>
+      <div class="b-fld"><label for="cpGroup" data-i18n="competition.groupLabel">Groupe ciblé</label><select id="cpGroup"></select></div>
+    </div>
+    <button class="btn" id="cpSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> <span data-i18n="competition.save">Créer la compétition</span></button>
   </div>
 </div>
 
@@ -3654,6 +3751,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <div class="builder-foot">
       <div class="b-summary" id="bSummary"></div>
       <div class="b-actions">
+        <label class="b-alsolib" id="bAlsoLibWrap" style="display:none;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);margin-right:4px">
+          <input type="checkbox" id="bAlsoLib"> Aussi en bibliothèque
+        </label>
+        <button class="b-ghost" id="bSaveGroup" style="display:none"><i class="ic ic-users"></i> Programmer pour un groupe</button>
         <button class="b-ghost" id="bSaveLib"><i class="ic ic-book"></i> Ranger en bibliothèque</button>
         <button class="btn" id="bSaveCal"><i class="ic ic-check"></i> Ajouter au calendrier</button>
       </div>
@@ -3708,16 +3809,16 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20260924f"></script>
+<script src="./sillance-i18n-app.js?v=20260927c"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
-<script src="./sillance-tour.js"></script>
+<script src="./sillance-tour.js?v=20260927d"></script>
 <script src="./sillance-flow.js"></script>
-<script src="./sillance-app.core.js?v=20260924f"></script>
+<script src="./sillance-app.core.js?v=20260928b"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20260924f"></script>
+<script type="module" src="./sillance-integration.js?v=20260928b"></script>
 <script src="./sillance-cookies.js"></script>
 <script src="./sillance-analytics.js"></script>
 </body>

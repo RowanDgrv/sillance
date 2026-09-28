@@ -415,6 +415,13 @@ export const PF = {
     }).select().single();
     if (error) throw error; return data;
   },
+  async updateScheduled(id, s) {
+    const { data, error } = await sb.from("scheduled_sessions").update({
+      disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,
+      zone: s.zone, blocks: s.blocks ?? [],
+    }).eq("id", id).select().single();
+    if (error) throw error; return data;
+  },
   async markSessionDone(id, { done = true, rpe, rpeMuscle } = {}) {
     const payload = { done, rpe };
     // rpe_muscle : colonne 0021 — repli gracieux si pas encore déployée.
@@ -580,6 +587,18 @@ export const PF = {
   // Athlète connecté : accepte via le token (?invite=... dans l'URL).
   async acceptInvite(token) {
     return await this._invoke("accept-invite", { token });
+  },
+  // -------- INVITATIONS À REJOINDRE UN CLUB (distinct du coaching perso) --------
+  // Gérant du club : invite un nouveau membre par email (contact@sillance.app).
+  async inviteClubMember(clubId, email) {
+    return await this._invoke("invite-club-member", { club_id: clubId, email });
+  },
+  // Athlète connecté : rejoint le club via le token (?club_invite=... dans l'URL).
+  async acceptClubInvite(token) {
+    return await this._invoke("accept-club-invite", { token });
+  },
+  pendingClubInviteToken() {
+    return new URLSearchParams(location.search).get("club_invite");
   },
   // Coach : se rattache lui-même comme son propre athlète (self-coaching),
   // compte dans son propre quota d'athlètes (palier de prix).
