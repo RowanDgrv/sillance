@@ -600,6 +600,11 @@ export const PF = {
   pendingClubInviteToken() {
     return new URLSearchParams(location.search).get("club_invite");
   },
+  // ?join=<token> : lien stable du club (widget "Adhérents"), distinct de
+  // ?club_invite= (à usage unique, par email).
+  pendingJoinToken() {
+    return new URLSearchParams(location.search).get("join");
+  },
   // Coach : se rattache lui-même comme son propre athlète (self-coaching),
   // compte dans son propre quota d'athlètes (palier de prix).
   async enableSelfCoaching() {
@@ -677,6 +682,45 @@ export const PF = {
     const { data, error } = await sb.from("clubs")
       .insert({ name, owner_id: this.user.id }).select().single();
     if (error) throw error; return data;
+  },
+
+  // -------- LIEN D'INVITATION DU CLUB (stable, partagé une fois à tous les
+  // athlètes) + demandes d'adhésion reçues via ce lien --------
+  // Lecture publique minimale (nom du club) par token, pour la page
+  // d'atterrissage — fonctionne même déconnecté (RPC security definer).
+  async getClubByJoinToken(token) {
+    const { data, error } = await sb.rpc("club_by_join_token", { p_token: token });
+    if (error) { console.warn("[PF] club_by_join_token :", error.message); return null; }
+    return data?.[0] ?? null;
+  },
+  // Athlète connecté : envoie une demande d'adhésion pour ce club.
+  async requestToJoinClub(clubId, disc, message) {
+    const { data, error } = await sb.from("club_join_requests")
+      .upsert(
+        { club_id: clubId, athlete_id: this.user.id, disc: disc || null, message: message || null, status: "pending" },
+        { onConflict: "club_id,athlete_id" },
+      ).select().single();
+    if (error) throw error; return data;
+  },
+  // Gérant du club : liste ses demandes en attente (avec le profil du demandeur).
+  async myClubJoinRequests(clubId) {
+    const { data, error } = await sb.from("club_join_requests")
+      .select("id, athlete_id, disc, message, created_at, profiles:athlete_id(full_name, email)")
+      .eq("club_id", clubId).eq("status", "pending").order("created_at");
+    if (error) { console.warn("[PF] lecture club_join_requests échouée :", error.message); return []; }
+    return data ?? [];
+  },
+  // Gérant du club : accepte (crée le membre, affecté au groupe choisi) ou refuse.
+  async resolveJoinRequest(requestId, { accept, clubId, athleteId, groupId }) {
+    if (accept) {
+      const { error: memErr } = await sb.from("club_members")
+        .insert({ club_id: clubId, athlete_id: athleteId, group_id: groupId || null, role: "member" });
+      if (memErr) throw memErr;
+    }
+    const { error } = await sb.from("club_join_requests")
+      .update({ status: accept ? "accepted" : "rejected", resolved_at: new Date().toISOString() })
+      .eq("id", requestId);
+    if (error) throw error;
   },
   async getClubMembers(clubId) {
     const { data, error } = await sb.from("club_members").select("*, club_groups(name,color)").eq("club_id", clubId).limit(1000);

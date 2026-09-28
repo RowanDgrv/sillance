@@ -4812,6 +4812,7 @@ function initClubFilters(){
   }
 }
 function renderClubAthletes(filter){
+  loadRealClubJoinData();
   renderJoinRequests();
   renderLicenceAlert();
   initClubFilters();
@@ -5927,6 +5928,38 @@ function saveConsent(){
   ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
 })();
 
+/* ---- Lien d'invitation du club + demandes reçues : RÉEL une fois connecté ----
+   Ce widget existait déjà (inviteLink/inviteWhatsapp/inviteSimulate) mais
+   tournait à 100% en local : lien codé en dur dans le HTML, "demandes"
+   simulées dans un tableau JS jamais persisté (bug remonté 28/09/2026,
+   capture d'écran montrant /rejoindre/muret-goat-squad — une route qui n'a
+   jamais existé). REAL_CLUB reste null en démo : tout le comportement local
+   ci-dessous (JOIN_REQUESTS de démo, bouton Simuler) est inchangé. */
+let REAL_CLUB=null, _clubJoinLoading=false;
+async function loadRealClubJoinData(){
+  if(!window.PF?.user || _clubJoinLoading) return;
+  _clubJoinLoading=true;
+  try{
+    if(!REAL_CLUB){
+      const clubs=await PF.myClubs();
+      REAL_CLUB=clubs[0]||null;
+    }
+    if(!REAL_CLUB) return;
+    const linkInput=document.getElementById('inviteLink');
+    if(linkInput) linkInput.value=`${location.origin}${location.pathname}?join=${REAL_CLUB.join_token}`;
+    const simBtn=document.getElementById('inviteSimulate');
+    if(simBtn) simBtn.style.display='none';
+    const reqs=await PF.myClubJoinRequests(REAL_CLUB.id);
+    JOIN_REQUESTS=reqs.map(r=>({
+      id:r.id, athleteId:r.athlete_id, disc:r.disc||'tri',
+      name:r.profiles?.full_name || r.profiles?.email || 'Athlète',
+      msg:r.message || tr('join.wantsToJoinViaLink'),
+    }));
+    renderJoinRequests();
+  }catch(e){ console.warn('[PF] loadRealClubJoinData:', e); }
+  finally{ _clubJoinLoading=false; }
+}
+
 /* ---- Demandes d'adhésion (via le lien d'invitation) ---- */
 function renderJoinRequests(){
   const box=document.getElementById('joinRequests'); if(!box) return;
@@ -5949,7 +5982,11 @@ function renderJoinRequests(){
   box.querySelectorAll('.join-req').forEach(row=>{
     const r=JOIN_REQUESTS.find(x=>x.id===row.dataset.id);
     row.querySelector('[data-act="accept"]').onclick=()=> openAcceptModal(r);
-    row.querySelector('[data-act="reject"]').onclick=()=>{
+    row.querySelector('[data-act="reject"]').onclick=async ()=>{
+      if(REAL_CLUB && r.athleteId){
+        try{ await PF.resolveJoinRequest(r.id, {accept:false}); }
+        catch(e){ console.warn('[PF] resolveJoinRequest:', e); toast('Erreur, réessaie.', 'error'); return; }
+      }
       JOIN_REQUESTS=JOIN_REQUESTS.filter(x=>x.id!==r.id);
       renderClubAthletes(); toast(tr('toast.demandeRefusee'));
     };
@@ -5975,9 +6012,20 @@ function openAcceptModal(r){
 }
 document.getElementById('acceptClose').onclick=()=> acceptOverlay.classList.remove('open');
 acceptOverlay.addEventListener('click', e=>{ if(e.target===acceptOverlay) acceptOverlay.classList.remove('open'); });
-document.getElementById('acceptSave').onclick=()=>{
+document.getElementById('acceptSave').onclick=async ()=>{
   if(!acceptingReq) return;
   if(!acceptGroupId){ toast(tr('toast.choisisGroupePourCetAthlete')); return; }
+  if(REAL_CLUB && acceptingReq.athleteId){
+    try{
+      await PF.resolveJoinRequest(acceptingReq.id, {
+        accept:true, clubId:REAL_CLUB.id, athleteId:acceptingReq.athleteId, groupId:acceptGroupId,
+      });
+    }catch(e){ console.warn('[PF] resolveJoinRequest:', e); toast('Erreur, réessaie.', 'error'); return; }
+  }
+  // Liste "Adhérents" ci-dessous : encore un affichage local (CLUB_ATHLETES,
+  // pas branché sur club_members) — le membre réel existe désormais en base
+  // même s'il n'apparaît pas encore ici tant que cette liste n'est pas
+  // rebranchée sur les vraies données.
   const newA={ id:'a'+Date.now(), name:acceptingReq.name, disc:acceptingReq.disc, since:String(new Date().getFullYear()), group:acceptGroupId };
   CLUB_ATHLETES.push(newA);
   JOIN_REQUESTS=JOIN_REQUESTS.filter(x=>x.id!==acceptingReq.id);
@@ -6002,6 +6050,7 @@ document.getElementById('inviteWhatsapp').onclick=()=>{
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 };
 document.getElementById('inviteSimulate').onclick=()=>{
+  if(REAL_CLUB) return; // masqué dès que le vrai club est chargé, garde-fou au cas où
   const name=DEMO_NAMES[demoNameIdx % DEMO_NAMES.length]; demoNameIdx++;
   JOIN_REQUESTS.push({id:'r'+Date.now(), name, disc: Math.random()>0.5?'tri':'bike', msg:tr('join.wantsToJoinViaLink')});
   renderClubAthletes();
