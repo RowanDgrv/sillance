@@ -3724,10 +3724,22 @@ async function openInviteClubMember(){
     if(!email || !email.includes('@')){ toast(tr('toast.entreEMailValide')); return; }
     const btn=document.getElementById('clubInvSend'); btn.disabled=true;
     try{
-      const {emailed} = await PF.inviteClubMember(club.id, email);
+      const {emailed, inviteUrl} = await PF.inviteClubMember(club.id, email);
+      // Tant que l'envoi automatique n'est pas configuré (RESEND_API_KEY),
+      // le lien reste utilisable : le coach le copie et l'envoie lui-même
+      // (par email depuis sa propre boîte, SMS…) — même repli que pour
+      // l'invitation coach→athlète (openInviteAthlete).
       document.getElementById('clubInvResult').innerHTML = emailed
         ? `<div class="cc-s" style="color:#39e6a3;margin-top:8px"><i class="ic ic-check"></i> Email envoyé à ${dispoSafe(email)}.</div>`
-        : `<div class="cc-s" style="color:#e5484d;margin-top:8px">Envoi impossible pour le moment (email non configuré). Réessaie plus tard.</div>`;
+        : `<div class="cc-s" style="margin-top:8px">Envoi automatique pas encore configuré : copie ce lien et envoie-le toi-même.</div>
+           <div class="invite-linkrow" style="margin-top:6px"><input type="text" id="clubInvLink" readonly value="${inviteUrl}"></div>
+           <button class="invite-copy cc-btn" id="clubInvCopy" style="margin-top:6px">${tr('invite.copyLinkBtn')}</button>`;
+      const copyBtn = document.getElementById('clubInvCopy');
+      if(copyBtn) copyBtn.onclick=()=>{
+        const inp=document.getElementById('clubInvLink'); inp.select();
+        try{ navigator.clipboard.writeText(inp.value); }catch(err){ document.execCommand && document.execCommand('copy'); }
+        toast(tr('toast.lienCopie'));
+      };
     }catch(e){
       console.warn('[PF] inviteClubMember:', e);
       document.getElementById('clubInvResult').innerHTML = `<div class="cc-s" style="color:#e5484d;margin-top:8px">Invitation impossible (déjà membre, ou erreur temporaire).</div>`;
