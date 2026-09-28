@@ -91,8 +91,11 @@ const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s
   ...(s.rpe_muscle != null ? { rpeMuscle: s.rpe_muscle } : {}), note: esc(s.note),
   coachNote: esc(s.coach_note),
   blocksV2: s.blocks && s.blocks.length ? { blocks: s.blocks } : undefined });
-const mapMember  = (m) => ({ id: m.id, name: esc(m.display_name) || "Athlète",
-  disc: m.disc || "tri", since: esc(m.since) || "", group: m.group_id });
+// display_name (membre sans compte) prioritaire, sinon le nom réel du profil
+// lié (join profiles dans getClubMembers) — avant ce fix un membre inscrit
+// via accept-club-invite retombait toujours sur le placeholder "Athlète".
+const mapMember  = (m) => ({ id: m.id, name: esc(m.display_name) || esc(m.profiles?.full_name) || "Athlète",
+  email: esc(m.profiles?.email) || "", disc: m.disc || "tri", since: esc(m.since) || "", group: m.group_id });
 const mapGroup   = (g) => ({ id: g.id, name: esc(g.name), color: g.color, desc: esc(g.description) });
 const mapCreneau = (c) => ({ id: c.id, disc: c.disc, title: esc(c.title), day: c.day,
   time: c.time, dur: c.dur, place: esc(c.place), cap: c.cap, coach: esc(c.coach),
