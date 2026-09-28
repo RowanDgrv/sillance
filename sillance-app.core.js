@@ -3619,7 +3619,7 @@ function openAddAthleteChoice(){
       </button>`:''}
       ${hasClub?`<button class="addath-choice" id="addathClubInvite" type="button">
         <i class="ic ic-send"></i>
-        <span><span class="addath-t">Nouveau membre du club</span><span class="addath-s" style="display:block">Il reçoit un email pour rejoindre le club (pas encore inscrit sur Sillance).</span></span>
+        <span><span class="addath-t">Nouveau membre du club</span><span class="addath-s" style="display:block">Génère un lien à lui envoyer toi-même (pas encore inscrit sur Sillance).</span></span>
       </button>`:''}
     </div>
   </div>`;
@@ -3704,10 +3704,10 @@ async function openInviteClubMember(){
   const formHTML=()=>`<div class="adh-modal" role="dialog" aria-label="Inviter dans le club">
     <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <h3>Inviter dans ${dispoSafe(club.name)}</h3>
-    <p class="adh-sub">Il reçoit un email (envoyé par contact@sillance.app) pour créer son compte et rejoindre le club directement.</p>
+    <p class="adh-sub">Génère un lien pour cette personne, tu l'envoies toi-même par le canal de ton choix (email, SMS, WhatsApp…).</p>
     <div class="invite-linkrow">
       <input type="email" id="clubInvEmail" placeholder="${tr('invite.emailPh')}" autocomplete="email">
-      <button class="cc-btn" id="clubInvSend">${tr('invite.send')}</button>
+      <button class="cc-btn" id="clubInvSend">Générer le lien</button>
     </div>
     <div id="clubInvResult"></div>
   </div>`;
@@ -3724,16 +3724,13 @@ async function openInviteClubMember(){
     if(!email || !email.includes('@')){ toast(tr('toast.entreEMailValide')); return; }
     const btn=document.getElementById('clubInvSend'); btn.disabled=true;
     try{
-      const {emailed, inviteUrl} = await PF.inviteClubMember(club.id, email);
-      // Tant que l'envoi automatique n'est pas configuré (RESEND_API_KEY),
-      // le lien reste utilisable : le coach le copie et l'envoie lui-même
-      // (par email depuis sa propre boîte, SMS…) — même repli que pour
-      // l'invitation coach→athlète (openInviteAthlete).
-      document.getElementById('clubInvResult').innerHTML = emailed
-        ? `<div class="cc-s" style="color:#39e6a3;margin-top:8px"><i class="ic ic-check"></i> Email envoyé à ${dispoSafe(email)}.</div>`
-        : `<div class="cc-s" style="margin-top:8px">Envoi automatique pas encore configuré : copie ce lien et envoie-le toi-même.</div>
-           <div class="invite-linkrow" style="margin-top:6px"><input type="text" id="clubInvLink" readonly value="${inviteUrl}"></div>
-           <button class="invite-copy cc-btn" id="clubInvCopy" style="margin-top:6px">${tr('invite.copyLinkBtn')}</button>`;
+      // Aucun envoi automatique (ni email ni WhatsApp) : on génère juste le
+      // lien, le coach le partage lui-même par le canal de son choix
+      // (décision produit 28/09/2026).
+      const {inviteUrl} = await PF.inviteClubMember(club.id, email);
+      document.getElementById('clubInvResult').innerHTML =
+        `<div class="invite-linkrow" style="margin-top:8px"><input type="text" id="clubInvLink" readonly value="${inviteUrl}"></div>
+         <button class="invite-copy cc-btn" id="clubInvCopy" style="margin-top:6px">${tr('invite.copyLinkBtn')}</button>`;
       const copyBtn = document.getElementById('clubInvCopy');
       if(copyBtn) copyBtn.onclick=()=>{
         const inp=document.getElementById('clubInvLink'); inp.select();
