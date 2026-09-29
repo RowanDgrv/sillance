@@ -1667,6 +1667,11 @@ async function refreshDeviceState(){
       }));
     } else { stravaActivities = []; }
     renderStravaCard();
+    // render() (donc syncSendWeekButtonVisibility) peut avoir déjà tourné
+    // AVANT que __pf_providers soit connu (chargé en parallèle du planning,
+    // pas après) — sans ce re-sync direct, le bouton "Envoyer la semaine"
+    // restait caché même une fois COROS bien détecté comme connecté.
+    if(typeof syncSendWeekButtonVisibility==='function') syncSendWeekButtonVisibility();
   }catch(e){ console.warn('[PF] refreshDeviceState:',e); }
 }
 
