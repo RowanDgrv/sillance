@@ -5062,6 +5062,32 @@ function renderClubCalGroupFilter(){
     renderClubCalendar();
   });
 }
+/* Séances INDIVIDUELLES (coach → un seul athlète, posées depuis SON
+   calendrier perso, sans lien avec un créneau) affichées sur le calendrier
+   club (demande Rowan 29/09/2026 : distinguer club/groupe/individuel).
+   source_creneau_id is null les distingue des séances matérialisées depuis
+   un créneau (déjà montrées via les cartes créneau, pas à dupliquer ici).
+   Chargées une fois par fenêtre visible (clubIndivFetchKey), pas à chaque
+   frappe — re-render déclenché quand la réponse arrive. */
+let clubIndivSessions = {};
+let clubIndivFetchKey = '';
+function fetchClubIndividualSessions(fromIso, toIso){
+  if(!(window.PF?.user && window.__pf_clubId)) return;
+  const key = fromIso+'|'+toIso;
+  if(clubIndivFetchKey===key) return;
+  clubIndivFetchKey = key;
+  const uids = CLUB_ATHLETES.map(a=>a.athleteUid).filter(Boolean);
+  if(!uids.length) return;
+  PF.getClubIndividualSchedule(uids, fromIso, toIso).then(rows=>{
+    const byDate = {};
+    rows.forEach(r=>{
+      const member = CLUB_ATHLETES.find(a=>a.athleteUid===r.athlete_id);
+      (byDate[r.date] ||= []).push({ id:r.id, memberId: member?member.id:null, memberName: member?member.name:'?', title:r.title, dur:r.dur });
+    });
+    clubIndivSessions = byDate;
+    if(clubView==='calendrier') renderClubCalendar();
+  }).catch(e=> console.warn('[PF] getClubIndividualSchedule échoué :', e));
+}
 function renderClubCalendar(){
   const grid = document.getElementById('clubCalGrid');
   if(!grid) return;
@@ -5075,6 +5101,7 @@ function renderClubCalendar(){
   grid.innerHTML='';
   const todayIso = iso(new Date());
   const matchesFilter = (groups)=> !clubCalGroupFilter || !(groups&&groups.length) || groups.includes(clubCalGroupFilter);
+  fetchClubIndividualSessions(iso(mon0), iso(sun));
 
   for(let w=0; w<nWeeks; w++){
     const wMon = addDays(mon0, w*7);
@@ -5090,6 +5117,7 @@ function renderClubCalendar(){
       const slots = CRENEAUX.filter(c=> (c.recur==='once' ? c.date===key : c.day===i) && matchesFilter(c.groups))
         .sort((a,b)=>(a.time||'').localeCompare(b.time||''));
       const comps = COMPETITIONS.filter(comp=>comp.date===key && (!clubCalGroupFilter || comp.targetGroupId===clubCalGroupFilter));
+      const indiv = clubCalGroupFilter ? [] : (clubIndivSessions[key]||[]);
       const day=document.createElement('div');
       day.className='day'+(key===todayIso?' today':'');
       day.innerHTML = `
@@ -5098,6 +5126,10 @@ function renderClubCalendar(){
           ${comps.map(comp=>`<div class="club-cal-comp"><i class="ic ic-flag"></i>${comp.name}</div>`).join('')}
           ${slots.map(c=>{
             const D=DISC[c.disc]||{color:'var(--muted)'};
+            const groups=creneauGroups(c);
+            const recipBadge = groups.length
+              ? groups.map(g=>`<span class="club-cal-badge" style="background:color-mix(in srgb,${g.color} 18%,transparent);border:1px solid color-mix(in srgb,${g.color} 55%,transparent);color:${g.color}">${g.name}</span>`).join('')
+              : `<span class="club-cal-badge type-club"><i class="ic ic-landmark"></i>${tr('clubCal.legendClub')}</span>`;
             const avatars = c.attendees.slice(0,5).map(id=>{
               const a=CLUB_ATHLETES.find(x=>x.id===id);
               return `<div class="cr-att" data-open-ath="${id}" title="${a?a.name:''}">${a?initials(a.name):'?'}</div>`;
@@ -5105,10 +5137,16 @@ function renderClubCalendar(){
             return `<div class="club-cal-slot" style="--c:${D.color}" data-creneau="${c.id}">
               <div class="ccs-t">${c.time||''} · ${c.title}</div>
               ${c.place?`<div class="ccs-m">${c.place}</div>`:''}
+              <div>${recipBadge}</div>
               ${avatars?`<div class="ccs-att">${avatars}</div>`:''}
               ${(c.disc==='run')?`<button class="ccs-mk" data-mk="${c.id}">${c.sessionTemplate?tr('creneau.editSession'):tr('creneau.createSession')}</button>`:''}
             </div>`;
           }).join('')}
+          ${indiv.map(s=>`<div class="club-cal-indiv" data-open-ath="${s.memberId||''}">
+            <span class="club-cal-badge type-indiv"><i class="ic ic-user"></i>${tr('clubCal.legendIndiv')}</span>
+            <div class="ccs-t">${s.title}</div>
+            <div class="ccs-m">${s.memberName} · ${fmtDur(s.dur)}</div>
+          </div>`).join('')}
         </div>`;
       row.appendChild(day);
     }

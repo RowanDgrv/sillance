@@ -1581,6 +1581,35 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
   background:color-mix(in srgb,var(--strength) 18%,transparent);border:1px solid color-mix(in srgb,var(--strength) 55%,transparent);
   color:var(--strength);font-size:10.5px;font-weight:700;line-height:1.2}
 .club-cal-comp .ic{width:11px;height:11px;flex:none}
+
+/* Destinataire de chaque entrée (29/09/2026) : badge distinct de la couleur
+   discipline (--c, déjà utilisée pour la barre gauche des créneaux) — code
+   couleur + icône, pas juste la couleur seule, pour rester lisible même si
+   un groupe a une couleur proche. --recip-club/--recip-indiv choisies à
+   l'écart de la palette discipline (swim/bike/run/strength) ET de la
+   palette groupes (CLUB_GROUPS[].color, arbitraire) pour ne jamais se
+   confondre avec un badge de groupe (.cr-grp, coloré --gc = la vraie
+   couleur DU groupe, volontairement laissé tel quel ci-dessus). */
+:root{ --recip-club:#2BB6A3; --recip-indiv:#C77DFF; }
+.club-cal-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;
+  font-size:9.5px;font-weight:700;line-height:1.5;margin:0 4px 4px 0}
+.club-cal-badge .ic{width:9px;height:9px;flex:none}
+.club-cal-badge.type-club{background:color-mix(in srgb,var(--recip-club) 18%,transparent);
+  border:1px solid color-mix(in srgb,var(--recip-club) 55%,transparent);color:var(--recip-club)}
+.club-cal-badge.type-indiv{background:color-mix(in srgb,var(--recip-indiv) 18%,transparent);
+  border:1px solid color-mix(in srgb,var(--recip-indiv) 55%,transparent);color:var(--recip-indiv)}
+.club-cal-legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:0 0 14px;font-size:11px;color:var(--muted)}
+.club-cal-legend .lg-item{display:flex;align-items:center;gap:6px}
+.club-cal-legend .lg-dot{width:9px;height:9px;border-radius:50%;flex:none}
+
+/* Séance individuelle (coach → un seul athlète, pas de créneau) affichée
+   sur le calendrier club — carte volontairement SANS couleur discipline en
+   barre gauche (celle-ci reste réservée aux créneaux) : l'accent unique
+   --recip-indiv suffit à la distinguer d'un créneau au premier coup d'œil. */
+.club-cal-indiv{border:1px solid color-mix(in srgb,var(--recip-indiv) 45%,var(--line));border-left:3px solid var(--recip-indiv);
+  border-radius:var(--radius-sm);background:var(--panel-2);padding:8px 10px 9px;margin-bottom:6px;cursor:pointer}
+.club-cal-indiv .ccs-t{font-weight:600;font-size:12.5px;line-height:1.3}
+.club-cal-indiv .ccs-m{font-family:var(--font-data);font-size:10.5px;color:var(--muted);margin-top:3px}
 .day.day-race{outline:1px solid color-mix(in srgb,var(--run) 45%,transparent);outline-offset:-1px}
 .ap-dispo{display:inline-flex;align-items:center;gap:var(--space-1);font-size:var(--fs-xs);font-weight:700;color:var(--fc);white-space:nowrap}
 .ap-dispo .ic{width:10px;height:10px}
@@ -3102,6 +3131,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         </select>
       </nav>
       <div class="club-hint" style="margin:10px 0">Créneaux, compétitions et inscriptions de tous les groupes. Clique sur un athlète pour ouvrir son calendrier.</div>
+      <div class="club-cal-legend">
+        <span class="lg-item"><span class="lg-dot" style="background:var(--recip-club)"></span><span data-i18n="clubCal.legendClub">Tout le club</span></span>
+        <span class="lg-item"><span class="lg-dot" style="background:linear-gradient(90deg,#2FD9FF,#FF5470)"></span><span data-i18n="clubCal.legendGroup">Groupe précis (couleur = le groupe)</span></span>
+        <span class="lg-item"><span class="lg-dot" style="background:var(--recip-indiv)"></span><span data-i18n="clubCal.legendIndiv">Séance individuelle</span></span>
+      </div>
       <div class="asg-groups" id="clubCalGroupFilter" style="margin-bottom:14px"></div>
       <div class="cal-grid" id="clubCalGrid"></div>
     </div>
