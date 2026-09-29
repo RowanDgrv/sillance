@@ -429,6 +429,7 @@ let weeksShown = WEEKS_SHOWN_OPTIONS.includes(+localStorage.getItem('sil_cal_wee
 // athlète ci-dessus (même famille de contrôles, même options de semaines).
 let clubCalWeekOffset = 0;
 let clubCalWeeksShown = WEEKS_SHOWN_OPTIONS.includes(+localStorage.getItem('sil_club_cal_weeks')) ? +localStorage.getItem('sil_club_cal_weeks') : 3;
+let clubCalGroupFilter = null; // null = tous les groupes
 let mode = 'coach';
 let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
@@ -4399,12 +4400,20 @@ let CLUB_GROUPS = [
   {id:'g6', get name(){return tr('grp.g6.name')}, color:'#FF8A3D', get desc(){return tr('grp.g6.desc')}}
 ];
 function clubGroup(id){ return CLUB_GROUPS.find(g=>g.id===id); }
+/* Un créneau cible 0 (tout le club), 1 ou plusieurs groupes (0059 —
+   avant, un seul groupe possible ou aucun). Deux helpers pour ne pas
+   répéter cette logique partout où un créneau est affiché/filtré. */
+function creneauGroups(c){ return (c.groups||[]).map(clubGroup).filter(Boolean); }
+function creneauCanSee(c, member){
+  if(!c.groups || !c.groups.length) return true;
+  return !!(member && member.group && c.groups.includes(member.group));
+}
 const CLUB_DAYS = [tr('day.mon'),tr('day.tue'),tr('day.wed'),tr('day.thu'),tr('day.fri'),tr('day.sat'),tr('day.sun')];
 let CRENEAUX = [
-  {id:'c1', disc:'run', get title(){return tr('cre.c1.title')}, day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7']},
-  {id:'c2', disc:'swim', get title(){return tr('cre.c2.title')}, day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6']},
-  {id:'c3', disc:'bike', get title(){return tr('cre.c3.title')}, day:5, time:'19:00', dur:150, place:'Départ Vélodrome, Muret', cap:12, coach:'Karim', price:0, attendees:['a3','a5','a8']},
-  {id:'c4', disc:'bike', get title(){return tr('cre.c4.title')}, day:6, time:'08:00', dur:180, place:'Départ Base de loisirs, Muret', cap:30, coach:'Éric', price:0, attendees:['a1','a4','a7']}
+  {id:'c1', disc:'run', get title(){return tr('cre.c1.title')}, day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7'], groups:['g2','g3']},
+  {id:'c2', disc:'swim', get title(){return tr('cre.c2.title')}, day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6'], groups:[]},
+  {id:'c3', disc:'bike', get title(){return tr('cre.c3.title')}, day:5, time:'19:00', dur:150, place:'Départ Vélodrome, Muret', cap:12, coach:'Karim', price:0, attendees:['a3','a5','a8'], groups:['g6']},
+  {id:'c4', disc:'bike', get title(){return tr('cre.c4.title')}, day:6, time:'08:00', dur:180, place:'Départ Base de loisirs, Muret', cap:30, coach:'Éric', price:0, attendees:['a1','a4','a7'], groups:[]}
 ];
 /* ============================================================
    SUIVI JEUNE — chronos de référence (natation / course à pied)
@@ -4777,7 +4786,7 @@ function renderCreneaux(){
   // les créneaux ouverts à tous ou à SON groupe — les autres n'existent pas pour lui)
   const me=CLUB_ATHLETES.find(a=>a.id===ME_CLUB_ID);
   const seen = crMemberView
-    ? CRENEAUX.filter(c=>!c.group || (me && me.group===c.group))
+    ? CRENEAUX.filter(c=>creneauCanSee(c, me))
     : CRENEAUX;
   const hidden = CRENEAUX.length - seen.length;
   box.innerHTML = `<div class="cr-viewbar">
@@ -4803,14 +4812,15 @@ function renderCreneaux(){
         <span><i class="ic ic-pin"></i> ${c.place}</span>
         <span><i class="ic ic-user"></i> ${c.coach}</span>
       </div>
-      ${(()=>{ const g=c.group?clubGroup(c.group):null;
+      ${(()=>{ const groups=creneauGroups(c);
         const me=CLUB_ATHLETES.find(a=>a.id===ME_CLUB_ID);
-        const canSee=!g || (me && me.group===c.group);
-        const chip=g?`<span class="cr-grp" style="--gc:${g.color}">${g.name}</span>`:'';
+        const canSee=creneauCanSee(c, me);
+        const groupNames=groups.map(g=>g.name).join(', ');
+        const chips=groups.map(g=>`<span class="cr-grp" style="--gc:${g.color}">${g.name}</span>`).join('');
         const body=c.desc ? (canSee?`<div class="cr-desc">${c.desc}</div>`
-          :`<div class="cr-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContent', {name:g.name})}</div>`) : '';
+          :`<div class="cr-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContent', {name:groupNames})}</div>`) : '';
         const pend=(c.invited&&c.invited.length)?`<div class="cr-pending">${tr(c.invited.length>1?'creneau.invitedPendingPlural':'creneau.invitedPendingSingular', {n:c.invited.length})}</div>`:'';
-        return chip+body+pend; })()}
+        return chips+body+pend; })()}
       <div class="cr-fill"><i style="width:${fillPct}%"></i></div>
       <div class="cr-fillrow"><span>${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</span><span>${tr('creneau.spotsLeft', {n:c.cap-c.attendees.length})}</span></div>
       <div class="cr-attendees">${avatars||`<span class="cr-roster">${tr('creneau.noOneRegistered')}</span>`}</div>
@@ -4832,8 +4842,8 @@ function renderCreneaux(){
     // rejoins — c'est la demande "je m'inscris, je reçois la séance prévue".
     const materializeForMe = ()=>{
       if(window.PF?.user && c.sessionTemplate){
-        PF.scheduleSession(PF.user.id, nextCreneauDate(c), c.sessionTemplate)
-          .catch(e=> console.warn('[PF] scheduleSession (créneau rejoint) échoué :', e));
+        PF.scheduleSessionFromCreneau(PF.user.id, nextCreneauDate(c), c.sessionTemplate, c.id)
+          .catch(e=> console.warn('[PF] scheduleSessionFromCreneau (rejoint) échoué :', e));
       }
     };
     const cf=card.querySelector('[data-act="confirm"]');
@@ -4850,7 +4860,10 @@ function renderCreneaux(){
       const i=c.attendees.indexOf(ME_CLUB_ID);
       if(i>-1){
         c.attendees.splice(i,1); toast(tr('toast.inscriptionAnnulee'));
-        if(window.PF?.user) PF.leaveCreneau(c.id, ME_CLUB_ID).catch(e=> console.warn('[PF] leaveCreneau échoué :', e));
+        if(window.PF?.user){
+          PF.leaveCreneau(c.id, ME_CLUB_ID).catch(e=> console.warn('[PF] leaveCreneau échoué :', e));
+          if(c.sessionTemplate) PF.unscheduleFromCreneau(PF.user.id, c.id, nextCreneauDate(c)).catch(e=> console.warn('[PF] unscheduleFromCreneau échoué :', e));
+        }
       } else {
         if(c.attendees.length>=c.cap){ toast(tr('toast.creneauComplet')); return; }
         c.attendees.push(ME_CLUB_ID);
@@ -4899,20 +4912,40 @@ function saveCreneauSessionTemplate(creneauId){
   }
   builderState.creneauId = null;
   closeBuilder();
-  toast(tr('creneauAssign.templateSaved'));
+  // "Sync complète" (29/09/2026) : pousse tout de suite à TOUS ceux déjà
+  // inscrits sur ce créneau, peu importe leur groupe — pas seulement les
+  // futurs inscrits. scheduleSessionFromCreneau remplace proprement une
+  // éventuelle version précédente (re-enregistrer le contenu ne duplique pas).
+  const already = c.attendees.map(id=>CLUB_ATHLETES.find(a=>a.id===id)).filter(Boolean);
+  const date = nextCreneauDate(c);
+  let pushed=0;
+  if(window.PF?.user){
+    already.forEach(a=>{
+      if(!a.athleteUid) return;
+      pushed++;
+      PF.scheduleSessionFromCreneau(a.athleteUid, date, c.sessionTemplate, c.id)
+        .catch(e=> console.warn('[PF] scheduleSessionFromCreneau (auto) échoué :', e));
+    });
+  }
+  toast(pushed ? tr('creneauAssign.templateSavedAndPushed', {n:pushed}) : tr('creneauAssign.templateSaved'));
   if(typeof renderCreneaux==='function' && clubView==='creneaux') renderCreneaux();
   if(typeof renderClubCalendar==='function' && clubView==='calendrier') renderClubCalendar();
-  openClubAssign(c);
+  // La fenêtre d'attribution manuelle sert à ajouter d'AUTRES athlètes/
+  // groupes — ceux déjà inscrits viennent d'être servis ci-dessus, les
+  // ré-inclure ici les repousserait juste une seconde fois pour rien.
+  openClubAssign(c, already.map(a=>a.id));
 }
 /* Pose la séance-type d'un créneau sur le calendrier d'athlètes du CLUB
    choisis à la main (roster CLUB_ATHLETES, pas ROSTER coach perso — un
    adhérent n'est pas forcément le client personnel du coach) ou d'un
    groupe entier. Repris de openAssign (même CSS .adh-overlay/.asg-*),
    version allégée : pas de notion de cycle, cible = CLUB_ATHLETES. */
-function openClubAssign(c){
+function openClubAssign(c, excludeIds){
+  excludeIds = excludeIds || [];
   const defDate = nextCreneauDate(c);
-  const groups = CLUB_GROUPS.filter(g=> CLUB_ATHLETES.some(a=>a.group===g.id));
-  const rows = CLUB_ATHLETES.map((a,i)=>{
+  const pickable = CLUB_ATHLETES.map((a,i)=>({a,i})).filter(({a})=> !excludeIds.includes(a.id));
+  const groups = CLUB_GROUPS.filter(g=> pickable.some(({a})=>a.group===g.id));
+  const rows = pickable.map(({a,i})=>{
     const g = a.group ? clubGroup(a.group) : null;
     return `<label class="asg-row"><input type="checkbox" data-idx="${i}" ${a.group?`data-grp="${a.group}"`:''}>
       <span class="ap-av" style="--ac:var(--muted)">${initials(a.name)}</span><span>${a.name}</span>
@@ -4925,7 +4958,7 @@ function openClubAssign(c){
     <p class="adh-sub">${tr('creneauAssign.sub')}</p>
     <div class="asg-date"><span>${tr('assign.onDate')}</span><input type="date" id="ccaDate" value="${defDate}"></div>
     ${groups.length?`<div class="asg-groups">${groups.map(g=>{
-      const n=CLUB_ATHLETES.filter(a=>a.group===g.id).length;
+      const n=pickable.filter(({a})=>a.group===g.id).length;
       return `<button class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name} · ${n}</button>`;
     }).join('')}</div>`:''}
     <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">${tr('assign.noAthlete')}</div>`}</div>
@@ -4966,8 +4999,8 @@ function openClubAssign(c){
     if(window.PF?.user){
       targets.forEach(a=>{
         if(!a.athleteUid){ skipped++; return; }
-        PF.scheduleSession(a.athleteUid, date, c.sessionTemplate)
-          .catch(e=> console.warn('[PF] scheduleSession (créneau) échoué :', e));
+        PF.scheduleSessionFromCreneau(a.athleteUid, date, c.sessionTemplate, c.id)
+          .catch(e=> console.warn('[PF] scheduleSessionFromCreneau (attribution) échoué :', e));
       });
     }
     close();
@@ -5014,9 +5047,25 @@ function openClubAthleteCalendar(a){
    les inscrits en bulles — clic = ouvre le calendrier de CET athlète
    (openClubAthleteCalendar), survol = son nom (attribut title natif).
    ============================================================ */
+/* Filtre "un groupe à la fois" au-dessus du calendrier club — un créneau
+   ouvert à plusieurs groupes (0059) reste visible tant que le groupe filtré
+   en fait partie, ou qu'il est ouvert à tout le club (c.groups vide). */
+function renderClubCalGroupFilter(){
+  const el = document.getElementById('clubCalGroupFilter');
+  if(!el) return;
+  if(!CLUB_GROUPS.length){ el.innerHTML=''; return; }
+  el.innerHTML = `<button class="asg-chip ${clubCalGroupFilter===null?'on':''}" data-g="">${tr('clubCal.allGroups')}</button>`
+    + CLUB_GROUPS.map(g=>`<button class="asg-chip ${clubCalGroupFilter===g.id?'on':''}" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name}</button>`).join('');
+  el.querySelectorAll('.asg-chip').forEach(ch=> ch.onclick=()=>{
+    clubCalGroupFilter = ch.dataset.g || null;
+    renderClubCalGroupFilter();
+    renderClubCalendar();
+  });
+}
 function renderClubCalendar(){
   const grid = document.getElementById('clubCalGrid');
   if(!grid) return;
+  renderClubCalGroupFilter();
   const label = document.getElementById('clubCalLabel');
   const mon0 = mondayOf(clubCalWeekOffset);
   const nWeeks = clubCalWeeksShown;
@@ -5025,6 +5074,7 @@ function renderClubCalendar(){
   grid.classList.toggle('cal-grid-multi', nWeeks>1);
   grid.innerHTML='';
   const todayIso = iso(new Date());
+  const matchesFilter = (groups)=> !clubCalGroupFilter || !(groups&&groups.length) || groups.includes(clubCalGroupFilter);
 
   for(let w=0; w<nWeeks; w++){
     const wMon = addDays(mon0, w*7);
@@ -5037,9 +5087,9 @@ function renderClubCalendar(){
     for(let i=0;i<7;i++){
       const date = addDays(wMon,i);
       const key = iso(date);
-      const slots = CRENEAUX.filter(c=> c.recur==='once' ? c.date===key : c.day===i)
+      const slots = CRENEAUX.filter(c=> (c.recur==='once' ? c.date===key : c.day===i) && matchesFilter(c.groups))
         .sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-      const comps = COMPETITIONS.filter(comp=>comp.date===key);
+      const comps = COMPETITIONS.filter(comp=>comp.date===key && (!clubCalGroupFilter || comp.targetGroupId===clubCalGroupFilter));
       const day=document.createElement('div');
       day.className='day'+(key===todayIso?' today':'');
       day.innerHTML = `
@@ -6568,14 +6618,15 @@ function renderCreneauDetail(){
     `<span>${crdWhen(c)}</span><span>${fmtDur(c.dur)}</span><span>${c.place}</span><span>${c.coach}</span>`;
   document.querySelectorAll('#crdTabs .crd-tab').forEach(b=>b.classList.toggle('active', b.dataset.t===crdTab));
   const body=document.getElementById('crdBody');
-  const g=c.group?clubGroup(c.group):null;
+  const groups=creneauGroups(c);
+  const groupNames=groups.map(g=>g.name).join(', ');
   if(crdTab==='desc'){
     const me=CLUB_ATHLETES.find(a=>a.id===ME_CLUB_ID);
-    const canSee=!g || (me && me.group===c.group);
+    const canSee=creneauCanSee(c, me);
     body.innerHTML = canSee
       ? `<div class="crd-desc">${c.desc||tr('crd.noDesc')}</div>
-         <div class="crd-hint">${tr('crd.visibleBy', {who: g?tr('crd.theGroup', {name:g.name}):tr('crd.wholeClub')})}</div>`
-      : `<div class="crd-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContentDot', {name:g.name})}</div>`;
+         <div class="crd-hint">${tr('crd.visibleBy', {who: groups.length?groupNames:tr('crd.wholeClub')})}</div>`
+      : `<div class="crd-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContentDot', {name:groupNames})}</div>`;
   }
   else if(crdTab==='participants'){
     const rows=[
@@ -6603,8 +6654,11 @@ function renderCreneauDetail(){
         <div class="b-fld"><label for="crdDur">${tr('crd.durationMin')}</label><input type="number" id="crdDur" min="15" max="240" value="${c.dur}"></div>
         <div class="b-fld"><label for="crdPlace">${tr('crd.place')}</label><input type="text" id="crdPlace" value="${c.place}"></div>
         <div class="b-fld"><label for="crdCap">${tr('crd.maxSpots')}</label><input type="number" id="crdCap" min="1" max="200" value="${c.cap}"></div>
-        <div class="b-fld"><label>${tr('crd.groupReserved')}</label>
-          <select id="crdGroup"><option value="">${tr('crd.wholeClub')}</option>${CLUB_GROUPS.map(gr=>`<option value="${gr.id}" ${gr.id===c.group?'selected':''}>${gr.name}</option>`).join('')}</select></div>
+        <div class="b-fld full"><label>${tr('crd.groupReserved')}</label>
+          <div class="asg-groups" id="crdGroupChips">${CLUB_GROUPS.map(gr=>
+            `<button type="button" class="asg-chip ${c.groups.includes(gr.id)?'on':''}" data-g="${gr.id}" style="--gc:${gr.color}"><span class="dotc"></span>${gr.name}</button>`
+          ).join('') || `<span class="club-hint">${tr('crd.noGroupsYet')}</span>`}</div>
+          <span class="club-hint">${tr('crd.groupHint')}</span></div>
         <div class="b-fld"><label for="crdPrice">${tr('crd.price')}</label><input type="number" id="crdPrice" min="0" step="0.5" value="${c.price}"></div>
         <div class="b-fld full"><label for="crdDesc">${tr('crd.sessionContent')}</label><textarea id="crdDesc" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;resize:vertical">${c.desc||''}</textarea></div>
       </div>
@@ -6614,12 +6668,13 @@ function renderCreneauDetail(){
       if(c.recur==='once' && !c.date) c.date = iso(addDays(new Date(),7));
       renderCreneauDetail();
     };
+    document.querySelectorAll('#crdGroupChips .asg-chip').forEach(ch=> ch.onclick=()=> ch.classList.toggle('on'));
     document.getElementById('crdSave').onclick=()=>{
       c.time=document.getElementById('crdTime').value||c.time;
       c.dur=+document.getElementById('crdDur').value||c.dur;
       c.place=document.getElementById('crdPlace').value||c.place;
       c.cap=+document.getElementById('crdCap').value||c.cap;
-      c.group=document.getElementById('crdGroup').value||null;
+      c.groups=[...document.querySelectorAll('#crdGroupChips .asg-chip.on')].map(ch=>ch.dataset.g);
       c.price=+document.getElementById('crdPrice').value||0;
       c.desc=document.getElementById('crdDesc').value.trim();
       if(c.recur==='once'){ const d=document.getElementById('crdDate'); if(d&&d.value){ c.date=d.value; c.day=(new Date(d.value+'T00:00:00').getDay()+6)%7; } }
@@ -6627,7 +6682,7 @@ function renderCreneauDetail(){
       if(window.PF?.user && window.__pf_clubId && PF.saveCreneau && typeof c.id==='string' && c.id.length>20){
         PF.saveCreneau({ id:c.id, club_id:window.__pf_clubId, disc:c.disc, title:c.title, day:c.day, time:c.time,
           dur:c.dur, place:c.place, cap:c.cap, coach:c.coach, price:c.price,
-          description:c.desc||'', group_id:c.group||null, recur:c.recur||'weekly', date:c.date||null })
+          description:c.desc||'', group_ids:c.groups, group_id:c.groups[0]||null, recur:c.recur||'weekly', date:c.date||null })
           .catch(e=>console.warn('[PF] saveCreneau', e));
       }
       document.getElementById('crDetailOverlay').classList.remove('open');
@@ -6644,7 +6699,10 @@ document.querySelectorAll('#crdTabs .crd-tab').forEach(b=>b.onclick=()=>{ crdTab
 const creneauOverlay=document.getElementById('creneauOverlay');
 document.getElementById('clubAddCreneau').onclick=()=>{
   const sel=document.getElementById('crDay'); sel.innerHTML=CLUB_DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
-  document.getElementById('crGroup').innerHTML=`<option value="">${tr('crd.wholeClub')}</option>`+CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  const chipsEl=document.getElementById('crGroupChips');
+  chipsEl.innerHTML = CLUB_GROUPS.map(g=>`<button type="button" class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name}</button>`).join('')
+    || `<span class="club-hint">${tr('crd.noGroupsYet')}</span>`;
+  chipsEl.querySelectorAll('.asg-chip').forEach(ch=> ch.onclick=()=> ch.classList.toggle('on'));
   creneauOverlay.classList.add('open');
 };
 document.getElementById('creneauClose').onclick=()=> creneauOverlay.classList.remove('open');
@@ -6665,21 +6723,21 @@ document.getElementById('crSave').onclick=()=>{
     coach:dispoSafe(document.getElementById('crCoach').value||tr('crd.coach')),
     price:+document.getElementById('crPrice').value,
     desc:dispoSafe(document.getElementById('crDesc').value.trim()),
-    group:document.getElementById('crGroup').value||null,
+    groups:[...document.querySelectorAll('#crGroupChips .asg-chip.on')].map(ch=>ch.dataset.g),
     invited:[],
     attendees:[]
   };
-  // « Inviter tout le groupe » : les membres du groupe sont pré-invités,
-  // ils n'ont plus qu'à confirmer leur présence sur la carte du créneau
-  if(c.group && document.getElementById('crInviteGroup').checked){
-    c.invited = CLUB_ATHLETES.filter(a=>a.group===c.group).map(a=>a.id);
+  // « Inviter les groupes sélectionnés » : les membres de CHACUN des groupes
+  // ciblés sont pré-invités, ils n'ont plus qu'à confirmer leur présence.
+  if(c.groups.length && document.getElementById('crInviteGroup').checked){
+    c.invited = CLUB_ATHLETES.filter(a=>a.group && c.groups.includes(a.group)).map(a=>a.id);
   }
   CRENEAUX.push(c);
   // Persistance backend (si connecté à un club) — récupère l'id DB.
   if(window.PF?.user && window.__pf_clubId){
     PF.saveCreneau({ club_id:window.__pf_clubId, disc:c.disc, title:c.title, day:c.day,
       time:c.time, dur:c.dur, place:c.place, cap:c.cap, coach:c.coach, price:c.price,
-      description:c.desc||'', group_id:c.group||null })
+      description:c.desc||'', group_ids:c.groups, group_id:c.groups[0]||null })
       .then(saved=>{ if(saved) c.id = saved.id; })
       .catch(e=> console.warn('[PF] saveCreneau échoué :', e));
   }

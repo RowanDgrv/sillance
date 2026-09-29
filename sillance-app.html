@@ -3102,6 +3102,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         </select>
       </nav>
       <div class="club-hint" style="margin:10px 0">Créneaux, compétitions et inscriptions de tous les groupes. Clique sur un athlète pour ouvrir son calendrier.</div>
+      <div class="asg-groups" id="clubCalGroupFilter" style="margin-bottom:14px"></div>
       <div class="cal-grid" id="clubCalGrid"></div>
     </div>
 
@@ -3224,8 +3225,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       </div>
       <div class="b-fld"><label for="crDesc" data-i18n="slot.contentLabel">Contenu de la séance</label><textarea id="crDesc" rows="3" placeholder="Ex. 6×400m allure 5 km récup 1' + gainage (visible par les inscrits)" data-i18n-attr="placeholder:slot.descPh"></textarea></div>
       <div class="cr-row">
-        <div class="b-fld"><label for="crGroup" data-i18n="slot.groupRestrictedLabel">Groupe (contenu réservé)</label><select id="crGroup"><option value="" data-i18n="slot.wholeClubOption">Tout le club</option></select></div>
-        <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> Inviter tout le groupe</label></div>
+        <div class="b-fld full"><label data-i18n="slot.groupRestrictedLabel">Groupe(s) (contenu réservé — vide = tout le club)</label><div class="asg-groups" id="crGroupChips"></div></div>
+        <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> <span data-i18n="slot.inviteGroupsLabel">Inviter les groupes sélectionnés</span></label></div>
       </div>
       <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres : ils n'ont qu'à confirmer leur présence.</p>
       <p class="cr-note" id="crPriceNote">Mets 0 pour un créneau inclus dans l'adhésion. Un tarif &gt; 0 active la séance « à la carte » (utile pour un stage ou une séance ouverte aux invités).</p>
