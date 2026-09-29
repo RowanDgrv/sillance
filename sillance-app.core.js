@@ -3900,7 +3900,7 @@ function exportBilan(name){
     const recs = (typeof RECORDS!=='undefined')?RECORDS:[];
     let gear=[]; try{ gear=(GEAR||[]).filter(g=>g.type==='shoe'); }catch(e){}
     let ctl=null,atl=null,tsb=null;
-    try{ ctl=Math.round(STRAVA_DEMO.ctl.at(-1)); atl=Math.round(STRAVA_DEMO.atl.at(-1)); tsb=ctl-atl; }catch(e){}
+    try{ const last=buildLoadDaily(new Date(),364).at(-1); ctl=Math.round(last.ctl); atl=Math.round(last.atl); tsb=Math.round(last.tsb); }catch(e){}
     let done=0,tot=0,wtss=0,recent=[];
     try{ const mon=mondayOf(0);
       for(let i=0;i<7;i++){ (planning[iso(addDays(mon,i))]||[]).forEach(s=>{ tot++; wtss+=(s.tss||0); if(s.done)done++; }); }
@@ -10292,34 +10292,87 @@ function buildLoadPeriods(period){
       atl:Math.round(g._atl/g._n), tsb:Math.round(g._tsb/g._n), acwr:g._acwr/g._n }; });
 }
 
-/* Agrège la charge par semaine depuis le calendrier (planning). Complète les
-   semaines sans données par un historique démo déterministe pour donner une
-   année à défiler ; en usage réel, tout vient du planning. */
-function buildLoadWeeks(){
+/* ============================================================
+   CTL/ATL/TSB — reproduit EXACTEMENT la formule publiée par
+   TrainingPeaks (Dr Coggan) et reprise par Nolio (mêmes constantes,
+   configurables chez eux : 6.5j/41.5j par défaut) et Coros EvoLab
+   (mêmes fenêtres 7j/42j, sur du TRIMP plutôt que du TSS) :
+     CTL_j = CTL_(j-1)·e^(-1/42) + TSS_j·(1-e^(-1/42))
+     ATL_j = ATL_(j-1)·e^(-1/7)  + TSS_j·(1-e^(-1/7))
+     TSB_j = CTL_(j-1) - ATL_(j-1)   (forme AVANT la charge du jour)
+   AVANT ce fix, l'EMA était step-ée une fois par SEMAINE avec une TSS
+   moyenne aplatie (w.total/7) — mathématiquement différent d'un vrai
+   modèle quotidien : un gros bloc suivi de repos donnait un TSB lissé
+   au lieu du vrai profil pic/creux, faussant précisément la détection
+   du pic de forme (l'usage n°1 du TSB : caler le jour de course).
+   ============================================================ */
+const CTL_TAU = 42, ATL_TAU = 7;
+const CTL_ALPHA = 1 - Math.exp(-1/CTL_TAU), ATL_ALPHA = 1 - Math.exp(-1/ATL_TAU);
+
+/* Série JOUR PAR JOUR sur `days` jours jusqu'à `endDate` inclus. TSS réelle
+   du jour (somme des séances planning, 0 si repos) dès qu'au moins une
+   donnée réelle existe dans la fenêtre ; sinon repli démo (profil lissé
+   par semaine, réparti sur ses 7 jours — aucun athlète réel à représenter). */
+function buildLoadDaily(endDate, days){
+  endDate = endDate || new Date();
+  days = days || 364;
   const DISCS=['swim','bike','run','strength'];
-  const real={}, hoursReal={};
+  const dayTotal={}, dayLoad={}, dayHours={};
   for(const k in planning){
     const d=new Date(k+'T00:00:00'); if(isNaN(d)) continue;
-    const wk=iso(weekMonday(d));
-    (real[wk] || (real[wk]={swim:0,bike:0,run:0,strength:0}));
+    const load={swim:0,bike:0,run:0,strength:0};
     (planning[k]||[]).forEach(s=>{ const disc=DISCS.includes(s.disc)?s.disc:'bike';
-      real[wk][disc]+=(s.tss||0); hoursReal[wk]=(hoursReal[wk]||0)+(s.dur||0)/60; });
+      load[disc]+=(s.tss||0); dayHours[k]=(dayHours[k]||0)+(s.dur||0)/60; });
+    dayLoad[k]=load; dayTotal[k]=load.swim+load.bike+load.run+load.strength;
   }
-  const realKeys=Object.keys(real).sort();
-  const lastMon = realKeys.length ? new Date(realKeys[realKeys.length-1]+'T00:00:00') : weekMonday(new Date());
+  // planning ne couvre en général qu'une fenêtre autour d'aujourd'hui (démo
+  // non connectée : ~2-3 semaines de séances-types de démonstration, PAS
+  // 364 jours) — un premier jet traitait tout jour sans entrée comme un
+  // "vrai repos" dès qu'UNE entrée existait quelque part, ce qui crashait
+  // le CTL vers 0 sur ~340 jours démo fantômes. Le bon critère est la
+  // CONNEXION, pas la présence de données : compte réel connecté → jour
+  // sans séance = vrai repos (TSS 0, quelle que soit la date) ; démo hors
+  // connexion → repli synthétique lissé même en dehors des ~3 semaines
+  // seedées, pour donner une année d'historique cohérente à l'affichage.
+  const connected = !!(window.PF && window.PF.user);
+  const start = addDays(endDate, -(days-1));
+  const daysArr=[]; let ctl=0, atl=0;
+  for(let i=0;i<days;i++){
+    const d=addDays(start,i), key=iso(d);
+    let total,load,hours;
+    if(dayTotal[key]!==undefined){ total=dayTotal[key]; load=dayLoad[key]; hours=dayHours[key]||0; }
+    else if(connected){ total=0; load={swim:0,bike:0,run:0,strength:0}; hours=0; }
+    else { const t=Math.floor(i/7), base=(270+95*Math.sin(t/8)+((t*37)%55))/7;
+      load={swim:base*0.12,bike:base*0.5,run:base*0.3,strength:base*0.08};
+      total=load.swim+load.bike+load.run+load.strength; hours=base/45; }
+    const tsb = ctl-atl; // forme AVANT la charge du jour (convention TrainingPeaks)
+    ctl += (total-ctl)*CTL_ALPHA;
+    atl += (total-atl)*ATL_ALPHA;
+    daysArr.push({date:key, mon:d, total, load, hours, ctl, atl, tsb});
+  }
+  return daysArr;
+}
+
+/* Regroupe la série quotidienne par semaine (lundi→dimanche) pour les
+   graphes/exports existants : charge/heures = somme des 7 jours, ctl/atl/
+   tsb = valeur du DERNIER jour de la semaine — même convention que le
+   repère hebdomadaire du graphe officiel TrainingPeaks (un simple
+   habillage du calcul quotidien, pas un calcul distinct). */
+function buildLoadWeeks(){
+  const daily = buildLoadDaily(new Date(), 364);
+  const lastMon = weekMonday(daily[daily.length-1].mon);
   const weeks=[];
   for(let i=51;i>=0;i--){
-    const mon=addDays(lastMon,-i*7), wk=iso(mon);
-    let load,hours;
-    if(real[wk]){ load={...real[wk]}; hours=hoursReal[wk]||0; }
-    else { const t=51-i, base=270+95*Math.sin(t/8)+((t*37)%55);
-      load={swim:Math.round(base*0.12),bike:Math.round(base*0.5),run:Math.round(base*0.3),strength:Math.round(base*0.08)}; hours=base/45; }
-    weeks.push({wk,mon,label:(mon.getDate()+'/'+(mon.getMonth()+1)),load,hours,
-      total:load.swim+load.bike+load.run+load.strength});
+    const mon=addDays(lastMon,-i*7), wEnd=addDays(mon,7);
+    const wDays = daily.filter(d=> d.mon>=mon && d.mon<wEnd);
+    const load={swim:0,bike:0,run:0,strength:0}; let hours=0, total=0;
+    wDays.forEach(d=>{ load.swim+=d.load.swim; load.bike+=d.load.bike; load.run+=d.load.run; load.strength+=d.load.strength; hours+=d.hours; total+=d.total; });
+    const lastDay = wDays[wDays.length-1] || daily[daily.length-1];
+    weeks.push({wk:iso(mon), mon, label:(mon.getDate()+'/'+(mon.getMonth()+1)),
+      load:{swim:Math.round(load.swim),bike:Math.round(load.bike),run:Math.round(load.run),strength:Math.round(load.strength)},
+      hours, total:Math.round(total),
+      ctl:Math.round(lastDay.ctl), atl:Math.round(lastDay.atl), tsb:Math.round(lastDay.tsb)});
   }
-  let ctl=0,atl=0;
-  weeks.forEach(w=>{ const daily=w.total/7; ctl+=(daily-ctl)*(1-Math.exp(-7/42)); atl+=(daily-atl)*(1-Math.exp(-7/7));
-    w.ctl=Math.round(ctl); w.atl=Math.round(atl); w.tsb=Math.round(ctl-atl); });
   weeks.forEach((w,i)=>{ const from=Math.max(0,i-3); const ch=weeks.slice(from,i+1).reduce((a,b)=>a+b.total,0)/(i-from+1); w.acwr=ch?w.total/ch:1; });
   return weeks;
 }
@@ -10635,7 +10688,11 @@ function injectLoadHxCss(){
 }
 function renderLoadMix(){
   const box=document.getElementById('loadMixBody'); if(!box) return; injectLoadHxCss();
-  const ctl=STRAVA_DEMO.ctl.at(-1), atl=STRAVA_DEMO.atl.at(-1), tsb=Math.round(ctl-atl);
+  // Vrai CTL/ATL/TSB du jour (buildLoadDaily, planning réel si connecté) —
+  // avant ce fix cette carte affichait TOUJOURS les mêmes chiffres de démo
+  // codés en dur (STRAVA_DEMO.ctl/.atl), y compris pour un compte réel.
+  const lastDaily = buildLoadDaily(new Date(), 364).at(-1);
+  const ctl=Math.round(lastDaily.ctl), atl=Math.round(lastDaily.atl), tsb=Math.round(lastDaily.tsb);
   const rows=LOAD_LOG.map(s=>{ const D=DISC[s.disc]||{ico:null,color:'var(--muted)'};
     return `<div class="lm-row"><span class="lm-ic" style="color:${D.color}">${discIcon(D)}</span><span class="lm-n">${s.name}</span><span class="lm-m">${s.metric}</span><span class="lm-v">${sessionLoad(s)}</span></div>`; }).join('');
   box.innerHTML=`
