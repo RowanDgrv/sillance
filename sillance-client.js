@@ -799,6 +799,54 @@ export const PF = {
     });
     window.location.href = url;
   },
+  // Auto-inscription/désinscription d'un adhérent à un créneau (RLS 0058 :
+  // "attendees: member self manages own", scopée à SA propre ligne
+  // club_members — avant ce fix le bouton "s'inscrire" ne touchait qu'un
+  // tableau JS local, jamais la base, pour tout compte réel).
+  async joinCreneau(creneauId, memberId) {
+    const { error } = await sb.from("creneau_attendees")
+      .upsert({ creneau_id: creneauId, athlete_id: memberId }, { onConflict: "creneau_id,athlete_id" });
+    if (error) throw error; return true;
+  },
+  async leaveCreneau(creneauId, memberId) {
+    const { error } = await sb.from("creneau_attendees")
+      .delete().eq("creneau_id", creneauId).eq("athlete_id", memberId);
+    if (error) throw error; return true;
+  },
+  // Séance-type attachée à un créneau (0058) : posée une fois par le coach
+  // (bouton "Créer une séance pour ce créneau"), copiée sur le calendrier de
+  // chaque athlète qui s'inscrit ensuite (scheduleSessionFromCreneau).
+  async setCreneauSessionTemplate(creneauId, template) {
+    const { error } = await sb.from("creneaux")
+      .update({ session_template: template }).eq("id", creneauId);
+    if (error) throw error; return true;
+  },
+  // -------- CLUB : compétitions (objectifs par groupe) --------
+  async getClubCompetitions(clubId) {
+    const { data, error } = await sb.from("club_competitions").select("*").eq("club_id", clubId).order("date");
+    if (error) console.warn("[PF] lecture club_competitions échouée :", error.message);
+    return data ?? [];
+  },
+  async saveClubCompetition({ id, club_id, name, date, level, target_group_id }) {
+    const row = { club_id, name, date, level, target_group_id };
+    if (id) row.id = id;
+    const { data, error } = await sb.from("club_competitions").upsert(row).select().single();
+    if (error) throw error; return data;
+  },
+  async getClubCompetitionResponses(competitionIds) {
+    if (!competitionIds.length) return [];
+    const { data, error } = await sb.from("club_competition_responses")
+      .select("*").in("competition_id", competitionIds);
+    if (error) console.warn("[PF] lecture club_competition_responses échouée :", error.message);
+    return data ?? [];
+  },
+  // L'athlète répond pour lui-même (RLS : athlete_id = auth.uid()).
+  async respondToClubCompetition(competitionId, status) {
+    const { error } = await sb.from("club_competition_responses")
+      .upsert({ competition_id: competitionId, athlete_id: this.user.id, status },
+        { onConflict: "competition_id,athlete_id" });
+    if (error) throw error; return true;
+  },
 
   // -------- CLUB : les 3 formules & encaissement (Stripe) --------
   // Les tarifs des 3 formules (dropin/sub/coach), éditables par le club.

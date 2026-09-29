@@ -1562,6 +1562,25 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .day-taper-tag{display:inline-flex;align-items:center;gap:var(--space-1);margin:2px 6px 0;font-size:9.5px;font-weight:700;
   letter-spacing:.04em;text-transform:uppercase;color:var(--bike)}
 .day-taper-tag .ic{width:10px;height:10px}
+
+/* Calendrier club (onglet Calendrier) : créneaux + compétitions du jour,
+   réutilise le langage visuel du calendrier coach/athlète (.day/.day-head). */
+.club-cal-slot{border:1px solid var(--line);border-left:3px solid var(--c,var(--muted));
+  border-radius:var(--radius-sm);background:var(--panel-2);padding:8px 10px 9px;
+  margin-bottom:6px;cursor:pointer;transition:border-color .2s}
+.club-cal-slot:hover{border-color:color-mix(in srgb, var(--c) 60%, var(--line))}
+.club-cal-slot .ccs-t{font-weight:600;font-size:12.5px;line-height:1.3;display:flex;gap:6px;align-items:center}
+.club-cal-slot .ccs-t::before{content:'';width:7px;height:7px;flex:none;border-radius:2px;background:var(--c,var(--muted))}
+.club-cal-slot .ccs-m{font-family:var(--font-data);font-size:10.5px;color:var(--muted);margin-top:3px}
+.club-cal-slot .ccs-att{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.club-cal-slot .ccs-att .cr-att{width:22px;height:22px;font-size:9.5px;cursor:pointer}
+.club-cal-slot .ccs-mk{margin-top:6px;padding:4px 9px;border-radius:7px;border:1px dashed var(--line-strong);
+  background:transparent;color:var(--muted);font-size:10.5px;font-weight:600;cursor:pointer;width:100%;text-align:center}
+.club-cal-slot .ccs-mk:hover{border-color:var(--c);color:var(--c)}
+.club-cal-comp{display:flex;align-items:center;gap:5px;margin:0 0 6px;padding:5px 9px;border-radius:7px;
+  background:color-mix(in srgb,var(--strength) 18%,transparent);border:1px solid color-mix(in srgb,var(--strength) 55%,transparent);
+  color:var(--strength);font-size:10.5px;font-weight:700;line-height:1.2}
+.club-cal-comp .ic{width:11px;height:11px;flex:none}
 .day.day-race{outline:1px solid color-mix(in srgb,var(--run) 45%,transparent);outline-offset:-1px}
 .ap-dispo{display:inline-flex;align-items:center;gap:var(--space-1);font-size:var(--fs-xs);font-weight:700;color:var(--fc);white-space:nowrap}
 .ap-dispo .ic{width:10px;height:10px}
@@ -3060,12 +3079,30 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 
     <div class="club-tabs" id="clubTabs">
       <button class="club-tab active" data-ct="dash"><i class="ic ic-landmark"></i><span data-i18n="club.tabDash">Tableau de bord</span></button>
+      <button class="club-tab" data-ct="calendrier"><i class="ic ic-calendar"></i><span data-i18n="club.tabCalendar">Calendrier</span></button>
       <button class="club-tab" data-ct="creneaux"><i class="ic ic-calendar"></i><span data-i18n="club.tabSlots">Créneaux</span></button>
       <button class="club-tab" data-ct="presence"><i class="ic ic-check"></i><span data-i18n="club.tabAttendance">Présences</span></button>
       <button class="club-tab" data-ct="athletes"><i class="ic ic-users"></i><span data-i18n="club.tabMembers">Adhérents</span></button>
       <button class="club-tab" data-ct="groupes"><i class="ic ic-shirt"></i><span data-i18n="club.tabGroups">Groupes</span></button>
       <button class="club-tab" data-ct="suivi"><i class="ic ic-chart"></i><span data-i18n="club.tabSuivi">Suivi jeune</span></button>
       <button class="club-tab" data-ct="competitions"><i class="ic ic-flag"></i><span data-i18n="club.tabCompetitions">Compétitions</span></button>
+    </div>
+
+    <!-- Onglet calendrier club -->
+    <div class="club-view" id="clubViewCalendrier" hidden>
+      <nav class="week-nav" aria-label="Navigation des semaines du calendrier club">
+        <button class="icon-btn" id="clubCalPrev" aria-label="Semaine précédente">‹</button>
+        <span class="label" id="clubCalLabel"></span>
+        <button class="icon-btn" id="clubCalNext" aria-label="Semaine suivante">›</button>
+        <select class="cvt-select" id="clubCalWeeksSelect" aria-label="Nombre de semaines affichées">
+          <option value="1">1 semaine</option>
+          <option value="3" selected>3 semaines</option>
+          <option value="5">5 semaines</option>
+          <option value="10">10 semaines</option>
+        </select>
+      </nav>
+      <div class="club-hint" style="margin:10px 0">Créneaux, compétitions et inscriptions de tous les groupes. Clique sur un athlète pour ouvrir son calendrier.</div>
+      <div class="cal-grid" id="clubCalGrid"></div>
     </div>
 
     <!-- Onglet créneaux -->

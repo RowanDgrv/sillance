@@ -424,6 +424,11 @@ let dayIndex = (new Date().getDay()+6)%7;
 // un panneau interne, cf. .cal-grid-multi.
 const WEEKS_SHOWN_OPTIONS = [1,3,5,10];
 let weeksShown = WEEKS_SHOWN_OPTIONS.includes(+localStorage.getItem('sil_cal_weeks')) ? +localStorage.getItem('sil_cal_weeks') : 1;
+// Calendrier de l'onglet Club (créneaux + compétitions + inscriptions de
+// tout le club) — navigation/affichage INDÉPENDANTS du calendrier coach/
+// athlète ci-dessus (même famille de contrôles, même options de semaines).
+let clubCalWeekOffset = 0;
+let clubCalWeeksShown = WEEKS_SHOWN_OPTIONS.includes(+localStorage.getItem('sil_club_cal_weeks')) ? +localStorage.getItem('sil_club_cal_weeks') : 3;
 let mode = 'coach';
 let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
@@ -3440,6 +3445,19 @@ if(calWeeksSelect){
     render();
   });
 }
+/* Navigation du calendrier club (onglet Calendrier), indépendante du
+   calendrier coach/athlète ci-dessus (mêmes options de semaines). */
+document.getElementById('clubCalPrev')?.addEventListener('click', ()=>{ clubCalWeekOffset--; renderClubCalendar(); });
+document.getElementById('clubCalNext')?.addEventListener('click', ()=>{ clubCalWeekOffset++; renderClubCalendar(); });
+const clubCalWeeksSelect = document.getElementById('clubCalWeeksSelect');
+if(clubCalWeeksSelect){
+  clubCalWeeksSelect.value = String(clubCalWeeksShown);
+  clubCalWeeksSelect.addEventListener('change', ()=>{
+    clubCalWeeksShown = WEEKS_SHOWN_OPTIONS.includes(+clubCalWeeksSelect.value) ? +clubCalWeeksSelect.value : 3;
+    localStorage.setItem('sil_club_cal_weeks', String(clubCalWeeksShown));
+    renderClubCalendar();
+  });
+}
 const mc = document.getElementById('modeCoach'), ma = document.getElementById('modeAthlete'), mcl = document.getElementById('modeClub');
 function setActiveMode(btn){
   [mc,ma,mcl].forEach(b=>b.classList.remove('active')); btn.classList.add('active');
@@ -4434,7 +4452,12 @@ let COMPETITION_RESPONSES = {
 function compResponseKey(compId, athleteId){ return compId+':'+athleteId; }
 function competitionTargets(comp){ return CLUB_ATHLETES.filter(a=>a.group===comp.targetGroupId); }
 
-const ME_CLUB_ID = 'a1'; // l'athlète "moi" (pour la démo d'inscription)
+// l'athlète "moi" dans CLUB_ATHLETES — 'a1' en démo ; réassigné (setMeClubId,
+// hydrate club) à ma propre ligne club_members quand je suis connecté, sinon
+// TOUT le module d'auto-inscription au créneau (join/confirm) restait câblé
+// en dur sur le compte démo pour n'importe quel utilisateur réel (audit
+// 29/09/2026 — jusque-là aucune inscription réelle n'était même possible).
+let ME_CLUB_ID = 'a1';
 let clubView = 'dash';
 
 /* demandes d'adhésion en attente (arrivées via le lien d'invitation) */
@@ -4735,6 +4758,17 @@ function renderClubHistory(){
 }
 
 let crMemberView=false;
+/* Prochaine occurrence d'un créneau à partir d'aujourd'hui : sa date propre
+   s'il est ponctuel (recur==='once'), sinon le prochain jour de semaine
+   correspondant (aujourd'hui inclus). Sert à matérialiser sa séance-type
+   sur un calendrier (F/E) sans que le coach ait à choisir une date. */
+function nextCreneauDate(c){
+  if(c.recur==='once' && c.date) return c.date;
+  const today = new Date();
+  const todayIdx = (today.getDay()+6)%7; // 0=lundi..6=dimanche, même convention que c.day
+  const delta = ((c.day - todayIdx) % 7 + 7) % 7;
+  return iso(addDays(today, delta));
+}
 function renderCreneaux(){
   renderSessionReminder();
   renderClubHistory();
@@ -4785,6 +4819,7 @@ function renderCreneaux(){
           ? `<button class="cr-join" data-act="confirm"><i class="ic ic-check"></i> ${tr('creneau.confirmMyAttendance')}</button>`
           : `<button class="cr-join ${inIt?'in':''}" data-act="join">${inIt?`<i class="ic ic-check"></i> ${tr('creneau.registered')}`:(c.price>0?tr('creneau.registerPrice', {price:c.price}):tr('creneau.register'))}</button>`}
         <button data-act="roster">${tr('creneau.list')}</button>
+        ${(!crMemberView && c.disc==='run') ? `<button data-act="mksession">${c.sessionTemplate?tr('creneau.editSession'):tr('creneau.createSession')}</button>` : ''}
       </div>
     </div>`;
   }).join('') + (seen.length?'':`<p class="club-hint">${tr('creneau.noneVisible')}</p>`);
@@ -4792,30 +4827,155 @@ function renderCreneaux(){
   box.querySelectorAll('.cr-viewbtn').forEach(b=>b.onclick=()=>{ crMemberView=b.dataset.v==='member'; renderCreneaux(); });
   box.querySelectorAll('.creneau-card').forEach(card=>{
     const c=CRENEAUX.find(x=>x.id===card.dataset.id);
+    // Matérialise la séance-type du créneau (si le coach en a attaché une,
+    // cf. saveCreneauSessionTemplate) sur MON calendrier au moment où je
+    // rejoins — c'est la demande "je m'inscris, je reçois la séance prévue".
+    const materializeForMe = ()=>{
+      if(window.PF?.user && c.sessionTemplate){
+        PF.scheduleSession(PF.user.id, nextCreneauDate(c), c.sessionTemplate)
+          .catch(e=> console.warn('[PF] scheduleSession (créneau rejoint) échoué :', e));
+      }
+    };
     const cf=card.querySelector('[data-act="confirm"]');
     if(cf) cf.onclick=()=>{
       const i=(c.invited||[]).indexOf(ME_CLUB_ID);
       if(i>-1){ c.invited.splice(i,1); if(!c.attendees.includes(ME_CLUB_ID)) c.attendees.push(ME_CLUB_ID); }
+      if(window.PF?.user) PF.joinCreneau(c.id, ME_CLUB_ID).catch(e=> console.warn('[PF] joinCreneau échoué :', e));
+      materializeForMe();
       toast(tr('toast.presenceConfirmee'));
       renderCreneaux(); renderClubStats(); if(typeof renderPresence==='function') renderPresence();
     };
     const jb=card.querySelector('[data-act="join"]');
     if(jb) jb.onclick=()=>{
       const i=c.attendees.indexOf(ME_CLUB_ID);
-      if(i>-1){ c.attendees.splice(i,1); toast(tr('toast.inscriptionAnnulee')); }
-      else {
+      if(i>-1){
+        c.attendees.splice(i,1); toast(tr('toast.inscriptionAnnulee'));
+        if(window.PF?.user) PF.leaveCreneau(c.id, ME_CLUB_ID).catch(e=> console.warn('[PF] leaveCreneau échoué :', e));
+      } else {
         if(c.attendees.length>=c.cap){ toast(tr('toast.creneauComplet')); return; }
         c.attendees.push(ME_CLUB_ID);
         toast(c.price>0?tr('creneau.registeredPricePay', {price:c.price}):tr('creneau.registeredToSlot'));
+        if(window.PF?.user) PF.joinCreneau(c.id, ME_CLUB_ID).catch(e=> console.warn('[PF] joinCreneau échoué :', e));
+        materializeForMe();
       }
       renderCreneaux(); renderClubStats(); renderPresence();
     };
     card.querySelector('[data-act="roster"]').onclick=(e)=>{ e.stopPropagation(); openCreneauDetail(c,'participants'); };
+    const mk=card.querySelector('[data-act="mksession"]');
+    if(mk) mk.onclick=(e)=>{ e.stopPropagation(); openBuilderForCreneau(c); };
     card.addEventListener('click', e=>{ if(!e.target.closest('button')) openCreneauDetail(c,'desc'); });
     card.style.cursor='pointer';
   });
 }
 
+/* ============================================================
+   SÉANCE ATTACHÉE À UN CRÉNEAU (demande Rowan 28-29/09/2026)
+   ------------------------------------------------------------
+   Le coach ouvre LE MÊME builder que sur l'onglet Coach, mais depuis
+   la carte d'un créneau piste (disc==='run') ; à l'enregistrement, ça
+   ne pose pas la séance sur SON calendrier — ça la range sur le
+   créneau (session_template) puis ouvre l'attribution manuelle
+   (un athlète du club ou un groupe entier). Distingué du flux normal
+   via builderState.creneauId, testé en premier par le handler bSaveCal.
+   ============================================================ */
+function openBuilderForCreneau(c){
+  const hasTemplate = c.sessionTemplate && Array.isArray(c.sessionTemplate.blocks) && c.sessionTemplate.blocks.length;
+  const existing = hasTemplate
+    ? { disc:c.sessionTemplate.disc||c.disc, title:c.sessionTemplate.title||'',
+        blocksV2:{ blocks:c.sessionTemplate.blocks, title:c.sessionTemplate.title||'', disc:c.sessionTemplate.disc||c.disc } }
+    : { disc:c.disc };
+  openBuilder(null, existing);
+  builderState.creneauId = c.id;
+  builderState.targetDate = null;
+  document.getElementById('builderBadge').textContent = tr('creneau.builderBadge', {title:c.title});
+}
+function saveCreneauSessionTemplate(creneauId){
+  const c = CRENEAUX.find(x=>x.id===creneauId);
+  if(!c) return;
+  const s = builderToSession();
+  c.sessionTemplate = { disc:s.disc, title:s.title, dur:s.dur, dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] };
+  if(window.PF?.user){
+    PF.setCreneauSessionTemplate(creneauId, c.sessionTemplate).catch(e=> console.warn('[PF] setCreneauSessionTemplate échoué :', e));
+  }
+  builderState.creneauId = null;
+  closeBuilder();
+  toast(tr('creneauAssign.templateSaved'));
+  if(typeof renderCreneaux==='function' && clubView==='creneaux') renderCreneaux();
+  if(typeof renderClubCalendar==='function' && clubView==='calendrier') renderClubCalendar();
+  openClubAssign(c);
+}
+/* Pose la séance-type d'un créneau sur le calendrier d'athlètes du CLUB
+   choisis à la main (roster CLUB_ATHLETES, pas ROSTER coach perso — un
+   adhérent n'est pas forcément le client personnel du coach) ou d'un
+   groupe entier. Repris de openAssign (même CSS .adh-overlay/.asg-*),
+   version allégée : pas de notion de cycle, cible = CLUB_ATHLETES. */
+function openClubAssign(c){
+  const defDate = nextCreneauDate(c);
+  const groups = CLUB_GROUPS.filter(g=> CLUB_ATHLETES.some(a=>a.group===g.id));
+  const rows = CLUB_ATHLETES.map((a,i)=>{
+    const g = a.group ? clubGroup(a.group) : null;
+    return `<label class="asg-row"><input type="checkbox" data-idx="${i}" ${a.group?`data-grp="${a.group}"`:''}>
+      <span class="ap-av" style="--ac:var(--muted)">${initials(a.name)}</span><span>${a.name}</span>
+      ${g?`<span class="asg-grp" style="color:${g.color}">${g.name}</span>`:''}</label>`;
+  }).join('');
+  const el=document.createElement('div'); el.className='adh-overlay';
+  el.innerHTML=`<div class="adh-modal asg-modal" role="dialog" aria-label="${tr('creneauAssign.dialogAria')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('creneauAssign.title', {title:c.title})}</h3>
+    <p class="adh-sub">${tr('creneauAssign.sub')}</p>
+    <div class="asg-date"><span>${tr('assign.onDate')}</span><input type="date" id="ccaDate" value="${defDate}"></div>
+    ${groups.length?`<div class="asg-groups">${groups.map(g=>{
+      const n=CLUB_ATHLETES.filter(a=>a.group===g.id).length;
+      return `<button class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name} · ${n}</button>`;
+    }).join('')}</div>`:''}
+    <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">${tr('assign.noAthlete')}</div>`}</div>
+    ${rows?`<label class="asg-all"><input type="checkbox" id="ccaAll"> ${tr('assign.selectAll')}</label>
+    <button class="btn asg-go" id="ccaGo" disabled>${tr('assign.assign')}</button>`:''}
+  </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close;
+  el.addEventListener('click', e=>{ if(e.target===el) close(); });
+  document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
+  if(!rows) return;
+  const boxes=[...el.querySelectorAll('.asg-row input')];
+  const go=el.querySelector('#ccaGo'), all=el.querySelector('#ccaAll');
+  const sync=()=>{
+    const n=boxes.filter(b=>b.checked).length;
+    go.disabled=!n;
+    go.textContent = n ? tr(n>1?'assign.assignToNPlural':'assign.assignToNSingular', {n}) : tr('assign.assign');
+    all.checked = n===boxes.length;
+    el.querySelectorAll('.asg-chip').forEach(ch=>{
+      const m=boxes.filter(b=>b.dataset.grp===ch.dataset.g);
+      ch.classList.toggle('on', m.length>0 && m.every(b=>b.checked));
+    });
+  };
+  boxes.forEach(b=> b.addEventListener('change', sync));
+  all.addEventListener('change', ()=>{ boxes.forEach(b=> b.checked=all.checked); sync(); });
+  el.querySelectorAll('.asg-chip').forEach(ch=> ch.onclick=()=>{
+    const m=boxes.filter(b=>b.dataset.grp===ch.dataset.g);
+    const allOn=m.length && m.every(b=>b.checked);
+    m.forEach(b=> b.checked=!allOn);
+    sync();
+  });
+  go.onclick=()=>{
+    const date = el.querySelector('#ccaDate').value || defDate;
+    const targets=boxes.filter(b=>b.checked).map(b=>CLUB_ATHLETES[+b.dataset.idx]);
+    let skipped=0;
+    if(window.PF?.user){
+      targets.forEach(a=>{
+        if(!a.athleteUid){ skipped++; return; }
+        PF.scheduleSession(a.athleteUid, date, c.sessionTemplate)
+          .catch(e=> console.warn('[PF] scheduleSession (créneau) échoué :', e));
+      });
+    }
+    close();
+    toast(skipped
+      ? tr('creneauAssign.doneWithSkipped', {n:targets.length-skipped, skipped})
+      : tr(targets.length>1?'creneauAssign.donePlural':'creneauAssign.doneSingular', {n:targets.length}));
+  };
+}
 
 /* Ouvre le calendrier d'entraînement d'un adhérent du club (vue coach).
    Démo : plan dérivé stable propre à ce membre ; connecté : nécessitera le
@@ -4825,12 +4985,100 @@ function openClubAthleteCalendar(a){
   if(!rosterIsReal){
     const idx = Math.abs(String(a.id).split('').reduce((x,c)=>x+c.charCodeAt(0),0)) % COACH_ROSTER.length;
     selectedAthleteIdx = idx; applyDemoAthlete(idx); renderAthPicker();
+  } else if(a.athleteUid){
+    // Lien coach_athlete réel désormais posé (RLS 0058 club_coach_manages) :
+    // on charge SON planning par id, qu'il soit ou non dans ROSTER (athlète
+    // personnel du coach) — avant ce fix, un adhérent club hors ROSTER
+    // continuait d'afficher le planning déjà chargé, jamais le sien.
+    currentAthleteId = a.athleteUid;
+    const idx = ROSTER.findIndex(r=>r.id===a.athleteUid);
+    if(idx>-1){ selectedAthleteIdx = idx; renderAthPicker(); }
+    if(typeof window.__pf_loadPlanningFor==='function') window.__pf_loadPlanningFor(a.athleteUid);
+  } else {
+    toast(tr('clubAth.noAccountYet'));
+    return;
   }
   renderSidebar(); render(); updateVideolibVisibility(); updatePlanAthleteVisibility();
   if(typeof renderCoachBand==='function') renderCoachBand();
   if(typeof renderGear==='function') renderGear();
   window.scrollTo({top:0, behavior:'smooth'});
   toast(tr('clubAth.calendarOf', {name:a.name}) + (rosterIsReal?'':tr('clubAth.demoTypicalPlan')));
+}
+
+/* ============================================================
+   CALENDRIER CLUB (onglet Calendrier, demande Rowan 28-29/09/2026)
+   ------------------------------------------------------------
+   Vue unifiée : créneaux (récurrents par jour de semaine, ou ponctuels
+   datés) + compétitions du club, empilée sur plusieurs semaines comme
+   le calendrier coach/athlète (buildWeekRow). Chaque créneau affiche
+   les inscrits en bulles — clic = ouvre le calendrier de CET athlète
+   (openClubAthleteCalendar), survol = son nom (attribut title natif).
+   ============================================================ */
+function renderClubCalendar(){
+  const grid = document.getElementById('clubCalGrid');
+  if(!grid) return;
+  const label = document.getElementById('clubCalLabel');
+  const mon0 = mondayOf(clubCalWeekOffset);
+  const nWeeks = clubCalWeeksShown;
+  const sun = addDays(mon0, nWeeks*7-1);
+  if(label) label.textContent = `${fmt.format(mon0)} → ${fmt.format(sun)} ${sun.getFullYear()}`;
+  grid.classList.toggle('cal-grid-multi', nWeeks>1);
+  grid.innerHTML='';
+  const todayIso = iso(new Date());
+
+  for(let w=0; w<nWeeks; w++){
+    const wMon = addDays(mon0, w*7);
+    if(nWeeks>1){
+      const lbl=document.createElement('div'); lbl.className='week-row-label';
+      lbl.textContent = `${fmt.format(wMon)} → ${fmt.format(addDays(wMon,6))}`;
+      grid.appendChild(lbl);
+    }
+    const row=document.createElement('div'); row.className='week-row';
+    for(let i=0;i<7;i++){
+      const date = addDays(wMon,i);
+      const key = iso(date);
+      const slots = CRENEAUX.filter(c=> c.recur==='once' ? c.date===key : c.day===i)
+        .sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+      const comps = COMPETITIONS.filter(comp=>comp.date===key);
+      const day=document.createElement('div');
+      day.className='day'+(key===todayIso?' today':'');
+      day.innerHTML = `
+        <div class="day-head"><span class="dname">${DAYS[i]}</span><span class="dnum">${date.getDate()}</span></div>
+        <div class="day-body">
+          ${comps.map(comp=>`<div class="club-cal-comp"><i class="ic ic-flag"></i>${comp.name}</div>`).join('')}
+          ${slots.map(c=>{
+            const D=DISC[c.disc]||{color:'var(--muted)'};
+            const avatars = c.attendees.slice(0,5).map(id=>{
+              const a=CLUB_ATHLETES.find(x=>x.id===id);
+              return `<div class="cr-att" data-open-ath="${id}" title="${a?a.name:''}">${a?initials(a.name):'?'}</div>`;
+            }).join('') + (c.attendees.length>5?`<div class="cr-att more">+${c.attendees.length-5}</div>`:'');
+            return `<div class="club-cal-slot" style="--c:${D.color}" data-creneau="${c.id}">
+              <div class="ccs-t">${c.time||''} · ${c.title}</div>
+              ${c.place?`<div class="ccs-m">${c.place}</div>`:''}
+              ${avatars?`<div class="ccs-att">${avatars}</div>`:''}
+              ${(c.disc==='run')?`<button class="ccs-mk" data-mk="${c.id}">${c.sessionTemplate?tr('creneau.editSession'):tr('creneau.createSession')}</button>`:''}
+            </div>`;
+          }).join('')}
+        </div>`;
+      row.appendChild(day);
+    }
+    grid.appendChild(row);
+  }
+
+  grid.querySelectorAll('[data-open-ath]').forEach(el=> el.addEventListener('click', e=>{
+    e.stopPropagation();
+    const a = CLUB_ATHLETES.find(x=>x.id===el.dataset.openAth);
+    if(a) openClubAthleteCalendar(a);
+  }));
+  grid.querySelectorAll('[data-mk]').forEach(el=> el.addEventListener('click', e=>{
+    e.stopPropagation();
+    const c = CRENEAUX.find(x=>x.id===el.dataset.mk);
+    if(c) openBuilderForCreneau(c);
+  }));
+  grid.querySelectorAll('.club-cal-slot').forEach(el=> el.addEventListener('click', ()=>{
+    const c = CRENEAUX.find(x=>x.id===el.dataset.creneau);
+    if(c) openCreneauDetail(c,'desc');
+  }));
 }
 let clubOnlyUnassigned = false;
 /* Segmentation croisée du roster (#7 audit) : sport × groupe (objectif) ×
@@ -5154,7 +5402,11 @@ function saveCompetition(){
   if(!name || !date){ toast(tr('competition.missingFields')); return; }
   const comp = {id:'cp'+Date.now(), name, date, level, targetGroupId};
   COMPETITIONS.push(comp);
-  /* backend réel plus tard : PF.createObjectiveCompetition(comp) */
+  if(window.PF?.user && window.__pf_clubId){
+    PF.saveClubCompetition({ club_id:window.__pf_clubId, name, date, level, target_group_id:targetGroupId||null })
+      .then(saved=>{ if(saved) comp.id = saved.id; })
+      .catch(e=> console.warn('[PF] saveClubCompetition échoué :', e));
+  }
   CLUB_ATHLETES.filter(a=>a.group===targetGroupId).forEach(a=>{
     COMPETITION_RESPONSES[compResponseKey(comp.id, a.id)] = {status:'pending'};
   });
@@ -6155,6 +6407,7 @@ function renderPresence(){
 function switchClubView(){
   document.querySelectorAll('.club-tab').forEach(b=> b.classList.toggle('active', b.dataset.ct===clubView));
   document.getElementById('clubViewDash').hidden = clubView!=='dash';
+  document.getElementById('clubViewCalendrier').hidden = clubView!=='calendrier';
   document.getElementById('clubViewCreneaux').hidden = clubView!=='creneaux';
   document.getElementById('clubViewGroupes').hidden = clubView!=='groupes';
   document.getElementById('clubViewAthletes').hidden = clubView!=='athletes';
@@ -6164,6 +6417,7 @@ function switchClubView(){
   document.getElementById('clubViewBill').hidden = clubView!=='bill';
   document.getElementById('clubViewOffres').hidden = clubView!=='offres';
   if(clubView==='dash') renderClubDash();
+  if(clubView==='calendrier') renderClubCalendar();
   if(clubView==='creneaux') renderCreneaux();
   if(clubView==='groupes') renderGroups();
   if(clubView==='athletes') renderClubAthletes();
@@ -6449,7 +6703,7 @@ if(typeof SillanceTour!=='undefined') SillanceTour.init();
    Supabase. Si rien ne se connecte, ce hook ne fait rien et l'app reste
    en mode démo avec ses données en dur. ------------------------------- */
 window.__pf_app = {
-  data: { RECORDS, checkin, planning, realised, ATHLETE_REF, CLUB_ATHLETES, CLUB_GROUPS, CRENEAUX, VIDEOS },
+  data: { RECORDS, checkin, planning, realised, ATHLETE_REF, CLUB_ATHLETES, CLUB_GROUPS, CRENEAUX, VIDEOS, COMPETITIONS, COMPETITION_RESPONSES },
   render, renderSidebar, renderClub, updateVideolibVisibility,
   refreshDevices: refreshDeviceState,
   getMode(){ return mode; },
@@ -6461,6 +6715,8 @@ window.__pf_app = {
   setGear(items){ if(typeof GEAR!=='undefined'){ GEAR = items.slice(); renderGear(); } },
   // Roster d'athlètes du coach (sélecteur "planifier pour") + athlète courant.
   setCoachAthletes,
+  // Résout "moi" dans CLUB_ATHLETES (club_members.id) une fois hydraté.
+  setMeClubId(id){ if(id) ME_CLUB_ID = id; },
   getCurrentAthleteId(){ return currentAthleteId; },
   // Masque l'analyse/records de démo pour un compte confirmé sans activité réelle.
   setActivityState,
@@ -7748,6 +8004,7 @@ document.getElementById('bShorthandGo').addEventListener('click', ()=>{
   }
 });
 document.getElementById('bSaveCal').addEventListener('click', ()=>{
+  if(builderState.creneauId){ saveCreneauSessionTemplate(builderState.creneauId); return; }
   const s=builderToSession();
   const key=builderState.targetDate || iso(mondayOf(weekOffset));
   if(builderEditing){

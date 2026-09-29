@@ -94,12 +94,25 @@ const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s
 // display_name (membre sans compte) prioritaire, sinon le nom réel du profil
 // lié (join profiles dans getClubMembers) — avant ce fix un membre inscrit
 // via accept-club-invite retombait toujours sur le placeholder "Athlète".
-const mapMember  = (m) => ({ id: m.id, name: esc(m.display_name) || esc(m.profiles?.full_name) || "Athlète",
+// athleteUid (m.athlete_id = profiles.id, PEUT être null pour un membre sans
+// compte) distinct de id (m.id = la ligne club_members) : plusieurs tables
+// (scheduled_sessions, club_competition_responses) sont keyées sur le vrai
+// profil utilisateur, pas sur l'adhésion — calendrier club (0058) en a besoin
+// pour ouvrir/écrire le calendrier réel de l'adhérent.
+const mapMember  = (m) => ({ id: m.id, athleteUid: m.athlete_id || null,
+  name: esc(m.display_name) || esc(m.profiles?.full_name) || "Athlète",
   email: esc(m.profiles?.email) || "", disc: m.disc || "tri", since: esc(m.since) || "", group: m.group_id });
 const mapGroup   = (g) => ({ id: g.id, name: esc(g.name), color: g.color, desc: esc(g.description) });
+// recur/date/description existent en base depuis 0017/0018 mais n'étaient
+// jamais mappés ici (audit 29/09/2026) : tout créneau réel s'affichait donc
+// comme hebdomadaire, jamais comme ponctuel daté, et sa description restait
+// invisible — corrigé au passage, nécessaire pour placer correctement les
+// créneaux sur le calendrier club (0058).
 const mapCreneau = (c) => ({ id: c.id, disc: c.disc, title: esc(c.title), day: c.day,
   time: c.time, dur: c.dur, place: esc(c.place), cap: c.cap, coach: esc(c.coach),
-  price: Number(c.price) || 0, group: c.group_id, attendees: [] });
+  price: Number(c.price) || 0, group: c.group_id, attendees: [],
+  recur: c.recur || 'weekly', date: c.date || null, desc: esc(c.description) || '',
+  sessionTemplate: c.session_template || null });
 const mapGear = (g) => ({ id: g.id, type: g.type, name: esc(g.name), brand: esc(g.brand) || "",
   km: Number(g.km) || 0, max: Number(g.max_km) || 1000,
   cat: g.cat || null, sessionTypes: g.session_types || [],
@@ -336,14 +349,35 @@ async function hydrate() {
       }
       const club = clubs[0];
       window.__pf_clubId = club.id;   // exposé pour les écritures (création créneau)
-      const [members, creneaux, attendance] = await Promise.all([
+      const [members, creneaux, attendance, competitions] = await Promise.all([
         PF.getClubMembers(club.id),
         PF.getCreneaux(club.id),
         PF.getClubAttendance(club.id),
+        PF.getClubCompetitions(club.id),
       ]);
       app.replaceArray(app.data.CLUB_ATHLETES, members.map(mapMember));
       const groups = await PF.sb.from("club_groups").select("*").eq("club_id", club.id);
       if (groups.data) app.replaceArray(app.data.CLUB_GROUPS, groups.data.map(mapGroup));
+      // Compétitions club (0058, réelles depuis ce jour — COMPETITIONS était
+      // jusque-là 100% démo, jamais persisté) + réponses par athlète.
+      const compRows = competitions.map(c => ({ id: c.id, name: c.name, date: c.date, level: c.level, targetGroupId: c.target_group_id }));
+      app.replaceArray(app.data.COMPETITIONS, compRows);
+      // club_competition_responses.athlete_id = profiles.id, mais le reste du
+      // front (COMPETITION_RESPONSES, competitionTargets) key tout sur
+      // CLUB_ATHLETES[].id = club_members.id — table de correspondance via
+      // athleteUid (posé par mapMember) pour retomber sur les mêmes clés.
+      const responses = await PF.getClubCompetitionResponses(compRows.map(c => c.id));
+      const memberIdByUid = {};
+      app.data.CLUB_ATHLETES.forEach(a => { if (a.athleteUid) memberIdByUid[a.athleteUid] = a.id; });
+      // "Moi" dans CLUB_ATHLETES (auto-inscription créneau, ME_CLUB_ID) —
+      // sans ça tout le module join/confirm restait câblé sur le compte démo.
+      if (memberIdByUid[uid] && app.setMeClubId) app.setMeClubId(memberIdByUid[uid]);
+      const respByKey = {};
+      responses.forEach(r => {
+        const memberId = memberIdByUid[r.athlete_id];
+        if (memberId) respByKey[r.competition_id + ':' + memberId] = { status: r.status };
+      });
+      app.assignObj(app.data.COMPETITION_RESPONSES, respByKey);
       // Présences réelles (audit 22/09/2026 : mapCreneau posait attendees:[]
       // en dur, aucun pointage n'était donc jamais visible pour un vrai club).
       const attByCreneau = {};
