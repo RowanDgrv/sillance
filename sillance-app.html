@@ -658,16 +658,19 @@ table.rc-cmp td.num{text-align:right;font-weight:800}
    navigateur peut peindre le squelette HTML vide avant l'exécution du script,
    puis tout saute d'un coup une fois le contenu injecté (CLS mesuré 0.66,
    quasi entièrement ce seul saut). Réserver l'espace élimine le saut. */
-.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));min-height:480px}
-@media (max-width:980px){.cal-grid{grid-template-columns:1fr}}
-.cal-grid.cal-grid-day{grid-template-columns:1fr}
-.cal-grid.cal-grid-day .day{border-right:none}
-/* affichage plusieurs semaines (sélecteur #calWeeksSelect) : le calendrier
-   empile des rangées de 7 jours au lieu d'une seule grille, on défile la
-   PAGE (pas un panneau interne) pour voir les semaines suivantes. */
-.cal-grid.cal-grid-multi{display:flex;flex-direction:column;gap:26px;min-height:0}
+/* render() empile TOUJOURS ses jours dans un .week-row (1 ou plusieurs
+   selon le sélecteur #calWeeksSelect) — .cal-grid n'est donc plus lui-même
+   la grille à 7 colonnes (ça ne marchait qu'avec des .day en enfants
+   directs) : il n'est qu'un simple conteneur qui empile 1..N .week-row,
+   chacun responsable de sa propre grille à 7 colonnes. Bug vécu en direct
+   29/09 : avec un seul .week-row enfant, l'ancienne grille à 7 colonnes de
+   .cal-grid le plaçait dans SA 1ère colonne (~1/7 de la largeur) — tout le
+   calendrier se tassait en haut à gauche. */
+.cal-grid{display:flex;flex-direction:column;gap:26px;min-height:480px}
 .week-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 @media (max-width:980px){.week-row{grid-template-columns:1fr}}
+.cal-grid.cal-grid-day .week-row{grid-template-columns:1fr}
+.cal-grid.cal-grid-day .day{border-right:none}
 .week-row-label{font-size:var(--fs-sm);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 8px 2px}
 /* overlay grille du calendrier (7 colonnes = jours), révélé par body.grid-on */
 .cal-guides{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .26s ease;z-index:5}
