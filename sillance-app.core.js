@@ -6802,8 +6802,24 @@ document.querySelectorAll('#crdTabs .crd-tab').forEach(b=>b.onclick=()=>{ crdTab
 
 // création de créneau
 const creneauOverlay=document.getElementById('creneauOverlay');
+// Bascule le champ Jour/Date selon la récurrence choisie, et reformule la note
+// sous le formulaire en conséquence (note non traduite : FR uniquement, comme
+// à l'origine).
+function renderCrWhenFld(recur){
+  const fld=document.getElementById('crWhenFld');
+  const note=document.getElementById('crRecurNote');
+  if(recur==='once'){
+    fld.innerHTML=`<label for="crDate">${tr('invoices.date')}</label><input type="date" id="crDate" value="${iso(new Date())}">`;
+    if(note) note.innerHTML=`Séance <b>ponctuelle</b>, à la date choisie. Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres : ils n'ont qu'à confirmer leur présence.`;
+  } else {
+    fld.innerHTML=`<label for="crDay">${tr('slot.dayLabel')}</label><select id="crDay">${CLUB_DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('')}</select>`;
+    if(note) note.innerHTML=`Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres : ils n'ont qu'à confirmer leur présence.`;
+  }
+}
 document.getElementById('clubAddCreneau').onclick=()=>{
-  const sel=document.getElementById('crDay'); sel.innerHTML=CLUB_DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
+  const recurSel=document.getElementById('crRecur'); recurSel.value='weekly';
+  renderCrWhenFld('weekly');
+  recurSel.onchange=()=>renderCrWhenFld(recurSel.value);
   const chipsEl=document.getElementById('crGroupChips');
   chipsEl.innerHTML = CLUB_GROUPS.map(g=>`<button type="button" class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name}</button>`).join('')
     || `<span class="club-hint">${tr('crd.noGroupsYet')}</span>`;
@@ -6816,11 +6832,20 @@ document.getElementById('crSave').onclick=()=>{
   // title/place/coach/desc échappés à la saisie : renderCreneaux() les
   // interpole ensuite tels quels dans du innerHTML (écriture optimiste
   // locale, avant tout aller-retour DB).
+  const recur = document.getElementById('crRecur').value==='once' ? 'once' : 'weekly';
+  let day, date=null;
+  if(recur==='once'){
+    const dEl=document.getElementById('crDate');
+    date = (dEl && dEl.value) ? dEl.value : iso(new Date());
+    day = (new Date(date+'T00:00:00').getDay()+6)%7;
+  } else {
+    day = +document.getElementById('crDay').value;
+  }
   const c={
     id:'c'+Date.now(),
     disc:document.getElementById('crDisc').value,
     title:dispoSafe(document.getElementById('crTitle').value||tr('crd.groupSlot')),
-    day:+document.getElementById('crDay').value,
+    day, recur, date,
     time:document.getElementById('crTime').value,
     dur:+document.getElementById('crDur').value,
     place:dispoSafe(document.getElementById('crPlace').value||tr('crd.tbd')),
@@ -6842,7 +6867,7 @@ document.getElementById('crSave').onclick=()=>{
   if(window.PF?.user && window.__pf_clubId){
     PF.saveCreneau({ club_id:window.__pf_clubId, disc:c.disc, title:c.title, day:c.day,
       time:c.time, dur:c.dur, place:c.place, cap:c.cap, coach:c.coach, price:c.price,
-      description:c.desc||'', group_ids:c.groups, group_id:c.groups[0]||null })
+      description:c.desc||'', group_ids:c.groups, group_id:c.groups[0]||null, recur:c.recur, date:c.date })
       .then(saved=>{ if(saved) c.id = saved.id; })
       .catch(e=> console.warn('[PF] saveCreneau échoué :', e));
   }

@@ -3250,8 +3250,15 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       </div>
       <div class="b-fld"><label for="crTitle" data-i18n="slot.titleLabel">Intitulé</label><input type="text" id="crTitle" placeholder="Ex. Séance piste collective" data-i18n-attr="placeholder:slot.titlePh"></div>
       <div class="cr-row">
-        <div class="b-fld"><label for="crDay" data-i18n="slot.dayLabel">Jour</label><select id="crDay"></select></div>
+        <div class="b-fld"><label for="crRecur" data-i18n="crd.recurrence">Récurrence</label>
+          <select id="crRecur">
+            <option value="weekly" selected data-i18n="creneau.everyWeek">chaque semaine</option>
+            <option value="once" data-i18n="crd.oneTimeDated">Séance ponctuelle (date)</option>
+          </select></div>
+        <div class="b-fld" id="crWhenFld"><label for="crDay" data-i18n="slot.dayLabel">Jour</label><select id="crDay"></select></div>
         <div class="b-fld"><label for="crTime" data-i18n="slot.timeLabel">Heure</label><input type="time" id="crTime" value="18:30"></div>
+      </div>
+      <div class="cr-row">
         <div class="b-fld"><label for="crDur" data-i18n="slot.durationLabel">Durée (min)</label><input type="number" id="crDur" value="90" min="15" max="240"></div>
       </div>
       <div class="cr-row">
@@ -3267,7 +3274,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         <div class="b-fld full"><label data-i18n="slot.groupRestrictedLabel">Groupe(s) (contenu réservé — vide = tout le club)</label><div class="asg-groups" id="crGroupChips"></div></div>
         <div class="b-fld" style="justify-content:flex-end"><label class="cr-invite"><input type="checkbox" id="crInviteGroup"> <span data-i18n="slot.inviteGroupsLabel">Inviter les groupes sélectionnés</span></label></div>
       </div>
-      <p class="cr-note">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres : ils n'ont qu'à confirmer leur présence.</p>
+      <p class="cr-note" id="crRecurNote">Le créneau se répète <b>chaque semaine</b> (jour + heure). Avec un groupe : seul ce groupe voit le contenu de la séance, et « Inviter » pré-invite tous ses membres : ils n'ont qu'à confirmer leur présence.</p>
       <p class="cr-note" id="crPriceNote">Mets 0 pour un créneau inclus dans l'adhésion. Un tarif &gt; 0 active la séance « à la carte » (utile pour un stage ou une séance ouverte aux invités).</p>
     </div>
     <button class="btn" id="crSave" style="width:100%;margin-top:8px"><i class="ic ic-check"></i> Publier le créneau</button>
