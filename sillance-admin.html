@@ -236,7 +236,18 @@ function renderTurnstile() {
     turnstileWidgetId = window.turnstile.render(el, {
       sitekey: TURNSTILE_SITE_KEY,
       callback: (t) => { turnstileToken = t; setLoginReady(true); },
-      "error-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification échouée — réessaie"); },
+      // Turnstile passe un code d'erreur au callback. 110200 = domaine non
+      // autorisé pour cette sitekey (constaté 05/10/2026 en testant via
+      // file:// / localhost) : pas un pépin réseau, recharger ne change rien
+      // tant que la page n'est pas servie depuis sillance.app. On le dit
+      // explicitement plutôt que d'afficher "réessaie" dans ce cas précis.
+      "error-callback": (code) => {
+        turnstileToken = "";
+        const domainBlocked = String(code || "").startsWith("1102");
+        setLoginReady(false, domainBlocked
+          ? "Page ouverte hors de sillance.app — ouvre-la sur le vrai domaine"
+          : "Vérification échouée — réessaie");
+      },
       "expired-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification expirée — réessaie"); },
       "timeout-callback": () => { turnstileToken = ""; setLoginReady(false, "Vérification expirée — réessaie"); },
     });
