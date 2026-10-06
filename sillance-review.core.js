@@ -5549,6 +5549,16 @@ function openBuilder(dateKey, existing){
   if(grpBtn) grpBtn.style.display = (hasClub && !builderEditing) ? '' : 'none';
   const alsoLibBox = document.getElementById('bAlsoLib');
   if(alsoLibBox) alsoLibBox.checked = false;
+  // récurrence hebdomadaire : n'a de sens qu'à la création d'une séance
+  // neuve posée directement sur le calendrier d'un athlète, pas en édition.
+  const recurBar = document.getElementById('builderRecurBar');
+  const recurChk = document.getElementById('bRecurOn');
+  const recurUntilWrap = document.getElementById('bRecurUntilWrap');
+  const recurUntilInp = document.getElementById('bRecurUntil');
+  if(recurBar) recurBar.style.display = builderEditing ? 'none' : 'flex';
+  if(recurChk) recurChk.checked = false;
+  if(recurUntilWrap) recurUntilWrap.style.display = 'none';
+  if(recurUntilInp) recurUntilInp.value = '';
   const disc = existing?.disc || 'bike';
   if(existing && existing.blocksV2 && existing.blocksV2.blocks && existing.blocksV2.blocks.length){
     // Une séance de la bibliothèque (TEMPLATES) porte un blocksV2 déjà complet
@@ -6239,6 +6249,18 @@ document.getElementById('bDiscPick').addEventListener('change', e=>{
     if(builderState._refreshNutri) builderState._refreshNutri();
 });
 document.getElementById('bAddBlock').addEventListener('click', ()=>{ builderState.blocks.push(defaultBlockNew(builderState.disc)); renderBlocks(); });
+document.getElementById('bRecurOn').addEventListener('change', e=>{
+  const wrap=document.getElementById('bRecurUntilWrap');
+  if(wrap) wrap.style.display = e.target.checked ? 'flex' : 'none';
+  if(e.target.checked){
+    const inp=document.getElementById('bRecurUntil');
+    const startKey = builderState.targetDate || iso(mondayOf(weekOffset));
+    if(inp){
+      inp.min = startKey;
+      if(!inp.value || inp.value<=startKey) inp.value = iso(addDays(new Date(startKey+'T00:00:00'), 7*8));
+    }
+  }
+});
 // Rangée en bibliothèque : utilisée par le bouton dédié (bSaveLib) ET par la
 // case "Aussi en bibliothèque" du bouton bSaveGroup — même logique, pas de
 // fermeture/toast ici, c'est l'appelant qui gère (il peut enchaîner d'autres
@@ -6303,21 +6325,46 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
     toast('Séance modifiée');
     return;
   }
-  (planning[key] ||= []).push(s);
-  // Persistance backend (si connecté) — récupère l'id DB pour les futurs done/rpe.
-  if(window.PF?.user){
-    PF.scheduleSession(currentAthleteId || PF.user.id, key, { disc:s.disc, title:s.title, dur:s.dur,
-      dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
-      .then(saved=>{ if(saved) s.id = saved.id; })
-      .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
+  // Récurrence hebdomadaire (même jour de semaine) : génère une séance
+  // indépendante par occurrence — chacune garde son propre done/rpe/id,
+  // comme une séance posée à la main chaque semaine. Plafonné à 1 an pour
+  // ne jamais créer un nombre de lignes incontrôlé sur une date erronée.
+  const recurOn = document.getElementById('bRecurOn')?.checked;
+  const recurUntilVal = document.getElementById('bRecurUntil')?.value;
+  const dateKeys = [key];
+  if(recurOn && recurUntilVal && recurUntilVal>key){
+    const end = new Date(recurUntilVal+'T00:00:00');
+    let d = new Date(key+'T00:00:00');
+    const MAX_OCC = 52;
+    while(dateKeys.length<MAX_OCC){
+      d = addDays(d,7);
+      if(d>end) break;
+      dateKeys.push(iso(d));
+    }
   }
+  dateKeys.forEach(k=>{
+    const occ = (k===key) ? s : { ...JSON.parse(JSON.stringify(s)), id:'s'+(uid++) };
+    (planning[k] ||= []).push(occ);
+    // Persistance backend (si connecté) — récupère l'id DB pour les futurs done/rpe.
+    if(window.PF?.user){
+      PF.scheduleSession(currentAthleteId || PF.user.id, k, { disc:occ.disc, title:occ.title, dur:occ.dur,
+        dist:occ.dist||0, tss:occ.tss, zone:occ.zone, blocks:(occ.blocksV2&&occ.blocksV2.blocks)||[] })
+        .then(saved=>{ if(saved) occ.id = saved.id; })
+        .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
+    }
+  });
   closeBuilder(); render();
   // Précise le jour cible dans le toast : quand la séance est créée depuis le
   // bouton générique (pas via le "+" d'un jour précis), elle atterrit sur le
   // lundi de la semaine affichée sans que le coach l'ait choisi — sans ce
   // repère, il peut chercher sa séance sur le mauvais jour.
   const targetDayLabel = new Date(key+'T00:00:00').toLocaleDateString(localeStr(), {weekday:'long', day:'numeric', month:'long'});
-  toast(tr('toast.seanceAjouteeCalendrier')+' : '+targetDayLabel);
+  if(dateKeys.length>1){
+    const weekday = new Date(key+'T00:00:00').toLocaleDateString(localeStr(), {weekday:'long'});
+    toast(tr('toast.seancesRecurrentesAjoutees', {n:dateKeys.length, weekday}));
+  } else {
+    toast(tr('toast.seanceAjouteeCalendrier')+' : '+targetDayLabel);
+  }
 });
 
 /* ============================================================

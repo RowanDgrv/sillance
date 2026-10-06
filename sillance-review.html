@@ -2128,6 +2128,13 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .addath-choice .addath-t{font-weight:700;font-size:14px}
 .addath-choice .addath-s{font-size:12px;color:var(--muted);margin-top:2px}
 
+.builder-recur{padding:10px 26px;border-top:1px solid var(--line);display:flex;align-items:center;
+  gap:12px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.b-recur-chk{display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;color:var(--text)}
+.b-recur-chk input{cursor:pointer}
+.b-recur-until{display:flex;align-items:center;gap:6px}
+.b-recur-until input[type=date]{border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);
+  color:var(--text);font-family:var(--font-data);font-size:12.5px;padding:5px 8px}
 .builder-foot{padding:15px 26px;border-top:1px solid var(--line);display:flex;align-items:center;
   justify-content:space-between;gap:14px;flex-wrap:wrap}
 .b-summary{font-family:var(--font-data);font-size:12.5px;color:var(--muted)}
@@ -3224,6 +3231,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       </div>
     </div>
 
+    <div class="builder-recur" id="builderRecurBar" style="display:none">
+      <label class="b-recur-chk"><input type="checkbox" id="bRecurOn"> <i class="ic ic-refresh"></i> <span data-i18n="builder.recurLabel">Se répète chaque semaine (même jour)</span></label>
+      <span class="b-recur-until" id="bRecurUntilWrap" style="display:none">
+        <span data-i18n="builder.recurUntil">jusqu'au</span>
+        <input type="date" id="bRecurUntil">
+      </span>
+    </div>
+
     <div class="builder-foot">
       <div class="b-summary" id="bSummary"></div>
       <div class="b-actions">
@@ -3285,10 +3300,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20260924f"></script>
+<script src="./sillance-i18n-app.js?v=20261006a"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-tour.js"></script>
-<script src="./sillance-review.core.js?v=20260928a"></script>
+<script src="./sillance-review.core.js?v=20261006a"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo.

@@ -126,6 +126,7 @@
     "toast.retourReferencesFtpVmaCss": `Retour aux références % (FTP/VMA/CSS…)`,
     "toast.seanceRangeeEnBibliotheque": `Séance rangée en bibliothèque`,
     "toast.seanceAjouteeCalendrier": `Séance ajoutée au calendrier`,
+    "toast.seancesRecurrentesAjoutees": `{n} séances ajoutées au calendrier, chaque {weekday}`,
     "toast.assistantIaActiveDemo": `Assistant IA activé (démo)`,
     "toast.analyseIaIndisponibleResumeLocal": `Analyse IA indisponible, résumé local affiché`,
     "toast.equipementAjouteSuiviDUsure": `Équipement ajouté · suivi d'usure calibré sur ton modèle`,
@@ -851,6 +852,7 @@
 
     "builder.warmupTitle": `Échauffement`, "builder.cooldownTitle": `Retour au calme`,
     "builder.editSession": `Modifier la séance`, "builder.newSession": `Nouvelle séance`,
+    "builder.recurLabel": `Se répète chaque semaine (même jour)`, "builder.recurUntil": `jusqu'au`,
     "builder.noSensorTitle": `Athlète sans montre GPS ni capteur : toutes les cibles passent en ressenti RPE 1-10`,
     "builder.noSensorChip": `Sans capteur · tout en RPE`,
     "builder.moveUp": `Monter`, "builder.moveDown": `Descendre`,
@@ -1623,6 +1625,7 @@
     "toast.retourReferencesFtpVmaCss": `Back to % references (FTP/vVO2max pace/CSS…)`,
     "toast.seanceRangeeEnBibliotheque": `Session saved to library`,
     "toast.seanceAjouteeCalendrier": `Session added to calendar`,
+    "toast.seancesRecurrentesAjoutees": `{n} sessions added to calendar, every {weekday}`,
     "toast.assistantIaActiveDemo": `AI Assistant activated (demo)`,
     "toast.analyseIaIndisponibleResumeLocal": `AI analysis unavailable, showing local summary`,
     "toast.equipementAjouteSuiviDUsure": `Gear added · wear tracking calibrated to your model`,
@@ -2305,6 +2308,7 @@
 
     "builder.warmupTitle": `Warm-up`, "builder.cooldownTitle": `Cool-down`,
     "builder.editSession": `Edit session`, "builder.newSession": `New session`,
+    "builder.recurLabel": `Repeats every week (same day)`, "builder.recurUntil": `until`,
     "builder.noSensorTitle": `Athlete without a GPS watch or sensor: all targets switch to perceived RPE 1-10`,
     "builder.noSensorChip": `No sensor · all in RPE`,
     "builder.moveUp": `Move up`, "builder.moveDown": `Move down`,
@@ -3023,6 +3027,7 @@
     "toast.retourReferencesFtpVmaCss": `Volver a las referencias % (FTP/VAM/CSS…)`,
     "toast.seanceRangeeEnBibliotheque": `Sesión guardada en la biblioteca`,
     "toast.seanceAjouteeCalendrier": `Sesión añadida al calendario`,
+    "toast.seancesRecurrentesAjoutees": `{n} sesiones añadidas al calendario, cada {weekday}`,
     "toast.assistantIaActiveDemo": `Asistente de IA activado (demo)`,
     "toast.analyseIaIndisponibleResumeLocal": `Análisis de IA no disponible, se muestra el resumen local`,
     "toast.equipementAjouteSuiviDUsure": `Equipo añadido · seguimiento de desgaste calibrado según tu modelo`,
@@ -3705,6 +3710,7 @@
 
     "builder.warmupTitle": `Calentamiento`, "builder.cooldownTitle": `Vuelta a la calma`,
     "builder.editSession": `Modificar la sesión`, "builder.newSession": `Nueva sesión`,
+    "builder.recurLabel": `Se repite cada semana (mismo día)`, "builder.recurUntil": `hasta`,
     "builder.noSensorTitle": `Atleta sin reloj GPS ni sensor: todos los objetivos pasan a percepción RPE 1-10`,
     "builder.noSensorChip": `Sin sensor · todo en RPE`,
     "builder.moveUp": `Subir`, "builder.moveDown": `Bajar`,
