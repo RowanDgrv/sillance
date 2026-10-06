@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title data-i18n="avis.pageTitle">Sillance : Avis des coachs &amp; clubs</title>
+<meta name="description" data-i18n-attr="content:avis.metaDescription" content="Ce que les premiers coachs et clubs pensent de Sillance : planification, suivi de charge, facturation intégrée.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sillance">
+<meta property="og:title" data-i18n-attr="content:avis.pageTitle" content="Sillance : Avis des coachs &amp; clubs">
+<meta property="og:description" data-i18n-attr="content:avis.metaDescription" content="Ce que les premiers coachs et clubs pensent de Sillance.">
+<meta property="og:image" content="https://sillance.app/og-image.png">
+<meta property="og:url" content="https://sillance.app/avis.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" data-i18n-attr="content:avis.pageTitle" content="Sillance : Avis des coachs &amp; clubs">
+<meta name="twitter:description" data-i18n-attr="content:avis.metaDescription" content="Ce que les premiers coachs et clubs pensent de Sillance.">
+<meta name="twitter:image" content="https://sillance.app/og-image.png">
+<link rel="canonical" href="https://sillance.app/avis.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+<link rel="shortcut icon" href="./favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600&display=optional" rel="stylesheet">
+<style>
+  :root{--paper:#0B1120;--panel:#121A2B;--ink:#F3F6FC;--soft:#C2CBDD;--muted:#8A93A8;--accent:#46C2D8;--orange:#FF9A3D;--line:rgba(150,165,200,.16);--line-strong:rgba(150,165,200,.30)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper);color:var(--soft);font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65}
+  .wrap{max-width:1040px;margin:0 auto;padding:48px 22px 80px}
+  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:22px;border-bottom:1px solid var(--line-strong);margin-bottom:36px}
+  .wm{font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);text-decoration:none}
+  .wm b{color:var(--accent)}
+  nav a{color:var(--muted);text-decoration:none;font-size:13px;margin-left:18px}
+  nav a:hover{color:var(--accent)}
+  .lang-switch{display:inline-flex;gap:2px;margin-left:18px;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;padding:2px}
+  .lang-switch button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 8px;
+    border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer}
+  .lang-switch button.active{background:var(--accent);color:#062028}
+  h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:34px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);margin-bottom:10px}
+  .lead{font-size:16px;color:var(--soft);margin-bottom:36px}
+  a{color:var(--accent)}
+  .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .review-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px 24px;
+    display:flex;flex-direction:column;gap:14px}
+  .review-stars{color:var(--orange);font-size:14px;letter-spacing:2px}
+  .review-quote{color:var(--soft);font-size:14px;line-height:1.65;font-weight:400;flex:1}
+  .review-who{display:flex;align-items:center;gap:12px}
+  .review-avatar{width:40px;height:40px;border-radius:10px;background:var(--accent);color:#062028;
+    display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;
+    font-size:14px;flex:none}
+  .review-name{color:var(--ink);font-weight:600;font-size:13.5px}
+  .review-role{color:var(--muted);font-size:12px}
+  .reviews-empty{color:var(--muted);font-size:14px;padding:30px 0}
+  .cta{margin-top:46px;padding-top:28px;border-top:1px solid var(--line-strong)}
+  .btn{display:inline-block;font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;letter-spacing:.06em;
+    text-transform:uppercase;background:var(--accent);color:#062028;border:none;border-radius:8px;
+    padding:13px 22px;cursor:pointer}
+  .btn:hover{filter:brightness(1.08)}
+  footer{margin-top:70px;padding-top:20px;border-top:1px solid var(--line-strong);font-size:13px;color:var(--muted)}
+  footer nav{margin-top:8px}
+  footer nav a{margin-left:0;margin-right:16px}
+  @media(max-width:880px){.reviews-grid{grid-template-columns:1fr}}
+  @media(max-width:640px){
+    .wrap{padding:32px 18px 60px}
+    header{flex-direction:column;align-items:flex-start;gap:14px;padding-bottom:18px;margin-bottom:28px}
+    nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+    nav a{margin-left:0}
+    .lang-switch{margin-left:0}
+    h1{font-size:28px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <a class="wm" href="index.html">Sill<b>ance</b></a>
+  <nav>
+    <a href="sillance-aide.html" data-i18n="avis.nav.aide">Aide &amp; guide</a>
+    <a href="contact.html" data-i18n="avis.nav.contact">Contact</a>
+    <div class="lang-switch" role="group" aria-label="Language / Langue / Idioma">
+      <button type="button" data-lang-btn="fr">FR</button>
+      <button type="button" data-lang-btn="en">EN</button>
+      <button type="button" data-lang-btn="es">ES</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+<h1 data-i18n="avis.h1">Avis</h1>
+<p class="lead" data-i18n="avis.lead">Ce que les premiers coachs et clubs pensent de Sillance — sans filtre, publiés tels quels.</p>
+
+<div class="reviews-grid" id="reviewsGridFull"></div>
+
+<div class="cta">
+  <a class="btn" href="./sillance-app.html" data-i18n="avis.cta">Essayer Sillance</a>
+</div>
+</main>
+
+<footer>
+  <span data-i18n="avis.footerTag">Sillance : coaching triathlon, Hyrox &amp; endurance.</span>
+  <nav aria-label="Liens de bas de page" data-i18n-attr="aria-label:avis.footerNavAria">
+    <a href="index.html" data-i18n="avis.footer.home">Accueil</a>
+    <a href="sillance-aide.html" data-i18n="avis.footer.aide">Aide &amp; guide</a>
+    <a href="legal.html#mentions" data-i18n="avis.footer.mentions">Mentions légales</a>
+    <a href="legal.html#cgu" data-i18n="avis.footer.cgu">CGU / CGV</a>
+    <a href="legal.html#confidentialite" data-i18n="avis.footer.confidentialite">Confidentialité</a>
+  </nav>
+</footer>
+
+</div>
+<script src="./sillance-i18n.js"></script>
+<script src="./sillance-i18n-avis.js"></script>
+<script src="./sillance-reviews.js"></script>
+<script src="./sillance-cookies.js"></script>
+<script src="./sillance-analytics.js"></script>
+</body>
+</html>
