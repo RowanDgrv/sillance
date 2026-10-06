@@ -59,7 +59,12 @@
     {"@type":"Question","name":"Coach indépendant ou Club, lequel choisir ?","acceptedAnswer":{"@type":"Answer","text":"Coach indépendant : tu factures tes athlètes dans l'app, le palier suit ton nombre d'athlètes coachés (19, 29 ou 49 euros par mois). Club : licence à la saison pour une structure ou une box, au nombre d'athlètes réellement suivis, avec créneaux, adhérents et présences. Entraîneurs illimités dans les deux cas."}},
     {"@type":"Question","name":"Le paiement en ligne, c'est pour quand ?","acceptedAnswer":{"@type":"Answer","text":"Sillance est en bêta. Tu peux déjà tout utiliser et tester la démo sans inscription. L'encaissement en ligne des abonnements sera activé prochainement ; d'ici là, l'accès n'est pas facturé."}},
     {"@type":"Question","name":"Combien de temps pour mettre en place et faire venir mes athlètes ?","acceptedAnswer":{"@type":"Answer","text":"Créer ton espace et poser un premier plan prend quelques minutes. Chaque athlète reçoit une invitation, crée son accès et connecte sa montre en une fois. Essai gratuit de 14 jours pour te faire ton avis avant de t'engager."}},
-    {"@type":"Question","name":"Sillance gère le Hyrox, pas seulement l'endurance ?","acceptedAnswer":{"@type":"Answer","text":"Oui. La charge d'entraînement est calculée sur une métrique commune à la course, au vélo, à la natation et au Hyrox. Les box Hyrox utilisent l'espace Club : créneaux, groupes, présences, facturation adhérents."}}
+    {"@type":"Question","name":"Sillance gère le Hyrox, pas seulement l'endurance ?","acceptedAnswer":{"@type":"Answer","text":"Oui. La charge d'entraînement est calculée sur une métrique commune à la course, au vélo, à la natation et au Hyrox. Les box Hyrox utilisent l'espace Club : créneaux, groupes, présences, facturation adhérents."}},
+    {"@type":"Question","name":"Comment créer une séance ?","acceptedAnswer":{"@type":"Answer","text":"En rôle Coach, depuis la Bibliothèque, clique « + Créer une séance » : renseigne discipline, durée, objectif, puis ajoute tes blocs (échauffement, intervalles, retour au calme). Glisse-la ensuite sur le jour voulu du calendrier, ou clique le + qui apparaît au survol d'un jour pour la créer directement à cette date."}},
+    {"@type":"Question","name":"Comment créer une séance qui se répète sur plusieurs semaines, ou un cycle complet ?","acceptedAnswer":{"@type":"Answer","text":"Deux options. Même séance chaque semaine (ex. piste le mardi) : coche « Se répète chaque semaine (même jour) » à la création et choisis la date de fin, jusqu'à 52 semaines. Programme complet de plusieurs semaines différentes : utilise « + Créer un cycle » sous la bibliothèque."}},
+    {"@type":"Question","name":"Mon activité ne remonte pas, ma montre n'apparaît pas : que faire ?","acceptedAnswer":{"@type":"Answer","text":"Vérifie d'abord la connexion dans le panneau Synchronisation (rôle Athlète). Les données Strava restent personnelles à l'athlète et ne sont jamais partagées avec le coach — connecte plutôt Garmin ou Coros. Sinon, importe manuellement le fichier .FIT, .TCX ou .GPX exporté de ta montre."}},
+    {"@type":"Question","name":"Comment inviter un athlète à rejoindre Sillance ?","acceptedAnswer":{"@type":"Answer","text":"En rôle Coach, depuis ton roster, clique « Inviter un athlète » et renseigne son e-mail. Il reçoit un lien, crée son accès et apparaît automatiquement dans ta liste."}},
+    {"@type":"Question","name":"Je peux changer de palier en cours d'abonnement ?","acceptedAnswer":{"@type":"Answer","text":"Oui, le palier suit ton nombre d'athlètes réellement coachés. Écris-nous via la page Contact et on ajuste ton palier."}}
   ]
 }
 </script>
@@ -304,15 +309,16 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 .legal-links a:hover{color:var(--accent)}
 
 /* ---------- faq ---------- */
-.faq-list{display:flex;flex-direction:column;border-top:1px solid var(--line);max-width:900px}
-.faq-item{border-bottom:1px solid var(--line)}
-.faq-item summary{list-style:none;cursor:pointer;padding:22px 0;display:flex;justify-content:space-between;align-items:baseline;gap:20px;
-  font-family:var(--display);font-weight:600;font-size:clamp(17px,2vw,20px);text-transform:uppercase;letter-spacing:-.005em;color:var(--text)}
+.faq-list{display:flex;flex-direction:column;gap:12px;max-width:900px}
+.faq-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:0 22px;transition:border-color .15s}
+.faq-item[open]{border-color:var(--line-strong)}
+.faq-item summary{list-style:none;cursor:pointer;padding:20px 0;display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  font-family:var(--display);font-weight:600;font-size:clamp(15px,1.8vw,17px);text-transform:none;letter-spacing:-.005em;color:var(--text)}
 .faq-item summary::-webkit-details-marker{display:none}
-.faq-item summary::after{content:"+";font-family:var(--mono);font-weight:400;color:var(--accent);flex:none}
+.faq-item summary::after{content:"+";font-family:var(--mono);font-weight:400;font-size:18px;color:var(--accent);flex:none}
 .faq-item[open] summary::after{content:"\2013"}
-.faq-a{padding:0 0 24px;max-width:64ch}
-.faq-a p{color:var(--soft);font-weight:300;line-height:1.6}
+.faq-a{padding:0 0 22px;max-width:64ch}
+.faq-a p{color:var(--soft);font-weight:300;line-height:1.6;font-size:14.5px}
 .faq-a a{color:var(--accent)}
 </style></head>
 <body>
@@ -596,6 +602,26 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
         <summary data-i18n="faq.q8">Sillance gère le Hyrox, pas seulement l'endurance ?</summary>
         <div class="faq-a"><p data-i18n-html="faq.a8">Oui. La charge d'entraînement est calculée sur une métrique commune à la course, au vélo, à la natation et au Hyrox. Les box Hyrox utilisent l'espace Club : créneaux, groupes, présences, facturation adhérents.</p></div>
       </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q9">Comment créer une séance ?</summary>
+        <div class="faq-a"><p data-i18n-html="faq.a9">En rôle Coach, depuis la Bibliothèque, clique « + Créer une séance » : renseigne discipline, durée, objectif, puis ajoute tes blocs (échauffement, intervalles, retour au calme). Glisse-la ensuite sur le jour voulu du calendrier, ou clique le + qui apparaît au survol d'un jour pour la créer directement à cette date.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q10">Comment créer une séance qui se répète sur plusieurs semaines, ou un cycle complet ?</summary>
+        <div class="faq-a"><p data-i18n-html="faq.a10">Deux options. Même séance chaque semaine (ex. piste le mardi) : coche « Se répète chaque semaine (même jour) » à la création et choisis la date de fin, jusqu'à 52 semaines — chaque occurrence reste indépendante. Programme complet de plusieurs semaines différentes : utilise « + Créer un cycle » sous la bibliothèque.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q11">Mon activité ne remonte pas, ma montre n'apparaît pas : que faire ?</summary>
+        <div class="faq-a"><p data-i18n-html="faq.a11">Vérifie d'abord la connexion dans le panneau Synchronisation (rôle Athlète). Point important : les données Strava restent personnelles à l'athlète et ne sont jamais partagées avec le coach — connecte plutôt Garmin ou Coros pour que ton coach voie tes séances. Si la synchro automatique ne suffit pas, tu peux toujours importer manuellement le fichier .FIT, .TCX ou .GPX exporté de ta montre.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q12">Comment inviter un athlète à rejoindre Sillance ?</summary>
+        <div class="faq-a"><p data-i18n-html="faq.a12">En rôle Coach, depuis ton roster, clique « Inviter un athlète » et renseigne son e-mail. Il reçoit un lien, crée son accès et apparaît automatiquement dans ta liste — connecte ensuite sa montre ou importe ses fichiers pour voir ses séances.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q13">Je peux changer de palier en cours d'abonnement ?</summary>
+        <div class="faq-a"><p data-i18n-html="faq.a13">Oui, le palier suit ton nombre d'athlètes réellement coachés. Écris-nous via la page <a href="./contact.html">Contact</a> (ou depuis « Gérer mon abonnement ») et on ajuste ton palier.</p></div>
+      </details>
     </div>
   </div></section>
 
@@ -629,9 +655,9 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 </div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-index.js?v=20261006a"></script>
+<script src="./sillance-i18n-index.js?v=20261006b"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-reviews.js"></script>
+<script src="./sillance-reviews.js?v=20261006a"></script>
 <script src="./sillance-index.js"></script>
 <script src="./sillance-cookies.js"></script>
 <script src="./sillance-analytics.js"></script>

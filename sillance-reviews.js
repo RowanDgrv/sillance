@@ -9,6 +9,8 @@
 
   // Chaque entrée : { name, role, quote, rating (1-5, optionnel) }.
   var REVIEWS = [
+    { name: "Thomas", role: "Coach de triathlon indépendant",
+      quote: "Sillance me permet de gagner du temps, des rappels automatiques sur le matériel nécessaire chaque matin pour mes athlètes et un gain de temps énorme dans la création de séance ou de cycle d'entraînement." },
   ];
 
   function initials(name) {
