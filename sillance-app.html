@@ -2197,6 +2197,14 @@ body[data-athview] .planner > .library{display:none}
   background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);
   font-size:12.5px;font-family:inherit;
 }
+/* Titre + 2 select en ligne forçaient le builder entier en scroll horizontal
+   sur mobile (retours testeurs 07/10/2026, confirmé 390px : ligne à 483px
+   dans un conteneur à 296px). Le titre prend sa propre ligne, les 2 select
+   passent à la ligne suivante — aucun changement de markup nécessaire. */
+@media (max-width:480px){
+  .builder-meta-row{flex-wrap:wrap}
+  .builder-meta-row .b-title-input{flex:1 1 100%}
+}
 /* sélecteur de références multiples */
 .b-refs-row{display:flex;align-items:center;gap:10px;margin-top:13px;flex-wrap:wrap}
 .b-ref-chip.nosensor{margin-left:auto;border-style:dashed}
