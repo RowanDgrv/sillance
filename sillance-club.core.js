@@ -233,9 +233,23 @@ function switchView(v){
   $$('#nav .nav').forEach(n=>n.classList.toggle('active', n.dataset.v===v));
   $$('section[data-view]').forEach(s=>s.classList.toggle('hide', s.dataset.view!==v));
   renderCurrentView();
+  closeMobileNav();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $$('#nav .nav').forEach(n=> n.onclick = ()=>switchView(n.dataset.v));
+
+// Menu repliable mobile (☰) : fermé par défaut (cf. CSS @media 680px),
+// n'a aucun effet sur desktop (classe sans portée hors de ce breakpoint).
+function closeMobileNav(){
+  const aside = document.querySelector('aside');
+  aside?.classList.remove('nav-open');
+  document.getElementById('navToggle')?.setAttribute('aria-expanded', 'false');
+}
+document.getElementById('navToggle')?.addEventListener('click', () => {
+  const aside = document.querySelector('aside');
+  const open = aside?.classList.toggle('nav-open');
+  document.getElementById('navToggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+});
 document.addEventListener('sil:langchange', ()=>{
   DAYS = [tr('day.sunShort'),tr('day.monShort'),tr('day.tueShort'),tr('day.wedShort'),tr('day.thuShort'),tr('day.friShort'),tr('day.satShort')];
   refreshKpis();

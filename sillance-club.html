@@ -60,6 +60,7 @@
   .side-foot{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
   .side-foot .pp{display:flex;align-items:center;gap:7px}
   .pmark{width:18px;height:18px;border-radius:5px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:grid;place-items:center;color:#06222a;font-weight:800;font-size:11px;font-family:"Oswald"}
+  .nav-toggle{display:none}
 
   /* ---------- Main ---------- */
   main{padding:22px 26px 60px;max-width:1180px}
@@ -111,7 +112,8 @@
   .tag.paid{background:rgba(255,120,71,.15);color:var(--hyrox)}
   .tag.sub{background:rgba(70,194,216,.13);color:var(--accent)}
 
-  table{width:100%;border-collapse:collapse;font-size:13px}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -1px}
+  table{width:100%;min-width:520px;border-collapse:collapse;font-size:13px}
   th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:8px 10px;border-bottom:1px solid var(--line)}
   td{padding:11px 10px;border-bottom:1px solid #161d24}
   tr:last-child td{border-bottom:0}
@@ -143,17 +145,33 @@
   .demoflag{display:inline-block;font-size:10.5px;color:var(--warn);border:1px solid rgba(255,177,61,.4);border-radius:99px;padding:2px 9px;margin-left:8px;vertical-align:middle}
 
   /* Mobile (audit 03/08/2026 : aucun breakpoint sur ce layout sidebar fixe,
-     débordement horizontal confirmé à 320px) : la sidebar passe en flux
-     normal au-dessus du contenu plutôt qu'en colonne fixe de 232px. Placé en
-     fin de feuille pour gagner sur les règles non conditionnelles de main/aside
-     déclarées plus haut (même spécificité, l'ordre de cascade décide). */
+     débordement horizontal confirmé à 320px ; retour testeurs 07/10/2026 :
+     le correctif de l'époque — sidebar en flux normal au-dessus du contenu —
+     affichait toute la liste de nav + le pavé "propulsé par Sillance" en
+     plein écran AVANT le tableau de bord, qui n'apparaissait qu'après un
+     long scroll. Menu repliable (☰) à la place : fermé par défaut, seule la
+     marque reste visible, le contenu est immédiatement sous les yeux.
+     Placé en fin de feuille pour gagner sur les règles non conditionnelles
+     de main/aside déclarées plus haut (même spécificité, l'ordre de cascade
+     décide). */
   @media(max-width:680px){
     .app{grid-template-columns:minmax(0,1fr)}
-    aside{position:static; height:auto; overflow:visible; border-right:none; border-bottom:1px solid var(--line)}
+    aside{position:static; height:auto; overflow:visible; border-right:none; border-bottom:1px solid var(--line); padding-bottom:10px}
+    .brand{border-bottom:none; padding-bottom:4px; margin-bottom:0}
+    .nav-toggle{display:flex; align-items:center; justify-content:center; width:38px; height:38px; flex:none;
+      background:transparent; border:1px solid var(--line-strong); color:var(--ink); border-radius:9px; font-size:17px; cursor:pointer}
+    .nav-toggle:hover{border-color:var(--accent)}
+    nav#nav{display:none; margin-top:12px}
+    aside.nav-open nav#nav{display:flex}
+    .side-foot{display:none}
     main{padding:18px 16px 40px; max-width:100%}
     .card{padding:16px 14px}
     .slot{grid-template-columns:44px minmax(0,1fr) auto; gap:8px}
     .slot .btn.sm{padding:5px 8px; font-size:11px}
+    /* #offersWrap force 3 colonnes en style inline (JS) : la media query de
+       .cols seule ne suffit pas à la faire passer en 1 colonne ici (même
+       spécificité qu'un style inline = l'inline gagne). */
+    #offersWrap{grid-template-columns:minmax(0,1fr) !important}
   }
 </style>
 </head>
@@ -167,6 +185,7 @@
         <div class="bname os" id="bname" contenteditable="true" spellcheck="false">Box Hyrox Muret</div>
         <div class="bcity" id="bcity" contenteditable="true" spellcheck="false">Muret · 31</div>
       </div>
+      <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="nav" aria-label="Menu">☰</button>
     </div>
     <nav id="nav">
       <div class="nav active" data-v="dash"><span class="ico">🏟️</span> <span data-i18n="club.nav.dash">Tableau de bord</span></div>
@@ -255,8 +274,8 @@
       <div class="card">
         <h2 data-i18n="club.bill.title">Paiements</h2>
         <p class="hint" data-i18n="club.bill.hint">Abonnements mensuels + réservations à la carte. Paiement par Stripe, encaissé directement par la salle.</p>
-        <table><thead><tr><th data-i18n="clubBill.member">Adhérent</th><th data-i18n="clubBill.reason">Motif</th><th data-i18n="clubBill.type">Type</th><th data-i18n="invoices.amount">Montant</th><th data-i18n="adherence.status">Statut</th></tr></thead>
-        <tbody id="billBody"></tbody></table>
+        <div class="table-scroll"><table><thead><tr><th data-i18n="clubBill.member">Adhérent</th><th data-i18n="clubBill.reason">Motif</th><th data-i18n="clubBill.type">Type</th><th data-i18n="invoices.amount">Montant</th><th data-i18n="adherence.status">Statut</th></tr></thead>
+        <tbody id="billBody"></tbody></table></div>
       </div>
     </section>
 
@@ -265,8 +284,8 @@
       <div class="card">
         <h2 data-i18n="club.nav.members">Adhérents</h2>
         <p class="hint" data-i18n-html="club.members.hint">Change la formule d'un adhérent d'un clic. Les « Coaching&nbsp;+ » sont suivis par un coach (data &amp; adaptation des séances).</p>
-        <table><thead><tr><th data-i18n="clubBill.member">Adhérent</th><th data-i18n="club.members.plan">Formule</th><th data-i18n="crd.coach">Coach</th><th data-i18n="club.members.att30">Présences (30j)</th><th></th></tr></thead>
-        <tbody id="memBody"></tbody></table>
+        <div class="table-scroll"><table><thead><tr><th data-i18n="clubBill.member">Adhérent</th><th data-i18n="club.members.plan">Formule</th><th data-i18n="crd.coach">Coach</th><th data-i18n="club.members.att30">Présences (30j)</th><th></th></tr></thead>
+        <tbody id="memBody"></tbody></table></div>
       </div>
     </section>
 
@@ -287,7 +306,7 @@
 
 <script src="./sillance-i18n.js"></script>
 <script src="./sillance-i18n-club.js?v=20261007b"></script>
-<script src="./sillance-club.core.js"></script>
+<script src="./sillance-club.core.js?v=20261007a"></script>
 <script src="./sillance-cookies.js"></script>
 <script src="./sillance-analytics.js"></script>
 </body>
