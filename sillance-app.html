@@ -364,6 +364,12 @@ body.light .theme-toggle .tt-moon{display:none}
   border-right:1px solid var(--line);
 }
 .pulse-strip .stat:last-child{border-right:none}
+/* Prochaine course cliquable (07/10/2026, demandé par Rowan : le J-22 par
+   défaut n'était pas modifiable) : ouvre le même calendrier de saison que
+   le bouton "Saison" déjà existant (bandeau coach / onglet Forme & courses
+   athlète) — pas un 2e système, juste un 2e point d'entrée vers le même. */
+.stat-clickable{cursor:pointer;transition:background .15s}
+.stat-clickable:hover,.stat-clickable:focus-visible{background:var(--panel-2);outline:none}
 .stat .k{font-size:var(--fs-sm);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px}
 .stat .v{font-family:var(--font-data);font-size:26px;font-weight:700;line-height:1.1}
 .stat .v em{font-style:normal;font-size:var(--fs-md);color:var(--muted);font-weight:400;margin-left:var(--space-1)}
@@ -527,6 +533,14 @@ body.light .theme-toggle .tt-moon{display:none}
 .season-recap-link{display:inline-block;margin-top:5px;font-size:11px;font-weight:600;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .season-result{flex:none;font-size:12.5px;font-weight:600;text-align:right;max-width:150px}
 .season-add-result{color:var(--accent);text-decoration:underline;text-underline-offset:2px;font-weight:500}
+/* Modifier/supprimer une course du calendrier (07/10/2026) : avant ça, une
+   course prévue (ex. le J-22 par défaut) n'était jamais corrigeable, juste
+   remplaçable en en ajoutant une autre à côté. */
+.season-edit,.season-del{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
+  background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:border-color .15s,color .15s}
+.season-edit:hover{border-color:var(--accent);color:var(--accent)}
+.season-del:hover{border-color:var(--run);color:var(--run)}
+.season-edit i,.season-del i{width:13px;height:13px}
 .season-form{display:flex;flex-wrap:wrap;gap:8px}
 .season-form input,.season-form select{min-width:0;flex:1 1 110px}
 .season-form #seaName{flex:2 1 160px}
@@ -2860,7 +2874,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       </defs>
       <path d="M0 30 H80 L95 30 L103 12 L112 42 L120 22 L128 30 H260 L275 30 L283 8 L292 44 L300 20 L308 30 H460 L475 30 L483 14 L492 40 L500 23 L508 30 H660 L675 30 L683 10 L692 43 L700 21 L708 30 H860 L875 30 L883 13 L892 41 L900 22 L908 30 H1060 L1075 30 L1083 9 L1092 42 L1100 20 L1108 30 H1200"/>
     </svg>
-    <div class="stat">
+    <div class="stat stat-clickable" id="raceStatBlock" role="button" tabindex="0" title="Modifier / ajouter une course">
       <div class="k" data-i18n="dash.nextRace">Prochaine course</div>
       <div class="v" id="raceCountdown">J–22</div>
       <div class="trend flat" id="raceName">Gorillaman · Sprint</div>
@@ -3520,6 +3534,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <select id="seaType"><option value="run">Course à pied</option><option value="tri">Triathlon</option><option value="hyrox">Hyrox</option></select>
       <select id="seaPrio"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
       <button class="btn cy-ghost" id="seaAdd" data-i18n="season.add">+ Ajouter</button>
+      <button class="btn cy-ghost" id="seaCancelEdit" data-i18n="season.cancelEdit" hidden>Annuler</button>
     </div>
   </div>
 </div>
@@ -3998,11 +4013,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261007e"></script>
+<script src="./sillance-i18n-app.js?v=20261007f"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-tour.js?v=20260927d"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-app.core.js?v=20261007c"></script>
+<script src="./sillance-app.core.js?v=20261007h"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

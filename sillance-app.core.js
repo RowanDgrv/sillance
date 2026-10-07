@@ -2480,17 +2480,45 @@ function currentRace(){
     const taper = taperDaysFor(upcoming.name);
     return { name:upcoming.name, days, date, taperDays:taper, taperStart: iso(addDays(new Date(), days-taper)), volCut: taperVolCut(taper) };
   }
-  // démo (non connecté) : comportement historique inchangé
+  // démo (non connecté) : passe par athRaces() (liste éditable — édition/
+  // suppression du 07/10/2026) plutôt que de relire a.race figé, sinon une
+  // course modifiée/supprimée dans le calendrier de saison ne se voyait
+  // jamais reflétée ici (donc ni dans le bandeau, ni dans l'affûtage).
+  const demoAth = (typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx]) ? ROSTER[selectedAthleteIdx] : null;
   let r=null;
-  if(typeof mode!=='undefined' && mode==='coach' && typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].race){
-    r = ROSTER[selectedAthleteIdx].race;
-  } else { try{ if(UPCOMING_RACES && UPCOMING_RACES[0]) r={name:UPCOMING_RACES[0].name, days:UPCOMING_RACES[0].inDays}; }catch(e){} }
+  if(demoAth){
+    const races = athRaces(demoAth);
+    r = races.filter(x=>x.days!=null && x.days>=0).sort((a,b)=>a.days-b.days)[0] || null;
+  }
+  if(!r){ try{ if(UPCOMING_RACES && UPCOMING_RACES[0]) r={name:UPCOMING_RACES[0].name, days:UPCOMING_RACES[0].inDays}; }catch(e){} }
   if(!r) return null;
   const days = r.days!=null?r.days:r.inDays;
   if(days==null || days<0) return null;
   const date = iso(addDays(new Date(), days));
   const taper = taperDaysFor(r.name);
   return { name:r.name, days, date, taperDays:taper, taperStart: iso(addDays(new Date(), days-taper)), volCut: taperVolCut(taper) };
+}
+// Bandeau "PROCHAINE COURSE" en haut : toujours dérivé de currentRace() (donc
+// de la vraie liste a.races, pas du champ legacy a.race figé) — appelé au
+// changement d'athlète ET après chaque édition/suppression de course
+// (07/10/2026), sinon le bandeau restait affiché avec l'ancien nom/J- après
+// une modification.
+function updateRaceBanner(){
+  const rc = document.getElementById('raceCountdown'), rn = document.getElementById('raceName');
+  if(!rc && !rn) return;
+  const race = currentRace();
+  if(rc) rc.textContent = race ? 'J–'+race.days : '—';
+  if(rn) rn.textContent = race ? race.name : '';
+}
+// Pas mal d'affichages ailleurs (bandeau coach, sélecteur d'athlète, alertes,
+// comparateur…) lisent encore le champ legacy a.race plutôt que a.races —
+// plus simple de le maintenir synchronisé ici (soonest upcoming) que de
+// corriger chaque lecture éparpillée une par une.
+function syncLegacyRace(a){
+  if(!a) return;
+  const races = athRaces(a);
+  const upcoming = races.filter(x=>x.days!=null && x.days>=0).sort((x,y)=>x.days-y.days)[0];
+  a.race = upcoming ? { name:upcoming.name, days:upcoming.days } : null;
 }
 
 /* Construit UNE rangée de 7 jours (semaine démarrant à `mon`) — extrait de
@@ -4092,8 +4120,8 @@ function applyDemoAthlete(i){
   // dispo : ne pas laisser traîner celle de l'athlète précédent si absente
   checkin.dispo = a.checkin.dispo || 'ok';
   checkin.dispoNote = a.checkin.dispoNote || '';
-  const rc = document.getElementById('raceCountdown'); if(rc) rc.textContent = 'J–'+a.race.days;
-  const rn = document.getElementById('raceName'); if(rn) rn.textContent = a.race.name;
+  syncLegacyRace(a);
+  updateRaceBanner();
   // matériel : celui que CET athlète a renseigné (vide = vide, on n'invente rien)
   if(typeof GEAR!=='undefined'){ GEAR = JSON.parse(JSON.stringify(a.gear||[])); renderGear(); }
   renderSidebar(); render();
@@ -5797,7 +5825,14 @@ function scheduleRecapSave(race){
 }
 function athRaces(a){
   if(Array.isArray(a.races) && a.races.length) return a.races;
-  return a.race ? [{name:a.race.name, days:a.race.days, priority:'A', type:'run'}] : [];
+  // Promotion unique de l'ancien champ singulier a.race vers a.races (une
+  // seule fois, mémoïsé) — pour que l'édition/suppression (07/10/2026)
+  // n'ait qu'UN seul endroit à manipuler, jamais à distinguer les deux cas.
+  if(a.race && !Array.isArray(a.races)){
+    a.races = [{name:a.race.name, days:a.race.days, priority:'A', type:'run', location:null}];
+    return a.races;
+  }
+  return [];
 }
 const SEASON_PRIO_COLOR = {A:'var(--run)', B:'var(--bike)', C:'var(--muted)'};
 const RACE_TYPE_ICON = {run:'ic-run', tri:'ic-waves', hyrox:'ic-zap'};
@@ -5806,6 +5841,7 @@ function fmtRaceDate(days){
   const d=addDays(new Date(), days);
   return d.toLocaleDateString(localeStr(),{day:'numeric',month:'short',year:'numeric'});
 }
+let _seasonEditing=null; // référence directe vers l'objet course en cours d'édition (ou null)
 function renderSeasonList(){
   const a=_seasonAth; if(!a) return;
   const box=document.getElementById('seasonList');
@@ -5822,11 +5858,16 @@ function renderSeasonList(){
         ${past?`<a class="season-recap-link" data-i="${i}" href="#">${r.recap?tr('recap.editLink'):tr('recap.addLink')}</a>`:''}
       </div>
       <div class="season-result" data-i="${i}">${r.result ? r.result : (past ? `<span class="season-add-result">${tr('season.addResult')}</span>` : '')}</div>
+      <button type="button" class="season-edit" data-i="${i}" title="${tr('season.editRace')}"><i class="ic ic-edit"></i></button>
+      <button type="button" class="season-del" data-i="${i}" title="${tr('season.deleteRace')}"><i class="ic ic-x"></i></button>
     </div>`;
   }).join('');
   box.querySelectorAll('.season-row').forEach((row,i)=>{
     const races2=athRaces(a).slice().sort((x,y)=>x.days-y.days);
-    const r=races2[i]; if(r.days>=0) return; // résultat/analyse éditables seulement pour le passé
+    const r=races2[i];
+    row.querySelector('.season-edit').onclick=()=> startEditRace(r);
+    row.querySelector('.season-del').onclick=()=> deleteRace(a, r);
+    if(r.days>=0) return; // résultat/analyse éditables seulement pour le passé
     row.querySelector('.season-result').style.cursor='pointer';
     row.querySelector('.season-result').onclick=()=>{
       openMiniPrompt({title:tr('season.resultFor', {name:r.name}), value:r.result||'', onSave:(v)=>{
@@ -5843,6 +5884,41 @@ function renderSeasonList(){
     const rl=row.querySelector('.season-recap-link');
     if(rl) rl.onclick=(ev)=>{ ev.preventDefault(); openRaceRecap(a, r); };
   });
+}
+// Pré-remplit le formulaire du bas avec la course cliquée, bascule son
+// bouton en mode "Enregistrer" (07/10/2026 — avant ça, le J-22 par défaut
+// affiché partout n'était JAMAIS corrigeable, seulement remplaçable en en
+// ajoutant une autre à côté).
+function startEditRace(r){
+  _seasonEditing = r;
+  document.getElementById('seaName').value = r.name||'';
+  document.getElementById('seaLoc').value = r.location||'';
+  document.getElementById('seaDate').value = iso(addDays(new Date(), r.days));
+  document.getElementById('seaType').value = r.type||'run';
+  document.getElementById('seaPrio').value = r.priority||'C';
+  const btn=document.getElementById('seaAdd'); if(btn) btn.textContent=tr('season.saveEdit');
+  const cancel=document.getElementById('seaCancelEdit'); if(cancel) cancel.hidden=false;
+  document.getElementById('seaName').focus();
+}
+function cancelEditRace(){
+  _seasonEditing=null;
+  document.getElementById('seaName').value=''; document.getElementById('seaLoc').value=''; document.getElementById('seaDate').value='';
+  document.getElementById('seaType').value='run'; document.getElementById('seaPrio').value='C';
+  const btn=document.getElementById('seaAdd'); if(btn) btn.textContent=tr('season.add');
+  const cancel=document.getElementById('seaCancelEdit'); if(cancel) cancel.hidden=true;
+}
+function deleteRace(a, r){
+  if(!Array.isArray(a.races)) a.races = athRaces(a);
+  const idx = r.id ? a.races.findIndex(x=>x.id===r.id) : a.races.findIndex(x=>x.name===r.name && x.days===r.days);
+  if(idx<0) return;
+  a.races.splice(idx,1);
+  if(r.id && window.PF && PF.user) PF.deleteRace(r.id).catch(e=>console.warn('[PF] deleteRace:', e));
+  if(_seasonEditing===r) cancelEditRace();
+  renderSeasonList();
+  syncLegacyRace(a);
+  if(typeof render==='function') render();
+  if(typeof renderCoachBand==='function') renderCoachBand();
+  updateRaceBanner();
 }
 async function openSeasonCalendar(a){
   _seasonAth=a;
@@ -5877,6 +5953,18 @@ function myRacesAthlete(){
   ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
   const _mrb=document.getElementById('myRacesBtn');
   if(_mrb) _mrb.onclick=()=>{ const a=myRacesAthlete(); if(a) openSeasonCalendar(a); };
+  // Bandeau "PROCHAINE COURSE" (07/10/2026) : même calendrier de saison,
+  // résolu selon le mode affiché — l'athlète suivi en vue Coach, soi-même
+  // en vue Athlète (myRacesAthlete gère déjà ce 2e cas pour myRacesBtn).
+  const _rsb=document.getElementById('raceStatBlock');
+  if(_rsb){
+    const openForCurrent=()=>{
+      const a=(typeof mode!=='undefined' && mode==='coach') ? ROSTER[selectedAthleteIdx] : myRacesAthlete();
+      if(a) openSeasonCalendar(a);
+    };
+    _rsb.addEventListener('click', openForCurrent);
+    _rsb.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openForCurrent(); } });
+  }
   document.getElementById('seaAdd').addEventListener('click', async ()=>{
     const a=_seasonAth; if(!a) return;
     const name=document.getElementById('seaName').value.trim();
@@ -5886,18 +5974,40 @@ function myRacesAthlete(){
     const prio=document.getElementById('seaPrio').value;
     if(!name || !dateVal){ toast(tr('season.fillNameDate'), 'error'); return; }
     if(!Array.isArray(a.races)) a.races = athRaces(a);
+    const days=Math.round((new Date(dateVal+'T00:00:00')-new Date(new Date().toDateString()))/86400000);
+    if(_seasonEditing){
+      const r=_seasonEditing;
+      r.name=name; r.location=loc||null; r.days=days; r.type=type; r.priority=prio;
+      if(r.id && window.PF && PF.user){
+        PF.updateRace(r.id, {name, location:loc||null, race_date:dateVal, type, priority:prio})
+          .catch(e=>console.warn('[PF] updateRace:', e));
+      }
+      cancelEditRace();
+      renderSeasonList();
+      syncLegacyRace(a);
+      if(typeof render==='function') render();
+      if(typeof renderCoachBand==='function') renderCoachBand();
+      updateRaceBanner();
+      toast(tr('season.updated'));
+      return;
+    }
     if(window.PF && PF.user){
       const row = await PF.addRace({athleteId:a.id, name, location:loc||null, raceDate:dateVal, type, priority:prio});
       if(!row){ toast(tr('season.saveError'), 'error'); return; }
       a.races.push(raceRowToObj(row));
     } else {
-      const days=Math.round((new Date(dateVal+'T00:00:00')-new Date(new Date().toDateString()))/86400000);
       a.races.push({name, location:loc||null, days, priority:prio, type});
     }
     document.getElementById('seaName').value=''; document.getElementById('seaLoc').value=''; document.getElementById('seaDate').value='';
     renderSeasonList();
+    syncLegacyRace(a);
+    if(typeof render==='function') render();
+    if(typeof renderCoachBand==='function') renderCoachBand();
+    updateRaceBanner();
     toast(tr('season.added'));
   });
+  const _sce=document.getElementById('seaCancelEdit');
+  if(_sce) _sce.addEventListener('click', cancelEditRace);
 })();
 
 /* ============================================================
