@@ -102,6 +102,12 @@
   --line:rgba(16,24,40,.10); --line-strong:rgba(16,24,40,.18);
   --nav-bg:rgba(245,247,250,.75);
 }
+/* Le hero garde un fond sombre quel que soit le thème (commentaire ci-dessus) :
+   son texte doit donc rester clair lui aussi — sans ça le mode jour rendait
+   le titre et le lede illisibles, texte foncé sur fond resté sombre (signalé
+   07/10/2026, captures à l'appui). Re-pin local des 3 variables à leurs
+   valeurs sombres d'origine, qui ne cascade qu'aux descendants du hero. */
+.hero{--text:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8}
 html{background:var(--paper)}
 body{transition:background-color .25s,color .25s}
 *{box-sizing:border-box;margin:0;padding:0}

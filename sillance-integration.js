@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20260929d";
+import { PF } from "./sillance-client.js?v=20261007c";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -1047,6 +1047,18 @@ function injectGateStyles() {
     background:none;border:0;cursor:pointer;text-decoration:underline}
   #pf-lock-overlay .tier-lbl,.pf-lock-overlay .tier-lbl{font:700 11px 'Archivo',system-ui;letter-spacing:.09em;text-transform:uppercase;
     color:#7d8d98;text-align:left;margin:22px 0 10px}
+  /* Toggle mensuel/annuel (07/10/2026) : même pilule glissante que la nav
+     landing, en plus simple (pas de highlight JS positionné en pixels —
+     juste 2 boutons, l'actif prend le fond). */
+  #pf-lock-overlay .bill-toggle,.pf-lock-overlay .bill-toggle{display:inline-flex;gap:2px;margin-top:18px;
+    padding:3px;border-radius:999px;background:#141c24;border:1px solid #223}
+  #pf-lock-overlay .bt-opt,.pf-lock-overlay .bt-opt{border:0;background:transparent;color:#8ea0aa;cursor:pointer;
+    font:700 12px 'Archivo',system-ui;padding:7px 14px;border-radius:999px;transition:background .15s,color .15s;
+    display:flex;align-items:center;gap:6px}
+  #pf-lock-overlay .bt-opt small,.pf-lock-overlay .bt-opt small{font:700 9.5px 'Archivo';color:#35C58C;
+    background:rgba(53,197,140,.14);padding:2px 6px;border-radius:99px}
+  #pf-lock-overlay .bt-opt.active,.pf-lock-overlay .bt-opt.active{background:#46C2D8;color:#06222a}
+  #pf-lock-overlay .bt-opt.active small,.pf-lock-overlay .bt-opt.active small{background:rgba(6,34,42,.18);color:#06222a}
   #pf-lock-overlay .tier-picks,.pf-lock-overlay .tier-picks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   #pf-lock-overlay .tierpick,.pf-lock-overlay .tierpick{border:1.5px solid #223;background:#141c24;border-radius:12px;
     padding:14px 8px;cursor:pointer;text-align:center;font-family:'Archivo',system-ui;
@@ -1055,6 +1067,8 @@ function injectGateStyles() {
   #pf-lock-overlay .tierpick:disabled,.pf-lock-overlay .tierpick:disabled{opacity:.55;cursor:wait}
   #pf-lock-overlay .tierpick .tp-price,.pf-lock-overlay .tierpick .tp-price{font:800 19px 'Oswald',system-ui;color:#eaf6f9}
   #pf-lock-overlay .tierpick .tp-price small,.pf-lock-overlay .tierpick .tp-price small{font:600 10.5px 'Archivo';color:#7d8d98}
+  #pf-lock-overlay .tierpick .tp-price .tp-eq,.pf-lock-overlay .tierpick .tp-price .tp-eq{display:block;
+    font:500 10px 'Archivo';color:#7d8d98;margin-top:2px}
   #pf-lock-overlay .tierpick .tp-cap,.pf-lock-overlay .tierpick .tp-cap{font:500 11px/1.3 'Archivo';color:#8ea0aa}
   #pf-lock-overlay .tier-included,.pf-lock-overlay .tier-included{list-style:none;margin:16px 0 0;padding:0;text-align:left;
     display:flex;flex-direction:column;gap:7px}
@@ -1064,6 +1078,48 @@ function injectGateStyles() {
   const s = document.createElement("style");
   s.id = "pf-gate-style"; s.textContent = css;
   document.head.appendChild(s);
+}
+
+/* ===========================================================================
+ *  Toggle mensuel/annuel (07/10/2026, demandé par Rowan) — partagé entre les
+ *  paywalls coach et club. Annuel = 11 mois facturés (1 mois offert), même
+ *  règle que stripe-checkout (ANNUAL_MONTHS_BILLED) pour ne jamais afficher
+ *  un prix différent de celui réellement facturé.
+ * ========================================================================= */
+const ANNUAL_MONTHS_BILLED = 11;
+
+function billToggleHTML() {
+  return `
+    <div class="bill-toggle" role="group">
+      <button type="button" class="bt-opt active" data-bt="month">${tr("gate.billMonthly")}</button>
+      <button type="button" class="bt-opt" data-bt="year">${tr("gate.billYearly")} <small>${tr("gate.yearlySave")}</small></button>
+    </div>`;
+}
+
+function priceHTML(monthlyPrice, interval) {
+  const fmt = (n) => String(Math.round(n * 100) / 100).replace(".", ",");
+  if (interval === "year") {
+    const annualTotal = monthlyPrice * ANNUAL_MONTHS_BILLED;
+    const perMonthEq = annualTotal / 12;
+    return `${fmt(annualTotal)}&nbsp;€<small> ${tr("gate.perYear")}</small>
+      <span class="tp-eq">${fmt(perMonthEq)}&nbsp;€${tr("gate.perMonth")}</span>`;
+  }
+  return `${fmt(monthlyPrice)}&nbsp;€<small> ${tr("gate.perMonth")}</small>`;
+}
+
+function wireBillToggle(overlay) {
+  const toggle = overlay.querySelector(".bill-toggle");
+  if (!toggle) return;
+  toggle.querySelectorAll(".bt-opt").forEach((btn) => {
+    btn.onclick = () => {
+      const interval = btn.dataset.bt === "year" ? "year" : "month";
+      overlay.dataset.interval = interval;
+      toggle.querySelectorAll(".bt-opt").forEach((b) => b.classList.toggle("active", b === btn));
+      overlay.querySelectorAll(".tierpick").forEach((tp) => {
+        tp.querySelector(".tp-price").innerHTML = priceHTML(Number(tp.dataset.price), interval);
+      });
+    };
+  });
 }
 
 function renderCoachGate({ subscribed, role, trialDaysLeft, locked }) {
@@ -1084,15 +1140,17 @@ function renderCoachGate({ subscribed, role, trialDaysLeft, locked }) {
     ];
     const o = document.createElement("div");
     o.id = "pf-lock-overlay";
+    o.dataset.interval = "month";
     o.innerHTML = `
       <div class="card">
         <h2>${tr("gate.trialOverHeading")}</h2>
         <p>${tr("gate.trialOverText2")}</p>
+        ${billToggleHTML()}
         <div class="tier-lbl">${tr("gate.pickTier")}</div>
         <div class="tier-picks">
           ${TIERS.map((t) => `
-            <button class="tierpick" data-tier="${t.n}">
-              <span class="tp-price">${t.price}&nbsp;€<small> ${tr("gate.perMonth")}</small></span>
+            <button class="tierpick" data-tier="${t.n}" data-price="${t.price}">
+              <span class="tp-price">${priceHTML(t.price, "month")}</span>
               <span class="tp-cap">${t.cap}</span>
             </button>`).join("")}
         </div>
@@ -1107,11 +1165,12 @@ function renderCoachGate({ subscribed, role, trialDaysLeft, locked }) {
         <button class="out" id="pf-lock-out">${tr("auth.logOut")}</button>
       </div>`;
     document.body.appendChild(o);
+    wireBillToggle(o);
     o.querySelectorAll(".tierpick").forEach((btn) => {
       btn.onclick = () => {
         o.querySelectorAll(".tierpick").forEach((b) => (b.disabled = true));
         btn.querySelector(".tp-price").textContent = tr("gate.selecting");
-        PF.startCheckout("coach", Number(btn.dataset.tier)).catch((e) => {
+        PF.startCheckout("coach", Number(btn.dataset.tier), o.dataset.interval).catch((e) => {
           console.warn("[PF] checkout:", e);
           o.querySelectorAll(".tierpick").forEach((b) => (b.disabled = false));
         });
@@ -1162,15 +1221,17 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
     const o = document.createElement("div");
     o.id = "pf-club-lock-overlay";
     o.className = "pf-lock-overlay";
+    o.dataset.interval = "month";
     o.innerHTML = `
       <div class="card">
         <h2>${tr("gate.club.trialOverHeading")}</h2>
         <p>${tr("gate.club.trialOverText2")}</p>
+        ${billToggleHTML()}
         <div class="tier-lbl">${tr("gate.club.pickTier")}</div>
         <div class="tier-picks">
           ${TIERS.map((t) => `
-            <button class="tierpick" data-tier="${t.n}">
-              <span class="tp-price">${String(t.price).replace(".", ",")}&nbsp;€<small> ${tr("gate.perMonth")}</small></span>
+            <button class="tierpick" data-tier="${t.n}" data-price="${t.price}">
+              <span class="tp-price">${priceHTML(t.price, "month")}</span>
               <span class="tp-cap">${t.cap}</span>
             </button>`).join("")}
         </div>
@@ -1183,11 +1244,12 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
         <button class="out" id="pf-club-lock-out">${tr("auth.logOut")}</button>
       </div>`;
     document.body.appendChild(o);
+    wireBillToggle(o);
     o.querySelectorAll(".tierpick").forEach((btn) => {
       btn.onclick = () => {
         o.querySelectorAll(".tierpick").forEach((b) => (b.disabled = true));
         btn.querySelector(".tp-price").textContent = tr("gate.selecting");
-        PF.startCheckout("club", Number(btn.dataset.tier)).catch((e) => {
+        PF.startCheckout("club", Number(btn.dataset.tier), o.dataset.interval).catch((e) => {
           console.warn("[PF] checkout:", e);
           o.querySelectorAll(".tierpick").forEach((b) => (b.disabled = false));
         });
