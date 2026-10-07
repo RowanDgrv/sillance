@@ -2309,13 +2309,26 @@ body[data-athview] .planner > .library{display:none}
 .ln-zone-row{display:flex;align-items:center;gap:7px}
 .ln-zone{border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
   font-size:var(--fs-base);font-weight:600;padding:6px 7px;min-width:0}
-.ln-pct{display:flex;align-items:center;gap:6px;flex:1}
+.ln-pct{position:relative;display:flex;align-items:center;gap:6px;flex:1}
 .ln-pct input[type=range]{flex:1;appearance:none;-webkit-appearance:none;height:4px;border-radius:99px;min-width:50px;
-  background:linear-gradient(90deg,var(--good),var(--bike),var(--run));outline:none}
+  outline:none}
 /* a11y (audit 03/08/2026) : idem — focus restitué au clavier uniquement. */
 .ln-pct input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ln-pct input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:13px;height:13px;
-  border-radius:50%;background:var(--text);border:2px solid var(--ink);cursor:pointer}
+  border-radius:50%;background:var(--text);border:2px solid var(--ink);cursor:pointer;margin-top:0;
+  box-shadow:0 0 0 3px rgba(0,0,0,.35)}
+.ln-pct input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--text);
+  border:2px solid var(--ink);cursor:pointer;box-shadow:0 0 0 3px rgba(0,0,0,.35)}
+/* bulle de valeur flottante — glisse avec le pouce, visible pendant la
+   saisie (clavier ou souris). Position en % calée sur la fraction 40-130
+   du slider (cf. pctFrac côté JS), pas sur le curseur réel de la souris. */
+.pct-bubble{position:absolute;bottom:100%;margin-bottom:9px;transform:translateX(-50%);
+  background:var(--ink);color:var(--text);border:1px solid var(--line-strong);border-radius:8px;
+  padding:4px 9px;font-family:var(--font-data);font-size:11px;font-weight:700;white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .15s;z-index:5}
+.pct-bubble::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--ink)}
+.ln-pct input[type=range]:focus ~ .pct-bubble,.ln-pct input[type=range]:active ~ .pct-bubble{opacity:1}
 .ln-pct .pv{font-family:var(--font-data);font-size:11.5px;font-weight:700;min-width:36px;text-align:right}
 .ln-targets{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:2px}
 .ln-targets span{font-family:var(--font-data);font-size:10.5px;font-weight:700;color:var(--swim);

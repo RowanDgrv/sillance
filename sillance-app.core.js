@@ -345,6 +345,29 @@ function zoneColorAt(i, total){
   const idx = Math.round((i/(total-1))*(ZONE_RAMP.length-1));
   return ZONE_RAMP[Math.max(0,Math.min(ZONE_RAMP.length-1, idx))];
 }
+// Piste du slider d'intensité peinte par bandes de zones réelles (celles du
+// modèle choisi — %FTP, %VMA, %FC max…, ou les zones perso de l'athlète),
+// plutôt que l'ancien dégradé fixe à 3 couleurs identique quel que soit le
+// modèle. Bandes dures (pas de fondu) : une zone est une catégorie, pas un
+// continuum. `min`/`max` = bornes du slider (40-130 en dur partout où il est
+// utilisé aujourd'hui) ; une zone inversée (lo>hi, ex. allures) est bornée
+// dans le bon sens avant calcul des % de piste.
+function zoneGradientFor(modelKey, min, max){
+  const FALLBACK = 'linear-gradient(90deg,var(--good),var(--bike),var(--run))';
+  const zList = zonesFor(modelKey);
+  if(!zList || !zList.length) return FALLBACK;
+  const stops = [];
+  zList.forEach((z,i)=>{
+    const color = zoneColorAt(i, zList.length);
+    const lo = Math.max(min, Math.min(z[1], z[2]));
+    const hi = Math.min(max, Math.max(z[1], z[2]));
+    if(hi<=lo) return;
+    const pLo = ((lo-min)/(max-min))*100;
+    const pHi = ((hi-min)/(max-min))*100;
+    stops.push(`${color} ${pLo.toFixed(1)}%`, `${color} ${pHi.toFixed(1)}%`);
+  });
+  return stops.length ? `linear-gradient(90deg,${stops.join(',')})` : FALLBACK;
+}
 function loadCustomZones(){
   try{ const raw=localStorage.getItem('sil_custom_zones'); if(raw) Object.assign(CUSTOM_ZONES, JSON.parse(raw)); }catch(e){}
 }
@@ -7759,10 +7782,15 @@ function lineHTML(blk, ln){
         ${zIdx<0?`<option value="-1" selected>${zn||'—'}</option>`:''}
         ${custZ.length?`<optgroup label="${tr('zoneEd.customZones')}">${custZ.map(({z,ci})=>`<option value="c${ci}">${dispoSafe(z.name)} · ${REF_LABEL[z.ref]||z.ref}</option>`).join('')}</optgroup>`:''}
       </select>`;
+    const pctFrac = Math.max(0,Math.min(1,(ln.pct-40)/(130-40)));
     intHTML = `
       <div class="ln-zone-row">
         <select class="ln-zone" data-f="model" title="${tr('builder.calcReference')}">${models.map(k=>`<option value="${k}" ${k===ln.model?'selected':''}>${REF_LABEL[k]}</option>`).join('')}</select>
-        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="${tr('builder.intensityPctAria')}"><span class="pv-unit">%</span></div>
+        <div class="ln-pct">
+          <input type="range" min="40" max="130" value="${ln.pct}" data-f="pct" style="background:${zoneGradientFor(ln.model,40,130)}">
+          <input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="${tr('builder.intensityPctAria')}"><span class="pv-unit">%</span>
+          <div class="pct-bubble" data-bubble style="left:${(pctFrac*100).toFixed(1)}%">${ln.pct}% · ${dispoSafe(zn||'—')}</div>
+        </div>
       </div>
       <div class="ln-targets">${targets}${zoneSel}</div>`;
   } else {
@@ -7904,6 +7932,12 @@ function wireBlocks(){
             // sinon le slider est détruit sous le doigt et le réglage fin est impossible
             ln.pct=+inp.value; ln.rpe=rpeFromPct(ln.pct);
             const nn=lnEl.querySelector('[data-f="pctn"]'); if(nn && document.activeElement!==nn) nn.value=ln.pct;
+            const bub=lnEl.querySelector('[data-bubble]');
+            if(bub){
+              const frac=Math.max(0,Math.min(1,(ln.pct-40)/(130-40)));
+              bub.style.left=(frac*100).toFixed(1)+'%';
+              bub.textContent=ln.pct+'% · '+dispoSafe(zoneForPct(ln.model, ln.pct)||'—');
+            }
             updateBuilderSummary();
           }
           else if(f==='pctn'){
