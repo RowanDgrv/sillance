@@ -3647,6 +3647,7 @@ if(clubCalWeeksSelect){
 const mc = document.getElementById('modeCoach'), ma = document.getElementById('modeAthlete'), mcl = document.getElementById('modeClub');
 function setActiveMode(btn){
   [mc,ma,mcl].forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  moveModeHl(btn);
   // mobile (colonnes empilées) : le panneau latéral est AU-DESSUS du calendrier
   // → on y amène l'utilisateur au changement de mode, sinon il ne le voit jamais
   if(window.innerWidth<=980) setTimeout(()=>{
@@ -3655,6 +3656,23 @@ function setActiveMode(btn){
     if(cible) cible.scrollIntoView({behavior:'smooth', block:'start'});
   }, 120);
 }
+// Pilule glissante des onglets Coach/Athlète/Club (07/10/2026). Repositionnée
+// au clic (setActiveMode) ET une fois au chargement, le layout n'étant pas
+// forcément stable au moment où ce script s'exécute (polices/icônes).
+function moveModeHl(btn){
+  const hl = document.querySelector('.mode .nav-hl');
+  if(!hl || !btn) return;
+  hl.classList.add('on');
+  hl.style.left = btn.offsetLeft+'px';
+  hl.style.width = btn.offsetWidth+'px';
+}
+(function initModeHl(){
+  const active = document.querySelector('.mode button.active');
+  if(!active) return;
+  moveModeHl(active);
+  setTimeout(()=> moveModeHl(document.querySelector('.mode button.active')), 0);
+  window.addEventListener('resize', ()=> moveModeHl(document.querySelector('.mode button.active')));
+})();
 mc.onclick = ()=>{
   if(!guardModeSwitch('coach')) return;
   // auto-coaching réel : en revenant de la vue Athlète (où le planning affiché
@@ -4533,20 +4551,26 @@ document.querySelectorAll('.ath-tab').forEach(b=>{
   });
 });
 
-/* ---------- Thème clair / sombre ---------- */
+/* ---------- Thème clair / sombre ----------
+   Interrupteur façon switch (07/10/2026, même composant que la landing) :
+   l'icône soleil/lune visible est gérée en CSS (body.light .tt-sun/.tt-moon),
+   ce bloc ne pose plus que la classe + la persistance. Préférence mémorisée
+   (clé sil_theme, PARTAGÉE avec la landing — un choix fait d'un côté du site
+   s'applique à l'autre) ; à défaut, auto selon l'heure comme avant. */
 (function themeInit(){
   const btn=document.getElementById('themeBtn');
-  const icon=document.getElementById('themeIcon');
-  function apply(light){
+  const THEME_KEY='sil_theme';
+  function apply(light, persist){
     document.body.classList.toggle('light', light);
-    if(icon) icon.innerHTML = light ? '<i class="ic ic-sun"></i>' : '<i class="ic ic-moon"></i>';
+    if(btn) btn.setAttribute('aria-pressed', light?'true':'false');
     if(btn) btn.title = light ? tr('theme.switchDark') : tr('theme.switchLight');
     if(typeof rebuildCharts==='function') setTimeout(rebuildCharts, 0);
+    if(persist){ try{ localStorage.setItem(THEME_KEY, light?'light':'dark'); }catch(e){} }
   }
-  // Thème auto selon l'heure : mode jour (clair) de 7h00 à 18h59, mode nuit (sombre) de 19h00 à 6h59.
-  const h = new Date().getHours();
-  apply(h>=7 && h<19);
-  if(btn) btn.addEventListener('click', ()=> apply(!document.body.classList.contains('light')));
+  let saved=null; try{ saved=localStorage.getItem(THEME_KEY); }catch(e){}
+  if(saved==='light'||saved==='dark') apply(saved==='light', false);
+  else { const h = new Date().getHours(); apply(h>=7 && h<19, false); }
+  if(btn) btn.addEventListener('click', ()=> apply(!document.body.classList.contains('light'), true));
 })();
 
 /* ============================================================

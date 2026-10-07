@@ -283,15 +283,35 @@ body[data-patterns="1"] .session[data-disc="strength"]::before,
 body[data-patterns="1"] .tpl[data-disc="strength"]::before{background:var(--c)}
 
 .mode{
-  display:flex;border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;background:var(--panel);
+  position:relative;display:flex;border:1px solid var(--line-strong);border-radius:12px;background:var(--panel);
 }
 .mode button{
-  padding:9px 18px;background:transparent;border:none;color:var(--muted);
-  font-weight:600;font-size:var(--fs-md);letter-spacing:.03em;transition:.2s;
+  position:relative;z-index:1;padding:9px 18px;background:transparent;border:none;color:var(--muted);
+  font-weight:600;font-size:var(--fs-md);letter-spacing:.03em;transition:color .2s;
 }
-.mode button.active{background:linear-gradient(120deg, rgba(47,217,255,.16), rgba(157,123,255,.16));color:var(--text)}
+.mode button.active{color:var(--text)}
 .mode button.mode-locked{opacity:.35;cursor:not-allowed}
 .mode button.mode-locked:hover{color:var(--muted)}
+/* Pilule glissante (07/10/2026, même traitement que la nav de la landing) :
+   positionnée en JS (setActiveMode) sur les coordonnées du bouton actif. */
+.mode .nav-hl{position:absolute;top:3px;bottom:3px;left:3px;width:0;border-radius:9px;z-index:0;
+  background:linear-gradient(120deg, rgba(47,217,255,.16), rgba(157,123,255,.16));
+  opacity:0;pointer-events:none;transition:left .28s cubic-bezier(.4,0,.2,1),width .28s cubic-bezier(.4,0,.2,1),opacity .15s}
+.mode .nav-hl.on{opacity:1}
+/* Interrupteur jour/nuit façon switch (même composant que la landing,
+   couleurs Sillance) — remplace l'icône simple d'origine. */
+.theme-toggle{position:relative;width:46px;height:25px;border-radius:999px;border:1.5px solid var(--line-strong);
+  background:var(--panel-2);cursor:pointer;flex:none;padding:0;transition:border-color .2s}
+.theme-toggle:hover{border-color:var(--accent)}
+.theme-toggle .tt-knob{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--bike));
+  transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center}
+body.light .theme-toggle .tt-knob{transform:translateX(21px)}
+.theme-toggle svg{width:12px;height:12px}
+.theme-toggle .tt-sun{color:#06222a;display:none}
+.theme-toggle .tt-moon{color:#06222a;display:flex}
+body.light .theme-toggle .tt-sun{display:flex}
+body.light .theme-toggle .tt-moon{display:none}
 /* ---------- Sélecteur d'athlète (mode coach) ---------- */
 .ath-picker{position:relative}
 .ap-btn{
@@ -2622,8 +2642,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 .welcome-sub{color:var(--soft,#C4CCDE);font-size:var(--fs-lg);margin-bottom:22px;line-height:1.5}
 .welcome-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);text-align:left;margin-bottom:20px}
 @media (max-width:480px){.welcome-grid{grid-template-columns:1fr}}
-.wel-item{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);padding:var(--space-3) 13px}
-.wel-item span{font-size:20px;flex:none}
+/* Cartes d'intro un peu plus travaillées (07/10/2026) : badge icône coloré
+   (teinte propre à chaque carte, via --wc inline) au lieu d'une icône nue,
+   léger lift au survol — simple à l'oeil mais moins "liste plate". */
+.wel-item{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;
+  background:var(--panel-2);padding:14px 13px;transition:border-color .15s,transform .15s}
+.wel-item:hover{border-color:color-mix(in srgb,var(--wc) 50%,var(--line-strong));transform:translateY(-1px)}
+.wel-item span{flex:none;width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;background:color-mix(in srgb,var(--wc) 16%,transparent);color:var(--wc)}
 .wel-item b{display:block;font-size:var(--fs-md);margin-bottom:2px}
 .wel-item small{font-size:var(--fs-sm);color:var(--muted);line-height:1.4}
 .welcome-tip{font-size:12.5px;color:var(--soft,#C4CCDE);background:rgba(47,217,255,.08);border:1px solid rgba(47,217,255,.2);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:20px}
@@ -2678,10 +2704,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <h2 id="welcomeH2">Bienvenue sur <b>Sillance</b></h2>
     <p class="welcome-sub">La démo de ma plateforme de coaching triathlon, Hyrox &amp; clubs. Tu peux tout explorer librement.</p>
     <div class="welcome-grid">
-      <div class="wel-item"><span><i class="ic ic-sun"></i></span><div><b>Ton point du jour</b><small>fraîcheur, risque, séance du jour</small></div></div>
-      <div class="wel-item"><span><i class="ic ic-thermometer"></i></span><div><b>Impact des conditions</b><small>ce que chaleur, vent et D+ t'ont coûté</small></div></div>
-      <div class="wel-item"><span><i class="ic ic-shoe"></i></span><div><b>Matériel</b><small>usure des chaussures + alertes km</small></div></div>
-      <div class="wel-item"><span><i class="ic ic-landmark"></i></span><div><b>Vue Club</b><small>créneaux, groupes, présences</small></div></div>
+      <div class="wel-item" style="--wc:var(--accent)"><span><i class="ic ic-sun"></i></span><div><b>Ton point du jour</b><small>Fraîcheur, risque, séance du jour.</small></div></div>
+      <div class="wel-item" style="--wc:var(--bike)"><span><i class="ic ic-thermometer"></i></span><div><b>Impact des conditions</b><small>Ce que chaleur, vent et D+ t'ont coûté.</small></div></div>
+      <div class="wel-item" style="--wc:var(--strength)"><span><i class="ic ic-shoe"></i></span><div><b>Matériel</b><small>Usure suivie, rappel auto pour changer tes baskets.</small></div></div>
+      <div class="wel-item" style="--wc:var(--good)"><span><i class="ic ic-brain"></i></span><div><b>Assistant IA</b><small>Résumé et conseils après chaque séance, et sur ta semaine.</small></div></div>
     </div>
     <p class="welcome-tip"><i class="ic ic-lightbulb"></i> Bascule entre <b>Coach</b>, <b>Athlète</b> et <b>Club</b> en haut à droite.</p>
     <button class="btn welcome-start" id="welcomeStart">Commencer à explorer →</button>
@@ -2716,6 +2742,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <button class="cvt-select" id="sendWeekWatchBtn" type="button" hidden><i class="ic ic-send"></i> <span data-i18n="watch.sendWeekBtn">Envoyer la semaine</span></button>
     </nav>
     <div class="mode" role="tablist" aria-label="Mode d'affichage" data-i18n-attr="aria-label:nav.displayMode">
+      <span class="nav-hl" aria-hidden="true"></span>
       <button id="modeCoach" class="active" role="tab" aria-selected="true"><i class="ic ic-target"></i><span data-i18n="mode.coach">Coach</span></button>
       <button id="modeAthlete" role="tab" aria-selected="false"><i class="ic ic-user"></i><span data-i18n="mode.athlete">Athlète</span></button>
       <button id="modeClub" role="tab" aria-selected="false"><i class="ic ic-landmark"></i><span data-i18n="mode.club">Club</span></button>
@@ -2730,8 +2757,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <button class="icon-btn tuto-btn" id="tutoBtn" aria-label="Tutoriel guidé" title="Tutoriel guidé · créer une séance" data-i18n-attr="aria-label:tour.guidedAria,title:tour.guidedTitle">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 7-6 2-2 6-6-15z"/></svg>
     </button>
-    <button class="icon-btn theme-btn" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre" data-i18n-attr="aria-label:theme.changeAria,title:theme.changeTitle">
-      <span id="themeIcon"><i class="ic ic-moon"></i></span>
+    <button type="button" class="theme-toggle" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre" aria-pressed="false" data-i18n-attr="aria-label:theme.changeAria,title:theme.changeTitle">
+      <span class="tt-knob" id="themeIcon">
+        <svg class="tt-icon tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        <svg class="tt-icon tt-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.4 14.7A8.5 8.5 0 0 1 9.3 3.6a8.5 8.5 0 1 0 11.1 11.1Z"/></svg>
+      </span>
     </button>
     <button class="icon-btn settings-btn" id="settingsBtn" aria-label="Paramètres" title="Paramètres" data-i18n-attr="aria-label:settings.label,title:settings.label">
       <i class="ic ic-settings"></i>
