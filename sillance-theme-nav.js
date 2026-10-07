@@ -93,4 +93,52 @@
       try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
     });
   }
+
+  // Toggle mensuel/annuel de la section Tarifs (07/10/2026) : annuel = 11
+  // mois facturés (1 mois offert), même règle que stripe-checkout côté
+  // backend — ne jamais afficher un prix différent de celui réellement
+  // facturé une fois l'abonnement réellement souscrit dans l'app.
+  var ANNUAL_MONTHS_BILLED = 11;
+  var pricingToggle = document.getElementById('pricingBillToggle');
+  if (pricingToggle) {
+    var billInterval = 'month';
+    function t(key) {
+      return (window.SilI18n && window.SilI18n.t(key)) || key;
+    }
+    function fmt(n) {
+      var rounded = Math.round(n * 100) / 100;
+      var lang = (window.SilI18n && window.SilI18n.getLang()) || 'fr';
+      return lang === 'en' ? rounded.toString() : rounded.toString().replace('.', ',');
+    }
+    function renderPrices() {
+      document.querySelectorAll('.amt[data-m]').forEach(function (amt) {
+        var monthly = Number(amt.dataset.m);
+        var num = amt.querySelector('.amt-num');
+        var per = amt.querySelector('.per');
+        var eq = amt.querySelector('.amt-eq');
+        if (billInterval === 'year') {
+          var annual = monthly * ANNUAL_MONTHS_BILLED;
+          num.innerHTML = fmt(annual) + '&nbsp;€';
+          if (per) per.textContent = t('pricing.perYear');
+          if (!eq) { eq = document.createElement('span'); eq.className = 'amt-eq'; amt.appendChild(eq); }
+          eq.textContent = fmt(annual / 12) + ' €' + t('pricing.perMonth');
+        } else {
+          num.innerHTML = fmt(monthly) + '&nbsp;€';
+          if (per) per.textContent = t('pricing.perMonth');
+          if (eq) eq.remove();
+        }
+      });
+    }
+    pricingToggle.querySelectorAll('.bt-opt').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        billInterval = btn.dataset.bt === 'year' ? 'year' : 'month';
+        pricingToggle.querySelectorAll('.bt-opt').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        renderPrices();
+      });
+    });
+    document.addEventListener('sil:langchange', function () { setTimeout(renderPrices, 0); });
+    renderPrices();
+  }
 })();

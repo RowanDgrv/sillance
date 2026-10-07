@@ -327,6 +327,20 @@ main,.nav,footer{position:relative;z-index:1}
 .price.feature .tier{color:var(--accent)}
 .price .amt{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;color:var(--text);margin-top:4px}
 .price .amt .per{font-family:var(--ui);font-size:14px;font-weight:400;color:var(--muted);margin-left:4px}
+.price .amt .amt-eq{display:block;font-family:var(--ui);font-size:12px;font-weight:400;color:var(--muted);margin-top:4px}
+/* Toggle mensuel/annuel (07/10/2026) : même logique que le paywall de l'app
+   (sillance-integration.js billToggleHTML), recodé ici en CSS var()
+   théma-adaptatif puisque la landing bascule jour/nuit (contrairement au
+   paywall app, toujours sombre). */
+.bill-toggle{display:inline-flex;gap:2px;margin-top:18px;padding:3px;border-radius:999px;
+  background:var(--panel);border:1px solid var(--line-strong)}
+.bt-opt{border:0;background:transparent;color:var(--soft);cursor:pointer;font-family:var(--ui);
+  font-weight:600;font-size:13px;padding:8px 16px;border-radius:999px;transition:background .15s,color .15s;
+  display:flex;align-items:center;gap:7px}
+.bt-opt small{font-family:var(--ui);font-weight:700;font-size:10px;color:var(--good,#35C58C);
+  background:rgba(53,197,140,.14);padding:2px 7px;border-radius:99px}
+.bt-opt.active{background:var(--accent);color:#062028}
+.bt-opt.active small{background:rgba(6,32,40,.18);color:#062028}
 .price .cap{color:var(--soft);font-size:13px;font-weight:300;line-height:1.5}
 .price .founder{font-family:var(--mono);font-size:12.5px;color:var(--accent2);margin-top:2px}
 .price .founder b{color:var(--accent2)}
@@ -550,7 +564,11 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
       <span class="kicker" data-i18n="pricing.kicker">Tarifs</span>
       <h2 class="h2" data-i18n="pricing.title">Des prix pensés pour durer</h2>
       <p class="sub" style="color:var(--soft);font-weight:300;margin-top:14px" data-i18n-html="pricing.sub1">Le coach indépendant facture ses athlètes dans l'app. Les clubs prennent une licence à la saison, au nombre d'athlètes réellement suivis. <b style="color:var(--text);font-weight:600">Entraîneurs illimités à tous les paliers.</b></p>
-      <p class="sub" style="color:var(--muted);font-weight:300;font-size:12.5px;margin-top:10px" data-i18n="pricing.sub2">Sillance est en bêta. Le paiement en ligne sera activé prochainement.</p>
+      <p class="sub" style="color:var(--muted);font-weight:300;font-size:12.5px;margin-top:10px" data-i18n="pricing.sub2">Sillance est en bêta. Essai gratuit de 14 jours, sans carte bancaire.</p>
+      <div class="bill-toggle" id="pricingBillToggle" role="group">
+        <button type="button" class="bt-opt active" data-bt="month" data-i18n="pricing.billMonthly">Mensuel</button>
+        <button type="button" class="bt-opt" data-bt="year"><span data-i18n="pricing.billYearly">Annuel</span> <small data-i18n="pricing.yearlySave">1 mois offert</small></button>
+      </div>
     </div>
 
     <div class="sec-head" style="margin-top:0">
@@ -560,17 +578,17 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <div class="grid" style="margin-bottom:44px">
       <div class="price">
         <span class="tier" data-i18n="pricing.coachTier">Coach solo</span>
-        <div class="amt">19 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="amt" data-m="19"><span class="amt-num">19&nbsp;€</span><span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
         <div class="cap" data-i18n="pricing.coach1.cap">1 à 10 athlètes coachés</div>
       </div>
       <div class="price feature">
         <span class="tier" data-i18n="pricing.coachTier">Coach solo</span>
-        <div class="amt">29 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="amt" data-m="29"><span class="amt-num">29&nbsp;€</span><span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
         <div class="cap" data-i18n="pricing.coach2.cap">11 à 30 athlètes coachés</div>
       </div>
       <div class="price">
         <span class="tier" data-i18n="pricing.coachTier">Coach solo</span>
-        <div class="amt">49 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="amt" data-m="49"><span class="amt-num">49&nbsp;€</span><span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
         <div class="cap" data-i18n="pricing.coach3.cap">31+ athlètes coachés</div>
       </div>
     </div>
@@ -583,7 +601,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <div class="grid">
       <div class="price">
         <span class="tier" data-i18n="pricing.club1.tier">Club</span>
-        <div class="amt">50 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="amt" data-m="50"><span class="amt-num">50&nbsp;€</span><span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
         <div class="cap" data-i18n="pricing.club1.cap">jusqu'à 50 athlètes activés, moins d'1 €/mois par athlète</div>
         <div class="founder" data-i18n-html="pricing.club1.founder"><b>Clubs fondateurs : 25 €/mois</b> (10 premiers)</div>
         <ul>
@@ -594,7 +612,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
       </div>
       <div class="price feature">
         <span class="tier" data-i18n="pricing.club2.tier">Grand club</span>
-        <div class="amt">112,50 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="amt" data-m="112.5"><span class="amt-num">112,50&nbsp;€</span><span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
         <div class="cap" data-i18n="pricing.club2.cap">jusqu'à 150 athlètes activés, 0,75 €/mois par athlète</div>
         <div class="founder" data-i18n-html="pricing.club2.founder"><b>Clubs fondateurs : 56,25 €/mois</b> (10 premiers)</div>
         <ul>
@@ -605,7 +623,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
       </div>
       <div class="price">
         <span class="tier" data-i18n="pricing.club3.tier">Club illimité</span>
-        <div class="amt">150 €<span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
+        <div class="amt" data-m="150"><span class="amt-num">150&nbsp;€</span><span class="per" data-i18n="pricing.perMonth">/ mois</span></div>
         <div class="cap" data-i18n="pricing.club3.cap">jusqu'à 300 athlètes activés, 0,50 €/mois par athlète</div>
         <div class="founder" data-i18n-html="pricing.club3.founder"><b>Clubs fondateurs : 75 €/mois</b> (10 premiers)</div>
         <ul>
@@ -734,10 +752,10 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 </div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-index.js?v=20261006d"></script>
+<script src="./sillance-i18n-index.js?v=20261007a"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
 <script src="./sillance-reviews.js?v=20261006a"></script>
-<script src="./sillance-theme-nav.js?v=20261007a"></script>
+<script src="./sillance-theme-nav.js?v=20261007b"></script>
 <script src="./sillance-index.js"></script>
 <script src="./sillance-cookies.js"></script>
 <script src="./sillance-analytics.js"></script>
