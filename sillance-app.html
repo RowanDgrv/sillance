@@ -1932,6 +1932,12 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .club-ath-licence.warn{background:rgba(255,84,112,.14);color:var(--run);border-color:rgba(255,84,112,.5)}
 .club-ath-licence.soon{background:rgba(255,177,61,.14);color:var(--bike);border-color:rgba(255,177,61,.5)}
 .club-ath-licence.ok{background:rgba(57,230,163,.12);color:var(--good);border-color:rgba(57,230,163,.4)}
+/* Puce "Suivi jeunes" (07/10/2026) : indépendante du groupe — un athlète
+   garde son groupe habituel (ciblage créneaux) tout en étant (ou non)
+   suivi dans l'onglet chronos. Même style que les autres puces de ligne. */
+.club-ath-youth{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;
+  border:1px solid var(--line-strong);color:var(--muted);cursor:pointer}
+.club-ath-youth.on{background:rgba(157,123,255,.14);color:var(--strength);border-color:rgba(157,123,255,.5)}
 
 /* suivi jeune : carte test + sparkline */
 .suivi-card{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
@@ -3295,7 +3301,9 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <!-- Onglet suivi jeune (chronos de référence) -->
     <div class="club-view" id="clubViewSuivi" hidden>
       <div class="club-actions">
-        <span class="club-hint" data-i18n="suivi.hint">Chronos de référence des jeunes du club, sur l'année. Filtré par défaut sur les groupes jeunes.</span>
+        <span class="club-hint" data-i18n="suivi.hint">Chronos de référence des jeunes du club, sur l'année.</span>
+        <select id="suiviAddAthlete" class="club-filter-sel" aria-label="Ajouter un jeune au suivi"></select>
+        <button class="btn club-add" id="suiviAddBtn" data-i18n="youth.add">+ Suivi jeunes</button>
         <select id="suiviFilterGroup" class="club-filter-sel" aria-label="Filtrer par groupe"></select>
         <button class="group-edit" id="tutoBtnSuivi"><i class="ic ic-lightbulb"></i> <span data-i18n="tour.suivi.btn">Tuto</span></button>
       </div>
@@ -4013,11 +4021,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261007f"></script>
+<script src="./sillance-i18n-app.js?v=20261007g"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-tour.js?v=20260927d"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-app.core.js?v=20261007h"></script>
+<script src="./sillance-app.core.js?v=20261007i"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

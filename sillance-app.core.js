@@ -4625,10 +4625,10 @@ const CLUB_ATHLETES = [
   {id:'a3', name:'Karim Benali', disc:'bike', since:'2025', group:'g6', offer:'coach', coach:'Karim', level:'competition', licence:{fed:'FFC', num:'1122334', medCertUntil:'2027-01-20'}},
   {id:'a4', name:'Sophie Laurent', disc:'tri', since:'2022', group:'g5', offer:'sub', level:'confirme', licence:{fed:'FFTri', num:'4498765', medCertUntil:'2026-05-30'}},
   {id:'a5', name:'Tom Variable', disc:'bike', since:'2025', group:'g6', offer:'sub', level:'debutant'},
-  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, level:'debutant', guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12', licence:{fed:'FFTri', num:'4587654', medCertUntil:'2027-04-01'}},
-  {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie', level:'competition', licence:{fed:'FFTri', num:'4523456', medCertUntil:'2026-12-15'}},
+  {id:'a6', name:'Inès Rousseau', disc:'tri', since:'2024', group:'g1', offer:'sub', minor:true, level:'debutant', youthTracked:true, guardian:{name:'Claire Rousseau', email:'claire.rousseau@example.com'}, consentAt:'2026-01-12', licence:{fed:'FFTri', num:'4587654', medCertUntil:'2027-04-01'}},
+  {id:'a7', name:'Lucas Petit', disc:'tri', since:'2023', group:'g2', offer:'coach', coach:'Julie', level:'competition', youthTracked:true, licence:{fed:'FFTri', num:'4523456', medCertUntil:'2026-12-15'}},
   {id:'a8', name:'Marie Girard', disc:'bike', since:'2025', group:'g6', offer:'sub', level:'confirme'},
-  {id:'a9', name:'Nolan Faure', disc:'tri', since:'2025', group:'g2', offer:'sub', minor:true, level:'debutant', guardian:{name:'Sabrina Faure', email:'sabrina.faure@example.com'}, consentAt:'2026-02-03', licence:{fed:'FFTri', num:'4591122', medCertUntil:'2027-03-05'}}
+  {id:'a9', name:'Nolan Faure', disc:'tri', since:'2025', group:'g2', offer:'sub', minor:true, level:'debutant', youthTracked:true, guardian:{name:'Sabrina Faure', email:'sabrina.faure@example.com'}, consentAt:'2026-02-03', licence:{fed:'FFTri', num:'4591122', medCertUntil:'2027-03-05'}}
 ];
 const CLUB_LEVELS = [
   {id:'debutant', get name(){return tr('level.debutant')}},
@@ -5481,6 +5481,7 @@ function renderClubAthletes(filter){
         <span class="club-ath-cal" data-caid="${a.id}" title="${tr('clubAthList.openCalendarTitle')}"><i class="ic ic-calendar"></i> ${tr('clubAthList.calendar')}</span>
         ${minorChip(a)}
         ${licenceChip(a)}
+        ${youthChip(a)}
       </div>
     </div>`;
   }).join('') || `<p class="club-hint">${tr('clubAthList.noAthleteFound')}</p>`;
@@ -5509,6 +5510,7 @@ function renderClubAthletes(filter){
   });
   box.querySelectorAll('.club-ath-minor').forEach(el=>el.onclick=()=> openConsent(el.dataset.maid, filter));
   box.querySelectorAll('.club-ath-licence').forEach(el=>el.onclick=()=> openLicence(el.dataset.lid, filter));
+  box.querySelectorAll('.club-ath-youth').forEach(el=>el.onclick=()=> toggleYouthTracking(el.dataset.yid, filter));
   box.querySelectorAll('.club-ath-cal').forEach(el=>el.onclick=()=>{
     const a=CLUB_ATHLETES.find(x=>x.id===el.dataset.caid); if(a) openClubAthleteCalendar(a);
   });
@@ -5582,13 +5584,36 @@ function formatSecondsDelta(sec){
   const sign = sec<0 ? '-' : '+';
   return sign+Math.abs(sec).toFixed(2)+'s';
 }
-let suiviFilterGroup = 'g1,g2';
+let suiviFilterGroup = 'all';
 function initSuiviFilter(){
-  const sel=document.getElementById('suiviFilterGroup'); if(!sel || sel.dataset.init) return;
-  sel.dataset.init='1';
-  sel.innerHTML = `<option value="g1,g2" data-i18n="clubFilter.allGroups">Groupes jeunes (Loisir + Compétition)</option>`
-    + CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
-  sel.onchange=()=>{ suiviFilterGroup=sel.value; renderSuivi(); };
+  const sel=document.getElementById('suiviFilterGroup');
+  if(sel && !sel.dataset.init){
+    sel.dataset.init='1';
+    sel.innerHTML = `<option value="all">${tr('suivi.allTracked')}</option>`
+      + CLUB_GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+    sel.onchange=()=>{ suiviFilterGroup=sel.value; renderSuivi(); };
+  }
+  // Sélecteur d'ajout (07/10/2026) : reconstruit à chaque passage — la liste
+  // des athlètes PAS ENCORE suivis change au fil des ajouts/retraits.
+  const addSel=document.getElementById('suiviAddAthlete');
+  if(addSel){
+    const notTracked = CLUB_ATHLETES.filter(a=>!a.youthTracked);
+    addSel.innerHTML = notTracked.length
+      ? notTracked.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')
+      : `<option value="">${tr('youth.allAlreadyTracked')}</option>`;
+    addSel.disabled = !notTracked.length;
+    const addBtn=document.getElementById('suiviAddBtn');
+    if(addBtn && !addBtn.dataset.init){
+      addBtn.dataset.init='1';
+      addBtn.onclick=()=>{
+        const aid=addSel.value; if(!aid) return;
+        const a=CLUB_ATHLETES.find(x=>x.id===aid); if(!a) return;
+        a.youthTracked=true;
+        toast(tr('youth.addedFor', {name:a.name}));
+        renderSuivi();
+      };
+    }
+  }
 }
 /* Pas de graphique ici volontairement (retour Rowan 27/09) : une courbe de
    temps qui descend quand l'athlète progresse se lit comme une dégradation
@@ -5596,8 +5621,7 @@ function initSuiviFilter(){
    gain vs le test précédent, gain total depuis le premier test. */
 function renderSuivi(){
   initSuiviFilter();
-  const groupIds = suiviFilterGroup.split(',');
-  const athletes = CLUB_ATHLETES.filter(a=> groupIds.includes(a.group));
+  const athletes = CLUB_ATHLETES.filter(a=> a.youthTracked && (suiviFilterGroup==='all' || a.group===suiviFilterGroup));
   const box = document.getElementById('suiviList');
   box.innerHTML = athletes.length ? athletes.map(a=>{
     const g = a.group ? clubGroup(a.group) : null;
@@ -6586,6 +6610,21 @@ function openCompareAthletes(){
 
 /* Chip « mineur / consentement parental » sur chaque fiche athlète club. */
 function minorConsentOk(a){ return !!(a.consentAt || a.guardian_consent_at); }
+/* Puce "Suivi jeunes" (07/10/2026, demandé par Rowan) : indépendante du
+   groupe — un clic depuis Adhérents ajoute/retire l'athlète du Suivi jeune
+   sans toucher à son groupe habituel (ciblage des créneaux). */
+function youthChip(a){
+  return a.youthTracked
+    ? `<span class="club-ath-youth on" data-yid="${a.id}" title="${tr('youth.trackedTitle')}"><i class="ic ic-chart"></i> ${tr('youth.tracked')}</span>`
+    : `<span class="club-ath-youth" data-yid="${a.id}" title="${tr('youth.addTitle')}">${tr('youth.add')}</span>`;
+}
+function toggleYouthTracking(aid, filter){
+  const a = CLUB_ATHLETES.find(x=>x.id===aid); if(!a) return;
+  a.youthTracked = !a.youthTracked;
+  renderClubAthletes(filter);
+  toast(a.youthTracked ? tr('youth.addedFor', {name:a.name}) : tr('youth.removedFor', {name:a.name}));
+  /* backend réel plus tard : PF.setYouthTracking(aid, a.youthTracked) */
+}
 function minorChip(a){
   if(a.minor){
     return minorConsentOk(a)
