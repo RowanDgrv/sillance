@@ -1100,8 +1100,14 @@ body:not([data-athview]):not([data-clubview]) .gear-card .gear-del{display:none}
 .gear-advice{display:flex;gap:11px;align-items:flex-start;border:1px solid rgba(70,194,216,.3);background:rgba(70,194,216,.06);
   border-radius:12px;padding:var(--space-3) 15px;margin-bottom:10px;font-size:var(--fs-md);line-height:1.5}
 .gear-advice.warn{border-color:rgba(255,177,61,.35);background:rgba(255,177,61,.07)}
+.gear-advice.coach-pick{border-color:rgba(157,123,255,.35);background:rgba(157,123,255,.07)}
+.gear-advice.coach-pick .ga-ico{color:var(--strength)}
 .ga-ico{flex:none;width:19px;height:19px;color:var(--swim)}
 .gear-advice.warn .ga-ico{color:var(--bike)}
+.gear-coachrec{background:transparent;border:1px solid var(--line-strong);color:var(--soft);border-radius:7px;
+  font-size:var(--fs-sm);padding:var(--space-1) var(--space-2);cursor:pointer;flex:none;display:inline-flex;align-items:center;gap:5px}
+.gear-coachrec:hover{border-color:var(--strength);color:var(--strength)}
+.gear-coachrec i{width:12px;height:12px}
 
 /* ---------- Panneau "Aujourd'hui" (guide quotidien) ---------- */
 .today-panel{display:none;margin-bottom:18px}
@@ -3724,10 +3730,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261007h"></script>
+<script src="./sillance-i18n-app.js?v=20261007i"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-tour.js"></script>
-<script src="./sillance-calendrier.core.js?v=20261007g"></script>
+<script src="./sillance-calendrier.core.js?v=20261007h"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

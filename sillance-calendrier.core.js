@@ -4010,6 +4010,7 @@ function renderCoachBand(){
         <button class="cb-bilan" id="zonesBtn" title="${tr('coachBand.customizeZonesTitle')}"><i class="ic ic-target"></i> ${tr('coachBand.zones')}</button>
         <button class="cb-bilan" id="profileBtn" title="${tr('coachBand.athleteProfileTitle')}"><i class="ic ic-user"></i> ${tr('coachBand.athleteProfile')}</button>
         <button class="cb-bilan" id="seasonBtn" title="${tr('season.title')}"><i class="ic ic-calendar"></i> ${tr('season.btn')}</button>
+        <button class="cb-bilan" id="gearBtn" title="${tr('gear.coachAccessTitle')}"><i class="ic ic-shoe"></i> ${tr('nav.materiel')}</button>
       </div>
     </div>
     <div class="cb-forme">
@@ -4044,6 +4045,11 @@ function renderCoachBand(){
   const _zb=document.getElementById('zonesBtn'); if(_zb) _zb.onclick=()=>openZoneEditor();
   const _pb=document.getElementById('profileBtn'); if(_pb) _pb.onclick=()=>openAthleteProfile(a.id);
   const _seb=document.getElementById('seasonBtn'); if(_seb) _seb.onclick=()=>openSeasonCalendar(a);
+  const _gb=document.getElementById('gearBtn');
+  if(_gb) _gb.onclick=()=>{
+    revealAnalysis();
+    setTimeout(()=>{ const el=document.getElementById('gear'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+  };
   const _cbn=document.getElementById('cbNotifyReady');
   if(_cbn) _cbn.onchange=(ev)=>{
     if(!ev.target.checked) return;
@@ -10825,6 +10831,7 @@ function renderGear(){
       <div class="gear-alert ${al.cls}"><i class="ic ${al.ic}"></i><span>${al.txt}</span></div>
       <div style="margin-top:10px;display:flex;gap:7px">
         <button class="gear-del" data-act="add10" style="border-color:var(--line-strong)">+ ${tr('gear.simulate50km')}</button>
+        ${mode==='coach' && g.type==='shoe' ? `<button class="gear-coachrec" data-act="coachrec" style="${g.coachRecommended?'border-color:var(--good);color:var(--good)':''}"><i class="ic ${g.coachRecommended?'ic-check':'ic-sparkles'}"></i> ${g.coachRecommended?tr('gear.coachRecommendedOn'):tr('gear.coachRecommend')}</button>` : ''}
       </div>
     </div>`;
   }).join('') || `<p class="club-hint">${mode==='coach'
@@ -10841,8 +10848,13 @@ function renderGear(){
       const keys = Object.keys(planning).filter(k=>k>=todayK).sort();
       for(const k of keys){ const f=(planning[k]||[]).find(x=>x.disc==='run' && !x.done); if(f){ target=f; when=tr('gear.yourNextRunSession', {title:f.title}); break; } }
     }
+    const coachPick = GEAR.find(g=>g.coachRecommended);
     const rec = recommendShoe(target);
-    const recHtml = rec ? `<div class="gear-advice">
+    const recHtml = coachPick
+      ? `<div class="gear-advice coach-pick">
+          <i class="ic ic-user ga-ico"></i>
+          <div>${tr('gear.coachPickFor', {when, name:coachPick.name})}</div></div>`
+      : rec ? `<div class="gear-advice">
       <i class="ic ic-sparkles ga-ico"></i>
       <div>${tr('gear.recommendedPairFor', {when, profile:SESSION_TYPE_LABEL[rec.want], name:rec.shoe.name, km:rec.shoe.km, max:rec.shoe.max})}</div></div>` : '';
     const forecasts = raceGearForecast();
@@ -10854,6 +10866,14 @@ function renderGear(){
     card.querySelector('[data-act="del"]').onclick=()=>{ GEAR=GEAR.filter(x=>x.id!==g.id); renderGear(); if(window.PF?.user) window.PF.retireGear(g.id).catch(e=>console.warn('retireGear',e)); };
     const addBtn=card.querySelector('[data-act="add10"]');
     if(addBtn) addBtn.onclick=()=>{ addGearKm(g, 50); };
+    const recBtn=card.querySelector('[data-act="coachrec"]');
+    if(recBtn) recBtn.onclick=()=>{
+      const wasOn = !!g.coachRecommended;
+      GEAR.forEach(x=>x.coachRecommended=false);
+      g.coachRecommended = !wasOn;
+      renderGear();
+      toast(g.coachRecommended ? tr('gear.coachRecommendedToast', {name:g.name}) : tr('gear.coachRecommendRemoved'));
+    };
   });
 }
 
