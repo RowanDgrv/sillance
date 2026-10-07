@@ -589,6 +589,7 @@ function renderFeelingPrompt() {
   const total = feelQueueTotal;
   const pos = total - feelQueue.length + 1;
   card.style.setProperty("--c", D.color);
+  card.classList.toggle("stacked", total > 1);
   card.innerHTML = `
     ${total > 1 ? `<div class="pf-feel-progress">${tr("feel.progress", { n: pos, total })}</div>` : ""}
     <span class="pf-feel-disc"><i class="ic ${D.icon}"></i> ${tr("disc." + item.disc) || item.disc}</span>
@@ -603,10 +604,13 @@ function renderFeelingPrompt() {
     <textarea class="pf-feel-note" placeholder="${tr("feel.notePlaceholder")}"></textarea>
     ${D.gearType ? `<div class="pf-feel-lbl"><i class="ic ic-shoe"></i> ${tr("feel.gearLabel")}</div><div id="feelGearWrap"></div>` : ""}
     <button class="pf-feel-save" id="feelSave" disabled>${tr("feel.validate")} <i class="ic ic-check"></i></button>
-    <button class="pf-feel-skip" id="feelSkip">${tr("feel.skip")}</button>`;
+    <button class="pf-feel-skip" id="feelSkip">${tr("feel.skip")}</button>
+    ${total > 1 ? `<button class="pf-feel-skipall" id="feelSkipAll">${tr("feel.skipAll")}</button>` : ""}`;
   const save = card.querySelector("#feelSave");
   const checkReady = () => { save.disabled = !(rpe && mood); };
   card.querySelector("#feelSkip").onclick = () => { feelQueue.shift(); renderFeelingPrompt(); };
+  const skipAllBtn = card.querySelector("#feelSkipAll");
+  if (skipAllBtn) skipAllBtn.onclick = () => { feelQueue = []; renderFeelingPrompt(); };
   card.querySelectorAll("#feelRpe button").forEach((b) => {
     b.onclick = () => {
       card.querySelectorAll("#feelRpe button").forEach((x) => x.classList.remove("sel"));
@@ -830,6 +834,24 @@ function injectStyles() {
   .pf-feel-skip{width:100%;margin-top:8px;background:transparent;color:#6b7480;border:0;
     padding:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
   .pf-feel-skip:hover{color:#8a949e}
+  /* Pile "révélée" en éventail façon jeu de cartes (07/10/2026, demandé par
+     Rowan) : 2 cartes fantômes derrière la carte active, visibles seulement
+     quand il reste plusieurs activités dans la file — renforce le compteur
+     texte déjà existant par un signal visuel immédiat. */
+  .pf-feel-card.stacked{position:relative}
+  .pf-feel-card.stacked::before,.pf-feel-card.stacked::after{
+    content:"";position:absolute;inset:0;border-radius:16px;background:#11151a;
+    border:1px solid #262c34;z-index:-1}
+  .pf-feel-card.stacked::before{transform:translateY(10px) scale(.97) rotate(-2deg);opacity:.7}
+  .pf-feel-card.stacked::after{transform:translateY(18px) scale(.94) rotate(2deg);opacity:.4}
+  /* "Valider toutes mes séances plus tard" (07/10/2026, demandé par Rowan) :
+     vide toute la file d'un coup — gain de temps quand plusieurs activités
+     se sont synchronisées (ex. retour de stage). Volontairement plus discret
+     que le skip individuel au-dessus : un geste plus rare, pas à mettre en
+     avant au même niveau. */
+  .pf-feel-skipall{width:100%;margin-top:2px;background:transparent;color:#6b7480;border:0;
+    padding:4px;font-size:11px;font-weight:600;cursor:pointer;opacity:.75}
+  .pf-feel-skipall:hover{opacity:1;color:#8a949e}
   /* "Sensation" (bien-être, distinct du RPE) — smileys façon Nolio/iDO,
      recherché le 24/09/2026 : Nolio sépare explicitement RPE (effort,
      objectif, alimente la charge) et sensation (bien-être, subjectif,
