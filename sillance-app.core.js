@@ -8253,6 +8253,66 @@ document.getElementById('bShorthandGo').addEventListener('click', ()=>{
     warn.style.display='none';
   }
 });
+
+/* ===========================================================================
+ *  TEXTE PRÉDICTIF — encart "écris ta séance" (natation). Suggère, pendant
+ *  la frappe, les mots-clés que parseSwimShorthandSegment reconnaît
+ *  réellement (même dictionnaires SWIM_TYPE/STROKE/PACE_KEYWORDS que le
+ *  parseur — jamais un mot inventé qui ne matcherait rien une fois validé).
+ *  N'affiche des suggestions qu'une fois un "Nx?Mm" posé dans le segment en
+ *  cours (avant ça, un mot-clé seul n'a rien à quoi se rattacher). Clic sur
+ *  une puce = insertion en fin de segment, sans toucher au reste du texte.
+ * ========================================================================= */
+const SWIM_SUGGEST_TOKENS = [
+  ['échauffement','échauffement'], ['éducatif','éducatif'], ['contre-effort','contre-effort'],
+  ['récupération','récupération'], ['retour au calme','retour au calme'],
+  ['seuil','seuil'], ['endurance','endurance'], ['soutenu','soutenu'],
+  ['vma','VMA/sprint'], ['allure course','allure course'],
+  ['crawl','crawl'], ['dos','dos'], ['brasse','brasse'], ['papillon','papillon'], ['4 nages','4 nages'],
+  ['repos 20','repos 20s'], ["départ 1'30","départ 1'30"],
+];
+function swimShorthandSegmentBounds(ta){
+  const v = ta.value, pos = ta.selectionStart;
+  let start = 0;
+  for(let i=pos-1;i>=0;i--){ const c=v[i]; if(c==='\n'||c==='+'||c===','){ start=i+1; break; } }
+  let end = v.length;
+  for(let i=pos;i<v.length;i++){ const c=v[i]; if(c==='\n'||c==='+'||c===','){ end=i; break; } }
+  return {start, end, text: v.slice(start, end)};
+}
+function renderShorthandSuggest(){
+  const ta=document.getElementById('bShorthandInput');
+  const box=document.getElementById('bShorthandSuggest');
+  if(!ta || !box) return;
+  const seg = swimShorthandSegmentBounds(ta).text.trim();
+  const hasDistance = /^\d+\s*([x×]\s*\d+)?\s*m\b/i.test(seg);
+  if(!seg || !hasDistance){ box.style.display='none'; box.innerHTML=''; return; }
+  const parsed = parseSwimShorthandSegment(seg);
+  const chips = SWIM_SUGGEST_TOKENS.map(([ins,lbl])=>`<span class="bss-chip" data-ins="${dispoSafe(ins)}">+ ${dispoSafe(lbl)}</span>`).join('');
+  box.style.display='flex';
+  if(parsed && !parsed.unparsed){
+    const bits=[tr('lineType.'+parsed.type)||parsed.type];
+    if(parsed.nage) bits.push(parsed.nage);
+    bits.push(parsed.pct+'%');
+    box.innerHTML = `<span class="bss-chip bss-ok">✓ ${dispoSafe(bits.join(' · '))}</span>${chips}`;
+  } else {
+    box.innerHTML = chips;
+  }
+  box.querySelectorAll('[data-ins]').forEach(chip=>{
+    chip.onclick=()=>{
+      const {end, text:segNow} = swimShorthandSegmentBounds(ta);
+      const needsSpace = segNow.length>0 && !/\s$/.test(segNow);
+      ta.setRangeText((needsSpace?' ':'')+chip.dataset.ins, end, end, 'end');
+      ta.focus();
+      renderShorthandSuggest();
+    };
+  });
+}
+(function(){
+  const ta=document.getElementById('bShorthandInput');
+  if(!ta) return;
+  ['input','click','keyup'].forEach(ev=> ta.addEventListener(ev, renderShorthandSuggest));
+})();
+
 document.getElementById('bSaveCal').addEventListener('click', ()=>{
   if(builderState.creneauId){ saveCreneauSessionTemplate(builderState.creneauId); return; }
   const s=builderToSession();
