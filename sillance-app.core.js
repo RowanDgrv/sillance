@@ -2613,6 +2613,7 @@ function render(){
   renderTaperHint(primary.race, mon);
   renderWeekRiskHint(mon);
   renderWeekPulse(mon);
+  if(typeof renderWeekAiBtn==='function') renderWeekAiBtn(mon);
   if(typeof wireSessionVideos==='function') wireSessionVideos();
   if(typeof syncSendWeekButtonVisibility==='function') syncSendWeekButtonVisibility();
 }
@@ -2747,6 +2748,100 @@ function saveWeekPulseCoach(key, wk){
   if(window.PF?.user && rosterIsReal){ PF.saveCoachWeekNote(key, wk, note).catch(e=> console.warn('[PF] saveCoachWeekNote :', e)); }
   renderWeekPulse(mondayOf(weekOffset));
   toast(tr('toast.noteEnregistree'));
+}
+
+/* ============================================================
+   ASSISTANT IA — SEMAINE (bouton sous le calendrier, 07/10/2026)
+   ------------------------------------------------------------
+   Agrège les séances marquées FAITES de la semaine affichée (titre,
+   discipline, durée, TSS, zone, RPE) et envoie cette liste à l'edge
+   function week-review, qui juge l'adhérence/répartition de la semaine —
+   pas chaque séance en détail (ça reste le rôle de l'assistant par
+   séance, cf. renderAi ci-dessus). Même gate (add-on IA, add_on_required)
+   et même rendu (aiResultHtml, réutilisé tel quel — s/b n'y sont jamais
+   lus). Caché par semaine+athlète en mémoire ET côté serveur
+   (week_reviews) : un clic répété ne redéclenche jamais Claude.
+   ============================================================ */
+let WEEK_REVIEW_CACHE = {}; // clé "athleteId|weekMondayIso" -> {mapped, isDemo}
+function weekReviewSessions(mon){
+  const out=[];
+  for(let i=0;i<7;i++){
+    const dKey = iso(addDays(mon,i));
+    (planning[dKey]||[]).filter(s=>s.done).forEach(s=>{
+      out.push({ date:dKey, title:s.title, disc:s.disc, dur:s.dur, tss:s.tss, zone:s.zone,
+        rpe:s.rpe||null, rpeMuscle:s.rpeMuscle||null });
+    });
+  }
+  return out;
+}
+function weekReviewMapped(r){
+  return {headline:r.headline, tenu:r.verdict, bullets:(r.bullets||[]).map(x=>({s:x.status,t:x.text})), recos:r.recos||[]};
+}
+function renderWeekAiBtn(mon){
+  const el = document.getElementById('weekAiAssist'); if(!el) return;
+  if(mode!=='coach'){ el.hidden=true; return; }
+  const key = activeAthleteKey();
+  if(!key){ el.hidden=true; return; }
+  el.hidden=false;
+  const wk = iso(mon), ck = key+'|'+wk;
+  const cached = WEEK_REVIEW_CACHE[ck];
+  if(cached){ el.innerHTML = aiResultHtml(null, null, cached.mapped, cached.isDemo, ['ai.weekFootDemo','ai.weekFootReal']); return; }
+  el.innerHTML = `<button class="btn ghost" id="weekAiGo"><i class="ic ic-brain"></i> ${tr('weekAi.cta')}</button>`;
+  const btn = document.getElementById('weekAiGo');
+  if(btn) btn.onclick = ()=> renderWeekAiConfirm(mon);
+}
+function renderWeekAiConfirm(mon){
+  const el = document.getElementById('weekAiAssist'); if(!el) return;
+  el.innerHTML = `
+    <div class="ai-confirm">
+      <p>${tr('weekAi.confirm')}</p>
+      <div class="ai-confirm-row">
+        <button class="btn" id="weekAiYes">${tr('common.yes')}</button>
+        <button class="btn ghost" id="weekAiNo">${tr('common.no')}</button>
+      </div>
+    </div>`;
+  document.getElementById('weekAiNo').onclick = ()=> renderWeekAiBtn(mon);
+  document.getElementById('weekAiYes').onclick = ()=> runWeekAi(mon);
+}
+function runWeekAi(mon){
+  const el = document.getElementById('weekAiAssist'); if(!el) return;
+  injectAiCss();
+  const key = activeAthleteKey(), wk = iso(mon), ck = key+'|'+wk;
+  const sessions = weekReviewSessions(mon);
+  if(!sessions.length){ el.innerHTML = `<p class="club-hint">${tr('weekAi.noSessions')}</p>`; return; }
+  if(!aiUnlocked()){
+    el.innerHTML = aiPaywallHtml();
+    const btn=document.getElementById('aiActivate');
+    if(btn) btn.onclick=()=>{
+      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>console.warn('[PF] ai-addon:',e)); return; }
+      window.__pf_aiDemo=true; renderWeekAiBtn(mon);
+    };
+    return;
+  }
+  el.innerHTML = `<div class="ai-loading"><span class="ai-dot"></span> ${tr('ai.analyzingInProgress')}</div>`;
+  if(window.PF?.user && window.__pf_aiAddon===true && typeof PF.summarizeWeek==='function'){
+    PF.summarizeWeek({ athlete_id: key, week_key: wk, sessions }).then(r=>{
+      if(r && r.error){
+        if(r.error==='add_on_required') window.__pf_aiAddon=false;
+        else toast(tr('toast.analyseIaIndisponibleResumeLocal'), 'error');
+        renderWeekAiBtn(mon);
+        return;
+      }
+      WEEK_REVIEW_CACHE[ck] = { mapped: weekReviewMapped(r), isDemo:false };
+      renderWeekAiBtn(mon);
+    }).catch(e=>{
+      console.warn('[PF] summarizeWeek échoué :', e);
+      toast(tr('toast.analyseIaIndisponibleResumeLocal'), 'error');
+      renderWeekAiBtn(mon);
+    });
+  } else {
+    // démo (ou add-on démo déverrouillé sans compte réel) : pas d'appel réseau
+    setTimeout(()=>{
+      WEEK_REVIEW_CACHE[ck] = { mapped:{headline:tr('weekAi.demoHeadline'), tenu:'oui',
+        bullets:[{s:'ok', t:tr('weekAi.demoBullet')}], recos:[]}, isDemo:true };
+      renderWeekAiBtn(mon);
+    }, 450);
+  }
 }
 
 /* ============================================================
@@ -9516,7 +9611,10 @@ function injectAiCss(){
   .ai-foot{margin-top:10px;font-size:10.5px;color:var(--muted);font-style:italic}
   .ai-badge-demo{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:99px;padding:2px 7px}
   .ai-trial{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent);border:1px solid color-mix(in srgb,var(--good) 40%,transparent);border-radius:99px;padding:3px 10px;margin-bottom:8px}
-  .ai-legal{margin-top:9px;font-size:10.5px;color:var(--muted);line-height:1.45}`;
+  .ai-legal{margin-top:9px;font-size:10.5px;color:var(--muted);line-height:1.45}
+  .ai-confirm p{font-size:13px;color:var(--soft);margin-bottom:10px}
+  .ai-confirm-row{display:flex;gap:8px}
+  .ai-confirm-row .btn{flex:none}`;
   document.head.appendChild(st);
 }
 function aiPaywallHtml(){
@@ -9534,14 +9632,17 @@ function aiPaywallHtml(){
     <div class="ai-legal">${tr('ai.legalNote', {price:AI_ADDON_PRICE})}</div>
   </div>`;
 }
-function aiResultHtml(s, b, r, isDemo){
+function aiResultHtml(s, b, r, isDemo, footKeys){
   const v=aiVerdictMeta(r.tenu);
   const ico=st=>st==='ok'?'<span style="color:var(--good)"><i class="ic ic-check"></i></span>':st==='warn'?'<span style="color:var(--bike)"><i class="ic ic-alert-triangle"></i></span>':'<span style="color:var(--run)"><i class="ic ic-x"></i></span>';
   const bul=r.bullets.map(x=>`<div><span class="ai-ico">${ico(x.s)}</span><span>${x.t}</span></div>`).join('');
   const recos=r.recos.length?`<div class="ai-recobox"><h6>${tr('ai.recommendations')}</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
+  // footKeys : override optionnel ([demoKey, realKey]) — la synthèse
+  // hebdomadaire (runWeekAi) parle de "la semaine", pas "la séance".
+  const [demoKey, realKey] = footKeys || ['ai.footDemo', 'ai.footReal'];
   const foot=isDemo
-    ? tr('ai.footDemo')
-    : tr('ai.footReal');
+    ? tr(demoKey)
+    : tr(realKey);
   return `<div class="ai-result" style="--av:${v.c}">
     <div class="ai-verdict">${v.l} ${isDemo?`<span class="ai-badge-demo">${tr('ai.demoBadge')}</span>`:''}</div>
     <div class="ai-headline">${r.headline}</div>

@@ -537,6 +537,11 @@
     "pulse.noAthleteReviewYet": `Pas encore de bilan de l'athlète pour cette semaine.`,
     "pulse.coachNote": `Note du coach`, "pulse.coachNotePlaceholder": `Ta lecture de la semaine pour cet athlète…`,
     "pulse.saveMyNote": `Enregistrer ma note`, "pulse.noCoachNoteYet": `Ton coach n'a pas encore laissé de note pour cette semaine.`,
+    "weekAi.cta": `Assistant IA sur la semaine`,
+    "weekAi.confirm": `Voulez-vous un retour sur les séances réalisées par l'athlète cette semaine ?`,
+    "weekAi.noSessions": `Aucune séance réalisée cette semaine pour l'instant.`,
+    "weekAi.demoHeadline": `Semaine cohérente avec le plan.`,
+    "weekAi.demoBullet": `Démo : connecte un compte avec l'add-on IA pour une vraie synthèse de la semaine.`,
 
     "weekInt.alertHard": `RPE moyen {avg} · la semaine est plus éprouvante que prévu : pense à alléger les prochaines séances.`,
     "weekInt.alertEasy": `RPE moyen {avg} · la semaine passe mieux que prévu : la charge peut être maintenue, voire montée.`,
@@ -963,6 +968,8 @@
     "ai.recommendations": `Recommandations`,
     "ai.footDemo": `Généré à partir des données réelles de la séance (zones FC, découplage, pics). En production : rédigé par Claude via l'add-on IA.`,
     "ai.footReal": `Rédigé par Claude à partir du bilan chiffré de la séance (zones FC, découplage, pics) · aucune donnée inventée.`,
+    "ai.weekFootDemo": `Généré à partir des séances réelles de la semaine. En production : rédigé par Claude via l'add-on IA.`,
+    "ai.weekFootReal": `Rédigé par Claude à partir des séances réalisées cette semaine · aucune donnée inventée.`,
     "ai.demoBadge": `démo`,
     "ai.analyzingInProgress": `Analyse de la séance en cours…`,
 
@@ -2053,6 +2060,11 @@
     "pulse.noAthleteReviewYet": `No athlete review yet for this week.`,
     "pulse.coachNote": `Coach note`, "pulse.coachNotePlaceholder": `Your read on this athlete's week…`,
     "pulse.saveMyNote": `Save my note`, "pulse.noCoachNoteYet": `Your coach hasn't left a note for this week yet.`,
+    "weekAi.cta": `AI assistant for the week`,
+    "weekAi.confirm": `Want feedback on the sessions the athlete completed this week?`,
+    "weekAi.noSessions": `No completed sessions this week yet.`,
+    "weekAi.demoHeadline": `Week consistent with the plan.`,
+    "weekAi.demoBullet": `Demo: connect an account with the AI add-on for a real weekly review.`,
 
     "weekInt.alertHard": `Average RPE {avg} · the week is more taxing than planned: consider lightening upcoming sessions.`,
     "weekInt.alertEasy": `Average RPE {avg} · the week is going better than planned: load can be maintained, or even increased.`,
@@ -2436,6 +2448,8 @@
     "ai.recommendations": `Recommendations`,
     "ai.footDemo": `Generated from the session's real data (HR zones, decoupling, peaks). In production: written by Claude via the AI add-on.`,
     "ai.footReal": `Written by Claude from the session's numeric summary (HR zones, decoupling, peaks) · no invented data.`,
+    "ai.weekFootDemo": `Generated from this week's real sessions. In production: written by Claude via the AI add-on.`,
+    "ai.weekFootReal": `Written by Claude from the sessions completed this week · no invented data.`,
     "ai.demoBadge": `demo`,
     "ai.analyzingInProgress": `Analyzing the session…`,
 
@@ -3472,6 +3486,11 @@
     "pulse.noAthleteReviewYet": `Aún no hay balance del atleta para esta semana.`,
     "pulse.coachNote": `Nota del coach`, "pulse.coachNotePlaceholder": `Tu lectura de la semana para este atleta…`,
     "pulse.saveMyNote": `Guardar mi nota`, "pulse.noCoachNoteYet": `Tu coach aún no ha dejado una nota para esta semana.`,
+    "weekAi.cta": `Asistente IA de la semana`,
+    "weekAi.confirm": `¿Quieres un balance de las sesiones que el atleta completó esta semana?`,
+    "weekAi.noSessions": `Todavía no hay sesiones completadas esta semana.`,
+    "weekAi.demoHeadline": `Semana coherente con el plan.`,
+    "weekAi.demoBullet": `Demo: conecta una cuenta con el complemento IA para un balance semanal real.`,
 
     "weekInt.alertHard": `RPE medio {avg} · la semana está siendo más exigente de lo previsto: considera aligerar las próximas sesiones.`,
     "weekInt.alertEasy": `RPE medio {avg} · la semana va mejor de lo previsto: la carga puede mantenerse, o incluso subirse.`,
@@ -3855,6 +3874,8 @@
     "ai.recommendations": `Recomendaciones`,
     "ai.footDemo": `Generado a partir de los datos reales de la sesión (zonas FC, desacoplamiento, picos). En producción: redactado por Claude a través del add-on IA.`,
     "ai.footReal": `Redactado por Claude a partir del balance numérico de la sesión (zonas FC, desacoplamiento, picos) · ningún dato inventado.`,
+    "ai.weekFootDemo": `Generado a partir de las sesiones reales de esta semana. En producción: redactado por Claude a través del add-on IA.`,
+    "ai.weekFootReal": `Redactado por Claude a partir de las sesiones completadas esta semana · ningún dato inventado.`,
     "ai.demoBadge": `demo`,
     "ai.analyzingInProgress": `Analizando la sesión…`,
 
