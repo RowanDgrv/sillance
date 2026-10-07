@@ -1115,8 +1115,12 @@ function renderAthleteBelow(){
     </div>
     <div class="records ath-below-card" id="coTeamCard">${coTeamBlockHTML(myDebriefKey(), 'athlete')}
       ${currentRace() ? `<button class="btn adh-open-btn" id="athShareSpecBtn" style="margin-top:10px"><i class="ic ic-link"></i> ${tr('race.shareWithLoved')}</button>` : ''}
-    </div>
-    <div class="morning-card ath-below-card" id="morningCard">
+    </div>`;
+  renderMorningCard();
+}
+function renderMorningCard(){
+  const el = document.getElementById('morningCard'); if(!el) return;
+  el.innerHTML = `
       <h2>${tr('morning.title')}</h2>
       <p class="hint" style="margin-bottom:10px">${tr('morning.text')}</p>
       <div class="morning-pre" id="morningPre"></div>
@@ -1133,8 +1137,7 @@ function renderAthleteBelow(){
         </select>
       </div>
       <button class="btn morning-btn" id="morningBtn"><i class="ic ic-bell"></i> ${tr('morning.activate')}</button>
-      <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">${tr('morning.howTo')}</a>
-    </div>`;
+      <a class="morning-help" href="./notification-tuto.pdf" target="_blank" rel="noopener">${tr('morning.howTo')}</a>`;
 }
 
 /* Édition des références physiologiques de l'athlète.
