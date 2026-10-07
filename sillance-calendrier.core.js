@@ -933,7 +933,11 @@ function planningRadarHTML(){
   </div>`;
 }
 function renderSidebar(){
-  if(mode!=='athlete'){ const g=document.getElementById('athBelowGrid'); if(g) g.innerHTML=''; }
+  if(mode!=='athlete'){
+    const g=document.getElementById('athBelowGrid'); if(g) g.innerHTML='';
+    const rb=document.getElementById('refsBlock'); if(rb) rb.innerHTML='';
+    const mc=document.getElementById('morningCard'); if(mc) mc.innerHTML='';
+  }
   if(mode==='coach'){
     const dw=dashWidgetPrefs();
     sidebarContent.innerHTML = coachGuideHTML() + (dw.needRadar?needRadarHTML():'') + (dw.planningRadar?planningRadarHTML():'') + `

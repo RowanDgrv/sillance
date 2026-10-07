@@ -658,6 +658,10 @@ table.rc-cmp td.num{text-align:right;font-weight:800}
    qui rendait la page interminable (surtout mobile). ---------- */
 .ath-below-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;margin-top:26px;align-items:start}
 .ath-below-grid:empty{display:none;margin-top:0}
+/* Idem pour #refsBlock/#morningCard (07/10/2026) : vidés hors vue Athlète
+   par renderSidebar, sinon ils resteraient visibles (bordure+padding d'
+   .ath-below-card) même sans contenu. */
+#refsBlock:empty,#morningCard:empty{display:none}
 .ath-below-card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:var(--space-4);margin-top:0!important;border-top:1px solid var(--line)!important}
 .ath-below-card h2{font-size:var(--fs-base);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:var(--space-1)}
 .set-plan{border:1px solid var(--line-strong);border-radius:var(--radius);padding:var(--space-4);background:var(--panel-2);margin-bottom:14px}
@@ -2013,11 +2017,12 @@ body[data-athview] .ath-tabs{display:flex}
    masquée par défaut, un seul onglet l'affiche. Côté coach, readyhub/
    analytics/analyticsEmpty/records/gear restent gérés par le Groupe C
    ci-dessous (révélés au clic sur une séance, cf. revealAnalysis()). */
-#refsBlock,#readyhub,#checkinWrap,#seasonCard,#athBelowGrid,
+#refsBlock,#morningCard,#readyhub,#checkinWrap,#seasonCard,#athBelowGrid,
 #recentRecordsCard,#analytics,#analyticsEmpty,#records,
 #athToolsGrid,#gear{display:none}
 
 body[data-athview="home"] #refsBlock{display:block}
+body[data-athview="home"] #morningCard:not(:empty){display:block}
 body[data-athview="home"] #athBelowGrid{display:grid}
 
 body[data-athview="forme"] #readyhub,
@@ -2030,7 +2035,11 @@ body[data-athview="stats"] #analytics:not([hidden]){display:block}
 body[data-athview="stats"] #analyticsEmpty:not([hidden]){display:block}
 
 body[data-athview="outils"] #athToolsGrid{display:grid}
-body[data-athview="outils"] #gear{display:block}
+/* Matériel sorti d'Outils vers son propre onglet (07/10/2026, demandé par
+   Rowan). Reste visible aussi en mode Coach/analyse (règle plus bas,
+   data-analysis="open" — inchangée, le coach voit le matériel renseigné
+   par l'athlète depuis le panneau d'analyse d'une séance). */
+body[data-athview="materiel"] #gear{display:block}
 
 /* Groupe C — mode coach uniquement (pas d'onglets athlète) : l'analyse
    reste repliée par défaut sous le calendrier, et se révèle au clic sur une
@@ -2829,6 +2838,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <button class="ath-tab" data-tab="forme"><i class="ic ic-zap"></i><span data-i18n="nav.forme">Forme &amp; courses</span></button>
     <button class="ath-tab" data-tab="calendrier"><i class="ic ic-calendar"></i><span data-i18n="nav.calendrier">Calendrier</span></button>
     <button class="ath-tab" data-tab="stats"><i class="ic ic-chart"></i><span data-i18n="nav.stats">Statistiques</span></button>
+    <button class="ath-tab" data-tab="materiel"><i class="ic ic-shoe"></i><span data-i18n="nav.materiel">Matériel</span></button>
     <button class="ath-tab" data-tab="outils"><i class="ic ic-link"></i><span data-i18n="nav.outils">Outils</span></button>
   </nav>
 
@@ -4021,11 +4031,11 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261007g"></script>
+<script src="./sillance-i18n-app.js?v=20261007h"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-tour.js?v=20260927d"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-app.core.js?v=20261007i"></script>
+<script src="./sillance-app.core.js?v=20261007j"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
