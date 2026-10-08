@@ -1003,8 +1003,9 @@ export const PF = {
   // { points, laps } — laps = vrais laps de la montre au format {start,end}
   // (indices dans points), [] si l'activité n'en a aucun (découpage auto au
   // km côté front dans ce cas).
-  async getActivityStreams(activityId) {
-    const data = await this._invoke("strava-activity-streams", { activity_id: activityId });
+  async getActivityStreams(activityId, provider) {
+    const fn = provider === "coros" ? "coros-activity-streams" : "strava-activity-streams";
+    const data = await this._invoke(fn, { activity_id: activityId });
     return { points: data?.points ?? [], laps: data?.laps ?? [] };
   },
   // Persiste un import manuel .TCX/.GPX (window.PFFit.parseFile → { summary, data }).

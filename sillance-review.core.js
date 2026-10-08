@@ -1581,7 +1581,7 @@ function importActivityFile(file){
 function openStravaAnalysis(act){
   if(!act || !act.id){ return; }
   toast(tr('toast.chargementDetail'));
-  PF.getActivityStreams(act.id).then(({points, laps})=>{
+  PF.getActivityStreams(act.id, act.src).then(({points, laps})=>{
     if(!points || !points.length){ toast(tr('toast.pasDetailSecondeParSeconde')); return; }
     const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
     const res = PFFit.buildFromRaw(points, act.disc, laps||[], {ftp});
