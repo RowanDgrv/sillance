@@ -453,6 +453,14 @@ export const PF = {
     }).eq("id", id).select().single();
     if (error) throw error; return data;
   },
+  // Change la date d'une séance déjà programmée (déplacer, drag&drop sur un
+  // autre jour). Distinct d'updateScheduled (contenu) : ne touche que date.
+  async moveScheduled(id, newDateIso) {
+    const { data, error } = await sb.from("scheduled_sessions").update({
+      date: newDateIso,
+    }).eq("id", id).select().single();
+    if (error) throw error; return data;
+  },
   async markSessionDone(id, { done = true, rpe, rpeMuscle } = {}) {
     const payload = { done, rpe };
     // rpe_muscle : colonne 0021 — repli gracieux si pas encore déployée.

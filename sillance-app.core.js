@@ -2608,13 +2608,23 @@ function buildWeekRow(mon){
       let data; try{ data = JSON.parse(e.dataTransfer.getData('text/plain')) }catch{ return }
       if(data.type==='tpl'){
         const t = TEMPLATES.find(x=>x.id===data.id);
-        (planning[key] ||= []).push({...t, id:'s'+(uid++), done:false});
-      } else if(data.type==='move'){
+        const s = {...t, id:'s'+(uid++), done:false};
+        (planning[key] ||= []).push(s);
+        if(window.PF?.user){
+          PF.scheduleSession(currentAthleteId || PF.user.id, key, { disc:s.disc, title:s.title, dur:s.dur,
+            dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
+            .then(saved=>{ if(saved) s.id=saved.id; })
+            .catch(err=> console.warn('[PF] scheduleSession (drop tpl) échoué :', err));
+        }
+      } else if(data.type==='move' && data.from!==key){
         const from = planning[data.from]||[];
         const idx = from.findIndex(s=>s.id===data.id);
         if(idx>-1){
           const [s] = from.splice(idx,1);
           (planning[key] ||= []).push(s);
+          if(window.PF?.user && s.id){
+            PF.moveScheduled(s.id, key).catch(err=> console.warn('[PF] moveScheduled (drop) échoué :', err));
+          }
         }
       }
       render();
@@ -3118,10 +3128,34 @@ function pushSingleSessionToWatch(s, dateKey){
     toast(tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)}));
   });
 }
+/* Déplace une séance vers une autre date — même logique que le drop du
+   drag&drop (persistance PF.moveScheduled), réutilisée ici pour un accès
+   explicite au clic. No-op si la date choisie est la même. */
+function moveSessionToDate(s, fromKey, toKey){
+  if(!toKey || toKey===fromKey) return;
+  const from = planning[fromKey]||[];
+  const idx = from.findIndex(x=>x.id===s.id);
+  if(idx>-1) from.splice(idx,1);
+  (planning[toKey] ||= []).push(s);
+  if(window.PF?.user && s.id){
+    PF.moveScheduled(s.id, toKey).catch(err=> console.warn('[PF] moveScheduled échoué :', err));
+  }
+  render();
+  toast(tr('toast.seanceDeplacee', {date: fmtDayFull.format(new Date(toKey+'T00:00:00'))}) || `Séance déplacée au ${toKey}`);
+}
+function openMoveDatePicker(s, dateKey){
+  openMiniPrompt({
+    title: tr('builder.moveSession') || 'Déplacer la séance',
+    label: tr('builder.moveSessionLabel') || 'Nouvelle date',
+    value: dateKey, inputType: 'date',
+    onSave: (v)=>{ if(v) moveSessionToDate(s, dateKey, v); },
+  });
+}
 /* Menu d'actions sur une séance PRÉVUE (pas encore faite), coach uniquement :
    modifier / ranger en bibliothèque / programmer pour un autre athlète ou
-   groupe / supprimer. Avant ça, cliquer une séance prévue n'ouvrait rien
-   d'exploitable côté coach (revealAnalysis() sur une séance vide). */
+   groupe / déplacer / supprimer. Avant ça, cliquer une séance prévue
+   n'ouvrait rien d'exploitable côté coach (revealAnalysis() sur une séance
+   vide). */
 function openSessionActions(s, dateKey){
   const el=document.createElement('div'); el.className='adh-overlay';
   el.innerHTML = `<div class="adh-modal" role="dialog" aria-label="Actions sur la séance" style="max-width:400px">
@@ -3130,6 +3164,7 @@ function openSessionActions(s, dateKey){
     <p class="adh-sub">${fmtDur(s.dur)} · ${s.tss} TSS · ${s.zone||''}</p>
     <div class="addath-choices">
       <button class="addath-choice" data-act="edit" type="button"><i class="ic ic-edit"></i> <span class="addath-t">${tr('builder.editSession')}</span></button>
+      <button class="addath-choice" data-act="move" type="button"><i class="ic ic-calendar"></i> <span class="addath-t">${tr('builder.moveSession') || 'Déplacer la séance'}</span></button>
       <button class="addath-choice" data-act="lib" type="button"><i class="ic ic-book"></i> <span class="addath-t">Enregistrer dans la bibliothèque</span></button>
       <button class="addath-choice" data-act="assign" type="button"><i class="ic ic-users"></i> <span class="addath-t">Programmer pour un autre athlète</span></button>
       <button class="addath-choice" data-act="watch" type="button"><i class="ic ic-send"></i> <span class="addath-t">${tr('watch.sendToWatch')}</span></button>
@@ -3143,6 +3178,7 @@ function openSessionActions(s, dateKey){
   el.addEventListener('click', e=>{ if(e.target===el) close(); });
   document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
   el.querySelector('[data-act="edit"]').onclick=()=>{ close(); openBuilder(dateKey, s); };
+  el.querySelector('[data-act="move"]').onclick=()=>{ close(); openMoveDatePicker(s, dateKey); };
   el.querySelector('[data-act="lib"]').onclick=()=>{
     saveSessionToLibrary(s); close();
     toast(tr('toast.seanceRangeeEnBibliotheque'));
@@ -3548,14 +3584,17 @@ function openModal(s, dateKey){
       </div>`; })()}
     ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> ${tr('modal.detailedAnalysis')}</button>`:''}
     ${canPushWatch?`<button class="btn" id="modalSendWatch" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-send"></i> ${tr('watch.sendToMyWatch')}</button>`:''}
+    ${!s.done?`<button class="btn" id="modalMove" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-calendar"></i> ${tr('builder.moveSession') || 'Déplacer la séance'}</button>`:''}
     <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?tr('common.close'):tr('modal.gotItCoach')}</button>`;
   overlay.classList.add('open');
   modal.querySelector('.close').onclick = closeModal;
-  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch') btn.onclick = closeModal; });
+  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch' && btn.id!=='modalMove') btn.onclick = closeModal; });
   const an = modal.querySelector('#openAnalysis');
   if(an) an.onclick = ()=>{ closeModal(); openAnalysis(s); };
   const sw = modal.querySelector('#modalSendWatch');
   if(sw) sw.onclick = ()=>{ pushSingleSessionToWatch(s, dateKey); };
+  const mv = modal.querySelector('#modalMove');
+  if(mv) mv.onclick = ()=>{ closeModal(); openMoveDatePicker(s, dateKey); };
 }
 function closeModal(){ overlay.classList.remove('open') }
 overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal() });
