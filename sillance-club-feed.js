@@ -40,38 +40,38 @@
 
   var CSS = '' +
     '.ic-megaphone{--i:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m3%2011%2018-5v12L3%2014v-3z%22%2F%3E%3Cpath%20d%3D%22M11.6%2016.8a3%203%200%201%201-5.8-1.6%22%2F%3E%3C%2Fsvg%3E")}' +
-    '.cf-btn{position:relative}' +
+    '.clf-btn{position:relative}' +
     // .icon-btn pose display:inline-flex, qui l'emporte sur [hidden] (cf. chat-panel)
-    '.cf-btn[hidden],.cf-dot[hidden],.cf-compose[hidden],.cf-row select[hidden]{display:none!important}' +
-    '.cf-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--swim);border:2px solid var(--ink,var(--bg))}' +
-    '.cf-overlay{position:fixed;inset:0;z-index:90;background:rgba(5,8,14,.62);display:flex;justify-content:center;align-items:flex-start;padding:6vh 16px 16px;overflow-y:auto}' +
-    '.cf-overlay[hidden]{display:none!important}' +
-    '.cf-panel{width:min(680px,100%);background:var(--panel);border:1px solid var(--line-strong);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.55);overflow:hidden;animation:cfIn .22s cubic-bezier(0.23,1,0.32,1)}' +
+    '.clf-btn[hidden],.clf-dot[hidden],.clf-compose[hidden],.clf-row select[hidden]{display:none!important}' +
+    '.clf-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--swim);border:2px solid var(--ink,var(--bg))}' +
+    '.clf-overlay{position:fixed;inset:0;z-index:90;background:rgba(5,8,14,.62);display:flex;justify-content:center;align-items:flex-start;padding:6vh 16px 16px;overflow-y:auto}' +
+    '.clf-overlay[hidden]{display:none!important}' +
+    '.clf-panel{width:min(680px,100%);background:var(--panel);border:1px solid var(--line-strong);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.55);overflow:hidden;animation:cfIn .22s cubic-bezier(0.23,1,0.32,1)}' +
     '@keyframes cfIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}' +
-    '@media (prefers-reduced-motion:reduce){.cf-panel{animation:none}}' +
-    '.cf-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--panel-2)}' +
-    '.cf-head h3{margin:0;font-size:var(--fs-lg,17px);display:flex;align-items:center;gap:8px}' +
-    '.cf-sub{margin:3px 0 0;font-size:12px;color:var(--muted)}' +
-    '.cf-x{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}' +
-    '.cf-compose{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}' +
-    '.cf-compose textarea{width:100%;min-height:76px;resize:vertical;border:1px solid var(--line-strong);border-radius:12px;background:var(--panel-2);color:var(--text);font:inherit;font-size:14px;padding:10px 12px;box-sizing:border-box}' +
-    '.cf-compose textarea:focus{outline:2px solid var(--swim);outline-offset:1px}' +
-    '.cf-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}' +
-    '.cf-row select{border:1px solid var(--line-strong);border-radius:9px;background:var(--panel-2);color:var(--text);font:inherit;font-size:13px;padding:8px 10px}' +
-    '.cf-pub{margin-left:auto;border:none;border-radius:99px;background:var(--swim);color:#fff;font-weight:700;font-size:13px;padding:9px 18px;cursor:pointer}' +
-    '.cf-pub:disabled{opacity:.5;cursor:default}' +
-    '.cf-list{padding:8px 18px 18px;display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow-y:auto}' +
-    '.cf-empty{padding:28px 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}' +
-    '.cf-post{border:1px solid var(--line);border-radius:14px;padding:13px 15px;background:var(--panel-2)}' +
-    '.cf-post-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}' +
-    '.cf-author{font-weight:700;font-size:13.5px}' +
-    '.cf-meta{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}' +
-    '.cf-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--swim);border:1px solid var(--line-strong);border-radius:99px;padding:2px 8px;margin-left:6px}' +
-    '.cf-body{margin:8px 0 0;font-size:14px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}' +
-    '.cf-actions{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}' +
-    '.cf-discuss{border:1px solid var(--swim);background:transparent;color:var(--swim);font-weight:700;font-size:12.5px;border-radius:99px;padding:7px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}' +
-    '.cf-del{border:none;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;padding:7px 4px}' +
-    '@media (hover:hover) and (pointer:fine){.cf-discuss:hover{background:var(--swim);color:#fff}.cf-del:hover{color:var(--run)}.cf-x:hover{color:var(--text)}}' +
+    '@media (prefers-reduced-motion:reduce){.clf-panel{animation:none}}' +
+    '.clf-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--panel-2)}' +
+    '.clf-head h3{margin:0;font-size:var(--fs-lg,17px);display:flex;align-items:center;gap:8px}' +
+    '.clf-sub{margin:3px 0 0;font-size:12px;color:var(--muted)}' +
+    '.clf-x{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}' +
+    '.clf-compose{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}' +
+    '.clf-compose textarea{width:100%;min-height:76px;resize:vertical;border:1px solid var(--line-strong);border-radius:12px;background:var(--panel-2);color:var(--text);font:inherit;font-size:14px;padding:10px 12px;box-sizing:border-box}' +
+    '.clf-compose textarea:focus{outline:2px solid var(--swim);outline-offset:1px}' +
+    '.clf-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}' +
+    '.clf-row select{border:1px solid var(--line-strong);border-radius:9px;background:var(--panel-2);color:var(--text);font:inherit;font-size:13px;padding:8px 10px}' +
+    '.clf-pub{margin-left:auto;border:none;border-radius:99px;background:var(--swim);color:#fff;font-weight:700;font-size:13px;padding:9px 18px;cursor:pointer}' +
+    '.clf-pub:disabled{opacity:.5;cursor:default}' +
+    '.clf-list{padding:8px 18px 18px;display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow-y:auto}' +
+    '.clf-empty{padding:28px 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}' +
+    '.clf-post{border:1px solid var(--line);border-radius:14px;padding:13px 15px;background:var(--panel-2)}' +
+    '.clf-post-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}' +
+    '.clf-author{font-weight:700;font-size:13.5px}' +
+    '.clf-meta{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}' +
+    '.clf-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--swim);border:1px solid var(--line-strong);border-radius:99px;padding:2px 8px;margin-left:6px}' +
+    '.clf-body{margin:8px 0 0;font-size:14px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}' +
+    '.clf-actions{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}' +
+    '.clf-discuss{border:1px solid var(--swim);background:transparent;color:var(--swim);font-weight:700;font-size:12.5px;border-radius:99px;padding:7px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}' +
+    '.clf-del{border:none;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;padding:7px 4px}' +
+    '@media (hover:hover) and (pointer:fine){.clf-discuss:hover{background:var(--swim);color:#fff}.clf-del:hover{color:var(--run)}.clf-x:hover{color:var(--text)}}' +
     '.chat-pinned{border:1px solid var(--line-strong);border-left:3px solid var(--swim);border-radius:10px;background:var(--panel-2);padding:9px 12px;font-size:13px;line-height:1.45;margin-bottom:6px;word-wrap:break-word}' +
     '.chat-pinned-k{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--swim);margin-bottom:4px}';
 
@@ -82,24 +82,24 @@
     if (document.getElementById("cfBtn")) return true;
     var bell = document.getElementById("bellWrap");
     if (!bell) return false;
-    var st = document.createElement("style"); st.id = "cf-style"; st.textContent = CSS; document.head.appendChild(st);
+    var st = document.createElement("style"); st.id = "clf-style"; st.textContent = CSS; document.head.appendChild(st);
     btn = document.createElement("button");
-    btn.className = "icon-btn cf-btn"; btn.id = "cfBtn"; btn.type = "button"; btn.hidden = true;
+    btn.className = "icon-btn clf-btn"; btn.id = "cfBtn"; btn.type = "button"; btn.hidden = true;
     btn.setAttribute("aria-label", t("feed.openAria")); btn.title = t("feed.title");
-    btn.innerHTML = '<i class="ic ic-megaphone"></i><span class="cf-dot" id="cfDot" hidden></span>';
+    btn.innerHTML = '<i class="ic ic-megaphone"></i><span class="clf-dot" id="cfDot" hidden></span>';
     bell.parentNode.insertBefore(btn, bell);
     dot = btn.querySelector("#cfDot");
     ov = document.createElement("div");
-    ov.className = "cf-overlay"; ov.id = "cfOverlay"; ov.hidden = true;
-    ov.innerHTML = '<div class="cf-panel" role="dialog" aria-modal="true" aria-labelledby="cfTitle">' +
-      '<div class="cf-head"><div><h3 id="cfTitle"><i class="ic ic-megaphone"></i> ' + esc(t("feed.title")) + '</h3><p class="cf-sub" id="cfSub"></p></div>' +
-      '<button class="cf-x" id="cfClose" type="button" aria-label="' + esc(t("feed.closeAria")) + '"><i class="ic ic-x"></i></button></div>' +
-      '<div class="cf-compose" id="cfCompose" hidden>' +
+    ov.className = "clf-overlay"; ov.id = "cfOverlay"; ov.hidden = true;
+    ov.innerHTML = '<div class="clf-panel" role="dialog" aria-modal="true" aria-labelledby="cfTitle">' +
+      '<div class="clf-head"><div><h3 id="cfTitle"><i class="ic ic-megaphone"></i> ' + esc(t("feed.title")) + '</h3><p class="clf-sub" id="cfSub"></p></div>' +
+      '<button class="clf-x" id="cfClose" type="button" aria-label="' + esc(t("feed.closeAria")) + '"><i class="ic ic-x"></i></button></div>' +
+      '<div class="clf-compose" id="cfCompose" hidden>' +
         '<textarea id="cfText" maxlength="4000" placeholder="' + esc(t("feed.placeholder")) + '"></textarea>' +
-        '<div class="cf-row"><select id="cfClub" aria-label="Club"></select><select id="cfGroup" aria-label="' + esc(t("feed.forGroup")) + '"></select>' +
-        '<button class="cf-pub" id="cfPublish" type="button">' + esc(t("feed.publish")) + '</button></div>' +
+        '<div class="clf-row"><select id="cfClub" aria-label="Club"></select><select id="cfGroup" aria-label="' + esc(t("feed.forGroup")) + '"></select>' +
+        '<button class="clf-pub" id="cfPublish" type="button">' + esc(t("feed.publish")) + '</button></div>' +
       '</div>' +
-      '<div class="cf-list" id="cfList"></div></div>';
+      '<div class="clf-list" id="cfList"></div></div>';
     document.body.appendChild(ov);
     btn.addEventListener("click", open);
     ov.addEventListener("click", function (e) { if (e.target === ov) close(); });
@@ -171,18 +171,18 @@
     }
     var list = ov.querySelector("#cfList");
     if (!state.posts.length) {
-      list.innerHTML = '<div class="cf-empty">' + esc(staffAny ? t("feed.emptyStaff") : t("feed.empty")) + "</div>";
+      list.innerHTML = '<div class="clf-empty">' + esc(staffAny ? t("feed.emptyStaff") : t("feed.empty")) + "</div>";
       return;
     }
     list.innerHTML = state.posts.map(function (p) {
       var mine = p.author_id === uid;
-      var tag = p.club_group_id ? '<span class="cf-tag">' + esc(groupName(p.club_id, p.club_group_id)) + "</span>" : (state.clubs.length > 1 ? '<span class="cf-tag">' + esc(clubName(p.club_id)) + "</span>" : "");
+      var tag = p.club_group_id ? '<span class="clf-tag">' + esc(groupName(p.club_id, p.club_group_id)) + "</span>" : (state.clubs.length > 1 ? '<span class="clf-tag">' + esc(clubName(p.club_id)) + "</span>" : "");
       var actions = "";
-      if (!mine) actions += '<button class="cf-discuss" type="button" data-discuss="' + esc(p.id) + '"><i class="ic ic-message-circle"></i> ' + esc(t("feed.discuss")) + "</button>";
-      if (mine || isStaffOf(p.club_id)) actions += '<button class="cf-del" type="button" data-del="' + esc(p.id) + '">' + esc(t("feed.delete")) + "</button>";
-      return '<article class="cf-post"><div class="cf-post-top"><span><span class="cf-author">' + esc(state.names[p.author_id] || t("feed.title")) + "</span>" + tag + "</span>" +
-        '<span class="cf-meta">' + esc(fmtDate(p.created_at)) + "</span></div>" +
-        '<p class="cf-body">' + esc(p.body) + "</p>" + (actions ? '<div class="cf-actions">' + actions + "</div>" : "") + "</article>";
+      if (!mine) actions += '<button class="clf-discuss" type="button" data-discuss="' + esc(p.id) + '"><i class="ic ic-message-circle"></i> ' + esc(t("feed.discuss")) + "</button>";
+      if (mine || isStaffOf(p.club_id)) actions += '<button class="clf-del" type="button" data-del="' + esc(p.id) + '">' + esc(t("feed.delete")) + "</button>";
+      return '<article class="clf-post"><div class="clf-post-top"><span><span class="clf-author">' + esc(state.names[p.author_id] || "Coach") + "</span>" + tag + "</span>" +
+        '<span class="clf-meta">' + esc(fmtDate(p.created_at)) + "</span></div>" +
+        '<p class="clf-body">' + esc(p.body) + "</p>" + (actions ? '<div class="clf-actions">' + actions + "</div>" : "") + "</article>";
     }).join("");
     list.querySelectorAll("[data-discuss]").forEach(function (b) { b.addEventListener("click", function () { discuss(b.dataset.discuss, b); }); });
     list.querySelectorAll("[data-del]").forEach(function (b) { b.addEventListener("click", function () { remove(b.dataset.del); }); });
@@ -241,7 +241,7 @@
 
   async function open() {
     ov.hidden = false;
-    ov.querySelector("#cfList").innerHTML = '<div class="cf-empty">…</div>';
+    ov.querySelector("#cfList").innerHTML = '<div class="clf-empty">…</div>';
     await loadPosts(); render();
     markSeen(); refreshDot();
     var focusEl = ov.querySelector("#cfCompose").hidden ? ov.querySelector("#cfClose") : ov.querySelector("#cfText");

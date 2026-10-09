@@ -1126,10 +1126,12 @@ export const PF = {
   async getProfilesByIds(ids) {
     const uniq = [...new Set((ids || []).filter(Boolean))];
     if (!uniq.length) return {};
-    const { data, error } = await sb.from("profiles").select("id, full_name").in("id", uniq);
+    const { data, error } = await sb.from("profiles").select("id, full_name, email").in("id", uniq);
     if (error) { console.warn("[PF] getProfilesByIds:", error.message); return {}; }
     const byId = {};
-    (data ?? []).forEach((p) => { byId[p.id] = p.full_name; });
+    // Nom complet souvent vide (non demandé à certains parcours d'inscription) :
+    // repli sur la partie locale de l'email plutôt qu'un libellé générique.
+    (data ?? []).forEach((p) => { byId[p.id] = p.full_name || (p.email ? p.email.split("@")[0] : ""); });
     return byId;
   },
   async conversationParticipants(conversationId) {
