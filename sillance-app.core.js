@@ -1335,9 +1335,13 @@ function renderAlerts(){
   });
   list.querySelectorAll('[data-act="message"]').forEach((b,i)=>{
     b.addEventListener('click', ()=>{
-      const a=COACH_ALERTS[i];
+      // COACH_ALERTS est encore 100% démo (seedDemoAlert plus bas, pas
+      // d'id athlète réel) : on ouvre la liste des conversations plutôt que
+      // de deviner un destinataire — openChat(athleteId) attend un vrai id
+      // depuis le 09/10/2026 (ex-paramètre "prefill" texte, supprimé avec
+      // le reste du prototype de chat factice).
       document.getElementById('bellMenu').classList.remove('open');
-      openChat(tr('alerts.chatPrefill', {score:a?a.score:''}));
+      openChat();
     });
   });
 }
@@ -7322,73 +7326,185 @@ window.__pf_app = {
 })();
 
 /* ============================================================
-   MESSAGERIE coach ↔ athlète + lien WhatsApp
+   MESSAGERIE coach ↔ athlète / coach ↔ groupe (09/10/2026)
    ------------------------------------------------------------
-   Chat interne (démo, en mémoire) + bouton "Ouvrir dans WhatsApp"
-   qui pré-remplit un message via le lien officiel wa.me (gratuit,
-   sans API ni serveur). Backend : remplacer CHAT_MSGS par de vrais
-   messages persistés ; brancher l'API WhatsApp Business pour des
-   envois automatiques.
+   Remplace l'ancien prototype 100% front (CHAT_MSGS en mémoire, nom
+   "Romain D." codé en dur, faux numéro WhatsApp, fausse réponse
+   automatique après 1,4s — jamais branché à rien de réel). Vraie
+   persistance (conversations/conversation_messages, migration 0065),
+   vrai temps réel (Supabase Realtime, première utilisation dans
+   Sillance). Périmètre : coach <-> 1 athlète ou coach <-> 1 groupe
+   d'entraînement, jamais athlète <-> athlète.
+   Panneau à 3 vues (liste / nouvelle conversation / fil ouvert),
+   toggle par visibilité plutôt que 3 panneaux séparés — même bulle
+   bas-droite qu'avant, juste plus de contenu dedans.
    ============================================================ */
-const ATHLETE_PHONE = '33600000000'; // numéro athlète, format international SANS +, à renseigner
-let CHAT_MSGS = [
-  {from:'them', text:'Salut coach ! Prêt pour la semaine', t:'08:12'},
-  {from:'me',   text:'Yes ! Belle séance de seuil prévue demain.', t:'08:15'}
-];
-const QUICK_COACH_DEFAULT = [tr('chat.q.restToday'),tr('chat.q.lightenToday'),tr('chat.q.wellDone'),tr('chat.q.shiftTomorrow'),tr('chat.q.hydrate')];
-const QUICK_ATHLETE = [tr('chat.q.recoveredWell'),tr('chat.q.tiredLegs'),tr('chat.q.sessionDone'),tr('chat.q.questionAboutSession')];
-/* Réponses rapides du coach — personnalisables, persistées en local.
-   Le chip "Gérer" ouvre un éditeur texte simple (une réponse par ligne)
-   plutôt qu'une UI dédiée : rapide à livrer, suffisant pour un coach qui
-   gère 20-30 athlètes au clavier. */
-let CHAT_MACROS = (()=>{ try{ const s=JSON.parse(localStorage.getItem('sil_chat_macros')||'null'); return (Array.isArray(s)&&s.length) ? s : QUICK_COACH_DEFAULT.slice(); }catch(e){ return QUICK_COACH_DEFAULT.slice(); } })();
-function manageChatMacros(){
-  openMiniPrompt({title:tr('chat.macrosPrompt'), value:CHAT_MACROS.join('\n'), textarea:true, onSave:(next)=>{
-    if(next==null) return;
-    // Échappé à la saisie : rendu ensuite en boutons via innerHTML sans
-    // ré-échapper (`<button>${x}</button>`).
-    CHAT_MACROS = next.split('\n').map(s=>dispoSafe(s.trim())).filter(Boolean).slice(0,8);
-    localStorage.setItem('sil_chat_macros', JSON.stringify(CHAT_MACROS));
-    renderChat();
-  }});
-}
+let CONVERSATIONS = [];
+let CONV_NAMES = {};      // {userId: fullName}, résolu à la demande
+let CURRENT_CONV = null;
+let unsubThread = null;
+let unsubInbox = null;
 
 const chatPanel=document.getElementById('chatPanel');
 const chatBody=document.getElementById('chatBody');
-function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-function renderChat(){
-  chatBody.innerHTML = `<div class="chat-day">${tr('chat.today')}</div>` + CHAT_MSGS.map(m=>
-    `<div class="chat-msg ${m.from}">${m.text}<span class="time">${m.t}</span></div>`).join('');
+const chatList=document.getElementById('chatList');
+const chatNewPicker=document.getElementById('chatNewPicker');
+const chatInputWrap=document.getElementById('chatInputWrap');
+const chatBack=document.getElementById('chatBack');
+const chatAvatar=document.getElementById('chatAvatar');
+const chatPeerName=document.getElementById('chatPeerName');
+const chatStatus=document.getElementById('chatStatus');
+const chatNewBtn=document.getElementById('chatNewBtn');
+
+function initials(name){ const n=(name||'?').trim(); const p=n.split(/\s+/); return ((p[0]?.[0]||'')+(p[1]?.[0]||p[0]?.[1]||'')).toUpperCase(); }
+function fmtMsgTime(iso){ const d=new Date(iso); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function convCounterpartId(c){ return c.kind==='direct' ? (mode!=='athlete' ? c.athlete_id : c.coach_id) : null; }
+function convName(c){
+  if(c.kind==='group') return c.title || tr('messaging.group');
+  const id = convCounterpartId(c);
+  if(mode!=='athlete'){ const a=ROSTER.find(x=>x.id===id); if(a) return a.name; }
+  return CONV_NAMES[id] || tr('messaging.loading');
+}
+function convUnread(c){ return c.last_message_at && (!c.my_last_read_at || new Date(c.last_message_at) > new Date(c.my_last_read_at)); }
+
+function showPanelView(view){
+  // view ∈ 'list' | 'new' | 'thread'
+  chatList.hidden = view!=='list';
+  chatNewPicker.hidden = view!=='new';
+  chatBody.hidden = view!=='thread';
+  chatInputWrap.hidden = view!=='thread';
+  chatBack.hidden = view==='list';
+  chatAvatar.hidden = view!=='thread';
+  chatNewBtn.hidden = view==='new' || mode==='athlete';
+}
+
+async function refreshChatBadge(){
+  if(!window.PF?.user) return;
+  const list = await PF.listConversations().catch(()=>[]);
+  const unread = list.some(convUnread);
+  const badge = document.getElementById('chatFabBadge');
+  badge.hidden = !unread;
+}
+
+async function loadConversationsList(){
+  if(!window.PF?.user){ chatList.innerHTML=`<div class="chat-list-empty">${tr('messaging.needAccount')}</div>`; return; }
+  CONVERSATIONS = await PF.listConversations().catch(()=>[]);
+  // Résout les noms manquants (coach des fils où JE suis athlète — les
+  // noms d'athlètes, eux, viennent déjà de ROSTER côté coach).
+  const missing = CONVERSATIONS.filter(c=>c.kind==='direct' && mode==='athlete').map(c=>c.coach_id).filter(id=>!CONV_NAMES[id]);
+  if(missing.length){ const names = await PF.getProfilesByIds(missing); Object.assign(CONV_NAMES, names); }
+  renderChatList();
+  document.getElementById('chatFabBadge').hidden = !CONVERSATIONS.some(convUnread);
+}
+function renderChatList(){
+  if(!CONVERSATIONS.length){
+    chatList.innerHTML = `<div class="chat-list-empty">${mode!=='athlete' ? tr('messaging.emptyCoach') : tr('messaging.emptyAthlete')}</div>`;
+    return;
+  }
+  chatList.innerHTML = CONVERSATIONS.map(c=>{
+    const unread = convUnread(c);
+    const name = convName(c);
+    const preview = c.kind==='group' ? tr('messaging.groupHint') : '';
+    return `<button class="chat-row ${unread?'unread':''}" data-id="${c.id}">
+      <div class="chat-avatar" style="${c.kind==='group'?'background:var(--run)':''}">${c.kind==='group'?'<i class="ic ic-users"></i>':dispoSafe(initials(name))}</div>
+      <div class="chat-row-body">
+        <div class="chat-row-top"><span class="chat-row-name">${dispoSafe(name)}</span><span class="chat-row-time">${c.last_message_at?fmtMsgTime(c.last_message_at):''}</span></div>
+        <div class="chat-row-preview">${preview}</div>
+      </div>
+      ${unread?'<span class="chat-row-dot"></span>':''}
+    </button>`;
+  }).join('');
+  chatList.querySelectorAll('.chat-row').forEach(el=>{
+    el.onclick = ()=>{ const c=CONVERSATIONS.find(x=>x.id===el.dataset.id); if(c) openConversation(c); };
+  });
+}
+
+async function openConversation(conv){
+  CURRENT_CONV = conv;
+  showPanelView('thread');
+  chatPeerName.textContent = convName(conv);
+  chatAvatar.innerHTML = conv.kind==='group' ? '<i class="ic ic-users"></i>' : dispoSafe(initials(convName(conv)));
+  chatAvatar.style.background = conv.kind==='group' ? 'var(--run)' : 'var(--swim)';
+  chatStatus.textContent = conv.kind==='group' ? tr('messaging.groupHint') : '';
+  chatBody.innerHTML = `<div class="chat-day">${tr('common.loading')||'…'}</div>`;
+  if(unsubThread) unsubThread();
+  const msgs = await PF.getMessages(conv.id).catch(()=>[]);
+  renderThread(msgs);
+  await PF.markConversationRead(conv.id);
+  conv.my_last_read_at = new Date().toISOString();
+  renderChatList(); // retire le point non-lu dans la liste en arrière-plan
+  unsubThread = PF.subscribeToConversation(conv.id, (msg)=>{
+    renderThread([...(CURRENT_THREAD_MSGS||[]), msg]);
+    if(CURRENT_CONV?.id===conv.id){ PF.markConversationRead(conv.id); conv.my_last_read_at=new Date().toISOString(); }
+  });
+}
+let CURRENT_THREAD_MSGS = [];
+function renderThread(msgs){
+  CURRENT_THREAD_MSGS = msgs;
+  const uid = window.PF?.user?.id;
+  chatBody.innerHTML = msgs.map(m=>{
+    const mine = m.sender_id===uid;
+    const senderTag = (!mine && CURRENT_CONV?.kind==='group') ? `<span class="sender">${dispoSafe((mode!=='athlete'?(ROSTER.find(a=>a.id===m.sender_id)?.name):CONV_NAMES[m.sender_id])||'')}</span>` : '';
+    return `<div class="chat-msg ${mine?'me':'them'}">${senderTag}${dispoSafe(m.body)}<span class="time">${fmtMsgTime(m.created_at)}</span></div>`;
+  }).join('') || `<div class="chat-list-empty">${tr('messaging.sayHi')}</div>`;
   chatBody.scrollTop = chatBody.scrollHeight;
-  const quick = (mode==='coach') ? CHAT_MACROS : QUICK_ATHLETE;
-  const q=document.getElementById('chatQuick');
-  q.innerHTML = quick.map(x=>`<button>${x}</button>`).join('') + (mode==='coach' ? `<button id="chatMacroManage" title="${tr('chat.customizeQuickReplies')}"><i class="ic ic-edit"></i> ${tr('chat.manage')}</button>` : '');
-  q.querySelectorAll('button').forEach((b,i)=>{ if(b.id==='chatMacroManage') b.onclick=manageChatMacros; else b.onclick=()=> sendChat(quick[i]); });
-  document.getElementById('chatPeerName').textContent = (mode==='coach')?'Romain D.':tr('crd.coach');
-  document.getElementById('chatAvatar').textContent = (mode==='coach')?'RD':'CO';
 }
-function sendChat(text){
-  text=(text||'').trim(); if(!text) return;
-  // Échappé à la saisie : renderChat() interpole m.text tel quel dans du
-  // innerHTML, sans ré-échapper (écriture optimiste locale, chat 100% front).
-  CHAT_MSGS.push({from:'me', text:dispoSafe(text), t:nowHM()});
-  document.getElementById('chatText').value=''; renderChat();
-  setTimeout(()=>{ CHAT_MSGS.push({from:'them', text:tr('chat.autoReply'), t:nowHM()}); renderChat(); }, 1400);
+async function sendChat(text){
+  text=(text||'').trim(); if(!text || !CURRENT_CONV) return;
+  document.getElementById('chatText').value='';
+  try{ await PF.sendMessage(CURRENT_CONV.id, text); }
+  catch(e){ console.warn('[PF] sendMessage:', e); toast(tr('messaging.sendFailed')); }
 }
-function openChat(prefill){
-  chatPanel.classList.add('open'); renderChat();
-  document.getElementById('chatFabBadge').hidden=true;
-  if(prefill){ document.getElementById('chatText').value=prefill; document.getElementById('chatText').focus(); }
+
+async function openNewPicker(){
+  showPanelView('new');
+  chatPeerName.textContent = tr('messaging.newTitle');
+  const groups = window.__pf_ownsClub && typeof CLUB_GROUPS!=='undefined' ? CLUB_GROUPS : [];
+  let html = '';
+  if(groups.length){
+    html += `<div class="chat-new-picker-head">${tr('messaging.groups')}</div>`;
+    html += groups.map(g=>`<button class="chat-pick-row" data-gid="${g.id}" data-gname="${dispoSafe(g.name)}"><i class="ic ic-users"></i> ${dispoSafe(g.name)}</button>`).join('');
+  }
+  html += `<div class="chat-new-picker-head">${tr('messaging.athletes')}</div>`;
+  html += ROSTER.map(a=>`<button class="chat-pick-row" data-aid="${a.id}">${dispoSafe(initials(a.name))} ${dispoSafe(a.name)}</button>`).join('') || `<div class="chat-list-empty">${tr('messaging.noAthletes')}</div>`;
+  chatNewPicker.innerHTML = html;
+  chatNewPicker.querySelectorAll('[data-aid]').forEach(el=>{
+    el.onclick = async ()=>{
+      if(!window.PF?.user){ toast(tr('watch.needAccount')); return; }
+      try{ const conv = await PF.openDirectConversation(el.dataset.aid); await loadConversationsList(); openConversation(CONVERSATIONS.find(c=>c.id===conv.id) || {...conv, my_last_read_at:null}); }
+      catch(e){ console.warn('[PF] openDirectConversation:', e); toast(tr('messaging.sendFailed')); }
+    };
+  });
+  chatNewPicker.querySelectorAll('[data-gid]').forEach(el=>{
+    el.onclick = async ()=>{
+      if(!window.PF?.user){ toast(tr('watch.needAccount')); return; }
+      try{ const conv = await PF.openGroupConversation(el.dataset.gid, el.dataset.gname); await loadConversationsList(); openConversation(CONVERSATIONS.find(c=>c.id===conv.id) || {...conv, my_last_read_at:null}); }
+      catch(e){ console.warn('[PF] openGroupConversation:', e); toast(tr('messaging.sendFailed')); }
+    };
+  });
 }
+
+function openChat(athleteId){
+  chatPanel.classList.add('open');
+  showPanelView('list');
+  loadConversationsList();
+  if(window.PF?.user && unsubInbox==null){
+    unsubInbox = PF.subscribeToMyConversations(()=>{ if(CURRENT_CONV==null) loadConversationsList(); else refreshChatBadge(); });
+  }
+  // Pont depuis l'alerte "message cette séance" (bell) : pas d'id athlète
+  // fiable aujourd'hui (COACH_ALERTS est encore 100% démo, cf. commentaire
+  // plus haut dans ce fichier) — on ouvre la liste plutôt que de deviner.
+  if(athleteId && mode!=='athlete'){
+    PF.openDirectConversation(athleteId).then(async (conv)=>{ await loadConversationsList(); openConversation(CONVERSATIONS.find(c=>c.id===conv.id)||conv); }).catch(()=>{});
+  }
+}
+chatNewBtn.onclick = openNewPicker;
+chatBack.onclick = ()=>{ CURRENT_CONV=null; if(unsubThread){ unsubThread(); unsubThread=null; } showPanelView('list'); loadConversationsList(); };
 document.getElementById('chatFab').onclick=()=>{ chatPanel.classList.contains('open')?chatPanel.classList.remove('open'):openChat(); };
 document.getElementById('chatClose').onclick=()=> chatPanel.classList.remove('open');
 document.getElementById('chatSend').onclick=()=> sendChat(document.getElementById('chatText').value);
 document.getElementById('chatText').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(e.target.value); });
-document.getElementById('chatWhatsapp').onclick=()=>{
-  const draft = document.getElementById('chatText').value.trim()
-    || tr('chat.waDraft');
-  window.open(`https://wa.me/${ATHLETE_PHONE}?text=${encodeURIComponent(draft)}`, '_blank');
-};
+if(window.PF?.user) refreshChatBadge();
 
 /* ============================================================
    ACCESSIBILITÉ — daltonisme, motifs, contraste (en 1 clic)
