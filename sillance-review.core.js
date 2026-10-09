@@ -3246,17 +3246,28 @@ function realRoleMode(){
 function guardModeSwitch(target){
   const real = realRoleMode();
   const selfCoachAllowed = real==='coach' && target==='athlete' && window.__pf_selfCoached;
-  if(real && real!==target && !selfCoachAllowed){
+  // Un coach qui possède aussi un club (clubs.owner_id) cumule les deux vues
+  // — manquait ici jusqu'au 09/10/2026 (présent dans sillance-app.core.js
+  // depuis le 22/09, jamais répliqué) : un coach-gérant-de-club perdait
+  // l'accès au mode Club sur cette page alors qu'il l'avait sur les 2 autres.
+  const ownsClubAllowed = real==='coach' && target==='club' && window.__pf_ownsClub;
+  if(real && real!==target && !selfCoachAllowed && !ownsClubAllowed){
     toast(tr('mode.notAvailable'));
     return false;
   }
   return true;
 }
+// 09/10/2026 : la porte Club n'est plus seulement grisée pour un compte sans
+// lien club — elle est retirée du menu (retour Rowan 09/10/2026).
 window.__pf_lockModes = function(realMode){
   const map = {coach:mc, athlete:ma, club:mcl};
   const selfCoachUnlock = realMode==='coach' && window.__pf_selfCoached;
+  const ownsClubUnlock = realMode==='coach' && window.__pf_ownsClub;
+  const canSeeClub = realMode==='club' || ownsClubUnlock;
+  mcl.hidden = !canSeeClub;
   Object.entries(map).forEach(([k,btn])=>{
-    const locked = k!==realMode && !(selfCoachUnlock && k==='athlete');
+    if(k==='club' && !canSeeClub) return;
+    const locked = k!==realMode && !(selfCoachUnlock && k==='athlete') && !(ownsClubUnlock && k==='club');
     btn.classList.toggle('mode-locked', locked);
     btn.title = locked ? tr('mode.reservedOther') : '';
   });

@@ -1047,6 +1047,121 @@ export const PF = {
     return saved;
   },
 
+  // -------- messagerie (conversations coach <-> athlète/groupe) --------
+  // Périmètre volontaire (09/10/2026) : coach <-> 1 athlète, ou coach <-> 1
+  // groupe d'entraînement (club_groups). Jamais athlète <-> athlète — cf.
+  // migration 0065 pour le détail du schéma/RLS.
+
+  // Liste des fils où JE suis participant (coach ou athlète), triés par
+  // dernier message. `last_read_at` embarqué = MA ligne de participation
+  // (filtrée côté requête), sert à calculer le badge non-lu côté UI.
+  async listConversations() {
+    const { data, error } = await sb.from("conversations")
+      .select("*, conversation_participants!inner(last_read_at)")
+      .eq("conversation_participants.user_id", this.user.id)
+      .order("last_message_at", { ascending: false, nullsFirst: false });
+    if (error) { console.warn("[PF] listConversations:", error.message); return []; }
+    return (data ?? []).map((c) => ({ ...c, my_last_read_at: c.conversation_participants?.[0]?.last_read_at ?? null }));
+  },
+  // Ouvre (ou réutilise, cf. index unique 0065) le fil coach<->athlète.
+  // Coach uniquement — symétrique à scheduleSession qui prend aussi
+  // athleteId en premier paramètre.
+  async openDirectConversation(athleteId) {
+    const { data: existing } = await sb.from("conversations")
+      .select("*").eq("coach_id", this.user.id).eq("athlete_id", athleteId).eq("kind", "direct").maybeSingle();
+    if (existing) return existing;
+    const { data: conv, error } = await sb.from("conversations")
+      .insert({ kind: "direct", coach_id: this.user.id, athlete_id: athleteId }).select().single();
+    if (error) throw error;
+    const { error: partErr } = await sb.from("conversation_participants").insert([
+      { conversation_id: conv.id, user_id: this.user.id },
+      { conversation_id: conv.id, user_id: athleteId },
+    ]);
+    if (partErr) throw partErr;
+    return conv;
+  },
+  // Ouvre un fil avec TOUT un groupe d'entraînement — snapshot des membres
+  // actuels du groupe au moment de la création (cf. limite documentée en
+  // 0065 : un athlète qui rejoint le groupe plus tard n'est pas ajouté
+  // rétroactivement à un fil déjà créé).
+  async openGroupConversation(clubGroupId, groupName) {
+    const { data: members, error: memErr } = await sb.from("club_members")
+      .select("athlete_id").eq("group_id", clubGroupId).not("athlete_id", "is", null);
+    if (memErr) throw memErr;
+    const { data: conv, error } = await sb.from("conversations")
+      .insert({ kind: "group", coach_id: this.user.id, club_group_id: clubGroupId, title: groupName ?? null })
+      .select().single();
+    if (error) throw error;
+    const athleteIds = [...new Set((members ?? []).map((m) => m.athlete_id))].filter((id) => id !== this.user.id);
+    const rows = [{ conversation_id: conv.id, user_id: this.user.id }, ...athleteIds.map((id) => ({ conversation_id: conv.id, user_id: id }))];
+    const { error: partErr } = await sb.from("conversation_participants").insert(rows);
+    if (partErr) throw partErr;
+    return conv;
+  },
+  async getMessages(conversationId, limit = 100) {
+    const { data, error } = await sb.from("conversation_messages")
+      .select("*").eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true }).limit(limit);
+    if (error) { console.warn("[PF] getMessages:", error.message); return []; }
+    return data ?? [];
+  },
+  async sendMessage(conversationId, body) {
+    const text = String(body ?? "").trim();
+    if (!text) return null;
+    const { data, error } = await sb.from("conversation_messages")
+      .insert({ conversation_id: conversationId, sender_id: this.user.id, body: text.slice(0, 4000) })
+      .select().single();
+    if (error) throw error;
+    return data;
+  },
+  async markConversationRead(conversationId) {
+    const { error } = await sb.from("conversation_participants")
+      .update({ last_read_at: new Date().toISOString() })
+      .eq("conversation_id", conversationId).eq("user_id", this.user.id);
+    if (error) console.warn("[PF] markConversationRead:", error.message);
+  },
+  // Résolution de noms pour l'UI (ex. nom du coach côté athlète, cf.
+  // migration 0066 — avant ça, aucune policy ne permettait à un athlète de
+  // lire le profil de son coach du tout).
+  async getProfilesByIds(ids) {
+    const uniq = [...new Set((ids || []).filter(Boolean))];
+    if (!uniq.length) return {};
+    const { data, error } = await sb.from("profiles").select("id, full_name").in("id", uniq);
+    if (error) { console.warn("[PF] getProfilesByIds:", error.message); return {}; }
+    const byId = {};
+    (data ?? []).forEach((p) => { byId[p.id] = p.full_name; });
+    return byId;
+  },
+  async conversationParticipants(conversationId) {
+    const { data, error } = await sb.from("conversation_participants")
+      .select("user_id, last_read_at").eq("conversation_id", conversationId);
+    if (error) { console.warn("[PF] conversationParticipants:", error.message); return []; }
+    return data ?? [];
+  },
+  // Abonnement temps réel (première utilisation de Supabase Realtime dans
+  // Sillance) aux nouveaux messages d'UN fil. Renvoie une fonction de
+  // désabonnement à appeler à la fermeture du panneau de chat.
+  subscribeToConversation(conversationId, onMessage) {
+    const channel = sb.channel(`conv-${conversationId}`)
+      .on("postgres_changes", {
+        event: "INSERT", schema: "public", table: "conversation_messages",
+        filter: `conversation_id=eq.${conversationId}`,
+      }, (payload) => onMessage(payload.new))
+      .subscribe();
+    return () => { sb.removeChannel(channel); };
+  },
+  // Abonnement global (liste des fils) : un nouveau message n'importe où
+  // doit faire remonter/rafraîchir le fil concerné dans la liste, même fil
+  // non ouvert. Un seul channel pour toute la session (pas un par fil).
+  subscribeToMyConversations(onMessage) {
+    const channel = sb.channel(`conv-inbox-${this.user.id}`)
+      .on("postgres_changes", {
+        event: "INSERT", schema: "public", table: "conversation_messages",
+      }, (payload) => onMessage(payload.new))
+      .subscribe();
+    return () => { sb.removeChannel(channel); };
+  },
+
   // -------- télémétrie --------
   // Best-effort : ne doit jamais faire planter l'appelant ni remonter d'erreur.
   async logClientError({ message, stack, url, context }) {

@@ -3632,6 +3632,12 @@ function guardModeSwitch(target){
   }
   return true;
 }
+// 09/10/2026 : la porte Club n'est plus seulement grisée pour un compte sans
+// lien club (coach/athlète sans club géré ni cumul) — elle est retirée du
+// menu. Avant ça, les 3 portes restaient TOUJOURS visibles pour tout compte
+// réel, juste verrouillées visuellement ; confusion inutile pour un compte
+// qui n'aura jamais accès au mode Club (retour Rowan 09/10/2026). Coach/
+// Athlète restent inchangés (toujours visibles, verrouillés selon le rôle).
 window.__pf_lockModes = function(realMode){
   const map = {coach:mc, athlete:ma, club:mcl};
   const selfCoachUnlock = realMode==='coach' && window.__pf_selfCoached;
@@ -3639,7 +3645,10 @@ window.__pf_lockModes = function(realMode){
   // accessible en plus de la sienne — cumul coach + gérant de club (ex.
   // Quentin Salmon, 22/09/2026), même logique que l'auto-coaching ci-dessus.
   const ownsClubUnlock = realMode==='coach' && window.__pf_ownsClub;
+  const canSeeClub = realMode==='club' || ownsClubUnlock;
+  mcl.hidden = !canSeeClub;
   Object.entries(map).forEach(([k,btn])=>{
+    if(k==='club' && !canSeeClub) return;
     const locked = k!==realMode && !(selfCoachUnlock && k==='athlete') && !(ownsClubUnlock && k==='club');
     btn.classList.toggle('mode-locked', locked);
     btn.title = locked ? tr('mode.reservedOther') : '';

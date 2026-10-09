@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261009a";
+import { PF } from "./sillance-client.js?v=20261009b";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -953,7 +953,8 @@ function renderAuth() {
         <div class="role" data-role="coach">${tr("mode.coach")}</div>
         ${hardGate ? `` : `<div class="role" data-role="athlete">${tr("mode.athlete")}</div>`}
         <div class="role" data-role="club_admin">${tr("mode.club")}</div>
-      </div>` : ``}
+      </div>
+      ${pickedRole === "club_admin" ? `<label>${tr("auth.clubName")}</label><input id="pf-club-name" placeholder="${tr("auth.clubNamePh")}">` : ``}` : ``}
     <label>${tr("common.email")}</label><input id="pf-email" type="email" placeholder="${tr("auth.emailPh")}">
     <label>${tr("auth.password")}</label><input id="pf-pass" type="password" placeholder="••••••••">
     <div class="err" id="pf-err"></div>
@@ -999,10 +1000,20 @@ async function submitAuth() {
       const consent = document.getElementById("pf-consent");
       if (consent && !consent.checked) { err.textContent = tr("auth.pleaseAcceptConsent"); return; }
       const fullName = document.getElementById("pf-name").value.trim();
+      // Rôle "club" : le nom du club est obligatoire ici, pas demandé après
+      // coup — sinon le compte atterrit en club_admin sans club réel (la
+      // seule chose qui le fait apparaître dans myClubs()/__pf_ownsClub).
+      const clubNameInput = document.getElementById("pf-club-name");
+      const clubName = clubNameInput ? clubNameInput.value.trim() : "";
+      if (pickedRole === "club_admin" && !clubName) { err.textContent = tr("auth.clubNameRequired"); return; }
       await PF.signUp({ email, password, fullName, role: pickedRole, captchaToken: turnstileToken });
       // Selon la config Supabase, une confirmation email peut être requise.
       await PF.signIn({ email, password, captchaToken: turnstileToken }).catch(() => {});
       if (!PF.user) { err.textContent = tr("auth.accountCreatedCheckEmail"); authMode = "signin"; renderAuth(); return; }
+      if (pickedRole === "club_admin") {
+        try { await PF.createClub(clubName); }
+        catch (e) { console.warn("[PF] createClub (signup) :", e); }
+      }
     } else {
       await PF.signIn({ email, password, captchaToken: turnstileToken });
     }
