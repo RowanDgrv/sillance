@@ -5169,12 +5169,16 @@ const chatNewBtn=document.getElementById('chatNewBtn');
 function initials(name){ const n=(name||'?').trim(); const p=n.split(/\s+/); return ((p[0]?.[0]||'')+(p[1]?.[0]||p[0]?.[1]||'')).toUpperCase(); }
 function fmtMsgTime(iso){ const d=new Date(iso); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function convCounterpartId(c){ return c.kind==='direct' ? (mode!=='athlete' ? c.athlete_id : c.coach_id) : null; }
+// Nom d'un utilisateur : roster perso du coach d'abord, sinon cache
+// CONV_NAMES (membres de club hors roster perso, coach côté athlète).
+function nameOf(id){ const a=ROSTER.find(x=>x.id===id); return (a&&a.name) || CONV_NAMES[id] || ''; }
 function convName(c){
   if(c.kind==='group') return c.title || tr('messaging.group');
-  const id = convCounterpartId(c);
-  if(mode!=='athlete'){ const a=ROSTER.find(x=>x.id===id); if(a) return a.name; }
-  return CONV_NAMES[id] || tr('messaging.loading');
+  return nameOf(convCounterpartId(c)) || tr('messaging.loading');
 }
+// Publications du fil du club, épinglées en tête des fils ouverts depuis
+// le bouton "Discuter de ça avec le coach".
+let POST_CACHE = {};
 function convUnread(c){ return c.last_message_at && (!c.my_last_read_at || new Date(c.last_message_at) > new Date(c.my_last_read_at)); }
 
 function showPanelView(view){
@@ -5199,9 +5203,9 @@ async function refreshChatBadge(){
 async function loadConversationsList(){
   if(!window.PF?.user){ chatList.innerHTML=`<div class="chat-list-empty">${tr('messaging.needAccount')}</div>`; return; }
   CONVERSATIONS = await PF.listConversations().catch(()=>[]);
-  // Résout les noms manquants (coach des fils où JE suis athlète — les
-  // noms d'athlètes, eux, viennent déjà de ROSTER côté coach).
-  const missing = CONVERSATIONS.filter(c=>c.kind==='direct' && mode==='athlete').map(c=>c.coach_id).filter(id=>!CONV_NAMES[id]);
+  // Résout les noms absents du roster perso (coach côté athlète, membres de
+  // club sans lien coach_athlete côté coach — cas des fils du fil du club).
+  const missing = CONVERSATIONS.filter(c=>c.kind==='direct').map(convCounterpartId).filter(id=>id && !nameOf(id));
   if(missing.length){ const names = await PF.getProfilesByIds(missing); Object.assign(CONV_NAMES, names); }
   renderChatList();
   document.getElementById('chatFabBadge').hidden = !CONVERSATIONS.some(convUnread);
@@ -5214,7 +5218,7 @@ function renderChatList(){
   chatList.innerHTML = CONVERSATIONS.map(c=>{
     const unread = convUnread(c);
     const name = convName(c);
-    const preview = c.kind==='group' ? tr('messaging.groupHint') : '';
+    const preview = c.kind==='group' ? tr('messaging.groupHint') : (c.source_post_id ? '↳ '+dispoSafe(c.title||'') : '');
     return `<button class="chat-row ${unread?'unread':''}" data-id="${c.id}">
       <div class="chat-avatar" style="${c.kind==='group'?'background:var(--run)':''}">${c.kind==='group'?'<i class="ic ic-users"></i>':dispoSafe(initials(name))}</div>
       <div class="chat-row-body">
@@ -5235,7 +5239,11 @@ async function openConversation(conv){
   chatPeerName.textContent = convName(conv);
   chatAvatar.innerHTML = conv.kind==='group' ? '<i class="ic ic-users"></i>' : dispoSafe(initials(convName(conv)));
   chatAvatar.style.background = conv.kind==='group' ? 'var(--run)' : 'var(--swim)';
-  chatStatus.textContent = conv.kind==='group' ? tr('messaging.groupHint') : '';
+  chatStatus.textContent = conv.kind==='group' ? tr('messaging.groupHint') : (conv.source_post_id ? tr('feed.aboutPost') : '');
+  if(conv.source_post_id && !POST_CACHE[conv.source_post_id]){
+    const post = await PF.getClubPost(conv.source_post_id).catch(()=>null);
+    if(post){ POST_CACHE[post.id]=post; if(!nameOf(post.author_id)) Object.assign(CONV_NAMES, await PF.getProfilesByIds([post.author_id])); }
+  }
   chatBody.innerHTML = `<div class="chat-day">${tr('common.loading')||'…'}</div>`;
   if(unsubThread) unsubThread();
   const msgs = await PF.getMessages(conv.id).catch(()=>[]);
@@ -5252,11 +5260,14 @@ let CURRENT_THREAD_MSGS = [];
 function renderThread(msgs){
   CURRENT_THREAD_MSGS = msgs;
   const uid = window.PF?.user?.id;
-  chatBody.innerHTML = msgs.map(m=>{
+  const post = CURRENT_CONV?.source_post_id ? POST_CACHE[CURRENT_CONV.source_post_id] : null;
+  const pinned = post ? `<div class="chat-pinned"><span class="chat-pinned-k">${tr('feed.pinnedFrom', {name:dispoSafe(nameOf(post.author_id)||tr('crd.coach'))})}</span>${dispoSafe(post.body).replace(/\n/g,'<br>')}</div>` : '';
+  const items = msgs.map(m=>{
     const mine = m.sender_id===uid;
-    const senderTag = (!mine && CURRENT_CONV?.kind==='group') ? `<span class="sender">${dispoSafe((mode!=='athlete'?(ROSTER.find(a=>a.id===m.sender_id)?.name):CONV_NAMES[m.sender_id])||'')}</span>` : '';
+    const senderTag = (!mine && CURRENT_CONV?.kind==='group') ? `<span class="sender">${dispoSafe(nameOf(m.sender_id))}</span>` : '';
     return `<div class="chat-msg ${mine?'me':'them'}">${senderTag}${dispoSafe(m.body)}<span class="time">${fmtMsgTime(m.created_at)}</span></div>`;
-  }).join('') || `<div class="chat-list-empty">${tr('messaging.sayHi')}</div>`;
+  }).join('');
+  chatBody.innerHTML = pinned + (items || `<div class="chat-list-empty">${post ? tr('feed.askHint') : tr('messaging.sayHi')}</div>`);
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 async function sendChat(text){

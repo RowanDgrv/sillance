@@ -1162,6 +1162,47 @@ export const PF = {
     return () => { sb.removeChannel(channel); };
   },
 
+  // -------- fil du club (publications staff, cf. migration 0069) --------
+  // Clubs où je suis simple membre (côté athlète) — les clubs gérés/staff
+  // viennent de myClubs().
+  async myClubMemberships() {
+    const { data, error } = await sb.from("club_members")
+      .select("club_id, group_id, role, clubs(id, name)").eq("athlete_id", this.user.id);
+    if (error) { console.warn("[PF] myClubMemberships:", error.message); return []; }
+    return data ?? [];
+  },
+  async listClubPosts(clubIds, limit = 50) {
+    if (!clubIds?.length) return [];
+    const { data, error } = await sb.from("club_posts")
+      .select("*").in("club_id", clubIds).order("created_at", { ascending: false }).limit(limit);
+    if (error) { console.warn("[PF] listClubPosts:", error.message); return []; }
+    return data ?? [];
+  },
+  async getClubPost(id) {
+    const { data, error } = await sb.from("club_posts").select("*").eq("id", id).maybeSingle();
+    if (error) { console.warn("[PF] getClubPost:", error.message); return null; }
+    return data;
+  },
+  async createClubPost(clubId, body, groupId = null) {
+    const text = String(body ?? "").trim();
+    if (!text) return null;
+    const { data, error } = await sb.from("club_posts")
+      .insert({ club_id: clubId, author_id: this.user.id, club_group_id: groupId, body: text.slice(0, 4000) })
+      .select().single();
+    if (error) throw error;
+    return data;
+  },
+  async deleteClubPost(id) {
+    const { error } = await sb.from("club_posts").delete().eq("id", id);
+    if (error) throw error;
+  },
+  // Ouvre (ou réutilise) le fil privé athlète <-> auteur d'une publication.
+  async startPostDiscussion(postId) {
+    const { data, error } = await sb.rpc("start_post_discussion", { p_post_id: postId });
+    if (error) throw error;
+    return data; // id de la conversation
+  },
+
   // -------- télémétrie --------
   // Best-effort : ne doit jamais faire planter l'appelant ni remonter d'erreur.
   async logClientError({ message, stack, url, context }) {
