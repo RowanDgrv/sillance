@@ -1997,6 +1997,11 @@ body[data-athview] .planner > .library{display:none}
   background:var(--panel);border:1px solid var(--line-strong);border-radius:18px;overflow:hidden;
   display:none;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.6)}
 .chat-panel.open{display:flex;animation:popIn .25s ease}
+/* Plusieurs enfants (.chat-avatar, .chat-back, .chat-new-btn…) posent leur
+   propre display:grid/flex, qui l'emporte sur [hidden]{display:none} de la
+   feuille UA à spécificité égale — sans ce filet, .hidden=true en JS ne
+   masque rien visuellement (trouvé en testant la messagerie, 09/10/2026). */
+.chat-panel [hidden]{display:none!important}
 .chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;
   background:var(--panel-2);border-bottom:1px solid var(--line)}
 .chat-head-id{display:flex;align-items:center;gap:11px;min-width:0}
