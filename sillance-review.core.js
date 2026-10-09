@@ -2782,6 +2782,7 @@ function openSessionActions(s, dateKey){
       <button class="addath-choice" data-act="move" type="button"><i class="ic ic-calendar"></i> <span class="addath-t">${tr('builder.moveSession') || 'Déplacer la séance'}</span></button>
       <button class="addath-choice" data-act="lib" type="button"><i class="ic ic-book"></i> <span class="addath-t">Enregistrer dans la bibliothèque</span></button>
       <button class="addath-choice" data-act="assign" type="button"><i class="ic ic-users"></i> <span class="addath-t">Programmer pour un autre athlète</span></button>
+      <button class="addath-choice" data-act="watch" type="button"><i class="ic ic-send"></i> <span class="addath-t">${tr('watch.sendToWatch')}</span></button>
       <button class="addath-choice" data-act="del" type="button" style="color:var(--danger,#e5484d)"><i class="ic ic-x"></i> <span class="addath-t">Supprimer la séance prévue</span></button>
     </div>
   </div>`;
@@ -2798,11 +2799,33 @@ function openSessionActions(s, dateKey){
     toast(tr('toast.seanceRangeeEnBibliotheque'));
   };
   el.querySelector('[data-act="assign"]').onclick=()=>{ close(); openAssign('session', s); };
+  el.querySelector('[data-act="watch"]').onclick=()=>{ close(); pushSingleSessionToWatch(s, dateKey); };
   el.querySelector('[data-act="del"]').onclick=()=>{
     if(window.PF?.user && s.id){ PF.deleteScheduled(s.id).catch(err=>console.warn('[PF] deleteScheduled', err)); }
     planning[dateKey] = (planning[dateKey]||[]).filter(x=>x.id!==s.id);
     close(); render();
   };
+}
+/* Envoi réel d'UNE séance vers la montre connectée de l'athlète concerné
+   (COROS seulement pour l'instant) — retombe sur l'export .tcx en cas
+   d'échec (Garmin/Polar/discipline non poussable). Même fonction que dans
+   sillance-calendrier.core.js/sillance-app.core.js (08/10/2026, ajoutée
+   ici pour parité — cette page n'avait aucune option montre jusque-là). */
+function pushSingleSessionToWatch(s, dateKey){
+  if(!window.PF?.user){ toast(tr('watch.needAccount')); return; }
+  if(!s.id){ toast(tr('watch.needSavedFirst')); return; }
+  toast(tr('watch.sending'));
+  PF.pushSessionToWatch(s.id, dateKey).then(()=>{
+    toast(tr('watch.sent'));
+  }).catch(e=>{
+    console.warn('[PF] pushSessionToWatch', e);
+    if(window.PFExport){
+      PFExport.download(s);
+      toast(tr('watch.exportFallback') || "Pas d'envoi direct possible — fichier .tcx téléchargé (à importer dans Garmin Connect, Polar Flow, etc.)");
+    } else {
+      toast(tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)}));
+    }
+  });
 }
 /* Carte "réalisé" : une activité importée (Strava/Coros/…) posée sur le jour
    où elle a eu lieu. Pas d'édition (pas de drag, pas de suppression) — un clic
@@ -3157,9 +3180,10 @@ function sessionNotesHTML(s){
   return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('session.coachInstructionsPerInterval')}</div>${items.join('')}</div>`;
 }
 
-function openModal(s){
+function openModal(s, dateKey){
   const D = DISC[s.disc];
   modal.style.setProperty('--c', D.color);
+  const canShowWatchBtn = !s.done;
   modal.innerHTML = `
     <button class="close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <span class="badge">${discIcon(D)} ${D.label}</span>
@@ -3187,12 +3211,18 @@ function openModal(s){
         <div class="nutri-txt">${n.post}</div>
       </div>`; })()}
     ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> ${tr('modal.detailedAnalysis')}</button>`:''}
+    ${canShowWatchBtn?`<button class="btn" id="modalSendWatch" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-send"></i> ${tr('watch.sendToMyWatch')}</button>`:''}
+    ${!s.done?`<button class="btn" id="modalMove" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-calendar"></i> ${tr('builder.moveSession') || 'Déplacer la séance'}</button>`:''}
     <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?tr('common.close'):tr('modal.gotItCoach')}</button>`;
   overlay.classList.add('open');
   modal.querySelector('.close').onclick = closeModal;
-  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis') btn.onclick = closeModal; });
+  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch' && btn.id!=='modalMove') btn.onclick = closeModal; });
   const an = modal.querySelector('#openAnalysis');
   if(an) an.onclick = ()=>{ closeModal(); openAnalysis(s); };
+  const sw = modal.querySelector('#modalSendWatch');
+  if(sw) sw.onclick = ()=>{ pushSingleSessionToWatch(s, dateKey); };
+  const mv = modal.querySelector('#modalMove');
+  if(mv) mv.onclick = ()=>{ closeModal(); openMoveDatePicker(s, dateKey); };
 }
 function closeModal(){ overlay.classList.remove('open') }
 overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal() });

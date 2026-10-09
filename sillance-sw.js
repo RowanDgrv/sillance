@@ -26,6 +26,7 @@ const CACHE_NAME = `sillance-${CACHE_VERSION}`;
 const PRECACHE_URLS = [
   './', './index.html', './sillance-app.html', './sillance-calendrier.html', './sillance-review.html',
   './sillance-client.js', './sillance-integration.js', './sillance-flow.js', './sillance-fit.js', './sillance-tour.js',
+  './sillance-workout-export.js',
   // Découpage modulaire (03/08/2026) : la logique applicative n'est plus
   // inline dans les .html ci-dessus — sans ces entrées, une install qui
   // passe hors-ligne avant toute navigation aurait une coquille vide.

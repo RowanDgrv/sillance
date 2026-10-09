@@ -3112,11 +3112,13 @@ function sessionCard(s, dateKey){
   return el;
 }
 /* Envoi réel d'UNE séance vers la montre connectée de l'athlète concerné
-   (29/09/2026 — COROS seulement pour l'instant, Polar/le .FIT manuel
-   viendront ensuite). Utilisable côté coach (pousse vers la montre DE
-   L'ATHLÈTE affiché, pas celle du coach) ou côté athlète (sa propre
-   montre) — le serveur résout qui est le destinataire réel via
-   scheduled_sessions.athlete_id, pas via qui a cliqué. */
+   (29/09/2026 — COROS seulement pour l'instant). Utilisable côté coach
+   (pousse vers la montre DE L'ATHLÈTE affiché, pas celle du coach) ou côté
+   athlète (sa propre montre) — le serveur résout qui est le destinataire
+   réel via scheduled_sessions.athlete_id, pas via qui a cliqué.
+   08/10/2026 : si le push échoue, on retombe automatiquement sur l'export
+   .tcx (PFExport) plutôt que de juste afficher une erreur — c'est le cas
+   Garmin/Polar qui n'ont pas d'écriture self-service. */
 function pushSingleSessionToWatch(s, dateKey){
   if(!window.PF?.user){ toast(tr('watch.needAccount')); return; }
   if(!s.id){ toast(tr('watch.needSavedFirst')); return; }
@@ -3125,7 +3127,12 @@ function pushSingleSessionToWatch(s, dateKey){
     toast(tr('watch.sent'));
   }).catch(e=>{
     console.warn('[PF] pushSessionToWatch', e);
-    toast(tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)}));
+    if(window.PFExport){
+      PFExport.download(s);
+      toast(tr('watch.exportFallback') || "Pas d'envoi direct possible — fichier .tcx téléchargé (à importer dans Garmin Connect, Polar Flow, etc.)");
+    } else {
+      toast(tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)}));
+    }
   });
 }
 /* Déplace une séance vers une autre date — même logique que le drop du
@@ -3549,13 +3556,13 @@ function sessionNotesHTML(s){
 function openModal(s, dateKey){
   const D = DISC[s.disc];
   modal.style.setProperty('--c', D.color);
-  // Envoi vers la montre (29/09/2026) : uniquement pour une séance pas
-  // encore faite (pousser une séance déjà réalisée n'a pas de sens), une
-  // discipline poussable (COROS = course/vélo seulement — limite de leur
-  // API), et si l'athlète a bien COROS connecté (sinon le bouton n'apparaît
-  // pas plutôt que d'échouer systématiquement).
-  const canPushWatch = !s.done && ['run','bike'].includes(s.disc)
-    && Array.isArray(window.__pf_providers) && window.__pf_providers.includes('coros');
+  // Envoi vers la montre : bouton toujours visible pour une séance pas
+  // encore faite (pousser une séance déjà réalisée n'a pas de sens) — ne
+  // préjuge plus de la discipline/connexion COROS (08/10/2026) : le clic
+  // tente le push réel, et retombe sur l'export .tcx en cas d'échec
+  // (pushSingleSessionToWatch), couvrant Garmin/Polar/discipline non
+  // poussable sans faire disparaître le bouton pour ces cas-là.
+  const canShowWatchBtn = !s.done;
   modal.innerHTML = `
     <button class="close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <span class="badge">${discIcon(D)} ${D.label}</span>
@@ -3583,7 +3590,7 @@ function openModal(s, dateKey){
         <div class="nutri-txt">${n.post}</div>
       </div>`; })()}
     ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> ${tr('modal.detailedAnalysis')}</button>`:''}
-    ${canPushWatch?`<button class="btn" id="modalSendWatch" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-send"></i> ${tr('watch.sendToMyWatch')}</button>`:''}
+    ${canShowWatchBtn?`<button class="btn" id="modalSendWatch" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-send"></i> ${tr('watch.sendToMyWatch')}</button>`:''}
     ${!s.done?`<button class="btn" id="modalMove" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-calendar"></i> ${tr('builder.moveSession') || 'Déplacer la séance'}</button>`:''}
     <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?tr('common.close'):tr('modal.gotItCoach')}</button>`;
   overlay.classList.add('open');
