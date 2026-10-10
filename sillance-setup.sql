@@ -1013,7 +1013,7 @@ where p.role = 'coach'
 --  Deux objets :
 --    1. ai_addons            = l'entitlement (le coach a-t-il l'add-on actif ?)
 --                             écrit UNIQUEMENT par le webhook Stripe (vérité).
---    2. session_summaries    = cache des résumés déjà générés par Claude
+--    2. session_summaries    = cache des résumés déjà générés par le modèle IA
 --                             (1 appel API max par séance, jamais recalculé).
 --  Voir aussi SILLANCE-AI-ADDON-PLAN.md (coût/marge/justification du prix).
 -- =============================================================================
@@ -1050,7 +1050,7 @@ create table if not exists session_summaries (
   headline      text,
   bullets       jsonb,
   recos         jsonb,
-  model         text,                    -- ex. claude-sonnet-4-6
+  model         text,                    -- identifiant du modèle utilisé
   created_at    timestamptz not null default now(),
   unique (coach_id, session_key)
 );

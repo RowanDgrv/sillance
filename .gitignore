@@ -22,3 +22,4 @@ TON-A-FAIRE-SIMPLE.md
 .env
 .env.*
 !.env.example
+.agents/

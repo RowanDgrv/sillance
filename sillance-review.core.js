@@ -7246,7 +7246,7 @@ function renderDecouple(s, data){
    2. aiSummary : moteur de RUBRIQUES qui juge la séance PAR RAPPORT
       À SON OBJECTIF et rend verdict + recommandations actionnables.
    En prod : l’edge function `session-summary` envoie ce bilan chiffré
-   à Claude (prompt caching) qui rédige le texte. En démo, le moteur
+   au modèle IA (prompt caching) qui rédige le texte. En démo, le moteur
    local ci-dessous produit le même type de sortie, marqué « démo ».
    Réservé COACH + add-on payant (gate aiUnlocked()).
    ============================================================ */
@@ -7405,7 +7405,7 @@ function renderAi(s, data){
   }
   body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> ${tr('ai.analyzingInProgress')}</div>`;
   const b=computeSessionBilan(s, data);
-  // Connecté + add-on réel (pas juste le déverrouillage démo) → vrai résumé Claude.
+  // Connecté + add-on réel (pas juste le déverrouillage démo) → vrai résumé IA.
   if(window.PF?.user && window.__pf_aiAddon===true && typeof PF.summarizeSession==='function'){
     const sessionKey=String(s.id || (s.title+'|'+(s.dur||'')+'|'+(s._realData?.provider_activity_id||'')));
     PF.summarizeSession({
