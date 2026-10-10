@@ -7386,8 +7386,7 @@ async function refreshChatBadge(){
   if(!window.PF?.user) return;
   const list = await PF.listConversations().catch(()=>[]);
   const unread = list.some(convUnread);
-  const badge = document.getElementById('chatFabBadge');
-  badge.hidden = !unread;
+  setChatBadges(unread);
 }
 
 async function loadConversationsList(){
@@ -7398,7 +7397,7 @@ async function loadConversationsList(){
   const missing = CONVERSATIONS.filter(c=>c.kind==='direct').map(convCounterpartId).filter(id=>id && !nameOf(id));
   if(missing.length){ const names = await PF.getProfilesByIds(missing); Object.assign(CONV_NAMES, names); }
   renderChatList();
-  document.getElementById('chatFabBadge').hidden = !CONVERSATIONS.some(convUnread);
+  setChatBadges(CONVERSATIONS.some(convUnread));
 }
 function renderChatList(){
   if(!CONVERSATIONS.length){
@@ -7511,7 +7510,23 @@ function openChat(athleteId){
 }
 chatNewBtn.onclick = openNewPicker;
 chatBack.onclick = ()=>{ CURRENT_CONV=null; if(unsubThread){ unsubThread(); unsubThread=null; } showPanelView('list'); loadConversationsList(); };
-document.getElementById('chatFab').onclick=()=>{ chatPanel.classList.contains('open')?chatPanel.classList.remove('open'):openChat(); };
+// Pastille non-lu : FAB (mobile) + bouton Conversations de la topbar.
+function setChatBadges(unread){ document.querySelectorAll('[data-chat-badge]').forEach(b=>{ b.hidden = !unread; }); }
+const toggleChat = ()=>{ chatPanel.classList.contains('open')?chatPanel.classList.remove('open'):openChat(); };
+document.getElementById('chatFab').onclick = toggleChat;
+document.getElementById('chatTopBtn').onclick = toggleChat;
+// Pilule glissante des actions de la topbar (même comportement que la nav
+// de la landing : n'apparaît qu'au survol / focus).
+(function(){
+  const g = document.getElementById('topActions'); if(!g) return;
+  const hl = g.querySelector('.nav-hl');
+  g.querySelectorAll('.ta-btn').forEach(b=>{
+    const go = ()=>{ hl.style.left = b.offsetLeft+'px'; hl.style.width = b.offsetWidth+'px'; hl.classList.add('on'); };
+    b.addEventListener('mouseenter', go); b.addEventListener('focus', go);
+  });
+  g.addEventListener('mouseleave', ()=> hl.classList.remove('on'));
+  g.addEventListener('focusout', e=>{ if(!g.contains(e.relatedTarget)) hl.classList.remove('on'); });
+})();
 document.getElementById('chatClose').onclick=()=> chatPanel.classList.remove('open');
 document.getElementById('chatSend').onclick=()=> sendChat(document.getElementById('chatText').value);
 document.getElementById('chatText').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(e.target.value); });

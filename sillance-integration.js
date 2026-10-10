@@ -763,6 +763,7 @@ function injectStyles() {
     box-shadow:0 6px 18px -6px rgba(70,194,216,.6);transition:filter .15s,transform .15s}
   #pf-cloud-badge:hover{filter:brightness(1.06);transform:translateY(-1px)}
   #pf-cloud-badge.on{background:#12171d;color:#39e6a3;border-color:#274;box-shadow:none;font-weight:600}
+  .top-right #pf-cloud-badge{position:static;padding:8px 13px;box-shadow:none;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis}
   #pf-auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);
     display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
   #pf-auth-overlay.open{display:flex}
@@ -898,7 +899,11 @@ function setCloudBadge(connected) {
     // "region" : tout le contenu doit être dans un landmark) — sans impact
     // visuel puisque le badge est en position:fixed (placé par rapport au
     // viewport, pas à son parent DOM).
-    (document.querySelector("header") || document.body).appendChild(b);
+    // Dans la topbar des pages app (10/10/2026) : le badge prend sa place en
+    // fin de groupe .top-right au lieu de flotter par-dessus les boutons.
+    // L'interrupteur jour/nuit reste en toute fin de barre (demande 10/10).
+    const tr_ = document.querySelector(".top-right");
+    if (tr_) tr_.insertBefore(b, document.getElementById("themeBtn")); else (document.querySelector("header") || document.body).appendChild(b);
     b.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); b.click(); }
     });

@@ -282,6 +282,39 @@ body.light .theme-toggle .tt-knob{transform:translateX(21px)}
 .theme-toggle .tt-moon{color:#06222a;display:flex}
 body.light .theme-toggle .tt-sun{display:flex}
 body.light .theme-toggle .tt-moon{display:none}
+/* ---------- Actions de la topbar (10/10/2026) ----------
+   Demande Rowan : trop de petits boutons carrés identiques en haut à droite.
+   Les 3 actions qu'on cherche vraiment (Conversations, Paramètres, Tutoriel)
+   passent en boutons libellés dans une pilule — même composant que la nav
+   de la landing (.nav-links + .nav-hl glissante, câblée dans le core.js) ;
+   le reste (aide, fil du club, alertes, couleurs, thème) devient de petites
+   icônes discrètes. Sous 1180px, la pilule garde les icônes seules (titre en infobulle). */
+@media (min-width:1241px){.topbar{gap:12px}.mode button{padding:9px 14px}}
+.top-right{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.top-actions{position:relative;display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;
+  background:var(--panel);border:1px solid var(--line-strong)}
+.top-actions .nav-hl{position:absolute;top:4px;bottom:4px;left:4px;width:0;border-radius:999px;z-index:0;
+  background:linear-gradient(120deg, rgba(47,217,255,.16), rgba(157,123,255,.16));opacity:0;pointer-events:none;
+  transition:left .28s cubic-bezier(.4,0,.2,1),width .28s cubic-bezier(.4,0,.2,1),opacity .15s}
+.top-actions .nav-hl.on{opacity:1}
+.ta-btn{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:999px;
+  border:none;background:transparent;color:var(--muted);font-family:var(--font-ui);font-weight:600;font-size:var(--fs-sm);
+  white-space:nowrap;cursor:pointer;transition:color .2s}
+.ta-btn:hover,.ta-btn:focus-visible{color:var(--text)}
+.ta-btn:focus-visible{outline:2px solid var(--swim);outline-offset:2px}
+.ta-btn .ic{margin-right:0;font-size:15px}
+.ta-btn svg{flex:none}
+.ta-btn.a11y-btn{display:inline-flex;font-size:var(--fs-sm)}
+.ta-dot{position:absolute;top:6px;left:24px;width:8px;height:8px;border-radius:50%;background:var(--run);box-shadow:0 0 0 2px var(--panel)}
+.ta-dot[hidden]{display:none}
+.top-tools{display:flex;align-items:center;gap:2px}
+.top-tools .icon-btn{width:30px;height:30px;border-color:transparent;background:transparent;color:var(--muted);font-size:14px}
+.top-tools .icon-btn:hover{border-color:transparent;background:var(--panel-2);color:var(--text);transform:none}
+.top-tools .bell-btn.has-alert{border-color:transparent;color:var(--run)}
+.top-right .theme-toggle{margin-left:4px;order:99}
+@media (min-width:761px){.chat-fab{display:none}}
+@media (max-width:1240px){.ta-btn>span:not(.ta-dot){display:none}.ta-btn{padding:9px 11px}}
+@media (max-width:760px){.top-right{width:100%;justify-content:space-between;gap:6px}}
 /* ---------- Sélecteur d'athlète (mode coach) ---------- */
 .ath-picker{position:relative}
 .ap-btn{
@@ -2368,40 +2401,44 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <button class="ap-btn" id="apBtn" aria-haspopup="listbox" aria-expanded="false"></button>
       <div class="ap-menu" id="apMenu" role="listbox" hidden></div>
     </div>
-    <a class="icon-btn help-btn" href="./sillance-aide.html" target="_blank" rel="noopener" aria-label="Aide" title="Aide &amp; guide" data-i18n-attr="aria-label:nav.help,title:nav.helpTitle">
-      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M9.3 9.3a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.2" r="0.5" fill="currentColor" stroke="none"/></svg>
-    </a>
-    <button class="icon-btn tuto-btn" id="tutoBtn" aria-label="Tutoriel guidé" title="Tutoriel guidé · créer une séance" data-i18n-attr="aria-label:tour.guidedAria,title:tour.guidedTitle">
-      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 7-6 2-2 6-6-15z"/></svg>
-    </button>
+    <div class="top-right">
+      <nav class="top-actions" id="topActions" aria-label="Actions" data-i18n-attr="aria-label:topbar.actionsAria">
+        <span class="nav-hl" aria-hidden="true"></span>
+        <button class="ta-btn" id="chatTopBtn" type="button" aria-label="Conversations" title="Conversations" data-i18n-attr="aria-label:topbar.conversations,title:topbar.conversations"><i class="ic ic-message-circle"></i><span data-i18n="topbar.conversations">Conversations</span><span class="ta-dot" data-chat-badge hidden></span></button>
+        <button class="ta-btn settings-btn" id="settingsBtn" type="button" aria-label="Paramètres" title="Paramètres" data-i18n-attr="aria-label:topbar.settings,title:topbar.settings"><i class="ic ic-settings"></i><span data-i18n="topbar.settings">Paramètres</span></button>
+        <button class="ta-btn tuto-btn" id="tutoBtn" type="button" aria-label="Tutoriel guidé" title="Tutoriel guidé · créer une séance" data-i18n-attr="aria-label:tour.guidedAria,title:tour.guidedTitle"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 7-6 2-2 6-6-15z"/></svg><span data-i18n="topbar.tutorial">Tutoriel</span></button>
+        <button class="ta-btn a11y-btn" type="button" id="a11yBtn" aria-label="Options d'affichage et de couleurs" aria-haspopup="true" title="Affichage & couleurs" data-i18n-attr="aria-label:display.optionsAria,title:display.optionsTitle">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+            <circle cx="9" cy="9" r="5.2" fill="var(--swim)" opacity="0.85"/>
+            <circle cx="15" cy="9" r="5.2" fill="var(--bike)" opacity="0.85"/>
+            <circle cx="12" cy="14.5" r="5.2" fill="var(--run)" opacity="0.85"/>
+          </svg><span data-i18n="topbar.colors">Couleurs</span>
+        </button>
+      </nav>
+      <div class="top-tools">
+      <a class="icon-btn help-btn" href="./sillance-aide.html" target="_blank" rel="noopener" aria-label="Aide" title="Aide &amp; guide" data-i18n-attr="aria-label:nav.help,title:nav.helpTitle">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M9.3 9.3a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.2" r="0.5" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <div class="bell-wrap" id="bellWrap">
+        <!-- aria-label PAS dans data-i18n-attr : refreshAlertBadge() le pilote en JS
+             (avec le compteur inclus, WCAG 2.5.3) — sinon applyTranslations() au
+             chargement l'écrase avec la version statique sans le compteur. -->
+        <button class="icon-btn bell-btn" id="bellBtn" aria-label="Notifications" aria-haspopup="true" title="Alertes" data-i18n-attr="title:notif.title">
+          <i class="ic ic-bell"></i><span class="bell-badge" id="bellBadge" hidden>0</span>
+        </button>
+        <div class="bell-menu" id="bellMenu" role="menu" aria-label="Alertes athlètes" data-i18n-attr="aria-label:notif.athleteAlerts">
+          <div class="bell-head" data-i18n="notif.athleteAlerts">Alertes athlètes</div>
+          <div class="bell-list" id="bellList"></div>
+        </div>
+      </div>
+      </div>
     <button type="button" class="theme-toggle" id="themeBtn" aria-label="Changer de thème" title="Mode clair / sombre" aria-pressed="false" data-i18n-attr="aria-label:theme.changeAria,title:theme.changeTitle">
       <span class="tt-knob" id="themeIcon">
         <svg class="tt-icon tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
         <svg class="tt-icon tt-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.4 14.7A8.5 8.5 0 0 1 9.3 3.6a8.5 8.5 0 1 0 11.1 11.1Z"/></svg>
       </span>
     </button>
-    <button class="icon-btn settings-btn" id="settingsBtn" aria-label="Paramètres" title="Paramètres" data-i18n-attr="aria-label:settings.label,title:settings.label">
-      <i class="ic ic-settings"></i>
-    </button>
-    <div class="bell-wrap" id="bellWrap">
-      <!-- aria-label PAS dans data-i18n-attr : refreshAlertBadge() le pilote en JS
-           (avec le compteur inclus, WCAG 2.5.3) — sinon applyTranslations() au
-           chargement l'écrase avec la version statique sans le compteur. -->
-      <button class="icon-btn bell-btn" id="bellBtn" aria-label="Notifications" aria-haspopup="true" title="Alertes" data-i18n-attr="title:notif.title">
-        <i class="ic ic-bell"></i><span class="bell-badge" id="bellBadge" hidden>0</span>
-      </button>
-      <div class="bell-menu" id="bellMenu" role="menu" aria-label="Alertes athlètes" data-i18n-attr="aria-label:notif.athleteAlerts">
-        <div class="bell-head" data-i18n="notif.athleteAlerts">Alertes athlètes</div>
-        <div class="bell-list" id="bellList"></div>
-      </div>
     </div>
-    <button class="icon-btn a11y-btn" id="a11yBtn" aria-label="Options d'affichage et de couleurs" aria-haspopup="true" title="Affichage & couleurs" data-i18n-attr="aria-label:display.optionsAria,title:display.optionsTitle">
-      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
-        <circle cx="9" cy="9" r="5.2" fill="var(--swim)" opacity="0.85"/>
-        <circle cx="15" cy="9" r="5.2" fill="var(--bike)" opacity="0.85"/>
-        <circle cx="12" cy="14.5" r="5.2" fill="var(--run)" opacity="0.85"/>
-      </svg>
-    </button>
     <div class="a11y-menu" id="a11yMenu" role="menu" aria-label="Options d'accessibilité" data-i18n-attr="aria-label:a11y.optionsAria">
       <div class="a11y-title" data-i18n="a11y.colorVisionHeading">Vision des couleurs</div>
       <button class="a11y-opt active" data-cvd="none" role="menuitemradio" aria-checked="true" data-i18n="a11y.stdColors">Couleurs standard</button>
@@ -3329,7 +3366,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 
 <!-- ===================== MESSAGERIE ===================== -->
 <button class="chat-fab" id="chatFab" aria-label="Messagerie" data-i18n-attr="aria-label:messaging.aria">
-  <i class="ic ic-message-circle"></i><span class="chat-fab-badge" id="chatFabBadge" hidden></span>
+  <i class="ic ic-message-circle"></i><span class="chat-fab-badge" id="chatFabBadge" data-chat-badge hidden></span>
 </button>
 <div class="chat-panel" id="chatPanel" role="dialog" aria-label="Messagerie" data-i18n-attr="aria-label:messaging.aria">
   <div class="chat-head">
@@ -3358,12 +3395,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261009d"></script>
+<script src="./sillance-i18n-app.js?v=20261010b"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-workout-export.js?v=20261009a"></script>
 <script src="./sillance-club-feed.js?v=20261009b"></script>
 <script src="./sillance-tour.js"></script>
-<script src="./sillance-review.core.js?v=20261009d"></script>
+<script src="./sillance-review.core.js?v=20261010a"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo.
@@ -3371,7 +3408,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
      défini, l'analyse Strava réelle et toute fonctionnalité cloud restaient
      inaccessibles ici même pour un compte connecté.) -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261009d"></script>
+<script type="module" src="./sillance-integration.js?v=20261010b"></script>
 <script src="./sillance-cookies.js"></script>
 <script src="./sillance-analytics.js"></script>
 </body>
