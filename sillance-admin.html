@@ -423,18 +423,23 @@ ctxMenu.querySelector('[data-act="suspend"]').addEventListener("click", async ()
   } catch (e) { toast(e.message, true); }
 });
 ctxMenu.querySelector('[data-act="viewas"]').addEventListener("click", async () => {
-  const id = ctxUserId; const u = USERS.find((x) => x.id === id); closeCtxMenu();
-  if (!u) return;
-  if (!confirm(
-    `Ouvrir la vue de ${u.full_name || u.email} ?\n\n` +
-    "Ça te connecte EN TANT QUE ce compte dans ce navigateur — ta session admin " +
-    "sera remplacée (y compris dans tes autres onglets sillance.app). " +
-    "Utilise une fenêtre de navigation privée si tu veux garder ta session admin ouverte à côté."
-  )) return;
+  const id = ctxUserId; closeCtxMenu();
+  if (!id) return;
+  // Onglet ouvert tout de suite (vide), DANS le geste de clic — sinon les
+  // navigateurs bloquent souvent un window.open() déclenché après un await
+  // (plus considéré comme une action utilisateur directe). On y navigue une
+  // fois le lien reçu. Le bandeau "vue admin" (sillance-client.js) s'affiche
+  // dans cet onglet une fois connecté ; fermer l'onglet suffit à en sortir,
+  // ça n'affecte jamais la session admin de cet onglet-ci (stockage isolé).
+  const preview = window.open("", "_blank");
   try {
-    const r = await callAdmin("resendEmail", { userId: id, type: "recovery" });
-    window.open(r.actionLink, "_blank");
-  } catch (e) { toast(e.message, true); }
+    const r = await callAdmin("resendEmail", { userId: id, type: "recovery", preview: true });
+    if (preview) preview.location = r.actionLink;
+    else toast("Pop-up bloqué par le navigateur — autorise les pop-ups pour sillance.app.", true);
+  } catch (e) {
+    if (preview) preview.close();
+    toast(e.message, true);
+  }
 });
 
 // ---------------------------------------------------------------------

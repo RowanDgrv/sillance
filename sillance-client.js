@@ -60,14 +60,26 @@ async function resilientFetch(url, options = {}) {
   throw lastErr;
 }
 
+// Mode "vue admin" (?adminPreview=1, posé par sillance-admin.html → "voir la
+// vue de ce compte") : la session de ce compte prévisualisé vit dans le
+// sessionStorage de CET ONGLET uniquement, jamais dans le localStorage
+// partagé par tous les onglets sillance.app — sinon se connecter en tant
+// qu'un autre compte pour juste regarder son rendu remplaçait la session
+// admin PARTOUT sur le domaine (retour Rowan 14/10/2026). sessionStorage
+// est scindé par onglet : fermer celui-ci efface la session prévisualisée
+// sans toucher aux autres onglets, aucune action de nettoyage nécessaire.
+const ADMIN_PREVIEW = new URLSearchParams(location.search).get("adminPreview") === "1";
+
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   global: { fetch: resilientFetch },
+  ...(ADMIN_PREVIEW ? { auth: { storage: window.sessionStorage, storageKey: "sb-admin-preview-session" } } : {}),
 });
 
 export const PF = {
   sb,
   user: null,
   profile: null,
+  isAdminPreview: ADMIN_PREVIEW,
 
   // -------- AUTH --------
   async init() {
@@ -77,7 +89,19 @@ export const PF = {
     sb.auth.onAuthStateChange((_e, session) => {
       this.user = session?.user ?? null;
     });
+    if (ADMIN_PREVIEW && this.user) this._showAdminPreviewBanner();
     return this.user;
+  },
+  // Bandeau discret rappelant qu'on regarde le compte de quelqu'un d'autre —
+  // sans ça, rien ne distingue visuellement cette session de la sienne.
+  _showAdminPreviewBanner() {
+    const email = this.user?.email || "";
+    const el = document.createElement("div");
+    el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:#FF9A3D;" +
+      "color:#1a1200;font:600 12.5px/1 -apple-system,system-ui,sans-serif;padding:7px 12px;" +
+      "text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.25)";
+    el.textContent = `👁 Vue admin — tu regardes le compte de ${email}. Ferme cet onglet pour quitter, ta session admin n'est pas affectée.`;
+    document.body?.appendChild(el);
   },
 
   async signUp({ email, password, fullName, role = "athlete", captchaToken }) {
