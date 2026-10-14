@@ -427,12 +427,24 @@ export const PF = {
     if (error) throw error; return data;
   },
   // Variante "upsert" pour une séance matérialisée depuis un créneau (0059) :
-  // delete-puis-insert sur (athlete_id, source_creneau_id, date) pour que
+  // delete-puis-insert sur (athlete_id, source_creneau_id) pour que
   // ré-enregistrer le contenu du créneau, ou qu'un athlète rejoigne/quitte/
   // rejoigne, remplace la séance au lieu d'empiler des doublons.
+  // Le delete porte sur TOUTES les occurrences futures (>= aujourd'hui), pas
+  // seulement sur `dateIso` : nextCreneauDate() recalcule "la prochaine
+  // occurrence à partir de maintenant" à chaque sauvegarde du contenu, donc
+  // ré-enregistrer un jour différent de la fois précédente (coach qui
+  // peaufine sa séance sur plusieurs jours avant le créneau) calcule une
+  // AUTRE date cible — un eq("date", dateIso) ne retrouvait alors jamais
+  // l'ancienne ligne et l'empilait au lieu de la remplacer (constaté
+  // 14/10/2026, club Muret Triathlon : 3 copies de la même séance chez
+  // les athlètes après 3 modifications du contenu sur des jours différents).
+  // Le passé (date < aujourd'hui) n'est jamais touché : historique/done
+  // préservés.
   async scheduleSessionFromCreneau(athleteId, dateIso, s, creneauId) {
+    const todayIso = new Date().toISOString().slice(0, 10);
     await sb.from("scheduled_sessions").delete()
-      .eq("athlete_id", athleteId).eq("source_creneau_id", creneauId).eq("date", dateIso);
+      .eq("athlete_id", athleteId).eq("source_creneau_id", creneauId).gte("date", todayIso);
     const { data, error } = await sb.from("scheduled_sessions").insert({
       athlete_id: athleteId, created_by: this.user.id, date: dateIso,
       disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,

@@ -79,6 +79,16 @@
   .toast.err{border-color:var(--bad);color:var(--bad)}
   .toast.show{display:block}
   [hidden]{display:none!important}
+
+  /* ---- Menu contextuel (clic droit sur une ligne) ---- */
+  .ctxmenu{position:fixed;z-index:90;background:var(--panel-2);border:1px solid var(--line-strong);
+    border-radius:10px;padding:5px;box-shadow:0 20px 50px rgba(0,0,0,.5);min-width:220px;display:none}
+  .ctxmenu.open{display:block}
+  .ctxmenu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;
+    border:none;color:var(--text);font-size:12.5px;padding:8px 10px;border-radius:7px}
+  .ctxmenu button:hover{background:rgba(70,194,216,.1)}
+  .ctxmenu button.warn:hover{background:rgba(255,107,129,.12);color:var(--bad)}
+  .ctxmenu hr{border:none;border-top:1px solid var(--line);margin:4px 2px}
   .empty{text-align:center;color:var(--muted);padding:40px}
 
   /* ---- Panneau de détail (piloter un compte) ---- */
@@ -159,6 +169,14 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="ctxmenu" id="ctxMenu">
+  <button type="button" data-act="manage"><i>⚙</i> Gérer le compte</button>
+  <button type="button" data-act="viewas"><i>👁</i> Voir la vue de ce compte</button>
+  <button type="button" data-act="copyemail"><i>⧉</i> Copier l'email</button>
+  <hr>
+  <button type="button" class="warn" data-act="suspend"></button>
+</div>
 
 <div class="scrim" id="scrim"></div>
 <div class="panel" id="panel" aria-hidden="true">
@@ -350,8 +368,74 @@ function renderRows() {
 function wireRowActions() {
   document.querySelectorAll("#rows tr").forEach((tr) => {
     tr.querySelector(".manageBtn").onclick = () => openPanel(tr.dataset.id);
+    tr.oncontextmenu = (e) => { e.preventDefault(); openCtxMenu(e, tr.dataset.id); };
   });
 }
+
+// ---------------------------------------------------------------------
+// Menu contextuel (clic droit sur une ligne) — raccourcis sans ouvrir le
+// panneau complet. "Voir la vue de ce compte" sert à vérifier le rendu
+// réel d'un athlète/coach (demande Rowan 14/10/2026, suite au bug de
+// séances dupliquées chez Quentin Salmon / Muret Triathlon) : ça réutilise
+// le même lien de connexion que "Renvoyer un lien" (resendEmail/recovery),
+// ouvert directement au lieu d'être juste affiché à copier.
+// ATTENTION ouverte au clic : ce lien connecte CE NAVIGATEUR en tant que ce
+// compte — la session admin est remplacée partout sur ce domaine (le
+// stockage de session est partagé entre onglets), pas seulement dans
+// l'onglet ouvert. D'où la confirmation explicite avant d'ouvrir.
+// ---------------------------------------------------------------------
+let ctxUserId = null;
+const ctxMenu = document.getElementById("ctxMenu");
+function openCtxMenu(e, userId) {
+  ctxUserId = userId;
+  const u = USERS.find((x) => x.id === userId);
+  const suspendBtn = ctxMenu.querySelector('[data-act="suspend"]');
+  suspendBtn.innerHTML = u && u.banned ? "<i>✓</i> Réactiver le compte" : "<i>⛔</i> Suspendre le compte";
+  const x = Math.min(e.clientX, window.innerWidth - 240);
+  const y = Math.min(e.clientY, window.innerHeight - 200);
+  ctxMenu.style.left = x + "px";
+  ctxMenu.style.top = y + "px";
+  ctxMenu.classList.add("open");
+}
+function closeCtxMenu() { ctxMenu.classList.remove("open"); ctxUserId = null; }
+document.addEventListener("click", (e) => { if (!ctxMenu.contains(e.target)) closeCtxMenu(); });
+document.addEventListener("contextmenu", (e) => { if (!e.target.closest("#rows tr")) closeCtxMenu(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCtxMenu(); });
+ctxMenu.querySelector('[data-act="manage"]').addEventListener("click", () => {
+  const id = ctxUserId; closeCtxMenu();
+  if (id) openPanel(id);
+});
+ctxMenu.querySelector('[data-act="copyemail"]').addEventListener("click", async () => {
+  const u = USERS.find((x) => x.id === ctxUserId); closeCtxMenu();
+  if (!u || !u.email) return;
+  try { await navigator.clipboard.writeText(u.email); toast("Email copié."); }
+  catch { toast("Copie impossible — " + u.email, true); }
+});
+ctxMenu.querySelector('[data-act="suspend"]').addEventListener("click", async () => {
+  const id = ctxUserId; const u = USERS.find((x) => x.id === id); closeCtxMenu();
+  if (!u) return;
+  const willSuspend = !u.banned;
+  if (!confirm(willSuspend ? "Suspendre ce compte ?" : "Réactiver ce compte ?")) return;
+  try {
+    await callAdmin("suspend", { userId: id, suspend: willSuspend });
+    toast(willSuspend ? "Compte suspendu." : "Compte réactivé.");
+    await load();
+  } catch (e) { toast(e.message, true); }
+});
+ctxMenu.querySelector('[data-act="viewas"]').addEventListener("click", async () => {
+  const id = ctxUserId; const u = USERS.find((x) => x.id === id); closeCtxMenu();
+  if (!u) return;
+  if (!confirm(
+    `Ouvrir la vue de ${u.full_name || u.email} ?\n\n` +
+    "Ça te connecte EN TANT QUE ce compte dans ce navigateur — ta session admin " +
+    "sera remplacée (y compris dans tes autres onglets sillance.app). " +
+    "Utilise une fenêtre de navigation privée si tu veux garder ta session admin ouverte à côté."
+  )) return;
+  try {
+    const r = await callAdmin("resendEmail", { userId: id, type: "recovery" });
+    window.open(r.actionLink, "_blank");
+  } catch (e) { toast(e.message, true); }
+});
 
 // ---------------------------------------------------------------------
 // Panneau "Gérer un compte" — un seul endroit pour piloter forfait,

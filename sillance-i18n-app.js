@@ -628,6 +628,7 @@
     "modal.athleteFeedback": `Feedback athlète`, "modal.cardio": `Cardio`, "modal.muscular": `Musculaire`,
     "modal.afterSession": `Après la séance · récupération`, "modal.detailedAnalysis": `Analyse détaillée de la séance`,
     "modal.gotItCoach": `C'est noté, coach`,
+    "modal.breakdown": `Déroulé (minutes)`, "modal.block": `Bloc`,
 
     "bilan.athlete": `Athlète`, "bilan.record": `RECORD`, "bilan.noRecord": `Aucun record enregistré`,
     "bilan.session": `Séance`, "bilan.done": `fait`, "bilan.upcoming": `à venir`,
@@ -2193,6 +2194,7 @@
     "modal.athleteFeedback": `Athlete feedback`, "modal.cardio": `Cardio`, "modal.muscular": `Muscular`,
     "modal.afterSession": `After the session · recovery`, "modal.detailedAnalysis": `Detailed session analysis`,
     "modal.gotItCoach": `Got it, coach`,
+    "modal.breakdown": `Breakdown (minutes)`, "modal.block": `Block`,
 
     "bilan.athlete": `Athlete`, "bilan.record": `RECORD`, "bilan.noRecord": `No recorded PR`,
     "bilan.session": `Session`, "bilan.done": `done`, "bilan.upcoming": `upcoming`,
@@ -3656,6 +3658,7 @@
     "modal.athleteFeedback": `Feedback del atleta`, "modal.cardio": `Cardio`, "modal.muscular": `Muscular`,
     "modal.afterSession": `Después de la sesión · recuperación`, "modal.detailedAnalysis": `Análisis detallado de la sesión`,
     "modal.gotItCoach": `Entendido, coach`,
+    "modal.breakdown": `Desglose (minutos)`, "modal.block": `Bloque`,
 
     "bilan.athlete": `Atleta`, "bilan.record": `RÉCORD`, "bilan.noRecord": `Ningún récord registrado`,
     "bilan.session": `Sesión`, "bilan.done": `hecho`, "bilan.upcoming": `próximo`,

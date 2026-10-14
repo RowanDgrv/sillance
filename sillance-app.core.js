@@ -3509,7 +3509,11 @@ function openZoneEditor(){
 function lineLabel(ln){
   if(ln.type==='station'){ const st=hyroxStation(ln.station)||HYROX_STATIONS[0]; return st.name; }
   const T=LINE_TYPES[ln.type];
-  const amt = (ln.metric==='dist') ? `${ln.dist||0} m` : `${(ln.dur&&ln.dur.m)||0}'`;
+  // metric==='reps' (renfo) n'a pas de ln.dur — retombait sur "0'" avant ce
+  // correctif (14/10/2026, trouvé en ajoutant le déroulé minuté côté athlète).
+  const amt = (ln.metric==='dist') ? `${ln.dist||0} m`
+    : (ln.metric==='reps') ? `${ln.reps||0} ${tr('builder.repsUnit')}${ln.weight?` @ ${ln.weight}kg`:''}`
+    : `${(ln.dur&&ln.dur.m)||0}'`;
   const nage = (ln.nage && NAGE_LABEL[ln.nage]) ? ` ${NAGE_LABEL[ln.nage]}` : '';
   const dep = (ln.sendoff && (ln.sendoff.m||ln.sendoff.s)) ? ` ${tr('builder.sendoffAbbr')} ${fmtMS(ln.sendoff)}` : '';
   return `${T?T.l:tr('lineType.interval')} · ${amt}${nage}${dep}`;
@@ -3557,6 +3561,42 @@ function sessionNotesHTML(s){
   return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('session.coachInstructionsPerInterval')}</div>${items.join('')}</div>`;
 }
 
+/* Déroulé texte de la séance, en minutes par bloc — sessionProfileHTML()
+   juste au-dessus ne trace qu'un graphique d'intensité relative (barres
+   colorées, aucun chiffre) : sans ça, un athlète ne peut pas savoir combien
+   de temps dure chaque partie de sa séance (retour club Muret Triathlon,
+   14/10/2026 — "inutile pour eux d'avoir juste un graphique"). Réutilise
+   lineLabel()/lineMinutesFor(), déjà utilisés par le graphique et les
+   consignes par intervalle, pour rester cohérent avec ce que montre déjà
+   le builder.
+   wrap dans une liste : nécessaire si une ligne peut dépasser */
+function sessionBreakdownHTML(s){
+  if(!s.blocksV2 || !s.blocksV2.blocks || !s.blocksV2.blocks.length) return '';
+  const disc = s.disc;
+  // Hyrox : les stations ne sont pas chronométrées ligne par ligne (cf.
+  // lineMinutesFor, "largeur symbolique") — afficher des minutes inventées
+  // serait faux. On montre la cible (distance/reps, + charge) à la place,
+  // sans minutage de bloc.
+  const rows = s.blocksV2.blocks.map(blk=>{
+    const nSeries = Math.max(1, blk.series||1);
+    const lines = blk.lines||[];
+    const head = (nSeries>1 ? `${nSeries}× ` : '') + (blk.title ? dispoSafe(blk.title) : tr('modal.block'));
+    if(disc==='hyrox'){
+      const txt = lines.map(ln=>{
+        const st = hyroxStation(ln.station)||HYROX_STATIONS[0];
+        const unit = st.unit==='m' ? 'm' : tr('builder.repsUnit');
+        return `${st.name} (${ln.target||0}${unit}${ln.weight?` @ ${ln.weight}kg`:''})`;
+      }).join(' + ');
+      return `<div class="sn-item"><div class="sn-when">${head}</div><div class="sn-txt">${dispoSafe(txt)}</div></div>`;
+    }
+    const lineTxt = lines.map(ln=> `${lineLabel(ln)} (${fmtDur(Math.round(lineMinutesFor(ln, disc)))})`).join(' + ');
+    const blockMin = lines.reduce((a,ln)=> a+lineMinutesFor(ln, disc), 0) * nSeries;
+    return `<div class="sn-item"><div class="sn-when">${head}</div><div class="sn-txt">${dispoSafe(lineTxt)} — ${fmtDur(Math.round(blockMin))}</div></div>`;
+  }).join('');
+  if(!rows) return '';
+  return `<div class="sn-block"><div class="sn-head"><i class="ic ic-list"></i> ${tr('modal.breakdown')}</div>${rows}</div>`;
+}
+
 function openModal(s, dateKey){
   const D = DISC[s.disc];
   modal.style.setProperty('--c', D.color);
@@ -3577,6 +3617,7 @@ function openModal(s, dateKey){
       <div class="cell"><div class="k">${tr('modal.intensity')}</div><div class="v">${s.zone}</div></div>
     </div>
     ${sessionProfileHTML(s)}
+    ${sessionBreakdownHTML(s)}
     <p class="desc">${(s.desc||tr('modal.plannedSession')).replace(/\n/g,'<br>')}</p>
     ${sessionCoachNoteHTML(s)}
     ${sessionWhyHTML(s)}
