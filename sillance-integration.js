@@ -91,16 +91,23 @@ const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s
   ...(s.rpe_muscle != null ? { rpeMuscle: s.rpe_muscle } : {}), note: esc(s.note),
   coachNote: esc(s.coach_note),
   blocksV2: s.blocks && s.blocks.length ? { blocks: s.blocks } : undefined });
-// display_name (membre sans compte) prioritaire, sinon le nom réel du profil
-// lié (join profiles dans getClubMembers) — avant ce fix un membre inscrit
-// via accept-club-invite retombait toujours sur le placeholder "Athlète".
+// Nom du profil lié prioritaire SI un compte est rattaché (athlete_id) —
+// display_name n'est qu'un repère pour un membre SANS compte, et devient une
+// étiquette périmée pour toujours dès qu'un vrai compte existe (bug trouvé
+// 15/10/2026, club Muret Triathlon : 3 adhérents avec des comptes réels et
+// des noms de profil distincts affichés tous sous le même nom, parce que
+// display_name avait été posé — à la création du membre ou hérité d'un lien
+// d'invitation réutilisé pour plusieurs personnes — et primait depuis sur le
+// vrai nom. display_name reste le repli si le join profiles échoue (RLS,
+// policy "profiles: club owner reads members" 0057 — raison de la priorité
+// display_name historique ci-dessous, gardée en secours plutôt que retirée).
 // athleteUid (m.athlete_id = profiles.id, PEUT être null pour un membre sans
 // compte) distinct de id (m.id = la ligne club_members) : plusieurs tables
 // (scheduled_sessions, club_competition_responses) sont keyées sur le vrai
 // profil utilisateur, pas sur l'adhésion — calendrier club (0058) en a besoin
 // pour ouvrir/écrire le calendrier réel de l'adhérent.
 const mapMember  = (m) => ({ id: m.id, athleteUid: m.athlete_id || null,
-  name: esc(m.display_name) || esc(m.profiles?.full_name) || "Athlète",
+  name: (m.athlete_id && esc(m.profiles?.full_name)) || esc(m.display_name) || esc(m.profiles?.full_name) || "Athlète",
   email: esc(m.profiles?.email) || "", disc: m.disc || "tri", since: esc(m.since) || "", group: m.group_id });
 const mapGroup   = (g) => ({ id: g.id, name: esc(g.name), color: g.color, desc: esc(g.description) });
 // recur/date/description existent en base depuis 0017/0018 mais n'étaient
