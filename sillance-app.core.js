@@ -574,6 +574,13 @@ function setCoachAthletes(list, defaultId){
   currentAthleteId = defaultId || (ROSTER[0] && ROSTER[0].id) || null;
   renderAthPicker();
   updatePlanAthleteVisibility();
+  // Sans ça, la carte "Athlète suivi" et le bandeau "Prochaine course" en haut
+  // du dashboard restaient figés sur l'athlète de DÉMO (Léa Fontan, Gorillaman)
+  // pour TOUT coach réel, jusqu'à ce qu'il clique lui-même un athlète dans le
+  // sélecteur — aucun autre appel de l'hydratation ne les rafraîchit (trouvé
+  // en testant en direct le 16/10/2026, pas visible à la seule lecture du code).
+  renderCoachBand();
+  updateRaceBanner();
 }
 function updatePlanAthleteVisibility(){
   const el = document.getElementById('athPicker'); if(el) el.hidden = mode!=='coach';

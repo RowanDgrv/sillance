@@ -522,6 +522,10 @@ function setCoachAthletes(list, defaultId){
   currentAthleteId = defaultId || (ROSTER[0] && ROSTER[0].id) || null;
   renderAthPicker();
   updatePlanAthleteVisibility();
+  // Même bug que sillance-app.core.js/sillance-calendrier.core.js (trouvé en
+  // testant en direct le 16/10/2026) : sans cet appel, la carte "Athlète
+  // suivi" restait figée sur l'athlète de démo pour tout coach réel.
+  renderCoachBand();
 }
 function updatePlanAthleteVisibility(){
   const el = document.getElementById('athPicker'); if(el) el.hidden = mode!=='coach';
