@@ -369,6 +369,17 @@ async function hydrate() {
     section("coTeam", async () => {
       const [team, pending] = await Promise.all([PF.getCoTeam(uid), PF.getPendingCoCoachRequests(uid)]);
       app.setCoTeam?.(uid, team, pending);
+      // Réservation test lactate (service perso de Rowan, pas un service club/
+      // coach générique) : visible uniquement pour ses propres athlètes, ou pour
+      // son propre compte — demande Rowan 16/10/2026, "les autres ne doivent pas
+      // y avoir accès". Montré par défaut en HTML (visiteur démo non connecté,
+      // comportement historique inchangé) ; masqué ici une fois la vraie équipe
+      // de coachs connue, sinon tout compte réel (coachs d'autres clubs inclus)
+      // le voyait sans distinction.
+      const isRowanOwn = (PF.user?.email || "").toLowerCase() === "rowandegraeve@gmail.com";
+      const coachedByRowan = team.some((t) => (t.coach?.email || "").toLowerCase() === "rowandegraeve@gmail.com");
+      const lactestEl = document.getElementById("lactestSection");
+      if (lactestEl) lactestEl.hidden = !(isRowanOwn || coachedByRowan);
     }),
 
     section("zones", async () => {
