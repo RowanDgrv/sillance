@@ -72,7 +72,7 @@
     "roles.athlete.link": `Voir l'espace athlète`,
 
     "how.kicker": `Comment ça marche`,
-    "how.title": `Planifier, voir, ajuster, être payé`,
+    "how.title": `Planifier, analyser, ajuster, être payé`,
     "how.step1.title": `Tu planifies`,
     "how.step1.text": `Fini les dimanches soirs sur Excel : pose les séances de la semaine en quelques clics, ou un cycle complet d'un coup. Chaque athlète a son plan.`,
     "how.step2.title": `L'athlète exécute`,
@@ -227,7 +227,7 @@
     "roles.athlete.link": `See the athlete space`,
 
     "how.kicker": `How it works`,
-    "how.title": `Plan, see, adjust, get paid`,
+    "how.title": `Plan, analyze, adjust, get paid`,
     "how.step1.title": `You plan`,
     "how.step1.text": `No more Sunday nights on spreadsheets: lay out the week's sessions in a few clicks, or a full training cycle at once. Every athlete gets their own plan.`,
     "how.step2.title": `The athlete trains`,
@@ -382,7 +382,7 @@
     "roles.athlete.link": `Ver el espacio atleta`,
 
     "how.kicker": `Cómo funciona`,
-    "how.title": `Planificar, ver, ajustar, cobrar`,
+    "how.title": `Planificar, analizar, ajustar, cobrar`,
     "how.step1.title": `Planificas`,
     "how.step1.text": `Se acabaron los domingos por la noche con hojas de cálculo: define las sesiones de la semana en unos clics, o un ciclo completo de una vez. Cada atleta tiene su propio plan.`,
     "how.step2.title": `El atleta ejecuta`,
