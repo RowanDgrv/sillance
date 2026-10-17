@@ -423,8 +423,8 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <a href="#roles" data-i18n="nav.links.roles">Pour qui</a>
     <a href="#how" data-i18n="nav.links.how">Comment ça marche</a>
     <a href="#data" data-i18n="nav.links.data">La plateforme</a>
-    <a href="#pricing" data-i18n="nav.links.pricing">Tarifs</a>
     <a href="#avis" data-i18n="nav.links.avis">Avis</a>
+    <a href="#pricing" data-i18n="nav.links.pricing">Tarifs</a>
     <a href="#faq" data-i18n="nav.links.faq">FAQ</a>
   </div>
   <div class="nav-right">
@@ -517,7 +517,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
       <div class="feat"><div class="num">01</div><div><h3 data-i18n="data.feat1.title">Charge d'entraînement</h3><p data-i18n="data.feat1.text">Forme, fatigue et fraîcheur réunies sur une seule métrique, commune au vélo, à la course, à la natation et au Hyrox. Tu sais quand pousser et quand relâcher.</p></div></div>
       <div class="feat"><div class="num">02</div><div><h3 data-i18n="data.feat2.title">Vision complète</h3><p data-i18n="data.feat2.text">Fréquence cardiaque, puissance, allure, cadence, dénivelé : chaque séance remonte avec le détail complet, par Coros ou import de fichier .FIT — jamais juste un résumé.</p></div></div>
       <div class="feat"><div class="num">03</div><div><h3 data-i18n="data.feat3.title">Assistant IA</h3><p data-i18n="data.feat3.text">Une synthèse claire de chaque séance et des recommandations concrètes, évaluées au regard de l'objectif que tu as fixé.</p></div></div>
-      <div class="feat"><div class="num">04</div><div><h3 data-i18n-html="data.feat4.title">Découplage &amp; durabilité</h3><p data-i18n="data.feat4.text">Les marqueurs fins de l'endurance : dérive cardiaque et puissance tenue sous fatigue. Pour affiner quand tu veux aller plus loin.</p></div></div>
+      <div class="feat"><div class="num">04</div><div><h3 data-i18n-html="data.feat4.title">Facturation intégrée</h3><p data-i18n="data.feat4.text">Tu factures tes athlètes directement dans l'app : encaissement automatique, aucune relance à gérer, aucun outil de paiement séparé à payer en plus.</p></div></div>
     </div>
   </div></section>
 
@@ -563,6 +563,19 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
           </div>
         </div>
       </div>
+    </div>
+  </div></section>
+
+  <!-- AVIS (avant les tarifs — la preuve doit arriver avant qu'on demande
+       un engagement financier, pas après. Audit CRO 17/10/2026.) -->
+  <section class="section" id="avis"><div class="wrap">
+    <div class="sec-head">
+      <span class="kicker" data-i18n="reviews.kicker">Avis</span>
+      <h2 class="h2" data-i18n="reviews.title">Ce qu'en disent les premiers coachs</h2>
+    </div>
+    <div class="reviews-grid" id="reviewsGridHome"></div>
+    <div class="cta-row" style="margin-top:30px">
+      <a class="btn ghost" href="./avis.html" data-i18n="reviews.seeAll">Voir tous les avis</a>
     </div>
   </div></section>
 
@@ -650,18 +663,6 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
     <div class="cta-row" style="margin-top:30px">
       <a class="btn primary" href="./sillance-club.html" data-i18n="pricing.cta1">Découvrir l'espace club</a>
       <a class="btn ghost" href="./sillance-app.html" data-i18n="pricing.cta2">Voir la démo coach</a>
-    </div>
-  </div></section>
-
-  <!-- AVIS -->
-  <section class="section" id="avis"><div class="wrap">
-    <div class="sec-head">
-      <span class="kicker" data-i18n="reviews.kicker">Avis</span>
-      <h2 class="h2" data-i18n="reviews.title">Ce qu'en disent les premiers coachs</h2>
-    </div>
-    <div class="reviews-grid" id="reviewsGridHome"></div>
-    <div class="cta-row" style="margin-top:30px">
-      <a class="btn ghost" href="./avis.html" data-i18n="reviews.seeAll">Voir tous les avis</a>
     </div>
   </div></section>
 
@@ -760,9 +761,9 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 </div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-index.js?v=20261007b"></script>
+<script src="./sillance-i18n-index.js?v=20261017a"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-reviews.js?v=20261006a"></script>
+<script src="./sillance-reviews.js?v=20261017a"></script>
 <script src="./sillance-theme-nav.js?v=20261007b"></script>
 <script src="./sillance-index.js"></script>
 <script src="./sillance-cookies.js"></script>
