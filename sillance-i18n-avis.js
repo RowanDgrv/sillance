@@ -9,7 +9,7 @@
     "avis.nav.aide": `Aide & guide`,
     "avis.nav.contact": `Contact`,
     "avis.h1": `Avis`,
-    "avis.lead": `Ce que les premiers coachs et clubs pensent de Sillance — sans filtre, publiés tels quels.`,
+    "avis.lead": `Ce que les premiers coachs et clubs pensent de Sillance, sans filtre, publiés tels quels.`,
     "avis.cta": `Essayer Sillance`,
     "avis.footerTag": `Sillance : coaching triathlon, Hyrox & endurance.`,
     "avis.footerNavAria": `Liens de bas de page`,
