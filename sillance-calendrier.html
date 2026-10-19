@@ -196,6 +196,8 @@ button{font-family:inherit;cursor:pointer}
 .morning-help:hover{color:var(--accent)}
 .ln-pct .pvn{width:3.6em;background:var(--panel);border:1px solid var(--line-strong);color:var(--text);border-radius:6px;padding:3px var(--space-1);font-family:var(--font-data);font-size:11.5px;text-align:center}
 .ln-pct .pv-unit{font-family:var(--font-data);font-size:var(--fs-sm);color:var(--muted)}
+.ln-pct .pv-tol-lbl{font-family:var(--font-data);font-size:var(--fs-sm);color:var(--muted);margin-left:2px}
+.ln-pct .pvtol{width:2.6em;background:var(--panel);border:1px solid var(--line-strong);color:var(--text);border-radius:6px;padding:3px var(--space-1);font-family:var(--font-data);font-size:11.5px;text-align:center}
 .ath-home-top{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
 .ath-home-top>*{flex:1 1 320px}
 .morning-card{margin-top:var(--space-4);border-top:1px solid var(--line);padding-top:var(--space-4)}
@@ -2269,7 +2271,7 @@ body[data-athview] .planner > .library{display:none}
 .bk-tools button.del:hover{color:var(--run);border-color:var(--run)}
 
 .bk-lines{padding:var(--space-2)}
-.ln{display:grid;grid-template-columns:18px 132px 76px 1fr 30px;gap:9px;align-items:center;
+.ln{display:grid;grid-template-columns:18px 132px 146px 1fr 30px;gap:9px;align-items:center;
   padding:var(--space-2);border-radius:9px;border-left:3px solid var(--lc);background:var(--panel-2);margin-bottom:6px}
 .ln:last-child{margin-bottom:0}
 @media (max-width:640px){.ln{grid-template-columns:18px 1fr 1fr;gap:7px}}
@@ -2280,6 +2282,7 @@ body[data-athview] .planner > .library{display:none}
 .ln-dur input{width:46px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
   font-family:var(--font-data);font-size:12.5px;text-align:center;padding:6px var(--space-1)}
 .ln-dur span{font-size:var(--fs-sm);color:var(--muted)}
+.ln-dur-hms input{width:30px;padding:6px 2px}
 .ln-mswitch{width:20px;height:20px;flex:none;border:1px solid var(--line-strong);border-radius:6px;background:var(--panel-2);
   color:var(--swim);font-size:var(--fs-sm);font-weight:700;padding:0;display:grid;place-items:center;transition:.15s}
 .ln-mswitch:hover{border-color:var(--swim);background:rgba(47,217,255,.1)}
@@ -3803,12 +3806,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261011a"></script>
+<script src="./sillance-i18n-app.js?v=20261019a"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-workout-export.js?v=20261009a"></script>
 <script src="./sillance-club-feed.js?v=20261009b"></script>
 <script src="./sillance-tour.js"></script>
-<script src="./sillance-calendrier.core.js?v=20261016a"></script>
+<script src="./sillance-calendrier.core.js?v=20261019a"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

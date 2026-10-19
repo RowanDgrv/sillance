@@ -234,7 +234,14 @@
     "builder.shorthandGo": `Générer la séance`,
     "builder.shorthandUnparsed": `Non reconnu, à ajouter à la main : {list}`,
     "builder.shorthandNothing": `Aucun bloc reconnu · commence chaque ligne par une distance (ex. "200m" ou "4x100m").`,
+    "builder.shorthandHintRunBike": `Tape ta séance comme sur ton carnet : durée ("40'", "1h30") ou distance ("400m"/"10km"), type, zone. "footing" = zone 2 (zone 1 si "récup" ou "lent").`,
+    "builder.shorthandPlaceholderRunBike": `40' footing
+6x3' seuil r2'
+10x400m vma r1'30
+10' retour au calme`,
+    "builder.shorthandNothingRunBike": `Aucun bloc reconnu · commence chaque ligne par une durée (ex. "40'") ou une distance (ex. "400m" ou "10km").`,
     "builder.shorthandRestNote": `Repos {sec}s`,
+    "builder.hoursUnit": `heures`, "builder.minutesUnit": `minutes`, "builder.secondsUnit": `secondes`,
     "builder.exercisePlaceholder": `Nom de l'exercice (squat, développé couché…)`,
     "builder.repsUnit": `reps`, "builder.switchRepsTime": `Basculer répétitions ⇄ temps (ex. repos chronométré, gainage tenu)`,
 
@@ -750,7 +757,7 @@
     "watch.needAccount": `Connecte-toi pour envoyer vers ta montre.`, "watch.needSavedFirst": `Enregistre d'abord la séance.`,
     "watch.sending": `Envoi vers la montre…`, "watch.sent": `Séance envoyée sur la montre`,
     "watch.sendFailed": `Envoi impossible : {reason}`, "watch.sendWeekBtn": `Envoyer la semaine`,
-    "watch.exportFallback": `Pas d'envoi direct possible — fichier .tcx téléchargé (à importer dans Garmin Connect, Polar Flow, etc.)`,
+    "watch.exportFallback": `Pas d'envoi direct possible — fichier .tcx téléchargé, mais Garmin Connect et Polar Flow n'acceptent pas l'import de séance structurée par ce biais (seulement des activités enregistrées). En attendant une intégration directe, recopie la structure à la main sur ta montre.`,
     "watch.weekNothingToSend": `Rien à envoyer cette semaine (course/vélo uniquement).`,
     "watch.sendingWeek": `Envoi de {n} séance(s) vers la montre…`,
     "watch.weekSentSingular": `{n} séance envoyée sur la montre`, "watch.weekSentPlural": `{n} séances envoyées sur la montre`,
@@ -898,6 +905,7 @@
     "builder.freeWeight": `poids libre`, "builder.deleteStation": `Supprimer la station`,
     "builder.chooseWorkZone": `Choisir la zone de travail`, "builder.calcReference": `Référence de calcul`,
     "builder.intensityPctAria": `Intensité en %`, "builder.switchTimeDist": `Basculer temps / distance`,
+    "builder.intensityTolTitle": `Tolérance ± (ex. 70 ±5 → entre 65 et 75%)`,
     "builder.zonePct": `Zone %`, "builder.exact": `Exact`, "builder.deleteLine": `Supprimer la ligne`,
 
     "builder.summary": `<b>{dur}</b> total · <b>{tss}</b> TSS estimé · {nbBlocks} · {nLines} intervalles`,
@@ -1800,7 +1808,14 @@
     "builder.shorthandGo": `Generate session`,
     "builder.shorthandUnparsed": `Not recognized, add by hand: {list}`,
     "builder.shorthandNothing": `No block recognized · start each line with a distance (e.g. "200m" or "4x100m").`,
+    "builder.shorthandHintRunBike": `Type your session like in your notebook: duration ("40'", "1h30") or distance ("400m"/"10km"), type, zone. "footing"/easy run = zone 2 (zone 1 if "récup" or "lent").`,
+    "builder.shorthandPlaceholderRunBike": `40' footing
+6x3' seuil r2'
+10x400m vma r1'30
+10' retour au calme`,
+    "builder.shorthandNothingRunBike": `No block recognized · start each line with a duration (e.g. "40'") or a distance (e.g. "400m" or "10km").`,
     "builder.shorthandRestNote": `Rest {sec}s`,
+    "builder.hoursUnit": `hours`, "builder.minutesUnit": `minutes`, "builder.secondsUnit": `seconds`,
     "builder.exercisePlaceholder": `Exercise name (squat, bench press…)`,
     "builder.repsUnit": `reps`, "builder.switchRepsTime": `Switch reps ⇄ time (e.g. timed rest, held plank)`,
 
@@ -2316,7 +2331,7 @@
     "watch.needAccount": `Log in to send to your watch.`, "watch.needSavedFirst": `Save the session first.`,
     "watch.sending": `Sending to watch…`, "watch.sent": `Session sent to the watch`,
     "watch.sendFailed": `Couldn't send: {reason}`, "watch.sendWeekBtn": `Send the week`,
-    "watch.exportFallback": `Direct send not available — .tcx file downloaded instead (import it into Garmin Connect, Polar Flow, etc.)`,
+    "watch.exportFallback": `Direct send not available — .tcx file downloaded, but Garmin Connect and Polar Flow don't accept structured workout import this way (only recorded activities). Until direct sync is available, copy the structure onto your watch by hand.`,
     "watch.weekNothingToSend": `Nothing to send this week (running/cycling only).`,
     "watch.sendingWeek": `Sending {n} session(s) to the watch…`,
     "watch.weekSentSingular": `{n} session sent to the watch`, "watch.weekSentPlural": `{n} sessions sent to the watch`,
@@ -2416,6 +2431,7 @@
     "builder.freeWeight": `free weight`, "builder.deleteStation": `Delete station`,
     "builder.chooseWorkZone": `Choose the work zone`, "builder.calcReference": `Calculation reference`,
     "builder.intensityPctAria": `Intensity in %`, "builder.switchTimeDist": `Switch time / distance`,
+    "builder.intensityTolTitle": `± tolerance (e.g. 70 ±5 → between 65 and 75%)`,
     "builder.zonePct": `Zone %`, "builder.exact": `Exact`, "builder.deleteLine": `Delete line`,
 
     "builder.summary": `<b>{dur}</b> total · <b>{tss}</b> estimated TSS · {nbBlocks} · {nLines} intervals`,
@@ -3264,7 +3280,14 @@
     "builder.shorthandGo": `Generar sesión`,
     "builder.shorthandUnparsed": `No reconocido, añadir a mano: {list}`,
     "builder.shorthandNothing": `Ningún bloque reconocido · empieza cada línea con una distancia (ej. "200m" o "4x100m").`,
+    "builder.shorthandHintRunBike": `Escribe tu sesión: duración ("40'", "1h30") o distancia ("400m"/"10km"), tipo, zona. "footing" = zona 2 (zona 1 si "récup" o "lent").`,
+    "builder.shorthandPlaceholderRunBike": `40' footing
+6x3' seuil r2'
+10x400m vma r1'30
+10' retour au calme`,
+    "builder.shorthandNothingRunBike": `Ningún bloque reconocido · empieza cada línea con una duración (ej. "40'") o una distancia (ej. "400m" o "10km").`,
     "builder.shorthandRestNote": `Descanso {sec}s`,
+    "builder.hoursUnit": `horas`, "builder.minutesUnit": `minutos`, "builder.secondsUnit": `segundos`,
     "builder.exercisePlaceholder": `Nombre del ejercicio (sentadilla, press banca…)`,
     "builder.repsUnit": `reps`, "builder.switchRepsTime": `Cambiar repeticiones ⇄ tiempo (ej. descanso cronometrado, plancha mantenida)`,
 
@@ -3780,7 +3803,7 @@
     "watch.needAccount": `Conéctate para enviar a tu reloj.`, "watch.needSavedFirst": `Guarda primero la sesión.`,
     "watch.sending": `Enviando al reloj…`, "watch.sent": `Sesión enviada al reloj`,
     "watch.sendFailed": `No se pudo enviar: {reason}`, "watch.sendWeekBtn": `Enviar la semana`,
-    "watch.exportFallback": `Envío directo no disponible — archivo .tcx descargado (impórtalo en Garmin Connect, Polar Flow, etc.)`,
+    "watch.exportFallback": `Envío directo no disponible — archivo .tcx descargado, pero Garmin Connect y Polar Flow no aceptan importar una sesión estructurada así (solo actividades grabadas). Mientras no haya sincronización directa, copia la estructura a mano en tu reloj.`,
     "watch.weekNothingToSend": `Nada que enviar esta semana (solo carrera/ciclismo).`,
     "watch.sendingWeek": `Enviando {n} sesión(es) al reloj…`,
     "watch.weekSentSingular": `{n} sesión enviada al reloj`, "watch.weekSentPlural": `{n} sesiones enviadas al reloj`,
@@ -3880,6 +3903,7 @@
     "builder.freeWeight": `peso libre`, "builder.deleteStation": `Eliminar la estación`,
     "builder.chooseWorkZone": `Elegir la zona de trabajo`, "builder.calcReference": `Referencia de cálculo`,
     "builder.intensityPctAria": `Intensidad en %`, "builder.switchTimeDist": `Alternar tiempo / distancia`,
+    "builder.intensityTolTitle": `Tolerancia ± (ej. 70 ±5 → entre 65 y 75%)`,
     "builder.zonePct": `Zona %`, "builder.exact": `Exacto`, "builder.deleteLine": `Eliminar la línea`,
 
     "builder.summary": `<b>{dur}</b> total · <b>{tss}</b> TSS estimado · {nbBlocks} · {nLines} intervalos`,

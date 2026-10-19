@@ -370,6 +370,36 @@ function computeTarget(modelKey, pct){
   if(m.unit==='pace100'){ const s=Math.round(base*pct/100); return paceStr(s)+'/100m'; }
   return '';
 }
+// "65–75%" si une tolérance est réglée sur la ligne, "70%" sinon — texte du
+// % affiché (bulle du slider, cf. ln-pct) et de la puce ± lue par le coach.
+function pctRangeText(pct, tol){ return tol ? `${Math.max(1,pct-tol)}–${pct+tol}` : `${pct}`; }
+// Variante "plage" de computeTarget — utilisée quand une ligne porte une
+// tolérance (ln.pctTol>0, ex. "70% VMA ± 5" → "65–75% · 11.2–12.9 km/h"),
+// cf. demande coach du 19/10/2026 ("entre 65 et 70%" plutôt qu'un % figé).
+// Sans tolérance, se comporte exactement comme computeTarget (texte identique).
+function computeTargetRange(modelKey, pct, tol){
+  const m = INTENSITY_MODELS[modelKey];
+  if(!m || !tol) return computeTarget(modelKey, pct);
+  const base = m.ref();
+  const lo = Math.max(1, pct-tol), hi = pct+tol;
+  if(m.unit==='W')   return `${Math.round(base*lo/100)}–${Math.round(base*hi/100)} W`;
+  if(m.unit==='bpm') return `${Math.round(base*lo/100)}–${Math.round(base*hi/100)} bpm`;
+  if(m.unit==='kmh'){
+    const vLo=base*lo/100, vHi=base*hi/100;
+    // l'allure est inversement proportionnelle à la vitesse : la borne basse
+    // de vitesse donne l'allure la PLUS LENTE (et inversement) — à inverser.
+    return `${vLo.toFixed(1)}–${vHi.toFixed(1)} km/h · ${paceFromKmh(vHi)}–${paceFromKmh(vLo)}`;
+  }
+  if(m.unit==='pace'){
+    const sLo=Math.round(base*lo/100), sHi=Math.round(base*hi/100);
+    return `${paceStr(Math.min(sLo,sHi))}–${paceStr(Math.max(sLo,sHi))}/km`;
+  }
+  if(m.unit==='pace100'){
+    const sLo=Math.round(base*lo/100), sHi=Math.round(base*hi/100);
+    return `${paceStr(Math.min(sLo,sHi))}–${paceStr(Math.max(sLo,sHi))}/100m`;
+  }
+  return '';
+}
 function paceStr(s){ return Math.floor(s/60)+"'"+String(Math.round(s%60)).padStart(2,'0')+'"'; }
 function paceFromKmh(kmh){ return paceStr(3600/kmh)+'/km'; }
 const TEMPLATES = [
@@ -429,6 +459,15 @@ let uid = 100;
 const planning = {}; // clé "YYYY-MM-DD" -> [sessions]
 const realised = {}; // clé "YYYY-MM-DD" -> [activités réalisées importées (Strava/Coros/…)], posées sur leur jour
 function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h?`${h}h${String(m).padStart(2,'0')}`:`${m}min`; }
+// Durée d'une LIGNE (h/m/s, cf. ln-dur-hms) en libellé court. Avant l'ajout
+// des champs heures/secondes au builder (19/10/2026), ces affichages ne
+// lisaient que ln.dur.m — une ligne de 1h30 ou de 45s s'affichait "0'".
+function fmtLineDur(d){
+  d = d||{}; const h=d.h||0, m=d.m||0, s=d.s||0;
+  if(h) return `${h}h${String(m).padStart(2,'0')}`;
+  if(m) return s ? `${m}'${String(s).padStart(2,'0')}"` : `${m}'`;
+  return `${s}"`;
+}
 
 /* ============================================================
    COACH — roster d'athlètes suivis (sélecteur riche, style Nolio/iDO)
@@ -2996,7 +3035,7 @@ function pushSingleSessionToWatch(s, dateKey){
     console.warn('[PF] pushSessionToWatch', e);
     if(window.PFExport){
       PFExport.download(s);
-      toast(tr('watch.exportFallback') || "Pas d'envoi direct possible — fichier .tcx téléchargé (à importer dans Garmin Connect, Polar Flow, etc.)");
+      toast(tr('watch.exportFallback') || "Pas d'envoi direct possible — fichier .tcx téléchargé, mais Garmin Connect et Polar Flow n'acceptent pas l'import de séance structurée par ce biais.");
     } else {
       toast(tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)}));
     }
@@ -3374,7 +3413,7 @@ function openZoneEditor(){
 function lineLabel(ln){
   if(ln.type==='station'){ const st=hyroxStation(ln.station)||HYROX_STATIONS[0]; return st.name; }
   const T=LINE_TYPES[ln.type];
-  const amt = (ln.metric==='dist') ? `${ln.dist||0} m` : `${(ln.dur&&ln.dur.m)||0}'`;
+  const amt = (ln.metric==='dist') ? `${ln.dist||0} m` : fmtLineDur(ln.dur);
   const nage = (ln.nage && NAGE_LABEL[ln.nage]) ? ` ${NAGE_LABEL[ln.nage]}` : '';
   const dep = (ln.sendoff && (ln.sendoff.m||ln.sendoff.s)) ? ` ${tr('builder.sendoffAbbr')} ${fmtMS(ln.sendoff)}` : '';
   return `${T?T.l:tr('lineType.interval')} · ${amt}${nage}${dep}`;
@@ -6877,6 +6916,128 @@ function parseSwimShorthand(text){
   return {blocks, unparsed};
 }
 
+/* ============================================================
+   NOTATION COURSE/VÉLO ABRÉGÉE → BLOCS (parseur déterministe)
+   ------------------------------------------------------------
+   Même principe que la notation natation ci-dessus, adapté aux sports à
+   durée : distance en km/m OU durée en minutes ("40'") voire heures
+   ("1h30"), même grammaire de répétitions (Nx...). L'intensité est
+   exprimée en ZONE (1 à 6, sur le modèle par défaut du sport — %VMA en
+   course, %FTP à vélo) plutôt qu'en % brut : la ligne générée tombe
+   automatiquement au milieu de la zone, EN RESPECTANT les zones perso de
+   l'athlète si le coach en a défini (cf. zonesFor), ce qu'un % en dur
+   ne pourrait pas faire.
+   "footing" est traité comme un mot-clé à part : zone 2 par défaut
+   (endurance fondamentale), zone 1 si "récup"/"lent" dans le même
+   segment — spec donnée le 19/10/2026. Un segment sans aucun mot-clé de
+   type reconnu devient "échauffement" s'il ouvre la séance, "exercice"
+   sinon (un coach tape rarement le mot "échauffement" lui-même).
+   ============================================================ */
+const RUNBIKE_TYPE_KEYWORDS = [
+  [/[ée]chauffement|warm[- ]?up/i, 'warmup'],
+  [/retour\s*au\s*calme|cool[- ]?down|d[ée]contract/i, 'cooldown'],
+  [/[ée]ducatifs?|technique|drill|gammes?|lignes?\s*droites?/i, 'educatif'],
+  [/contre[- ]?effort/i, 'contre'],
+  [/r[ée]cup(?:[ée]ration)?|facile|easy|aisance/i, 'recov'],
+];
+// zone 1→6 (ordre de test = ordre de priorité, le 1er qui matche gagne) —
+// même échelle que les zones à 6 paliers de INTENSITY_MODELS.vma/.ftp
+// (Récup/Endurance/Tempo/Seuil/VO2max/Vitesse-Anaérobie).
+const RUNBIKE_ZONE_KEYWORDS = [
+  [/sprint|ana[ée]robie|\bvma\b|maximal/i, 6],
+  [/vo2|fractionn[ée]|intervalle/i, 5],
+  [/seuil|threshold/i, 4],
+  [/tempo|soutenu/i, 3],
+  [/endurance|\bef\b|aisance/i, 2],
+  [/r[ée]cup(?:[ée]ration)?|facile|easy|lent/i, 1],
+];
+// pct au milieu de la zone N du modèle (respecte les zones perso de
+// l'athlète si définies) — borne basse de la 1ʳᵉ zone remontée à 40 pour
+// rester dans la plage du slider d'intensité (cf. min="40" sur ln-pct).
+function zoneMidPct(modelKey, zoneIdx){
+  const zList = zonesFor(modelKey);
+  if(!zList.length) return 70;
+  const z = zList[Math.max(0, Math.min(zList.length-1, zoneIdx-1))];
+  const lo = Math.max(40, Math.min(z[1],z[2])), hi = Math.max(z[1],z[2]);
+  return Math.round((lo+hi)/2);
+}
+function parseRunBikeShorthandSegment(raw, isFirst){
+  const txt = raw.trim();
+  if(!txt) return null;
+  // répétitions ("6x3'", "10x400m") : toujours en tête du segment.
+  let reps=1, rest=txt;
+  let m = txt.match(/^(\d+)\s*[x×]\s*/i);
+  if(m){ reps=Math.max(1,+m[1]); rest=txt.slice(m[0].length); }
+
+  // distance/durée : n'importe où dans le segment, PAS forcément en tête —
+  // contrairement à la natation ("200m échauffement"), le coach course/vélo
+  // tape souvent le mot-clé d'abord ("footing 40'", cf. spec 19/10/2026).
+  // Recherche dans l'ordre : heures composées, km, m, puis minutes/apostrophe.
+  let metric=null, dist=0, h=0, mins=0;
+  let dm = rest.match(/(\d+)\s*h\s*(\d{1,2})?\b/i);            // "1h30"
+  if(dm){ metric='time'; h=+dm[1]; mins=+(dm[2]||0); }
+  else {
+    dm = rest.match(/(\d+(?:[.,]\d+)?)\s*km\b/i);               // "10km"
+    if(dm){ metric='dist'; dist=Math.round(parseFloat(dm[1].replace(',','.'))*1000); }
+    else {
+      dm = rest.match(/(\d+)\s*m\b(?!in)/i);                    // "400m" (pas "min")
+      if(dm){ metric='dist'; dist=+dm[1]; }
+      else {
+        // \b DANS l'alternative (pas après le groupe) : après une apostrophe
+        // suivie d'un espace, les deux caractères sont non-mot donc \b ne
+        // matche jamais à cette frontière — "40' " ne matchait pas avant.
+        dm = rest.match(/(\d+)\s*(?:'|min(?:ute)?s?\b)/i);      // "40'" / "40min"
+        if(dm){ metric='time'; mins=+dm[1]; }
+      }
+    }
+  }
+  if(!metric) return {unparsed:txt};
+
+  let type=null;
+  for(const [re,t] of RUNBIKE_TYPE_KEYWORDS){ if(re.test(rest)){ type=t; break; } }
+  if(!type) type = isFirst ? 'warmup' : 'exo';
+
+  let zone=null;
+  for(const [re,z] of RUNBIKE_ZONE_KEYWORDS){ if(re.test(rest)){ zone=z; break; } }
+  if(!zone) zone=2; // "footing" seul, ou aucun mot-clé d'intensité → endurance
+
+  // repos entre répétitions : "r2'"/"récup 2'" = minutes, "repos 90" = secondes.
+  // Pas de notation composée "r1'30" en v1 (lu comme 1min) — même limite
+  // assumée que le "pas de répétitions imbriquées" du parseur natation.
+  let restSec=null;
+  let rr = rest.match(/(?:repos|r[ée]cup(?:[ée]ration)?|passif|\br)\D{0,4}(\d{1,3})\s*(?:'|min)/i);
+  if(rr) restSec = (+rr[1])*60;
+  else { rr = rest.match(/(?:repos|r[ée]cup(?:[ée]ration)?|passif)\D{0,6}(\d{1,3})/i); if(rr) restSec = +rr[1]; }
+
+  return { reps, metric, dist, h, mins, type, zone, restSec };
+}
+function parseRunBikeShorthand(text, disc){
+  const segments = String(text||'').split(/\n|\+|,/).map(s=>s.trim()).filter(Boolean);
+  const blocks=[]; const unparsed=[];
+  const def = {run:'vma', bike:'ftp'}[disc] || 'vma';
+  segments.forEach((seg,i)=>{
+    const p = parseRunBikeShorthandSegment(seg, i===0);
+    if(!p) return;
+    if(p.unparsed){ unparsed.push(p.unparsed); return; }
+    const work = defaultLine(p.type, disc);
+    work.metric = p.metric;
+    if(p.metric==='dist') work.dist = p.dist;
+    else work.dur = {h:p.h, m:p.mins, s:0};
+    work.model = def;
+    work.pct = zoneMidPct(def, p.zone);
+    work.rpe = rpeFromPct(work.pct);
+    if(p.restSec) work.note = tr('builder.shorthandRestNote', {sec:p.restSec});
+    blocks.push({bid:'b'+(builderUid++), series:p.reps, title:'', lines:[work]});
+  });
+  return {blocks, unparsed};
+}
+// point d'entrée commun au panneau "écris ta séance", quel que soit le sport.
+function parseShorthand(text, disc){
+  if(disc==='swim') return parseSwimShorthand(text);
+  if(disc==='run' || disc==='bike') return parseRunBikeShorthand(text, disc);
+  return {blocks:[], unparsed:[]};
+}
+
 /* références activables par sport (le coach coche celles qu'il veut voir) */
 function refsForDisc(disc){
   const keys = Object.entries(INTENSITY_MODELS)
@@ -6914,7 +7075,7 @@ function defaultLine(type, disc){
   const dist = (disc==='swim') ? (type==='warmup'?400:(type==='cooldown'?200:100)) : 1000;
   const base = {lid:'l'+(builderUid++), type, dur:{h:0,m:type==='warmup'?15:(type==='cooldown'?10:5),s:0},
           metric, dist,
-          model:def, pct, rpe:rpeFromPct(pct),
+          model:def, pct, pctTol:0, rpe:rpeFromPct(pct),
           mode:'zone',          // 'zone' (% de référence) ou 'exact' (valeur absolue)
           exact:exactDefault(disc)};
   if(metric==='reps'){ base.exercise=''; base.reps=8; base.weight=20; base.rpe=(type==='contre'?6:8); }
@@ -7027,13 +7188,23 @@ function openBuilder(dateKey, existing){
   initBuilderNutrition(existing);
   document.getElementById('builderOverlay').classList.add('open');
 }
-/* encadré "écris ta séance" (texte libre → blocs) — natation uniquement pour l'instant */
+/* encadré "écris ta séance" (texte libre → blocs) — natation, course, vélo */
 function toggleShorthandPanel(){
   const aside=document.getElementById('bShorthand');
   const modal=document.querySelector('.builder-modal');
-  const show = builderState.disc==='swim';
+  const show = ['swim','run','bike'].includes(builderState.disc);
   if(aside) aside.style.display = show ? '' : 'none';
   if(modal) modal.classList.toggle('wide', show);
+  if(show) updateShorthandCopy();
+}
+// Libellé/placeholder du panneau : grammaire natation (distance+nage) vs
+// course/vélo (durée ou distance + zone) — textes différents, cf. i18n.
+function updateShorthandCopy(){
+  const isSwim = builderState.disc==='swim';
+  const hintEl = document.querySelector('#bShorthand .b-shorthand-hint');
+  const ta = document.getElementById('bShorthandInput');
+  if(hintEl) hintEl.textContent = tr(isSwim ? 'builder.shorthandHint' : 'builder.shorthandHintRunBike');
+  if(ta) ta.placeholder = tr(isSwim ? 'builder.shorthandPlaceholder' : 'builder.shorthandPlaceholderRunBike');
 }
 function defaultActiveRefs(disc){
   const m = {bike:['ftp','fc','rpe'], run:['vma','fc','rpe'], swim:['css','rpe'], strength:['fc','rpe']}[disc];
@@ -7256,9 +7427,10 @@ function lineHTML(blk, ln){
   // bloc intensité : soit zone (%), soit exact
   let intHTML;
   if(ln.mode==='zone'){
+    if(ln.pctTol==null) ln.pctTol=0;
     const targets = builderState.activeRefs.map(r=>{
       if(r==='rpe') return `<span class="rpe">RPE ${ln.rpe}</span>`;
-      const tgt = computeTarget(r, ln.pct);
+      const tgt = computeTargetRange(r, ln.pct, ln.pctTol);
       return tgt? `<span>${tgt}</span>`:'';
     }).join('');
     const zn = zoneForPct(ln.model, ln.pct);
@@ -7278,7 +7450,7 @@ function lineHTML(blk, ln){
     intHTML = `
       <div class="ln-zone-row">
         <select class="ln-zone" data-f="model" title="${tr('builder.calcReference')}">${models.map(k=>`<option value="${k}" ${k===ln.model?'selected':''}>${REF_LABEL[k]}</option>`).join('')}</select>
-        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="${tr('builder.intensityPctAria')}"><span class="pv-unit">%</span></div>
+        <div class="ln-pct"><input type="range" min="40" max="130" value="${ln.pct}" data-f="pct"><input type="number" class="pvn" min="40" max="130" value="${ln.pct}" data-f="pctn" aria-label="${tr('builder.intensityPctAria')}"><span class="pv-unit">%</span><span class="pv-tol-lbl">±</span><input type="number" class="pvtol" min="0" max="30" value="${ln.pctTol||0}" data-f="pcttol" title="${tr('builder.intensityTolTitle')}" aria-label="${tr('builder.intensityTolTitle')}"></div>
       </div>
       <div class="ln-targets">${targets}${zoneSel}</div>`;
   } else {
@@ -7290,7 +7462,10 @@ function lineHTML(blk, ln){
   const swTitle = (builderState.disc==='strength') ? tr('builder.switchRepsTime') : tr('builder.switchTimeDist');
   const durField = metric==='dist'
     ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${swTitle}">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
-    : `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${swTitle}">⇄</button><input type="number" min="0" max="59" value="${ln.dur.m}" data-f="durm"><span>min</span></div>`;
+    : `<div class="ln-dur ln-metric ln-dur-hms"><button class="ln-mswitch" data-act="metricswitch" title="${swTitle}">⇄</button>`
+      + `<input type="number" min="0" max="23" value="${ln.dur.h||0}" data-f="durh" title="${tr('builder.hoursUnit')}"><span>h</span>`
+      + `<input type="number" min="0" max="59" value="${ln.dur.m||0}" data-f="durm" title="${tr('builder.minutesUnit')}"><span>'</span>`
+      + `<input type="number" min="0" max="59" value="${ln.dur.s||0}" data-f="durs" title="${tr('builder.secondsUnit')}"><span>"</span></div>`;
 
   // Natation uniquement : nage (tous types de ligne) + départ toutes les X
   // (uniquement pertinent en distance — un "départ" chronomètre le prochain
@@ -7427,7 +7602,15 @@ function wireBlocks(){
             const rg=lnEl.querySelector('[data-f="pct"]'); if(rg) rg.value=ln.pct;
             updateBuilderSummary();
           }
-          else if(f==='durm'){ ln.dur.m=+inp.value; updateBuilderSummary(); }
+          else if(f==='pcttol'){
+            // re-render complet : la tolérance change le texte des puces de
+            // cible (targets), pas de maj "en place" possible ici.
+            ln.pctTol=Math.max(0,Math.min(30,+inp.value||0));
+            renderBlocks();
+          }
+          else if(f==='durh'){ ln.dur.h=Math.max(0,+inp.value||0); updateBuilderSummary(); }
+          else if(f==='durm'){ ln.dur.m=Math.max(0,Math.min(59,+inp.value||0)); updateBuilderSummary(); }
+          else if(f==='durs'){ ln.dur.s=Math.max(0,Math.min(59,+inp.value||0)); updateBuilderSummary(); }
           else if(f==='dist'){ ln.dist=+inp.value||0; updateBuilderSummary(); }
           else if(f==='nage'){ ln.nage=inp.value||null; }
           else if(f==='sendoffm'){ if(!ln.sendoff) ln.sendoff={m:0,s:0}; ln.sendoff.m=+inp.value||0; }
@@ -7566,8 +7749,8 @@ function builderToText(){
       const T=LINE_TYPES[ln.type];
       const tgts = (ln.mode==='exact')
         ? exactToText(ln.exact)
-        : builderState.activeRefs.map(r=> r==='rpe'?`RPE ${ln.rpe}`:computeTarget(r,ln.pct)).filter(Boolean).join(' · ');
-      const amount = (ln.metric==='dist') ? `${ln.dist} m` : `${ln.dur.m}'`;
+        : builderState.activeRefs.map(r=> r==='rpe'?`RPE ${ln.rpe}`:computeTargetRange(r,ln.pct,ln.pctTol)).filter(Boolean).join(' · ');
+      const amount = (ln.metric==='dist') ? `${ln.dist} m` : fmtLineDur(ln.dur);
       const nage = (ln.nage && NAGE_LABEL[ln.nage]) ? ` ${NAGE_LABEL[ln.nage]}` : '';
       const dep = (ln.sendoff && (ln.sendoff.m||ln.sendoff.s)) ? ` (${tr('builder.sendoff')} ${fmtMS(ln.sendoff)})` : '';
       return `${T.l}${nage} ${amount}${dep} → ${tgts}`;
@@ -7720,7 +7903,7 @@ document.getElementById('bSaveGroup').addEventListener('click', ()=>{
 document.getElementById('bShorthandGo').addEventListener('click', ()=>{
   const input=document.getElementById('bShorthandInput');
   const warn=document.getElementById('bShorthandWarn');
-  const {blocks, unparsed} = parseSwimShorthand(input.value);
+  const {blocks, unparsed} = parseShorthand(input.value, builderState.disc);
   if(blocks.length){
     builderState.blocks = blocks;
     renderBlocks();
@@ -7730,7 +7913,7 @@ document.getElementById('bShorthandGo').addEventListener('click', ()=>{
     warn.textContent = tr('builder.shorthandUnparsed', {list: unparsed.join(' · ')});
   } else if(!blocks.length){
     warn.style.display='';
-    warn.textContent = tr('builder.shorthandNothing');
+    warn.textContent = tr(builderState.disc==='swim' ? 'builder.shorthandNothing' : 'builder.shorthandNothingRunBike');
   } else {
     warn.style.display='none';
   }
