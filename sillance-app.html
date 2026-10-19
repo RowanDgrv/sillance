@@ -201,7 +201,7 @@ button{font-family:inherit;cursor:pointer}
 /* tolérance ± de la cible % (ex. 70% ± 5 → "65–75%") — plage plutôt qu'un %
    figé, cf. demande coach du 19/10/2026. */
 .ln-pct .pv-tol-lbl{font-family:var(--font-data);font-size:var(--fs-sm);color:var(--muted);margin-left:2px}
-.ln-pct .pvtol{width:2.6em;background:var(--panel);border:1px solid var(--line-strong);color:var(--text);border-radius:6px;padding:3px var(--space-1);font-family:var(--font-data);font-size:11.5px;text-align:center}
+.ln-pct .pvtol{width:3.6em;background:var(--panel);border:1px solid var(--line-strong);color:var(--text);border-radius:6px;padding:3px var(--space-1);font-family:var(--font-data);font-size:11.5px;text-align:center}
 /* Rappel du matin à côté des références physio, pas en bas de page
    (07/10/2026). flex-wrap : les deux cartes se recollent en pile sur
    mobile/tablette (déjà le cas naturellement pour .records en dessous),
@@ -2403,7 +2403,7 @@ body[data-athview] .planner > .library{display:none}
 .bk-tools button.del:hover{color:var(--run);border-color:var(--run)}
 
 .bk-lines{padding:var(--space-2)}
-.ln{display:grid;grid-template-columns:18px 132px 146px 1fr 30px;gap:9px;align-items:center;
+.ln{display:grid;grid-template-columns:18px 132px 76px 1fr 30px;gap:9px;align-items:center;
   padding:var(--space-2);border-radius:9px;border-left:3px solid var(--lc);background:var(--panel-2);margin-bottom:6px}
 .ln:last-child{margin-bottom:0}
 @media (max-width:640px){.ln{grid-template-columns:18px 1fr 1fr;gap:7px}}
@@ -2414,11 +2414,20 @@ body[data-athview] .planner > .library{display:none}
 .ln-dur input{width:46px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
   font-family:var(--font-data);font-size:12.5px;text-align:center;padding:6px var(--space-1)}
 .ln-dur span{font-size:var(--fs-sm);color:var(--muted)}
-/* durée h/m/s (course/vélo/natation en temps) : 3 champs compacts au lieu du
-   seul champ minutes (0-59) d'origine — une séance de vélo de 1h30 ne tenait
-   pas dans "minutes seules". Largeur réduite vs .ln-dur input (46px) car 3
-   champs doivent cohabiter dans la même colonne de grille .ln. */
-.ln-dur-hms input{width:30px;padding:6px 2px}
+/* durée h/m/s : rangée dédiée SOUS le sélecteur de type (Échauffement…),
+   champs assez larges pour 3 chiffres + les flèches de réglage — en ligne
+   dans la colonne de grille ils étaient trop étroits pour afficher "10". */
+.ln:has(.ln-dur-hms) .ln-dur-hms{grid-column:2/5;grid-row:2}
+.ln:has(.ln-dur-hms) .ln-mid{grid-column:3/5;grid-row:1}
+.ln:has(.ln-dur-hms) .ln-actions{grid-column:5;grid-row:1}
+.ln:has(.ln-dur-hms) .ln-note{grid-row:3}
+.ln-dur-hms input{width:64px;padding:6px 4px}
+@media (max-width:640px){
+  .ln:has(.ln-dur-hms) .ln-actions{grid-column:3;grid-row:1}
+  .ln:has(.ln-dur-hms) .ln-dur-hms{grid-column:2/-1;grid-row:2}
+  .ln:has(.ln-dur-hms) .ln-mid{grid-column:1/-1;grid-row:3}
+  .ln:has(.ln-dur-hms) .ln-note{grid-row:4}
+}
 .ln-mswitch{width:20px;height:20px;flex:none;border:1px solid var(--line-strong);border-radius:6px;background:var(--panel-2);
   color:var(--swim);font-size:var(--fs-sm);font-weight:700;padding:0;display:grid;place-items:center;transition:.15s}
 .ln-mswitch:hover{border-color:var(--swim);background:rgba(47,217,255,.1)}
@@ -4127,7 +4136,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-club-feed.js?v=20261009b"></script>
 <script src="./sillance-tour.js?v=20260927d"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-app.core.js?v=20261019a"></script>
+<script src="./sillance-app.core.js?v=20261019b"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

@@ -7203,8 +7203,12 @@ function updateShorthandCopy(){
   const isSwim = builderState.disc==='swim';
   const hintEl = document.querySelector('#bShorthand .b-shorthand-hint');
   const ta = document.getElementById('bShorthandInput');
-  if(hintEl) hintEl.textContent = tr(isSwim ? 'builder.shorthandHint' : 'builder.shorthandHintRunBike');
-  if(ta) ta.placeholder = tr(isSwim ? 'builder.shorthandPlaceholder' : 'builder.shorthandPlaceholderRunBike');
+  const hintKey = isSwim ? 'builder.shorthandHint' : 'builder.shorthandHintRunBike';
+  const phKey = isSwim ? 'builder.shorthandPlaceholder' : 'builder.shorthandPlaceholderRunBike';
+  // on change aussi la CLÉ data-i18n : sinon la ré-application des traductions
+  // (changement de langue, etc.) remet le texte natation par-dessus.
+  if(hintEl){ hintEl.setAttribute('data-i18n', hintKey); hintEl.textContent = tr(hintKey); }
+  if(ta){ ta.setAttribute('data-i18n-attr', 'placeholder:'+phKey); ta.placeholder = tr(phKey); }
 }
 function defaultActiveRefs(disc){
   const m = {bike:['ftp','fc','rpe'], run:['vma','fc','rpe'], swim:['css','rpe'], strength:['fc','rpe']}[disc];
@@ -7464,8 +7468,8 @@ function lineHTML(blk, ln){
     ? `<div class="ln-dur ln-metric"><button class="ln-mswitch" data-act="metricswitch" title="${swTitle}">⇄</button><input type="number" min="0" max="10000" step="25" value="${ln.dist||0}" data-f="dist"><span>m</span></div>`
     : `<div class="ln-dur ln-metric ln-dur-hms"><button class="ln-mswitch" data-act="metricswitch" title="${swTitle}">⇄</button>`
       + `<input type="number" min="0" max="23" value="${ln.dur.h||0}" data-f="durh" title="${tr('builder.hoursUnit')}"><span>h</span>`
-      + `<input type="number" min="0" max="59" value="${ln.dur.m||0}" data-f="durm" title="${tr('builder.minutesUnit')}"><span>'</span>`
-      + `<input type="number" min="0" max="59" value="${ln.dur.s||0}" data-f="durs" title="${tr('builder.secondsUnit')}"><span>"</span></div>`;
+      + `<input type="number" min="0" max="999" value="${ln.dur.m||0}" data-f="durm" title="${tr('builder.minutesUnit')}"><span>'</span>`
+      + `<input type="number" min="0" max="999" value="${ln.dur.s||0}" data-f="durs" title="${tr('builder.secondsUnit')}"><span>"</span></div>`;
 
   // Natation uniquement : nage (tous types de ligne) + départ toutes les X
   // (uniquement pertinent en distance — un "départ" chronomètre le prochain
@@ -7609,8 +7613,8 @@ function wireBlocks(){
             renderBlocks();
           }
           else if(f==='durh'){ ln.dur.h=Math.max(0,+inp.value||0); updateBuilderSummary(); }
-          else if(f==='durm'){ ln.dur.m=Math.max(0,Math.min(59,+inp.value||0)); updateBuilderSummary(); }
-          else if(f==='durs'){ ln.dur.s=Math.max(0,Math.min(59,+inp.value||0)); updateBuilderSummary(); }
+          else if(f==='durm'){ ln.dur.m=Math.max(0,Math.min(999,+inp.value||0)); updateBuilderSummary(); }
+          else if(f==='durs'){ ln.dur.s=Math.max(0,Math.min(999,+inp.value||0)); updateBuilderSummary(); }
           else if(f==='dist'){ ln.dist=+inp.value||0; updateBuilderSummary(); }
           else if(f==='nage'){ ln.nage=inp.value||null; }
           else if(f==='sendoffm'){ if(!ln.sendoff) ln.sendoff={m:0,s:0}; ln.sendoff.m=+inp.value||0; }
