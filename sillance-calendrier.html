@@ -2219,6 +2219,15 @@ body[data-athview] .planner > .library{display:none}
   background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);
   font-size:12.5px;font-family:inherit;
 }
+/* Titre + 2 select en ligne débordaient sur mobile (07/10 puis 20/10/2026 :
+   ligne à 483px dans un conteneur à 374px à 500px de large). Même seuil que
+   le reste du builder (640px) : titre sur sa propre ligne, les 2 select se
+   partagent la suivante et peuvent rétrécir (min-width:0). */
+@media (max-width:640px){
+  .builder-meta-row{flex-wrap:wrap}
+  .builder-meta-row .b-title-input{flex:1 1 100%;min-width:0}
+  .builder-meta-row select{flex:1 1 0;min-width:0;max-width:100%}
+}
 /* sélecteur de références multiples */
 .b-refs-row{display:flex;align-items:center;gap:10px;margin-top:13px;flex-wrap:wrap}
 .b-ref-chip.nosensor{margin-left:auto;border-style:dashed}
