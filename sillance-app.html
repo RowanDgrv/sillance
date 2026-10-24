@@ -2690,6 +2690,10 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 .cf-all{font-family:var(--font-data);font-size:var(--fs-sm);color:var(--muted);background:transparent;border:none;cursor:pointer;text-decoration:underline;padding:var(--space-1) 6px}
 .cf-all:hover{color:var(--soft)}
 .chart-card.c-hidden{display:none}
+.chart-card .cc-nodata{display:none}
+.chart-card.c-nodata>:not(h3):not(.cc-nodata){display:none}
+.chart-card.c-nodata .cc-nodata{display:block;margin:14px 0 4px;padding:22px 16px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);font-size:13px}
+.cf-chip.cf-empty:not(.on){opacity:.55}
 .chart-card.c7{grid-column:span 7}.chart-card.c5{grid-column:span 5}
 .chart-card.c6{grid-column:span 6}.chart-card.c12{grid-column:span 12}
 @media (max-width:900px){.chart-card.c7,.chart-card.c5,.chart-card.c6,.chart-card.c12{grid-column:span 12}}
@@ -2840,7 +2844,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
       <div class="wel-item" style="--wc:var(--accent)"><span><i class="ic ic-sun"></i></span><div><b>Ton point du jour</b><small>Fraîcheur, risque, séance du jour.</small></div></div>
       <div class="wel-item" style="--wc:var(--bike)"><span><i class="ic ic-film"></i></span><div><b>Vidéos explicatives</b><small>Éducatifs natation &amp; course à pied, en accès direct.</small></div></div>
       <div class="wel-item" style="--wc:var(--strength)"><span><i class="ic ic-shoe"></i></span><div><b>Matériel</b><small>Usure suivie, rappel auto pour changer tes baskets.</small></div></div>
-      <div class="wel-item" style="--wc:var(--good)"><span><i class="ic ic-brain"></i></span><div><b>Assistant IA</b><small>Résumé et conseils après chaque séance, et sur ta semaine.</small></div></div>
+      <div class="wel-item" style="--wc:var(--good)"><span><i class="ic ic-brain"></i></span><div><b>Assistant IA · coachs</b><small>Vérifie chaque séance réalisée par rapport à la consigne : cible respectée, ou ce qui a coincé.</small></div></div>
     </div>
     <p class="welcome-tip"><i class="ic ic-lightbulb"></i> Bascule entre <b>Coach</b>, <b>Athlète</b> et <b>Club</b> en haut à droite.</p>
     <button class="btn welcome-start" id="welcomeStart">Commencer à explorer →</button>
@@ -4131,13 +4135,13 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261019a"></script>
+<script src="./sillance-i18n-app.js?v=20261024a"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-workout-export.js?v=20261009a"></script>
 <script src="./sillance-club-feed.js?v=20261009b"></script>
 <script src="./sillance-tour.js?v=20260927d"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-app.core.js?v=20261019b"></script>
+<script src="./sillance-app.core.js?v=20261024a"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

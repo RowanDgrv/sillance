@@ -2685,6 +2685,7 @@ function buildWeekRow(mon){
 }
 
 function render(){
+  window.__pf_chartRefresh?.();
   const mon = mondayOf(weekOffset);
   const nWeeks = calViewMode==='day' ? 1 : weeksShown;
   const sun = addDays(mon, nWeeks*7-1);
@@ -10161,10 +10162,38 @@ function renderDecouple(s, data){
 // (AI_ADDON_PRICE déclaré plus haut, avant le premier renderSidebar)
 function aiUnlocked(){ return window.__pf_aiAddon===true || window.__pf_aiDemo===true; }
 function aiFcMax(){ return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:190; }
-function aiHrZone(hr, fcMax){ const p=hr/fcMax*100; if(p<60)return'Z1'; if(p<70)return'Z2'; if(p<80)return'Z3'; if(p<90)return'Z4'; return'Z5'; }
+// Zones FC de L'ATHLÈTE (personnalisées par le coach si renseignées, sinon
+// 60/70/80/90 % FC max) — sinon un footing à 72 % serait jugé "trop rapide"
+// chez un athlète dont le coach a calé la Z2 jusqu'à 75 %.
+function aiHrZone(hr, fcMax){
+  const p=hr/fcMax*100, zs=zonesFor('fc');
+  for(let i=0;i<zs.length;i++){ if(p<zs[i][2]) return 'Z'+Math.min(5,i+1); }
+  return 'Z'+Math.min(5,Math.max(1,zs.length));
+}
 function aiTargetZone(type, objectif){ if(objectif&&objectif.zone) return objectif.zone; return {endurance:'Z2', seuil:'Z4', vo2:'Z5'}[type]||'Z3'; }
+/* Accélération franche en course : fenêtre glissante d'1 min dont l'allure
+   moyenne dépasse de 25 % l'allure médiane du corps de séance (échauffement
+   et retour au calme exclus). Renvoie la minute et l'écart, ou null. */
+function aiDetectSurge(pts, disc){
+  if(disc!=='run' || pts.length<30) return null;
+  const T=pts[pts.length-1].t, body=pts.filter(p=>p.t>T*0.1 && p.t<T*0.9 && p.sp>0);
+  if(body.length<20) return null;
+  const sorted=body.map(p=>p.sp).sort((a,b)=>a-b), med=sorted[Math.floor(sorted.length/2)];
+  let best=null, j=0, sum=0;
+  for(let i=0;i<body.length;i++){
+    sum+=body[i].sp;
+    while(body[i].t-body[j].t>1){ sum-=body[j].sp; j++; }
+    if(body[i].t-body[j].t<0.75) continue;
+    const avg=sum/(i-j+1);
+    if(avg>med*1.25 && (!best||avg>best.avg)) best={avg, at:Math.round(body[j].t)};
+  }
+  return best ? {atMin:best.at, pct:Math.round((best.avg/med-1)*100)} : null;
+}
 function computeSessionBilan(s, data){
-  const objectif=s.objectif||null, type=(objectif&&objectif.type)||sessionType(s), fcMax=aiFcMax(), target=aiTargetZone(type, objectif);
+  // Sans consigne lisible (ex. activité montre « Course matinale »), on ne
+  // devine plus "seuil" par défaut : la séance est jugée "libre", sans verdict.
+  const knownTitle=/vma|vo2|fractionn|interval|30\/30|400|800|seuil|tempo|ftp|threshold|endurance|longue|sortie|footing|récup/i.test(s.title||'');
+  const objectif=s.objectif||null, type=(objectif&&objectif.type)||(knownTitle?sessionType(s):'libre'), fcMax=aiFcMax(), target=aiTargetZone(type, objectif);
   const pts=data.pts, n=pts.length||1;
   const zc={Z1:0,Z2:0,Z3:0,Z4:0,Z5:0};
   pts.forEach(p=>{ zc[aiHrZone(p.hr,fcMax)]++; });
@@ -10183,9 +10212,59 @@ function computeSessionBilan(s, data){
     avgHr:data.avgHr, maxHr:data.maxHr, fcMax,
     pctFcMax:Math.round(data.maxHr/fcMax*100), avgPctFcMax:Math.round(data.avgHr/fcMax*100),
     zonePct, timeInTarget:zonePct[target]||0, decouple:dc?+dc.pct.toFixed(1):null,
-    hardReps, np:(s.disc==='bike'?((currentSimMetrics(s,data)||{}).np||0):0) };
+    hardReps, np:(s.disc==='bike'?((currentSimMetrics(s,data)||{}).np||0):0),
+    hasHr:(data.avgHr||0)>0, surge:aiDetectSurge(pts, s.disc),
+    aboveTargetPct:['Z1','Z2','Z3','Z4','Z5'].slice(+String(target).replace('Z','')||5).reduce((a,z)=>a+(zonePct[z]||0),0) };
+}
+/* ============================================================
+   VERDICT EN UNE PHRASE (24/10/2026) — demande coach :
+   consigne respectée → "Footing respectant la cible." ; sinon UNE
+   phrase qui dit ce qui n'a pas été (trop vite, sprint au milieu,
+   dérive cardiaque, séries trop dures…). Chaque constat vient d'une
+   mesure du bilan, rien n'est inventé. Les chiffres détaillés restent
+   consultables, repliés sous "Détails".
+   ============================================================ */
+function aiSessionLabel(b){
+  if(b.type==='endurance') return tr(b.disc==='bike'?'aiv.lblRide':b.disc==='swim'?'aiv.lblSwim':'aiv.lblEasy');
+  if(b.type==='seuil') return tr('aiv.lblThr');
+  if(b.type==='vo2') return tr('aiv.lblInt');
+  return tr('aiv.lblSession');
+}
+function aiIssues(b){
+  const out=[]; // {t, major}
+  if(b.type==='endurance'){
+    if(b.aboveTargetPct>=25) out.push({t:tr('aiv.tooFast',{pct:b.aboveTargetPct, zone:b.target}), major:b.aboveTargetPct>=40});
+    if(b.surge) out.push({t:tr('aiv.surge',{min:b.surge.atMin, pct:b.surge.pct}), major:false});
+    else if(b.pctFcMax>=90) out.push({t:tr('aiv.peak',{pct:b.pctFcMax}), major:false});
+    if(b.decouple!=null && b.decouple>=5) out.push({t:tr('aiv.drift',{pct:b.decouple}), major:b.decouple>=8});
+  } else if(b.type==='seuil'){
+    if((b.zonePct.Z5||0)>=20) out.push({t:tr('aiv.tooHard',{pct:b.zonePct.Z5}), major:true});
+    else if(b.timeInTarget<25) out.push({t:tr('aiv.tooEasy',{pct:b.timeInTarget, zone:b.target}), major:true});
+    if(b.decouple!=null && b.decouple>=8) out.push({t:tr('aiv.drift',{pct:b.decouple}), major:true});
+  } else if(b.type==='vo2'){
+    const peaks=b.hardReps.map(r=>r.peakPct), maxPeak=peaks.length?Math.max(...peaks):b.pctFcMax;
+    if(maxPeak<90) out.push({t:tr('aiv.repsTooEasy',{pct:maxPeak}), major:true});
+    if(b.hardReps.length>1){ const f=b.hardReps[0], l=b.hardReps[b.hardReps.length-1];
+      if(l.paceSec-f.paceSec>10) out.push({t:tr('aiv.repsFade',{p1:fmtPace(f.paceSec), p2:fmtPace(l.paceSec)}), major:false}); }
+  }
+  if(b.plannedDur && b.type!=='libre'){
+    const ecart=Math.round((b.dur-b.plannedDur)/b.plannedDur*100);
+    if(ecart<-20) out.push({t:tr('aiv.short',{pct:ecart}), major:false});
+    if(ecart>25) out.push({t:tr('aiv.long',{pct:ecart}), major:false});
+  }
+  return out;
 }
 function aiSummary(s, b){
+  const detail=aiDetailSummary(s, b), lbl=aiSessionLabel(b);
+  if(!b.hasHr) return {tenu:'libre', headline:tr('aiv.noHr',{lbl}), bullets:[], recos:[]};
+  if(b.type==='libre') return {tenu:'libre', headline:tr('aiv.free',{dur:b.dur, pct:b.avgPctFcMax}), bullets:detail.bullets, recos:[]};
+  const iss=aiIssues(b);
+  if(!iss.length) return {tenu:'oui', headline:tr('aiv.ok',{lbl}), bullets:detail.bullets, recos:[]};
+  const major=iss.some(x=>x.major);
+  const headline=lbl+' : '+iss.slice(0,3).map(x=>x.t).join(', ')+(major?tr('aiv.notDone'):'.');
+  return {tenu:major?'non':'partiel', headline, bullets:detail.bullets, recos:detail.recos.slice(0,1)};
+}
+function aiDetailSummary(s, b){
   const recos=[], bullets=[]; let tenu='partiel', headline='';
   // conformité au plan : la séance réalisée correspond-elle à la séance prévue ?
   if(b.plannedDur){
@@ -10233,7 +10312,7 @@ function aiSummary(s, b){
   }
   return {headline, tenu, bullets, recos};
 }
-function aiVerdictMeta(tenu){ return tenu==='oui'?{c:'var(--good)',l:tr('aiVerdict.met')}:tenu==='partiel'?{c:'var(--bike)',l:tr('aiVerdict.partial')}:{c:'var(--run)',l:tr('aiVerdict.missed')}; }
+function aiVerdictMeta(tenu){ if(tenu==='libre') return {c:'var(--muted)',l:tr('aiVerdict.free')}; return tenu==='oui'?{c:'var(--good)',l:tr('aiVerdict.met')}:tenu==='partiel'?{c:'var(--bike)',l:tr('aiVerdict.partial')}:{c:'var(--run)',l:tr('aiVerdict.missed')}; }
 function injectAiCss(){
   if(document.getElementById('pf-ai-css')) return;
   const st=document.createElement('style'); st.id='pf-ai-css';
@@ -10252,6 +10331,8 @@ function injectAiCss(){
   .ai-result{border-left:3px solid var(--av,var(--good));padding-left:14px}
   .ai-verdict{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:12px;color:var(--av);background:color-mix(in srgb,var(--av) 14%,transparent);border:1px solid color-mix(in srgb,var(--av) 40%,transparent);padding:4px 11px;border-radius:99px;margin-bottom:9px}
   .ai-headline{font-size:14.5px;font-weight:600;color:var(--soft);margin-bottom:12px;line-height:1.4}
+  .ai-details{margin-bottom:10px}
+  .ai-details>summary{cursor:pointer;font-size:12px;color:var(--muted);margin-bottom:8px}
   .ai-bul{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
   .ai-bul>div{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--soft);line-height:1.4}
   .ai-ico{flex:none;width:14px;font-weight:700}
@@ -10287,7 +10368,8 @@ function aiResultHtml(s, b, r, isDemo, footKeys){
   const v=aiVerdictMeta(r.tenu);
   const ico=st=>st==='ok'?'<span style="color:var(--good)"><i class="ic ic-check"></i></span>':st==='warn'?'<span style="color:var(--bike)"><i class="ic ic-alert-triangle"></i></span>':'<span style="color:var(--run)"><i class="ic ic-x"></i></span>';
   const bul=r.bullets.map(x=>`<div><span class="ai-ico">${ico(x.s)}</span><span>${x.t}</span></div>`).join('');
-  const recos=r.recos.length?`<div class="ai-recobox"><h6>${tr('ai.recommendations')}</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
+  const recos=(r.recos||[]).length?`<div class="ai-recobox"><h6>${tr('ai.recommendations')}</h6><ul>${r.recos.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
+  const details=(bul||recos)?`<details class="ai-details"><summary>${tr('aiv.details')}</summary><div class="ai-bul">${bul}</div>${recos}</details>`:'';
   // footKeys : override optionnel ([demoKey, realKey]) — la synthèse
   // hebdomadaire (runWeekAi) parle de "la semaine", pas "la séance".
   const [demoKey, realKey] = footKeys || ['ai.footDemo', 'ai.footReal'];
@@ -10297,8 +10379,7 @@ function aiResultHtml(s, b, r, isDemo, footKeys){
   return `<div class="ai-result" style="--av:${v.c}">
     <div class="ai-verdict">${v.l} ${isDemo?`<span class="ai-badge-demo">${tr('ai.demoBadge')}</span>`:''}</div>
     <div class="ai-headline">${r.headline}</div>
-    <div class="ai-bul">${bul}</div>
-    ${recos}
+    ${details}
     <div class="ai-foot">${foot}</div>
   </div>`;
 }
@@ -10307,6 +10388,7 @@ function renderAi(s, data){
   if(mode!=='coach'){ wrap.style.display='none'; return; }
   wrap.style.display=''; injectAiCss();
   const body=document.getElementById('anAiBody'); if(!body) return;
+  if(window.PF?.user && !s._realData){ body.innerHTML=`<p class="club-hint">${tr('aiv.noFile')}</p>`; return; }
   if(!aiUnlocked()){
     body.innerHTML=aiPaywallHtml();
     const btn=document.getElementById('aiActivate');
@@ -10319,9 +10401,10 @@ function renderAi(s, data){
   }
   body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> ${tr('ai.analyzingInProgress')}</div>`;
   const b=computeSessionBilan(s, data);
+  b.label=aiSessionLabel(b); b.constats=(b.hasHr&&b.type!=='libre')?aiIssues(b).map(x=>({texte:x.t, majeur:x.major})):[];
   // Connecté + add-on réel (pas juste le déverrouillage démo) → vrai résumé IA.
   if(window.PF?.user && window.__pf_aiAddon===true && typeof PF.summarizeSession==='function'){
-    const sessionKey=String(s.id || (s.title+'|'+(s.dur||'')+'|'+(s._realData?.provider_activity_id||'')));
+    const sessionKey='v2|'+String(s.id || (s.title+'|'+(s.dur||'')+'|'+(s._realData?.provider_activity_id||'')));
     PF.summarizeSession({
       session_key: sessionKey,
       bilan: b,
@@ -11164,14 +11247,38 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
     {key:'hyrox',     get label(){return tr('chart.hyrox')},     a:'hyroxBody',      cat:'hyrox'},
   ];
   const DEFAULT=['loadstack','load','hr'];   // sélection de départ resserrée
+  /* Données concrètes : en démo (non connecté) tout est montré. Pour un compte
+     réel, ces graphiques lisent encore des jeux de démo codés en dur
+     (STRAVA_DEMO, RUN_DYN, MMP_DEMO, HYROX_DEMO…) → pas de vraie donnée derrière.
+     Ils sont décochés d'office ; si le coach les coche, la carte affiche
+     "aucune donnée" au lieu de chiffres inventés. À retirer de ce set au fur
+     et à mesure qu'un graphique est branché sur les vraies activités. */
+  const DEMO_ONLY=new Set(['load','ftp','dist','mmp','durab','hr','lactate','runDyn','runTiles','runSym','runTrend','hyrox']);
+  const hasPlanning=()=>Object.values(planning).some(a=>a&&a.length);
+  const hasData=k=>{
+    if(!window.PF?.user) return true;
+    if(DEMO_ONLY.has(k)) return false;
+    return hasPlanning();            // loadstack / loadmix : calculés depuis le planning réel
+  };
+  const touched=new Set();           // cochés volontairement malgré l'absence de données (session)
+  const isOn=k=>sel.has(k) && (hasData(k) || touched.has(k));
   let sel; try{ sel=new Set(JSON.parse(localStorage.getItem('sil_chart_filter'))); if(!sel.size) sel=new Set(DEFAULT); }
   catch(e){ sel=new Set(DEFAULT); }
   const cards={};
   REG.forEach(r=>{ const n=document.getElementById(r.a); const c=n&&n.closest('.chart-card'); if(c){ c.dataset.chart=r.key; cards[r.key]=c; } });
   const save=()=>{ try{ localStorage.setItem('sil_chart_filter', JSON.stringify([...sel])); }catch(e){} };
   const apply=()=>{
-    REG.forEach(r=>{ if(cards[r.key]) cards[r.key].classList.toggle('c-hidden', !sel.has(r.key)); });
-    box.querySelectorAll('.cf-chip').forEach(ch=>{ const on=sel.has(ch.dataset.key); ch.classList.toggle('on',on); ch.setAttribute('aria-pressed',on); });
+    REG.forEach(r=>{ const c=cards[r.key]; if(!c) return;
+      c.classList.toggle('c-hidden', !isOn(r.key));
+      const empty=!hasData(r.key);
+      c.classList.toggle('c-nodata', empty);
+      if(empty && !c.querySelector('.cc-nodata')){
+        const m=document.createElement('p'); m.className='cc-nodata'; m.textContent=tr('chart.noData'); c.appendChild(m);
+      }
+    });
+    box.querySelectorAll('.cf-chip').forEach(ch=>{ const k=ch.dataset.key, on=isOn(k);
+      ch.classList.toggle('on',on); ch.setAttribute('aria-pressed',on);
+      ch.classList.toggle('cf-empty', !hasData(k)); });
     if(sel.has('loadstack')){ const sc=document.getElementById('loadStackScroll'); if(sc) requestAnimationFrame(()=>{ sc.scrollLeft=sc.scrollWidth; }); }
   };
   box.innerHTML = CATS.map(([ck,cl])=>{
@@ -11180,10 +11287,15 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
       items.map(r=>`<button type="button" class="cf-chip" data-key="${r.key}" aria-pressed="false"><span class="cf-box"><i class="ic ic-check"></i></span>${r.label}</button>`).join('')+
       `</div>`;
   }).join('') + `<div class="cf-actions"><button type="button" class="cf-all" id="cfAll">${tr('chart.all')}</button><button type="button" class="cf-all" id="cfNone">${tr('chart.none')}</button></div>`;
-  box.querySelectorAll('.cf-chip').forEach(ch=> ch.onclick=()=>{ const k=ch.dataset.key; sel.has(k)?sel.delete(k):sel.add(k); apply(); save(); });
-  box.querySelector('#cfAll').onclick=()=>{ REG.forEach(r=>{ if(cards[r.key]) sel.add(r.key); }); apply(); save(); };
-  box.querySelector('#cfNone').onclick=()=>{ sel.clear(); apply(); save(); };
+  box.querySelectorAll('.cf-chip').forEach(ch=> ch.onclick=()=>{ const k=ch.dataset.key;
+    if(isOn(k)){ sel.delete(k); touched.delete(k); } else { sel.add(k); if(!hasData(k)) touched.add(k); }
+    apply(); save(); });
+  // "Tout" = tous les graphiques qui ont des données ; les vides restent à cocher un par un.
+  box.querySelector('#cfAll').onclick=()=>{ REG.forEach(r=>{ if(cards[r.key] && hasData(r.key)) sel.add(r.key); }); apply(); save(); };
+  box.querySelector('#cfNone').onclick=()=>{ sel.clear(); touched.clear(); apply(); save(); };
   apply();
+  // La connexion (PF.user) et le planning réel arrivent après ce script → render() rappelle apply().
+  window.__pf_chartRefresh = apply;
 })();
 (function drawRunTrend(){
   const svg=document.getElementById('runTrendChart'); if(!svg) return;
