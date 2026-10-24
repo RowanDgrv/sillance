@@ -1682,7 +1682,7 @@ function importActivityFile(file){
 // séries (GPS/FC/allure/puissance) via l'edge function (cache serveur), les
 // rejoue avec PFFit.buildFromRaw (même pipeline que l'import .FIT) puis ouvre
 // le modal d'analyse habituel (découplage, comparateur, IA…).
-function openStravaAnalysis(act){
+function openStravaAnalysis(act, plan){
   if(!act || !act.id){ return; }
   toast(tr('toast.chargementDetail'));
   PF.getActivityStreams(act.id, act.src).then(({points, laps})=>{
@@ -1695,7 +1695,9 @@ function openStravaAnalysis(act){
     // (ex. 15x30s actif) — illisible pour analyser la séance réellement faite.
     const res = PFFit.buildFromRaw(points, act.disc, laps||[], {ftp});
     if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
-    openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
+    // plan : la séance prévue liée → l'IA juge contre SA consigne (titre,
+    // objectif, durée prévue) et non contre le nom donné par la montre.
+    openAnalysis(plan ? {...plan, _realData:res.data} : {id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
   }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(tr('toast.recuperationDetailStravaImpossible'), 'error'); });
 }
 
@@ -2647,7 +2649,7 @@ function buildWeekRow(mon){
     if(addBtn) addBtn.addEventListener('click', ()=> openBuilder(key, null));
     const body = day.querySelector('.day-body');
     sessions.forEach(s=> body.appendChild(sessionCard(s, key)));
-    acts.forEach(a=> body.appendChild(realisedCard(a)));
+    acts.filter(a=>!a.linkedTo).forEach(a=> body.appendChild(realisedCard(a)));
 
     /* drop */
     day.addEventListener('dragover', e=>{e.preventDefault(); day.classList.add('dragover')});
@@ -2684,8 +2686,49 @@ function buildWeekRow(mon){
   return { el: row, totalTss, totalMin, count, doneCount, race };
 }
 
+/* ============================================================
+   LIEN ACTIVITÉS ↔ SÉANCES PRÉVUES (24/10/2026)
+   ------------------------------------------------------------
+   Une activité synchronisée (Coros/Strava/…) est rattachée à la séance
+   prévue du MÊME jour et de la MÊME famille de sport ; s'il y a plusieurs
+   candidats, on apparie par durée la plus proche (1 activité ↔ 1 séance).
+   La séance passe "réalisée" (autoDone, recalculé à chaque rendu, jamais
+   écrit en base) et garde l'activité pour l'analyse et l'IA. Avant : la
+   séance prévue et l'activité vivaient côte à côte sans lien → séance
+   jamais "faite", IA hebdo vide, analyse sur données générées.
+   ============================================================ */
+const discFamily = d => ({trail:'run', vtt:'bike', gravel:'bike', openwater:'swim'})[d] || d;
+function linkRealisedToPlan(){
+  for(const day in planning) (planning[day]||[]).forEach(s=>{
+    if(s.autoDone){ s.done=false; s.autoDone=false; }
+    s.linkedAct=null;
+  });
+  for(const day in realised){
+    const acts=realised[day]||[]; acts.forEach(a=>{ a.linkedTo=null; });
+    const pairs=[];
+    (planning[day]||[]).forEach(s=> acts.forEach(a=>{
+      if(discFamily(s.disc)===discFamily(a.disc)) pairs.push({s, a, gap:Math.abs((a.dur||0)-(s.dur||0))});
+    }));
+    pairs.sort((x,y)=>x.gap-y.gap);
+    pairs.forEach(({s,a})=>{
+      if(s.linkedAct || a.linkedTo) return;
+      s.linkedAct=a; a.linkedTo=s.id||true;
+      if(!s.done){ s.done=true; s.autoDone=true; }
+    });
+  }
+}
+/* Ouvre l'analyse d'une séance faite. Activité liée → vraies données montre,
+   jugées contre la consigne prévue. Compte réel sans aucun fichier → pas de
+   courbes générées : on le dit, et on ouvre le menu de la séance. */
+function openSessionAnalysis(s, dateKey){
+  if(s._realData) return openAnalysis(s);
+  if(s.linkedAct) return openStravaAnalysis(s.linkedAct, s);
+  if(window.PF?.user){ toast(tr('aiv.noFile')); if(mode==='coach' && dateKey) openSessionActions(s, dateKey); return; }
+  openAnalysis(s);   // démo : séance-type simulée, c'est le but de la démo
+}
 function render(){
   window.__pf_chartRefresh?.();
+  linkRealisedToPlan();
   const mon = mondayOf(weekOffset);
   const nWeeks = calViewMode==='day' ? 1 : weeksShown;
   const sun = addDays(mon, nWeeks*7-1);
@@ -2875,8 +2918,14 @@ function weekReviewSessions(mon){
   for(let i=0;i<7;i++){
     const dKey = iso(addDays(mon,i));
     (planning[dKey]||[]).filter(s=>s.done).forEach(s=>{
+      const a=s.linkedAct;
       out.push({ date:dKey, title:s.title, disc:s.disc, dur:s.dur, tss:s.tss, zone:s.zone,
-        rpe:s.rpe||null, rpeMuscle:s.rpeMuscle||null });
+        rpe:s.rpe||null, rpeMuscle:s.rpeMuscle||null,
+        realDur:a?a.dur:null, avgHr:a?a.avgHr:null, dist:a?a.dist:null, source:a?a.src:(s.done?'manuel':null) });
+    });
+    // activités faites sans séance prévue ce jour-là
+    (realised[dKey]||[]).filter(a=>!a.linkedTo).forEach(a=>{
+      out.push({ date:dKey, title:a.name, disc:a.disc, dur:null, realDur:a.dur, avgHr:a.avgHr, dist:a.dist, source:a.src, horsPlan:true });
     });
   }
   return out;
@@ -2888,7 +2937,7 @@ function renderWeekAiBtn(mon){
   const el = document.getElementById('weekAiAssist'); if(!el) return;
   if(mode!=='coach'){ el.hidden=true; return; }
   const key = activeAthleteKey();
-  if(!key){ el.hidden=true; return; }
+  if(!key || !weekReviewSessions(mon).length){ el.hidden=true; return; }
   el.hidden=false;
   const wk = iso(mon), ck = key+'|'+wk;
   const cached = WEEK_REVIEW_CACHE[ck];
@@ -3114,6 +3163,7 @@ function sessionCard(s, dateKey){
     <div class="t">${s.title}</div>
     <div class="m"><span>${fmtDur(s.dur)}</span>${s.dist?`<span>${s.dist} km</span>`:''}<span>${s.tss} TSS</span><span>${s.zone}</span>${s.done&&s.rpe?`<span class="rpe-chip" style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}</span>`:''}${s.done&&s.rpeMuscle?`<span class="mus-chip" style="color:${rpeColor(s.rpeMuscle)}" title="${tr('session.muscleEffort')}"><i class="ic ic-dumbbell" style="width:10px;height:10px;vertical-align:-1px"></i>${s.rpeMuscle}</span>`:''}</div>
     ${sessionProfileHTML(s)}
+    ${s.linkedAct?`<div class="real-tag"><i class="ic ic-check"></i> ${tr('week.realised')} · ${realisedSrcLabel(s.linkedAct.src)}${s.linkedAct.dur?' · '+fmtDur(s.linkedAct.dur):''}${s.linkedAct.avgHr?' · '+s.linkedAct.avgHr+' bpm':''}</div>`:''}
     ${vid?`<span class="video-chip">${vid.title}</span>`:''}
     ${s.done?'<span class="done-chip"><i class="ic ic-check"></i></span>':''}
     ${mode==='coach'?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="${tr('session.noteForAthlete')}" title="${s.coachNote?dispoSafe(s.coachNote):tr('session.addNoteForAthlete')}"><i class="ic ic-message-circle"></i></button>`:''}
@@ -3142,6 +3192,7 @@ function sessionCard(s, dateKey){
       planning[dateKey] = planning[dateKey].filter(x=>x.id!==s.id); render(); return;
     }
     if(e.target.closest('.check-btn')){
+      if(s.autoDone){ openRpeModal(s); return; }
       if(s.done){
         s.done=false; delete s.rpe; delete s.note;
         if(window.PF?.user && s.id){ PF.markSessionDone(s.id, { done:false, rpe:null }).catch(e=>console.warn('[PF] markSessionDone', e)); }
@@ -3157,7 +3208,7 @@ function sessionCard(s, dateKey){
     // supprimer) — cliquer une séance prévue ne faisait jusqu'ici RIEN de
     // ce que le coach en attend (retour Rowan 28/09/2026).
     // ATHLÈTE : garde la fiche séance (détails, nutrition, mark-done).
-    if(mode==='coach'){ if(s.done) openAnalysis(s); else openSessionActions(s, dateKey); }
+    if(mode==='coach'){ if(s.done) openSessionAnalysis(s, dateKey); else openSessionActions(s, dateKey); }
     else openModal(s, dateKey);
   });
   return el;
@@ -3341,7 +3392,7 @@ function openRpeModal(s){
   });
   save.onclick = ()=>{
     if(!rpe) return;
-    s.done = true; s.rpe = rpe;
+    s.done = true; s.autoDone = false; s.rpe = rpe;
     if(rpeMuscle) s.rpeMuscle = rpeMuscle;
     const note = modal.querySelector('.rpe-note').value.trim();
     if(note) s.note = note;
@@ -3689,7 +3740,7 @@ function openModal(s, dateKey){
   modal.querySelector('.close').onclick = closeModal;
   modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch' && btn.id!=='modalMove') btn.onclick = closeModal; });
   const an = modal.querySelector('#openAnalysis');
-  if(an) an.onclick = ()=>{ closeModal(); openAnalysis(s); };
+  if(an) an.onclick = ()=>{ closeModal(); openSessionAnalysis(s, dateKey); };
   const sw = modal.querySelector('#modalSendWatch');
   if(sw) sw.onclick = ()=>{ pushSingleSessionToWatch(s, dateKey); };
   const mv = modal.querySelector('#modalMove');
