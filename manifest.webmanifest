@@ -1,7 +1,7 @@
 {
-  "name": "Sillance — Plan d'entraînement",
+  "name": "Sillance",
   "short_name": "Sillance",
-  "description": "Coaching triathlon, Hyrox & clubs — ton entraînement dans le sillage de ton coach.",
+  "description": "Coaching triathlon, Hyrox & clubs, ton entraînement dans le sillage de ton coach.",
   "start_url": "./sillance-app.html",
   "scope": "./",
   "display": "standalone",

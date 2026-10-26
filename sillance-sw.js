@@ -21,7 +21,7 @@
    versions) — pas obligatoire à chaque déploiement grâce au
    network-first, seulement utile si un jour un bug de cache est
    suspecté. */
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `sillance-${CACHE_VERSION}`;
 const PRECACHE_URLS = [
   './', './index.html', './sillance-app.html', './sillance-calendrier.html', './sillance-review.html',
