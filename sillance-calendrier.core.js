@@ -1435,7 +1435,7 @@ function buildMorningPreview(){
     <ul class="mp-sessions">${m.sessions.map(l=>`<li>${l}</li>`).join('')}</ul>
     <div class="mp-gear-lbl"><i class="ic ic-backpack"></i> ${tr('morning.toBring')}</div>
     <div class="mp-gear">${m.gear.map(g=>`<span>${g}</span>`).join('')}</div>
-    <button class="mp-sync" id="syncActivityBtn"><i class="ic ic-refresh"></i> ${tr('morning.syncActivity')}</button>`;
+    `;
 
   const btn = document.getElementById('morningBtn');
   if(btn && !btn._wired){
