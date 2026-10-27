@@ -7807,6 +7807,9 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') analysisOverlay.c
    | 'error' | 'warn'. Rétrocompatible : tout appel toast(msg) existant sans
    2e argument garde l'apparence par défaut (liseré vert, comme avant mais
    désormais explicite plutôt qu'absent). */
+// Exposé pour les scripts partagés (sillance-club-feed.js, sillance-reminder.js) :
+// ce fichier est une IIFE, sans ça leurs window.toast(...) ne faisaient rien.
+window.toast = toast;
 function toast(msg, type='ok'){
   let t=document.getElementById('silToast');
   if(!t){ t=document.createElement('div'); t.id='silToast'; document.body.appendChild(t);
