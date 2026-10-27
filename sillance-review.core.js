@@ -1911,7 +1911,7 @@ function applyCycle(c, startIso){
       PF.scheduleSession(currentAthleteId || PF.user.id, key, { disc:s.disc, title:s.title, dur:s.dur,
         dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
         .then(saved=>{ if(saved) s.id=saved.id; })
-        .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
+        .catch(e=> scheduleFailed(e, s, key));
     }
   });
   weekOffset = Math.round((mon - mondayOf(0))/(7*864e5));
@@ -1945,7 +1945,7 @@ function doAssign(kind, obj, dateIso, targets){
         PF.scheduleSession(a.id, key, { disc:s.disc, title:s.title, dur:s.dur,
           dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
           .then(saved=>{ if(saved) s.id=saved.id; })
-          .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
+          .catch(e=> scheduleFailed(e));
       } else {
         ((ASSIGN_EXTRA[a.id] ||= {})[key] ||= []).push(s);
       }
@@ -6548,7 +6548,11 @@ document.getElementById('bShorthandGo').addEventListener('click', ()=>{
 });
 document.getElementById('bSaveCal').addEventListener('click', ()=>{
   const s=builderToSession();
-  const key=builderState.targetDate || iso(mondayOf(weekOffset));
+  // Sans jour choisi (bouton générique « Créer une séance ») : aujourd'hui
+  // si la semaine affichée est la semaine en cours, sinon son lundi. Avant :
+  // toujours le lundi, donc souvent un jour déjà passé (constaté 27/10/2026 :
+  // séance posée mardi sur le lundi de la veille, invisible pour l'athlète).
+  const key=builderState.targetDate || (weekOffset===0 ? iso(new Date()) : iso(mondayOf(weekOffset)));
   if(builderEditing){
     // Édition d'une séance déjà planifiée : remplace en place plutôt que
     // d'empiler un doublon. La date ne bouge pas (le builder ne l'affiche pas
@@ -6561,7 +6565,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
     if(window.PF?.user){
       PF.updateScheduled(id, { disc:s.disc, title:s.title, dur:s.dur,
         dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
-        .catch(e=> console.warn('[PF] updateScheduled échoué :', e));
+        .catch(e=> scheduleFailed(e));
     }
     builderEditing = null;
     closeBuilder(); render();
@@ -6593,7 +6597,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
       PF.scheduleSession(currentAthleteId || PF.user.id, k, { disc:occ.disc, title:occ.title, dur:occ.dur,
         dist:occ.dist||0, tss:occ.tss, zone:occ.zone, blocks:(occ.blocksV2&&occ.blocksV2.blocks)||[] })
         .then(saved=>{ if(saved) occ.id = saved.id; })
-        .catch(e=> console.warn('[PF] scheduleSession échoué :', e));
+        .catch(e=> scheduleFailed(e, occ, k));
     }
   });
   closeBuilder(); render();
@@ -7811,6 +7815,15 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') analysisOverlay.c
 // ce fichier est une IIFE, sans ça leurs window.toast(...) ne faisaient rien.
 window.toast = toast;
 window.silEnablePush = enableMorningPush; // abonnement push du navigateur, réutilisé par le rappel coach
+// Échec d'enregistrement d'une séance (réseau, droits) : avant, un simple
+// console.warn, le coach voyait « Séance ajoutée » alors que rien n'était en
+// base et l'athlète ne la recevait jamais (constaté 27/10/2026). On retire la
+// séance affichée si on la connaît, et on prévient le coach.
+function scheduleFailed(e, s, key){
+  console.warn('[PF] enregistrement de séance échoué :', e);
+  if(s && key && planning[key]){ const i = planning[key].indexOf(s); if(i > -1){ planning[key].splice(i, 1); render(); } }
+  toast(tr('toast.sessionSaveFailed'), 'error');
+}
 function toast(msg, type='ok'){
   let t=document.getElementById('silToast');
   if(!t){ t=document.createElement('div'); t.id='silToast'; document.body.appendChild(t);
