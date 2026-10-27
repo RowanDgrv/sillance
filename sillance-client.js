@@ -272,6 +272,20 @@ export const PF = {
     if (error) throw error;
     return true;
   },
+  // Rappel de planification coach : jour limite + canal (0071, 'email' par
+  // défaut ; week_deadline_day NULL = dimanche côté edge function).
+  async getCoachReminderPrefs() {
+    const { data, error } = await sb.from("profiles")
+      .select("week_deadline_day, week_reminder_channel").eq("id", this.user.id).single();
+    if (error) { console.warn("getCoachReminderPrefs:", error.message); return null; }
+    return { day: data?.week_deadline_day ?? "sunday", channel: data?.week_reminder_channel ?? "email" };
+  },
+  async setCoachReminderPrefs({ day, channel }) {
+    const { error } = await sb.from("profiles")
+      .update({ week_deadline_day: day, week_reminder_channel: channel }).eq("id", this.user.id);
+    if (error) throw error;
+    return true;
+  },
   // Prévient l'athlète que sa semaine (week_monday = date ISO du lundi) est prête.
   async notifyWeekReady(athleteId, weekMonday) {
     return await this._invoke("notify-week-ready", { athlete_id: athleteId, week_monday: weekMonday });

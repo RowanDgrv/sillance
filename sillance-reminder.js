@@ -49,6 +49,16 @@
       'guide.emailTitle': 'Plus simple : l\'email',
       'guide.email': 'Le rappel par email est déjà actif par défaut, sans rien installer. Tu peux changer l\'heure ou le couper à tout moment dans « Rappel du matin ».',
       'guide.noSession': 'Pas de séance prévue ce jour-là ? Pas de rappel, pour ne pas te déranger les jours de repos.',
+      'coach.title': 'Rappel de planification',
+      'coach.hint': 'Si un athlète n\'a aucune séance la semaine suivante, tu es prévenu 3, 2 puis 1 jour avant ton jour limite, à 18h.',
+      'coach.deadline': 'Jour limite',
+      'coach.receive': 'Je veux recevoir',
+      'coach.statusOn': 'Actif : {ch}, limite le {day}',
+      'coach.saved': 'Rappel de planification enregistré',
+      'coach.off': 'Rappel de planification désactivé',
+      'guide.coachLead': 'Quand un athlète n\'a pas encore sa semaine suivante : la liste des athlètes à planifier, avant ton jour limite.',
+      'guide.coachStep': 'Reviens dans ton espace coach, bloc « Rappel de planification », choisis <b>Notification</b> puis touche <b>Autoriser</b>.',
+      'guide.coachEmail': 'Le rappel par email est déjà actif par défaut, sans rien installer. Tu peux changer le canal, le jour limite ou le couper dans « Rappel de planification ».',
       'guide.ok': 'J\'ai compris',
       'guide.close': 'Fermer'
     },
@@ -78,6 +88,16 @@
       'guide.emailTitle': 'Simpler: email',
       'guide.email': 'The email reminder is already on by default, nothing to install. Change the time or turn it off anytime in "Morning reminder".',
       'guide.noSession': 'No session planned that day? No reminder, so rest days stay quiet.',
+      'coach.title': 'Planning reminder',
+      'coach.hint': 'If an athlete has no session planned for next week, you get a heads-up 3, 2 and 1 day before your deadline, at 6 pm.',
+      'coach.deadline': 'Deadline',
+      'coach.receive': 'I want to receive',
+      'coach.statusOn': 'On: {ch}, deadline {day}',
+      'coach.saved': 'Planning reminder saved',
+      'coach.off': 'Planning reminder turned off',
+      'guide.coachLead': 'When an athlete doesn\'t have next week yet: the list of athletes to plan, before your deadline.',
+      'guide.coachStep': 'Go back to your coach space, "Planning reminder" block, pick <b>Notification</b> then tap <b>Allow</b>.',
+      'guide.coachEmail': 'The email reminder is already on by default, nothing to install. Change the channel, the deadline or turn it off in "Planning reminder".',
       'guide.ok': 'Got it',
       'guide.close': 'Close'
     },
@@ -107,6 +127,16 @@
       'guide.emailTitle': 'Más sencillo: el email',
       'guide.email': 'El recordatorio por email ya está activo por defecto, sin instalar nada. Cambia la hora o desactívalo cuando quieras en «Recordatorio matutino».',
       'guide.noSession': '¿Sin sesión prevista ese día? Sin recordatorio, para no molestarte los días de descanso.',
+      'coach.title': 'Recordatorio de planificación',
+      'coach.hint': 'Si un atleta no tiene ninguna sesión la semana siguiente, te avisamos 3, 2 y 1 día antes de tu día límite, a las 18 h.',
+      'coach.deadline': 'Día límite',
+      'coach.receive': 'Quiero recibir',
+      'coach.statusOn': 'Activo: {ch}, límite el {day}',
+      'coach.saved': 'Recordatorio de planificación guardado',
+      'coach.off': 'Recordatorio de planificación desactivado',
+      'guide.coachLead': 'Cuando un atleta aún no tiene su semana siguiente: la lista de atletas por planificar, antes de tu día límite.',
+      'guide.coachStep': 'Vuelve a tu espacio de entrenador, bloque «Recordatorio de planificación», elige <b>Notificación</b> y toca <b>Permitir</b>.',
+      'guide.coachEmail': 'El recordatorio por email ya está activo por defecto, sin instalar nada. Cambia el canal, el día límite o desactívalo en «Recordatorio de planificación».',
       'guide.ok': 'Entendido',
       'guide.close': 'Cerrar'
     }
@@ -163,18 +193,21 @@
   (function(){ var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st); })();
 
   var lastFocus = null;
+  var guideCtx = 'athlete';
   function stepsHtml(){
-    if(isIOS && isStandalone()) return '<ol class="sg-steps"><li>' + t('guide.iosInstalled') + '</li></ol>';
+    var coach = guideCtx === 'coach';
+    if(isIOS && isStandalone()) return '<ol class="sg-steps"><li>' + t(coach ? 'guide.coachStep' : 'guide.iosInstalled') + '</li></ol>';
     if(isIOS){
       var vars = { share: ICON_SHARE, add: ICON_ADD };
       return '<div class="sg-warn">' + t('guide.iosWarn') + '</div>'
         + (isIOSSafari ? '' : '<p class="sg-note">' + t('guide.iosOther') + '</p>')
         + '<ol class="sg-steps">'
-        + ['guide.ios1', 'guide.ios2', 'guide.ios3', 'guide.ios4', 'guide.ios5']
+        + ['guide.ios1', 'guide.ios2', 'guide.ios3', 'guide.ios4', coach ? 'guide.coachStep' : 'guide.ios5']
             .map(function(k){ return '<li>' + t(k, vars) + '</li>'; }).join('')
         + '</ol>';
     }
-    var keys = isAndroid ? ['guide.and1', 'guide.and2', 'guide.and3'] : ['guide.desk1', 'guide.desk2'];
+    var keys = isAndroid ? [coach ? 'guide.coachStep' : 'guide.and1', 'guide.and2', 'guide.and3']
+                         : [coach ? 'guide.coachStep' : 'guide.desk1', 'guide.desk2'];
     return '<ol class="sg-steps">' + keys.map(function(k){ return '<li>' + t(k) + '</li>'; }).join('') + '</ol>';
   }
   function ensureGuide(){
@@ -197,15 +230,17 @@
     });
     return ov;
   }
-  function openGuide(){
+  function openGuide(ctx){
+    guideCtx = ctx === 'coach' ? 'coach' : 'athlete';
+    var coach = guideCtx === 'coach';
     var ov = ensureGuide();
     ov.innerHTML = '<div class="modal sg-modal">'
       + '<button class="close" data-sg-close aria-label="' + t('guide.close') + '"><i class="ic ic-x"></i></button>'
       + '<h3 id="silGuideTitle">' + t('guide.title') + '</h3>'
-      + '<p class="sg-lead">' + t('guide.lead') + '</p>'
+      + '<p class="sg-lead">' + t(coach ? 'guide.coachLead' : 'guide.lead') + '</p>'
       + stepsHtml()
-      + '<p class="sg-note sg-mail"><b>' + t('guide.emailTitle') + '</b>' + t('guide.email') + '</p>'
-      + '<p class="sg-note">' + t('guide.noSession') + '</p>'
+      + '<p class="sg-note sg-mail"><b>' + t('guide.emailTitle') + '</b>' + t(coach ? 'guide.coachEmail' : 'guide.email') + '</p>'
+      + (coach ? '' : '<p class="sg-note">' + t('guide.noSession') + '</p>')
       + '<button class="btn" data-sg-close style="width:100%">' + t('guide.ok') + '</button>'
       + '</div>';
     lastFocus = document.activeElement;
@@ -311,6 +346,94 @@
     if(e.target.id !== 'morningChannel') return;
     if((e.target.value === 'push' || e.target.value === 'both') && needsInstall()) openGuide();
   }, true);
+
+  /* ---------- rappel de planification (coach) ----------
+     Bloc injecté dans la sidebar coach, compte réel uniquement (la démo a
+     déjà son sélecteur de deadline dans le radar « Athlètes à planifier »).
+     renderSidebar() réécrit la sidebar en innerHTML à chaque rendu : on
+     ré-injecte le bloc depuis l'état gardé ici. Enregistrement immédiat à
+     chaque changement, pas de bouton. */
+  var COACH_DAYS = ['friday', 'saturday', 'sunday'];
+  var coachPrefs = null, coachLoadedFor = null, coachLoading = false;
+  function coachBlockHtml(){
+    var p = coachPrefs;
+    var on = p.channel !== 'none';
+    var dayLbl = t('weekDeadline.' + p.day);
+    if(window.SilI18n && window.SilI18n.getLang() !== 'en') dayLbl = dayLbl.toLowerCase();
+    return '<div class="sn-head"><i class="ic ic-bell"></i> ' + t('coach.title') + '</div>'
+      + '<p class="club-hint">' + t('coach.hint') + '</p>'
+      + '<div class="pr-seg" role="group" aria-label="' + t('coach.deadline') + '"><span class="pr-seg-lbl">' + t('coach.deadline') + '</span>'
+      + COACH_DAYS.map(function(d){ return '<button type="button" data-rem-day="' + d + '" class="' + (p.day === d ? 'sel' : '') + '">' + t('weekDeadline.' + d) + '</button>'; }).join('')
+      + '</div>'
+      + '<div class="morning-time" style="margin-top:10px"><label for="remCoachChannel">' + t('coach.receive') + '</label>'
+      + '<select id="remCoachChannel">'
+      + [['email', 'morning.email'], ['push', 'morning.push'], ['both', 'morning.both'], ['none', 'rem.none']]
+          .map(function(o){ return '<option value="' + o[0] + '"' + (p.channel === o[0] ? ' selected' : '') + '>' + t(o[1]) + '</option>'; }).join('')
+      + '</select></div>'
+      + '<span class="rem-status' + (on ? ' on' : '') + '">' + (on ? t('coach.statusOn', { ch: chLabel(p.channel), day: dayLbl }) : t('rem.statusOff')) + '</span>'
+      + '<a class="morning-help" href="#" data-rem-coach-help>' + t('morning.howTo') + '</a>';
+  }
+  function paintCoach(){
+    var anchor = document.getElementById('adhOpen');
+    if(!anchor || !coachPrefs) return;
+    var blk = document.getElementById('remCoachBlock');
+    if(!blk){
+      blk = document.createElement('div');
+      blk.className = 'sn-block'; blk.id = 'remCoachBlock'; blk.style.marginBottom = '14px';
+      anchor.parentNode.insertBefore(blk, anchor);
+    }
+    blk.innerHTML = coachBlockHtml();
+  }
+  function loadCoach(){
+    var uid = window.PF && window.PF.user ? window.PF.user.id : null;
+    if(uid !== coachLoadedFor){ coachPrefs = null; coachLoadedFor = null; }
+    if(!uid || coachPrefs || coachLoading || !window.PF.getCoachReminderPrefs) return;
+    if(!document.getElementById('adhOpen')) return; // pas en vue coach
+    coachLoading = true;
+    window.PF.getCoachReminderPrefs().then(function(p){
+      coachLoading = false; coachLoadedFor = uid;
+      coachPrefs = p || { day: 'sunday', channel: 'email' };
+      paintCoach();
+    }).catch(function(){ coachLoading = false; });
+  }
+  function saveCoach(next, prev){
+    coachPrefs = next; paintCoach();
+    return window.PF.setCoachReminderPrefs(next).then(function(){
+      if(typeof window.toast === 'function') window.toast(t(next.channel === 'none' ? 'coach.off' : 'coach.saved'));
+    }).catch(function(){
+      coachPrefs = prev; paintCoach();
+      if(typeof window.toast === 'function') window.toast(t('rem.saveErr'), 'error');
+    });
+  }
+  setInterval(function(){
+    loadCoach();
+    if(coachPrefs && document.getElementById('adhOpen') && !document.getElementById('remCoachBlock')) paintCoach();
+  }, 1000);
+  document.addEventListener('click', function(e){
+    if(e.target.closest('[data-rem-coach-help]')){ e.preventDefault(); openGuide('coach'); return; }
+    var b = e.target.closest('[data-rem-day]'); if(!b || !coachPrefs) return;
+    var prev = { day: coachPrefs.day, channel: coachPrefs.channel };
+    if(b.dataset.remDay === prev.day) return;
+    saveCoach({ day: b.dataset.remDay, channel: prev.channel }, prev);
+  });
+  document.addEventListener('change', function(e){
+    if(e.target.id !== 'remCoachChannel' || !coachPrefs) return;
+    var prev = { day: coachPrefs.day, channel: coachPrefs.channel };
+    var ch = e.target.value;
+    if(ch === 'push' || ch === 'both'){
+      // Notification : sur iPhone non installé, impossible → guide ; ailleurs
+      // on abonne le navigateur (permission + push_subscriptions) avant d'enregistrer.
+      if(needsInstall()){ e.target.value = prev.channel; openGuide('coach'); return; }
+      if(typeof window.silEnablePush !== 'function'){ e.target.value = prev.channel; return; }
+      window.silEnablePush().then(function(){ saveCoach({ day: prev.day, channel: ch }, prev); })
+        .catch(function(err){
+          e.target.value = prev.channel;
+          if(typeof window.toast === 'function') window.toast(err && err.message ? err.message : t('rem.saveErr'), 'error');
+        });
+      return;
+    }
+    saveCoach({ day: prev.day, channel: ch }, prev);
+  });
 
   window.SilReminder = { openGuide: openGuide, needsInstall: needsInstall };
 })();

@@ -991,12 +991,12 @@ function renderSidebar(){
       <button class="btn adh-open-btn" id="compareAthOpen" style="margin-top:8px"><i class="ic ic-chart"></i> ${tr('compareAth.btn')}</button>
       <h2>${tr('sidebar.library')}</h2>
       <p class="hint">${tr('sidebar.libraryHint')}</p>
-      <button class="create-btn" id="createSessionBtn">+ ${tr('sidebar.createSession')}</button>
+      <button class="create-btn" id="createSessionBtn">${tr('sidebar.createSession')}</button>
       <div id="premiumUpsell"></div>
       <div id="tplList" style="margin-top:12px"></div>
       <h2 style="margin-top:20px">${tr('sidebar.cycles')}</h2>
       <p class="hint">${tr('sidebar.cyclesHint')}</p>
-      <button class="create-btn" id="createCycleBtn">+ ${tr('sidebar.createCycle')}</button>
+      <button class="create-btn" id="createCycleBtn">${tr('sidebar.createCycle')}</button>
       <div id="cycleList" style="margin-top:12px"></div>
       <div class="lib-note"><i class="ic ic-lightbulb"></i> <b>${tr('sidebar.coachTip')}</b> ${tr('sidebar.coachTipText')}</div>
       <div class="readiness" style="margin-top:14px">
@@ -9700,6 +9700,7 @@ document.addEventListener('keydown', e=>{
 // Exposé pour les scripts partagés (sillance-club-feed.js, sillance-reminder.js) :
 // ce fichier est une IIFE, sans ça leurs window.toast(...) ne faisaient rien.
 window.toast = toast;
+window.silEnablePush = enableMorningPush; // abonnement push du navigateur, réutilisé par le rappel coach
 function toast(msg, type='ok'){
   let t=document.getElementById('silToast');
   if(!t){ t=document.createElement('div'); t.id='silToast'; document.body.appendChild(t);
