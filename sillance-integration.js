@@ -998,12 +998,13 @@ function renderAuth() {
     <label for="pf-pass">${tr("auth.password")}${isUp ? req : ""}</label><input id="pf-pass" type="password" autocomplete="${isUp ? "new-password" : "current-password"}" placeholder="••••••••">
     ${isUp ? `<div class="pf-hint">${tr("auth.passwordRule")}</div>
       <label for="pf-pass2">${tr("auth.passwordConfirm")}${req}</label><input id="pf-pass2" type="password" autocomplete="new-password" placeholder="••••••••">
-      <label for="pf-source">${tr("auth.source")}${req}</label>
+      <label for="pf-source">${tr("auth.source")}</label>
       <select id="pf-source">
         <option value="">${tr("auth.sourcePick")}</option>
         ${sources.map((v) => `<option value="${v}">${tr("auth.src." + v)}</option>`).join("")}
       </select>
       <input id="pf-source-other" placeholder="${tr("auth.sourceOtherPh")}" style="margin-top:8px" hidden>` : ``}
+    ${isUp ? `<div class="pf-hint">${tr("auth.requiredNote")}</div>` : ``}
     <div class="err" id="pf-err" role="alert"></div>
     ${isUp ? `<label class="pf-consent"><input type="checkbox" id="pf-consent"><span>${tr("auth.consentText")} <a href="./legal.html#confidentialite" target="_blank" rel="noopener">${tr("auth.privacyPolicyLink")}</a>.</span></label>` : ``}
     <div id="pf-turnstile" style="margin:6px 0"></div>
@@ -1078,8 +1079,9 @@ async function submitAuth() {
       if (email.toLowerCase() !== $("pf-email2").value.trim().toLowerCase()) return fail("pf-email2", "auth.errEmailMismatch");
       if (password.length < 8) return fail("pf-pass", "auth.errWeakPassword");
       if (password !== $("pf-pass2").value) return fail("pf-pass2", "auth.errPasswordMismatch");
-      if (!source) return fail("pf-source", "auth.errSource");
-      if (source === "other" && !sourceDetail) return fail("pf-source-other", "auth.errSourceOther");
+      // Provenance FACULTATIVE (revue RGPD 28/10/2026) : donnée non nécessaire
+      // au service → minimisation (art. 5.1.c), la CNIL demande de distinguer
+      // champs obligatoires et facultatifs.
       const consent = $("pf-consent");
       if (consent && !consent.checked) { err.textContent = tr("auth.pleaseAcceptConsent"); return; }
       // Rôle "club" : le nom du club est obligatoire ici, pas demandé après
