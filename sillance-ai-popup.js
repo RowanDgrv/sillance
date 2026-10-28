@@ -25,8 +25,8 @@
       'aip.demo': 'Exemple (démo)',
       'aip.close': 'Fermer',
       'aip.errTitle': 'Analyse IA indisponible',
-      'aip.errIntro': 'L\'analyse n\'a pas pu être générée. Rien n\'a été facturé.',
-      'aip.err.anthropic_credit': 'Le crédit du service d\'IA est épuisé. C\'est un réglage côté Sillance, pas de ton côté.',
+      'aip.errIntro': 'L\'analyse n\'a pas pu être générée. Rien n\'a été facturé, et l\'équipe Sillance est prévenue automatiquement.',
+      'aip.err.anthropic_credit': 'Le service d\'IA a atteint sa limite. C\'est un réglage côté Sillance, pas de ton côté : l\'équipe est prévenue.',
       'aip.err.missing_key': 'Le service d\'IA n\'est pas configuré côté Sillance.',
       'aip.err.auth': 'La clé du service d\'IA est refusée. C\'est un réglage côté Sillance, pas de ton côté.',
       'aip.err.model': 'Le modèle d\'IA demandé n\'est pas disponible.',
@@ -48,7 +48,7 @@
       'aip.demo': 'Example (demo)',
       'aip.close': 'Close',
       'aip.errTitle': 'AI analysis unavailable',
-      'aip.errIntro': 'The analysis couldn\'t be generated. Nothing was charged.',
+      'aip.errIntro': 'The analysis couldn\'t be generated. Nothing was charged, and the Sillance team has been notified automatically.',
       'aip.err.anthropic_credit': 'The AI service has run out of credit. This is on Sillance\'s side, not yours.',
       'aip.err.missing_key': 'The AI service isn\'t configured on Sillance\'s side.',
       'aip.err.auth': 'The AI service key was rejected. This is on Sillance\'s side, not yours.',
@@ -71,7 +71,7 @@
       'aip.demo': 'Ejemplo (demo)',
       'aip.close': 'Cerrar',
       'aip.errTitle': 'Análisis IA no disponible',
-      'aip.errIntro': 'No se pudo generar el análisis. No se ha cobrado nada.',
+      'aip.errIntro': 'No se pudo generar el análisis. No se ha cobrado nada y el equipo de Sillance ha sido avisado automáticamente.',
       'aip.err.anthropic_credit': 'El servicio de IA se ha quedado sin crédito. Es un ajuste de Sillance, no tuyo.',
       'aip.err.missing_key': 'El servicio de IA no está configurado en Sillance.',
       'aip.err.auth': 'La clave del servicio de IA ha sido rechazada. Es un ajuste de Sillance, no tuyo.',
@@ -190,17 +190,26 @@
   }
 
   function errKey(detail){
-    var d = String(detail || 'unknown');
+    // Codes combinés « groq_429+anthropic_credit » (un par fournisseur tenté) :
+    // le message suit le fournisseur principal, le code complet reste affiché.
+    var d = String(detail || 'unknown').split('+')[0];
+    if(d === 'timeout') return 'aip.err.overloaded';
+    if(/_credit$/.test(d)) return 'aip.err.anthropic_credit';
     if(d === 'anthropic_credit' || d === 'missing_key' || d === 'bad_output' || d === 'add_on_required') return 'aip.err.' + d;
     if(/^network/.test(d)) return 'aip.err.network';
-    if(/^anthropic_401|authentication|permission/.test(d)) return 'aip.err.auth';
-    if(/^anthropic_404|not_found/.test(d)) return 'aip.err.model';
-    if(/^anthropic_529|overloaded/.test(d)) return 'aip.err.overloaded';
-    if(/^anthropic_429|rate_limit/.test(d)) return 'aip.err.rate';
+    if(/^(anthropic|groq)_(401|403)|authentication|permission|invalid_api_key/.test(d)) return 'aip.err.auth';
+    if(/^(anthropic|groq)_404|not_found|decommissioned/.test(d)) return 'aip.err.model';
+    if(/^(anthropic|groq)_(529|503)|overloaded/.test(d)) return 'aip.err.overloaded';
+    if(/^(anthropic|groq)_429|rate_limit/.test(d)) return 'aip.err.rate';
     return 'aip.err.unknown';
   }
   function showError(o){
     var detail = (o && o.detail) || 'unknown';
+    // Échec que le serveur n'a pas vu : on le signale pour l'email d'alerte.
+    if(/^network/.test(detail) && window.PF && window.PF.user && window.PF.reportAiFailure){
+      window.PF.reportAiFailure({ fn: o.kind === 'week' ? 'week-review' : 'session-summary', detail: detail,
+        context: { page: location.pathname, online: String(navigator.onLine) } });
+    }
     open(
       '<h3 id="silAiPopupT">' + esc(t('aip.errTitle')) + '</h3>'
       + '<p class="aip-sub">' + esc(t('aip.errIntro')) + '</p>'

@@ -96,7 +96,7 @@ symptôme inhabituel, cessez l'effort et consultez un professionnel de santé. L
 la plateforme relèvent de la seule responsabilité de ce coach.`,
     "legal.cgu.t9": `2.9 Assistant IA`,
     "legal.cgu.p9": `L'add-on « Assistant IA » génère des résumés et recommandations d'entraînement à partir des données chiffrées de
-vos séances, au moyen d'un modèle de langage fourni par Anthropic. Ces contenus sont générés automatiquement et
+vos séances, au moyen d'un modèle de langage fourni par Groq (Anthropic en secours). Ces contenus sont générés automatiquement et
 peuvent comporter des imprécisions : ils doivent être relus et validés par le coach avant toute décision d'entraînement.`,
     "legal.cgu.t10": `2.10 Propriété intellectuelle`,
     "legal.cgu.p10": `Le Service, sa marque, son interface, ses contenus (dont la bibliothèque d'exercices vidéo) sont la propriété
@@ -149,7 +149,7 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.eu": `Union européenne`,
     "legal.priv.sub2.b": `Paiements et abonnements`,
     "legal.priv.sub2.c": `UE / transferts encadrés (clauses contractuelles types)`,
-    "legal.priv.sub3.b": `Génération des résumés IA (add-on), qui reçoit uniquement le bilan chiffré et anonymisé de la séance, jamais votre identité`,
+    "legal.priv.sub3.b": `Génération des résumés IA (add-on) : Groq en principal, Anthropic en secours. Ils reçoivent uniquement le bilan chiffré et anonymisé de la séance, jamais votre identité, et ne l'utilisent pas pour entraîner leurs modèles`,
     "legal.priv.sub3.c": `États-Unis (clauses contractuelles types)`,
     "legal.priv.sub4.b": `Hébergement du site statique (aucune donnée personnelle)`,
     "legal.priv.us": `États-Unis`,
@@ -302,7 +302,7 @@ unusual symptom, stop exercising and consult a healthcare professional. Recommen
 the platform are the sole responsibility of that coach.`,
     "legal.cgu.t9": `2.9 AI Assistant`,
     "legal.cgu.p9": `The "AI Assistant" add-on generates training summaries and recommendations from the numerical data of
-your sessions, using a language model provided by Anthropic. This content is generated automatically and
+your sessions, using a language model provided by Groq (Anthropic as backup). This content is generated automatically and
 may contain inaccuracies: it must be reviewed and validated by the coach before any training decision.`,
     "legal.cgu.t10": `2.10 Intellectual property`,
     "legal.cgu.p10": `The Service, its brand, its interface, and its content (including the video exercise library) are the exclusive
@@ -355,7 +355,7 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.eu": `European Union`,
     "legal.priv.sub2.b": `Payments and subscriptions`,
     "legal.priv.sub2.c": `EU / safeguarded transfers (standard contractual clauses)`,
-    "legal.priv.sub3.b": `AI summary generation (add-on), which only receives the anonymized numerical summary of the session, never your identity`,
+    "legal.priv.sub3.b": `AI summary generation (add-on): Groq as primary, Anthropic as backup. They only receive the anonymized numerical summary of the session, never your identity, and don't use it to train their models`,
     "legal.priv.sub3.c": `United States (standard contractual clauses)`,
     "legal.priv.sub4.b": `Static site hosting (no personal data)`,
     "legal.priv.us": `United States`,
@@ -507,7 +507,7 @@ síntoma inusual, cesa el esfuerzo y consulta a un profesional de la salud. Las 
 la plataforma son responsabilidad exclusiva de dicho entrenador.`,
     "legal.cgu.t9": `2.9 Asistente de IA`,
     "legal.cgu.p9": `El add-on «Asistente de IA» genera resúmenes y recomendaciones de entrenamiento a partir de los datos numéricos de
-tus sesiones, mediante un modelo de lenguaje proporcionado por Anthropic. Este contenido se genera automáticamente y
+tus sesiones, mediante un modelo de lenguaje proporcionado por Groq (Anthropic como respaldo). Este contenido se genera automáticamente y
 puede contener imprecisiones: debe ser revisado y validado por el entrenador antes de cualquier decisión de entrenamiento.`,
     "legal.cgu.t10": `2.10 Propiedad intelectual`,
     "legal.cgu.p10": `El Servicio, su marca, su interfaz y sus contenidos (incluida la biblioteca de ejercicios en vídeo) son propiedad
@@ -560,7 +560,7 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.eu": `Unión Europea`,
     "legal.priv.sub2.b": `Pagos y suscripciones`,
     "legal.priv.sub2.c": `UE / transferencias reguladas (cláusulas contractuales tipo)`,
-    "legal.priv.sub3.b": `Generación de resúmenes de IA (add-on), que recibe únicamente el balance numérico y anonimizado de la sesión, nunca tu identidad`,
+    "legal.priv.sub3.b": `Generación de resúmenes de IA (add-on): Groq como principal, Anthropic como respaldo. Reciben únicamente el balance numérico y anonimizado de la sesión, nunca tu identidad, y no lo usan para entrenar sus modelos`,
     "legal.priv.sub3.c": `Estados Unidos (cláusulas contractuales tipo)`,
     "legal.priv.sub4.b": `Alojamiento del sitio estático (sin datos personales)`,
     "legal.priv.us": `Estados Unidos`,

@@ -213,6 +213,12 @@ export const PF = {
   async summarizeWeek(payload) {
     return await this._invokeSoft("week-review", payload);
   },
+  // Échec IA que le serveur n'a jamais vu (code network_*) : signalé pour
+  // déclencher l'email d'alerte à l'admin. Jamais bloquant.
+  async reportAiFailure({ fn, detail, context }) {
+    try { await sb.functions.invoke("ai-report-failure", { body: { fn, detail, context } }); }
+    catch (e) { console.warn("[PF] reportAiFailure:", e); }
+  },
   // ---- Option « Vidéos » PAR ATHLÈTE (le coach paie un siège par athlète) ----
   // Liste des activations vidéo du coach connecté : [{athlete_id, active}].
   async getVideoAccess() {
