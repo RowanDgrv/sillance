@@ -2210,6 +2210,14 @@ body[data-athview] .planner > .library{display:none}
 /* ---------- Éditeur de séance (riche) ---------- */
 .builder-modal{width:min(820px,100%);max-height:92vh;display:flex;flex-direction:column;padding:0;transition:width .2s}
 .builder-modal.wide{width:min(1140px,100%)}
+/* Petit écran : en-tête (314 px) + pied (~200 px) fixes ne laissaient que
+   ~170 px aux blocs. La fenêtre entière défile ; la zone des blocs n'a plus
+   son propre défilement. La ligne « zone % » passe à la ligne si besoin. */
+@media (max-width:640px){
+  .builder-modal{overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .builder-modal .builder-body{overflow:visible;flex:none}
+  .ln-zone-row,.ln-pct{flex-wrap:wrap;min-width:0}
+}
 .builder-head{padding:22px 26px 14px;border-bottom:1px solid var(--line)}
 .builder-meta-row{display:flex;gap:var(--space-3);align-items:center;margin-top:14px}
 .b-title-input{flex:1;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--panel-2);
@@ -2244,7 +2252,7 @@ body[data-athview] .planner > .library{display:none}
 .builder-body{padding:var(--space-4) 26px;overflow-y:auto;flex:1;background:var(--ink)}
 .b-body-cols{display:flex;gap:22px;align-items:flex-start}
 .b-main{flex:1;min-width:0}
-@media (max-width:900px){.b-body-cols{flex-direction:column}}
+@media (max-width:900px){.b-body-cols{flex-direction:column;align-items:stretch}.b-main{width:100%}}
 /* encadré "écris ta séance" (natation) — texte libre → blocs générés */
 .b-shorthand{flex:0 0 300px;position:sticky;top:0;border:1px solid rgba(47,217,255,.3);border-radius:13px;
   background:rgba(47,217,255,.05);padding:16px}
@@ -2263,6 +2271,9 @@ body[data-athview] .planner > .library{display:none}
 /* bloc = conteneur avec séries + lignes */
 .bk{border:1px solid var(--line);border-radius:13px;background:var(--panel);overflow:hidden}
 .bk-head{display:flex;align-items:center;gap:10px;padding:10px var(--space-3);background:var(--panel-2);border-bottom:1px solid var(--line)}
+/* Mobile : le champ titre gardait sa largeur native (~200 px) et poussait
+   dupliquer/supprimer hors du bloc. Le titre passe sur sa propre ligne. */
+@media (max-width:640px){.bk-head{flex-wrap:wrap}.bk-head .bk-tools{margin-left:auto}.bk-head .bk-title-in{order:9;flex:1 1 100%;min-width:0}}
 .bk-move{display:flex;flex-direction:column;gap:1px}
 .bk-move button{width:20px;height:15px;border:none;background:transparent;color:var(--muted);font-size:var(--fs-xs);line-height:1;padding:0;border-radius:3px}
 .bk-move button:hover{color:var(--swim);background:rgba(47,217,255,.1)}
@@ -2633,6 +2644,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .draw{stroke-dashoffset:0}
+}
+
+/* Mobile (28/10/2026) : Safari iOS zoome automatiquement sur tout champ dont
+   le texte fait moins de 16 px (la page « saute » à chaque saisie). Sur écran
+   tactile étroit, champs et menus passent à 16 px ; cases, curseurs et
+   boutons radio ne sont pas concernés. */
+@media (max-width:760px) and (pointer:coarse){
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:16px !important}
 }
 </style>
 </head>
@@ -3841,7 +3860,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261028l"></script>
+<script type="module" src="./sillance-integration.js?v=20261028n"></script>
 <script src="./sillance-cookies.js"></script>
 <script src="./sillance-analytics.js"></script>
 </body>

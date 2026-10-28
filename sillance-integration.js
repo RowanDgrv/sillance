@@ -793,7 +793,9 @@ function injectStyles() {
     box-shadow:0 6px 18px -6px rgba(70,194,216,.6);transition:filter .15s,transform .15s}
   #pf-cloud-badge:hover{filter:brightness(1.06);transform:translateY(-1px)}
   #pf-cloud-badge.on{background:#12171d;color:#39e6a3;border-color:#274;box-shadow:none;font-weight:600}
-  .top-right #pf-cloud-badge{position:static;padding:8px 13px;box-shadow:none;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+  /* z-index:auto : dans la barre (flex), un z-index s'applique même sans position
+     et le badge passait au-dessus des fenêtres ouvertes. */
+  .top-right #pf-cloud-badge{position:static;z-index:auto;padding:8px 13px;box-shadow:none;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis}
   #pf-auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);
     display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
   #pf-auth-overlay.open{display:flex}
@@ -823,6 +825,14 @@ function injectStyles() {
   .pf-auth-card input.bad,.pf-auth-card select.bad{border-color:#ff6b81}
   .pf-auth-card .pf-hint{font-size:11.5px;color:#6f7a85;margin-top:4px}
   .pf-auth-card .pf-req{color:#46C2D8}
+  /* Champs du formulaire : même style sombre pour les champs ET les menus
+     (les styles globaux de l'app rendaient les champs clairs en 13 px et les
+     menus sombres en 14 px), 16 px contre le zoom iOS, 44 px de haut au doigt. */
+  .pf-auth-card input:not([type=checkbox]),.pf-auth-card select{background:#0c0f13 !important;color:#e7edf3 !important;
+    border:1px solid #2a2f37 !important;border-radius:9px !important;font-size:16px !important;padding:10px 12px !important;
+    min-height:44px;box-sizing:border-box;width:100%}
+  .pf-auth-card input::placeholder{color:#5f6b78}
+  .pf-auth-card .pf-row2{align-items:end}
   .vcard.vlocked .thumb{filter:grayscale(.45) brightness(.62)}
   .vlock{position:absolute;top:8px;right:8px;z-index:3;background:rgba(8,10,13,.72);
     color:#ffd23f;border-radius:99px;padding:3px 8px;font-size:12px;font-weight:700}
