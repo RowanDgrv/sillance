@@ -112,6 +112,7 @@
       }
       return v;
     }
+    if(s._unplanned) return { statut: 'activité hors plan : aucune séance prévue, rien à comparer', titre_activite: s.title || NA, discipline: s.disc || NA };
     var blocks = (s.blocksV2 && s.blocksV2.blocks) || s.blocks || [];
     return {
       titre: s.title || NA, discipline: s.disc || NA, duree_min: s.dur || NA, zone_cible: s.zone || NA,
@@ -149,7 +150,8 @@
       var cadZero = pts.filter(function(p){ return p.sp > 5 && !p.cad; }).length;
       if(cadZero > n * 0.05) anomalies.push(cadZero + ' point(s) en course avec une cadence à 0');
       var cm = mean(cadPts.map(function(p){ return p.cad; }));
-      if(cm < 110) anomalies.push('cadence moyenne ' + r0(cm) + ' : probablement exprimée par jambe (à doubler)');
+      // Cadence par jambe (convention FIT) : conversion normale, pas une anomalie.
+      if(cm < 110) present.push('cadence enregistrée par jambe, convertie en pas/min');
     }
     var pauseMin = 0;
     for(var j = 1; j < n; j++){ var dt = pts[j].t - pts[j - 1].t; if(dt > 0.5 && pts[j].sp < 1) pauseMin += dt; }
@@ -311,9 +313,11 @@
       fc_repos_du_jour: rhrAll.length ? rhrAll[0] : NA,
       fc_repos_moy_7j: rhrAll.length ? r0(mean(rhrAll.slice(0, 7))) : NA,
       fc_repos_reference: ref && ref.fcRepos ? ref.fcRepos : NA,
-      sommeil_7j: ck.slice(0, 7).map(function(c){ return c.sommeil; }).filter(function(v){ return v != null; }),
-      fatigue_declaree_7j: ck.slice(0, 7).map(function(c){ return c.fatigue; }).filter(function(v){ return v != null; }),
-      echelle_checkin: 'sommeil, fatigue et motivation notés de 1 à 10 par l\'athlète',
+      // Échelles explicites : « sommeil 6 » a été lu « 6 h » par l'IA (28/10/2026).
+      qualite_sommeil_sur_10_7j: ck.slice(0, 7).map(function(c){ return c.sommeil; }).filter(function(v){ return v != null; }),
+      jambes_lourdes_sur_10_7j: ck.slice(0, 7).map(function(c){ return c.fatigue; }).filter(function(v){ return v != null; }),
+      motivation_sur_10_7j: ck.slice(0, 7).map(function(c){ return c.motivation; }).filter(function(v){ return v != null; }),
+      echelles_checkin: 'notes de 1 à 10 saisies par l\'athlète, PAS des heures : qualité du sommeil (10 = excellent), jambes lourdes (10 = très lourdes, mauvais), motivation (10 = très motivé)',
       rpe_de_la_seance: session.rpe != null ? session.rpe : NA,
       rpe_attendu_selon_zone_fc: 'repère : Z1 1-2, Z2 3-4, Z3 5-6, Z4 7-8, Z5 9-10 (échelle 1-10)',
       douleur_ou_dispo: ck[0] && ck[0].dispo && ck[0].dispo !== 'ok' ? (ck[0].dispo + (ck[0].dispo_note ? ' : ' + String(ck[0].dispo_note).slice(0, 160) : '')) : 'rien de déclaré',
@@ -468,7 +472,7 @@
     if(!(real && window.__pf_aiAddon === true && PF.sessionReport)){
       frame(renderReport(factsOnly(dossier)), o.session.title); return;
     }
-    var key = 'r4|' + String(o.session.id || (o.session.title + '|' + (o.session.dur || '')));
+    var key = 'r5|' + String(o.session.id || (o.session.title + '|' + (o.session.dur || '')));
     var r = await PF.sessionReport({ session_key: key, athlete_id: o.athleteId || null, dossier: dossier });
     if(r && r.error){
       close();

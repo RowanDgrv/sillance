@@ -1701,7 +1701,9 @@ function openStravaAnalysis(act, plan){
     // récupération (28/10/2026 : le catch ci-dessous affichait « récupération
     // impossible » alors que les données étaient bien arrivées).
     try{
-      openAnalysis(plan ? {...plan, _realData:res.data} : {id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
+      // _unplanned : activité hors plan. La zone 'Z2' ne sert qu'à l'affichage ;
+      // elle ne doit jamais être présentée à l'IA comme une consigne (28/10/2026).
+      openAnalysis(plan ? {...plan, _realData:res.data} : {id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _unplanned:true, _realData:res.data});
     }catch(err){
       console.error('[analyse] affichage impossible :', err);
       toast(tr('sync.analysisRenderFailed')+' : '+(err && err.message ? err.message : String(err)), 'error');
@@ -10524,8 +10526,11 @@ function aiResultHtml(s, b, r, isDemo, footKeys){
 // l'app ; ACWR = ATL/CTL, à titre indicatif seulement (prédicteur contesté).
 function reportLoad(){
   try{ const d=buildLoadDaily(new Date(),364).at(-1); if(!d) return null;
+    // Historique trop court (charge chronique < 15) : ratio et TSB sans valeur
+    // (ex. 28/10/2026 : ratio 2,27 sur une CTL de 1 → fatigue « rouge » à tort).
+    if(d.ctl < 15) return { note:"historique d'entraînement insuffisant dans Sillance pour évaluer la charge (charge chronique < 15)" };
     return { ctl_forme_chronique:Math.round(d.ctl), atl_fatigue_aigue:Math.round(d.atl), tsb_fraicheur:Math.round(d.tsb),
-      ratio_aigu_chronique:d.ctl?+(d.atl/d.ctl).toFixed(2):null, note:'ratio aigu/chronique à titre indicatif' }; }catch(e){ return null; }
+      ratio_aigu_chronique:+(d.atl/d.ctl).toFixed(2), note:'ratio aigu/chronique à titre indicatif' }; }catch(e){ return null; }
 }
 function reportGoal(){ try{ const r=currentRace(); return r ? `${r.name}, dans ${r.days} jours` : null; }catch(e){ return null; } }
 // Contrôle de la consigne (28/10/2026, sillance-consigne.js) : règles de code
