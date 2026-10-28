@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261028i";
+import { PF } from "./sillance-client.js?v=20261028j";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -1567,5 +1567,9 @@ function showPaymentReturnModal(success, message) {
   } catch (e) {
     console.warn("[PF] backend indisponible/non configuré → mode démo.", e?.message || e);
     setCloudBadge(false);
+  } finally {
+    // Fin du boot : on retire l'écran de chargement posé par sillance-boot.js
+    // (sinon la démo s'affichait ~2 s avant les vraies données).
+    document.documentElement.classList.remove("pf-booting");
   }
 })();

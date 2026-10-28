@@ -1118,7 +1118,12 @@ export const PF = {
     // _invokeSoft : la raison renvoyée par le serveur (« fichier pas encore
     // disponible côté COROS », « .fit introuvable »…) remonte jusqu'au toast ;
     // avant, _invoke levait une erreur générique et masquait la cause (28/10/2026).
-    const data = await this._invokeSoft(fn, { activity_id: activityId });
+    // Délai max (28/10/2026) : sans lui, une requête qui ne répond jamais
+    // laissait « Chargement du détail… » à l'écran sans aucune suite.
+    const timeout = new Promise((_, rej) => setTimeout(() => {
+      const e = new Error("Le serveur ne répond pas (délai de 25 s dépassé), réessaie dans un instant"); e.serverReason = true; rej(e);
+    }, 25000));
+    const data = await Promise.race([this._invokeSoft(fn, { activity_id: activityId }), timeout]);
     if (data?.error) { const e = new Error(data.detail && data.detail !== data.error ? `${data.error} (${data.detail})` : data.error); e.serverReason = true; throw e; }
     return { points: data?.points ?? [], laps: data?.laps ?? [] };
   },
