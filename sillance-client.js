@@ -108,13 +108,15 @@ export const PF = {
   // handle_new_user (0072). full_name reste envoyé : c'est lui que lit la
   // version précédente du trigger, et la colonne utilisée partout.
   async signUp({ email, password, firstName = "", lastName = "", fullName, role = "athlete",
-                 source = "", sourceDetail = "", captchaToken }) {
+                 source = "", sourceDetail = "", sex = "", birthYear = null, captchaToken }) {
     const name = fullName ?? [firstName, lastName].filter(Boolean).join(" ");
     const { data, error } = await sb.auth.signUp({
       email, password,
       options: {
         data: { full_name: name, first_name: firstName, last_name: lastName, role,
-                acquisition_source: source, acquisition_detail: sourceDetail },
+                acquisition_source: source, acquisition_detail: sourceDetail,
+                // athlète uniquement (0075) : recopiés dans athlete_profiles
+                ...(role === "athlete" ? { sex, birth_year: birthYear } : {}) },
         captchaToken,
       },
     });

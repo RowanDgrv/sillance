@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261028d";
+import { PF } from "./sillance-client.js?v=20261028e";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -992,7 +992,16 @@ function renderAuth() {
         ${hardGate ? `` : `<div class="role" data-role="athlete">${tr("mode.athlete")}</div>`}
         <div class="role" data-role="club_admin">${tr("mode.club")}</div>
       </div>
-      ${pickedRole === "club_admin" ? `<label>${tr("auth.clubName")}</label><input id="pf-club-name" placeholder="${tr("auth.clubNamePh")}">` : ``}` : ``}
+      ${pickedRole === "club_admin" ? `<label>${tr("auth.clubName")}</label><input id="pf-club-name" placeholder="${tr("auth.clubNamePh")}">` : ``}
+      ${pickedRole === "athlete" ? `
+      <div class="pf-row2">
+        <div><label for="pf-sex">${tr("auth.sex")}</label>
+          <select id="pf-sex"><option value="">${tr("auth.sexPick")}</option>
+            <option value="F">${tr("auth.sexF")}</option><option value="M">${tr("auth.sexM")}</option><option value="X">${tr("auth.sexX")}</option>
+          </select></div>
+        <div><label for="pf-birth">${tr("auth.birthYear")}</label><input id="pf-birth" type="number" inputmode="numeric" min="1900" max="${new Date().getFullYear()}" placeholder="1995"></div>
+      </div>
+      <div class="pf-hint">${tr("auth.sexBirthWhy")}</div>` : ``}` : ``}
     <label for="pf-email">${tr("common.email")}${isUp ? req : ""}</label><input id="pf-email" type="email" autocomplete="email" placeholder="${tr("auth.emailPh")}">
     ${isUp ? `<label for="pf-email2">${tr("auth.emailConfirm")}${req}</label><input id="pf-email2" type="email" autocomplete="email" placeholder="${tr("auth.emailPh")}">` : ``}
     <label for="pf-pass">${tr("auth.password")}${isUp ? req : ""}</label><input id="pf-pass" type="password" autocomplete="${isUp ? "new-password" : "current-password"}" placeholder="••••••••">
@@ -1033,7 +1042,7 @@ function renderAuth() {
 
 // renderAuth() reconstruit la carte à chaque clic sur un rôle : sans ça, tout
 // ce qui était déjà tapé (nom, email…) était effacé.
-const AUTH_DRAFT_IDS = ["pf-first", "pf-last", "pf-email", "pf-email2", "pf-pass", "pf-pass2", "pf-source", "pf-source-other", "pf-club-name"];
+const AUTH_DRAFT_IDS = ["pf-first", "pf-last", "pf-email", "pf-email2", "pf-pass", "pf-pass2", "pf-source", "pf-source-other", "pf-club-name", "pf-sex", "pf-birth"];
 function saveAuthDraft(card) {
   const d = {};
   AUTH_DRAFT_IDS.forEach((id) => { const el = card.querySelector("#" + id); if (el) d[id] = el.value; });
@@ -1082,6 +1091,11 @@ async function submitAuth() {
       // Provenance FACULTATIVE (revue RGPD 28/10/2026) : donnée non nécessaire
       // au service → minimisation (art. 5.1.c), la CNIL demande de distinguer
       // champs obligatoires et facultatifs.
+      // Sexe / année de naissance : athlète uniquement, facultatifs.
+      const sex = pickedRole === "athlete" && $("pf-sex") ? $("pf-sex").value : "";
+      const birthRaw = pickedRole === "athlete" && $("pf-birth") ? $("pf-birth").value.trim() : "";
+      const birthYear = birthRaw ? parseInt(birthRaw, 10) : null;
+      if (birthRaw && !(birthYear >= 1900 && birthYear <= new Date().getFullYear() - 5)) return fail("pf-birth", "auth.errBirthYear");
       const consent = $("pf-consent");
       if (consent && !consent.checked) { err.textContent = tr("auth.pleaseAcceptConsent"); return; }
       // Rôle "club" : le nom du club est obligatoire ici, pas demandé après
@@ -1091,7 +1105,7 @@ async function submitAuth() {
       const clubName = clubNameInput ? clubNameInput.value.trim() : "";
       if (pickedRole === "club_admin" && !clubName) { err.textContent = tr("auth.clubNameRequired"); return; }
       await PF.signUp({ email, password, firstName, lastName, role: pickedRole,
-                        source, sourceDetail, captchaToken: turnstileToken });
+                        source, sourceDetail, sex, birthYear, captchaToken: turnstileToken });
       // Selon la config Supabase, une confirmation email peut être requise.
       await PF.signIn({ email, password, captchaToken: turnstileToken }).catch(() => {});
       if (!PF.user) { err.textContent = tr("auth.accountCreatedCheckEmail"); authMode = "signin"; renderAuth(); return; }
