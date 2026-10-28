@@ -340,6 +340,9 @@
         objectif: o.goal || NA
       },
       seance_prevue: simplifyPlan(s),
+      // Verdict de conformité calculé par l'app (sillance-consigne.js) : temps
+      // dans la cible, efforts courts et récups jugés à l'allure, pas à la FC.
+      controle_consigne: o.consigne ? { verdict: o.consigne.verdict || NA, decoupage: o.consigne.methode, lignes: (o.consigne.lignes || []).map(function(l){ return l.text; }) } : NA,
       verification: dataCheck(data, fcMax, disc),
       blocs_realises: lapsFacts(data, fcMax, fcRest, zones, disc, ref.vma || null, o.speedZones || []),
       realise_global: { duree_min: r1((data.pts || []).length ? data.pts[data.pts.length - 1].t : null), distance_km: r1(data.dist), discipline: disc,
@@ -461,11 +464,11 @@
       try{ var c = await PF.getReportContext(o.athleteId || PF.user.id); context = c; profile = (c && c.profile) || {}; }catch(e){ console.warn('[report] contexte :', e); }
     }
     if(context) context.load = o.load || null; else context = { load: o.load || null };
-    var dossier = buildDossier({ session: o.session, data: o.data, ref: o.ref, zones: o.zones, speedZones: o.speedZones, goal: o.goal, context: context, profile: profile });
+    var dossier = buildDossier({ session: o.session, data: o.data, ref: o.ref, zones: o.zones, speedZones: o.speedZones, consigne: o.consigne, goal: o.goal, context: context, profile: profile });
     if(!(real && window.__pf_aiAddon === true && PF.sessionReport)){
       frame(renderReport(factsOnly(dossier)), o.session.title); return;
     }
-    var key = 'r3|' + String(o.session.id || (o.session.title + '|' + (o.session.dur || '')));
+    var key = 'r4|' + String(o.session.id || (o.session.title + '|' + (o.session.dur || '')));
     var r = await PF.sessionReport({ session_key: key, athlete_id: o.athleteId || null, dossier: dossier });
     if(r && r.error){
       close();

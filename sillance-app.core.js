@@ -3106,6 +3106,7 @@ function profLinePct(ln){
     if(ex.kind==='pace'){ const sec=(ex.m||0)*60+(ex.s||0); const v=sec?3600/sec:0; return ATHLETE_REF.vma&&v ? v/ATHLETE_REF.vma*100 : 85; }
     if(ex.kind==='time100'){ const sec=(ex.m||0)*60+(ex.s||0); return ATHLETE_REF.css&&sec ? ATHLETE_REF.css/sec*100 : 85; }
     if(ex.kind==='rpe')     return (ex.rpe||6)*12;
+    if(ex.kind==='hr')      return ATHLETE_REF.fcMax ? ((ex.lo||0)+(ex.hi||0))/2/ATHLETE_REF.fcMax*100 : 75;
     return 85;
   }
   return ln.pct||70;
@@ -8266,9 +8267,10 @@ function exactDefault(disc){
 }
 /* options de type de cible exacte par sport */
 function exactKinds(disc){
-  if(disc==='bike') return [['power',tr('exact.watts')],['pace',tr('exact.paceKm')],['speed','km/h'],['cadence',tr('exact.cadence')],['rpe',tr('exact.rpeNoSensor')]];
-  if(disc==='run')  return [['pace',tr('exact.paceKm')],['speed','km/h'],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
-  if(disc==='swim') return [['time100',tr('exact.time100')],['pace',tr('exact.pace100')],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
+  // 'hr' (28/10/2026) : plage de FC en bpm saisie par le coach (ex. footing 120-150 bpm).
+  if(disc==='bike') return [['power',tr('exact.watts')],['hr',tr('exact.hrBpm')],['pace',tr('exact.paceKm')],['speed','km/h'],['cadence',tr('exact.cadence')],['rpe',tr('exact.rpeNoSensor')]];
+  if(disc==='run')  return [['pace',tr('exact.paceKm')],['hr',tr('exact.hrBpm')],['speed','km/h'],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
+  if(disc==='swim') return [['time100',tr('exact.time100')],['pace',tr('exact.pace100')],['hr',tr('exact.hrBpm')],['time',tr('exact.totalTime')],['rpe',tr('exact.rpeNoSensor')]];
   return [['rpe','RPE']];
 }
 function defaultBlockNew(disc){
@@ -8297,6 +8299,7 @@ function exactToText(ex){
     case 'time100':{ const c=(ex.m||0)*60+(ex.s||0); return tol? `${fmtPace(c-tol)}–${fmtPace(c+tol)}/100m` : fmtPace(c)+'/100m'; }
     case 'time':{ const c=(ex.h||0)*3600+(ex.m||0)*60+(ex.s||0); const f=(s)=>{ s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600); const r=s%3600; return (h?h+'h':'')+Math.floor(r/60)+"'"+String(r%60).padStart(2,'0')+'"'; }; return tol? `${f(c-tol)}–${f(c+tol)}` : f(c); }
     case 'rpe':   return 'RPE '+(ex.rpe||6);
+    case 'hr':    return `${ex.lo||0}–${ex.hi||0} bpm`;
   }
   return '';
 }
@@ -8693,7 +8696,8 @@ function exactInputsHTML(ex){
   else if(ex.kind==='time100') fields=`<input class="ex-n2" type="number" min="0" max="20" value="${ex.m||0}" data-x="m"><span>'</span><input class="ex-n2" type="number" min="0" max="59" value="${ex.s||0}" data-x="s"><span>"/100m</span>`;
   else if(ex.kind==='time')  fields=`<input class="ex-n2" type="number" min="0" max="9" value="${ex.h||0}" data-x="h"><span>h</span><input class="ex-n2" type="number" min="0" max="59" value="${ex.m||0}" data-x="m"><span>'</span><input class="ex-n2" type="number" min="0" max="59" value="${ex.s||0}" data-x="s"><span>"</span>`;
   else if(ex.kind==='rpe')   fields=`<input class="ex-n" type="number" min="1" max="10" value="${ex.rpe||6}" data-x="rpe"><span>RPE</span>`;
-  const tolField = (ex.kind!=='rpe')
+  else if(ex.kind==='hr')    fields=`<input class="ex-n" type="number" min="40" max="230" value="${ex.lo||0}" data-x="lo"><span>–</span><input class="ex-n" type="number" min="40" max="230" value="${ex.hi||0}" data-x="hi"><span>bpm</span>`;
+  const tolField = (ex.kind!=='rpe' && ex.kind!=='hr')
     ? `<span class="ex-tol">±<input class="ex-n2" type="number" min="0" max="120" value="${ex.tol||0}" data-x="tol"><small>${tolUnit(ex.kind)}</small></span>`
     : '';
   return `<div class="ex-row">${sel}<div class="ex-fields">${fields}</div>${tolField}<span class="ex-chip"><i class="ic ic-target"></i> ${exactToText(ex)}</span></div>`;
@@ -8847,6 +8851,7 @@ function resetExact(kind){
     case 'time100': return {kind, m:1, s:30, tol:3};
     case 'time': return {kind, h:0, m:30, s:0, tol:0};
     case 'rpe': return {kind, rpe:6, tol:0};
+    case 'hr': return {kind, lo:120, hi:150, tol:0};
     default: return {kind, w:250, tol:10};
   }
 }
@@ -8898,6 +8903,7 @@ function estimateLineTss(ln, disc){
     else if(ex.kind==='speed') pct = ATHLETE_REF.vma? (ex.kmh/ATHLETE_REF.vma*100):85;
     else if(ex.kind==='pace'){ const v=3600/((ex.m||0)*60+(ex.s||0)); pct = ATHLETE_REF.vma? (v/ATHLETE_REF.vma*100):85; }
     else if(ex.kind==='rpe') pct = (ex.rpe||6)*12;
+    else if(ex.kind==='hr') pct = ATHLETE_REF.fcMax ? ((ex.lo||0)+(ex.hi||0))/2/ATHLETE_REF.fcMax*100 : 75;
     else pct = 85;
   }
   const ir=Math.min(1.4, pct/100*(disc==='swim'?0.95:1));
@@ -10522,6 +10528,35 @@ function reportLoad(){
       ratio_aigu_chronique:d.ctl?+(d.atl/d.ctl).toFixed(2):null, note:'ratio aigu/chronique à titre indicatif' }; }catch(e){ return null; }
 }
 function reportGoal(){ try{ const r=currentRace(); return r ? `${r.name}, dans ${r.days} jours` : null; }catch(e){ return null; } }
+// Contrôle de la consigne (28/10/2026, sillance-consigne.js) : règles de code
+// (temps dans la cible ; efforts courts et récups jugés à l'allure/puissance,
+// jamais à la FC) — l'IA ne fait que rédiger à partir de ce résultat.
+function consigneFor(s, data){
+  const blocks=(s.blocksV2&&s.blocksV2.blocks)||null;
+  if(!window.SilConsigne || !blocks || !blocks.length || !data) return null;
+  try{
+    return window.SilConsigne.evaluate({ blocks, disc:s.disc, data, refs:ATHLETE_REF,
+      zonesOf:k=>zonesFor(k), lineSec:ln=>lineMinutesFor(ln, s.disc)*60 });
+  }catch(e){ console.warn('[consigne]', e); return null; }
+}
+function renderConsigne(s, data){
+  const top=document.getElementById('anReportTop'); if(!top) return null;
+  let box=document.getElementById('anConsigne');
+  if(!box){ box=document.createElement('div'); box.id='anConsigne'; box.style.cssText='margin:6px 0 10px;border:1px solid var(--line);border-radius:12px;padding:12px 14px'; top.insertAdjacentElement('afterend', box); }
+  const c = (window.PF?.user && !s._realData) ? null : consigneFor(s, data);
+  if(!c){ box.style.display='none'; return null; }
+  box.style.display = mode==='coach' ? '' : 'none';
+  const V={validee:['var(--good)',tr('consigne.ok')], partielle:['var(--bike)',tr('consigne.partial')], non_conforme:['var(--run)',tr('consigne.bad')]}[c.verdict]||['var(--muted)',tr('consigne.na')];
+  const dot={ok:'var(--good)',partial:'var(--bike)',bad:'var(--run)',info:'var(--swim)',na:'var(--muted)'};
+  box.innerHTML=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <strong style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">${tr('consigne.title')}</strong>
+      <span style="font-weight:800;color:${V[0]};border:1px solid ${V[0]};border-radius:99px;padding:3px 10px;font-size:12px">${V[1]}</span></div>
+    <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45">
+      ${c.lignes.map(l=>`<li style="display:flex;gap:8px"><span style="flex:none;width:8px;height:8px;border-radius:50%;margin-top:6px;background:${dot[l.status]||dot.na}"></span><span>${dispoSafe(l.text)}</span></li>`).join('')}
+    </ul>
+    <div class="club-hint" style="margin-top:8px">${tr('consigne.method')} ${dispoSafe(c.methode)}</div>`;
+  return c;
+}
 function renderReportBtn(s, data){
   const wrap=document.getElementById('anAiWrap'); if(!wrap || !window.SilAiReport) return;
   // Bouton aussi en HAUT de l'analyse (28/10/2026 : en bas seulement, il
@@ -10544,6 +10579,10 @@ function renderReportBtn(s, data){
   rb.onclick=()=> window.SilAiReport.open({ session:s, data:realData, ref:ATHLETE_REF, zones:zonesFor('fc'),
     speedZones:zonesFor('vma'), load:reportLoad(), goal:reportGoal(), athleteId: s.athleteId || (rosterIsReal ? currentAthleteId : null) });
   const tb=document.getElementById('anReportTopBtn'); if(tb) tb.onclick=rb.onclick;
+  const cons=renderConsigne(s, data);
+  rb.onclick=()=> window.SilAiReport.open({ session:s, data:realData, ref:ATHLETE_REF, zones:zonesFor('fc'),
+    speedZones:zonesFor('vma'), load:reportLoad(), goal:reportGoal(), consigne:cons, athleteId: s.athleteId || (rosterIsReal ? currentAthleteId : null) });
+  if(tb) tb.onclick=rb.onclick;
 }
 function renderAi(s, data){
   const wrap=document.getElementById('anAiWrap'); if(!wrap) return;
@@ -10565,9 +10604,13 @@ function renderAi(s, data){
   body.innerHTML=`<div class="ai-loading"><span class="ai-dot"></span> ${tr('ai.analyzingInProgress')}</div>`;
   const b=computeSessionBilan(s, data);
   b.label=aiSessionLabel(b); b.constats=(b.hasHr&&b.type!=='libre')?aiIssues(b).map(x=>({texte:x.t, majeur:x.major})):[];
+  // Séance construite avec des cibles : le contrôle de consigne (règles de code,
+  // piège des intervalles géré) remplace l'heuristique sur la FC moyenne.
+  const cons=consigneFor(s, data);
+  if(cons && cons.verdict){ b.constats=cons.constats; b.type=b.type==='libre'?'consigne':b.type; b.controle_consigne={verdict:cons.verdict, lignes:cons.lignes.map(l=>l.text)}; }
   // Connecté + add-on réel (pas juste le déverrouillage démo) → vrai résumé IA.
   if(window.PF?.user && window.__pf_aiAddon===true && typeof PF.summarizeSession==='function'){
-    const sessionKey='v2|'+String(s.id || (s.title+'|'+(s.dur||'')+'|'+(s._realData?.provider_activity_id||'')));
+    const sessionKey='v3|'+String(s.id || (s.title+'|'+(s.dur||'')+'|'+(s._realData?.provider_activity_id||'')));
     PF.summarizeSession({
       session_key: sessionKey,
       bilan: b,
