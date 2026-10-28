@@ -260,6 +260,7 @@ l'analyse individuelle, réservée aux entraîneurs.</p>
   <li data-i18n="legal.priv.ret7">Sauvegardes techniques de la base de données : rétention glissante de 30 jours maximum, à seule fin de continuité de service.</li>
   <li data-i18n="legal.priv.ret8">Mesure d'audience (si acceptée) : 13 mois, en agrégat, sans identifiant permettant de relier plusieurs visites à une même personne.</li>
   <li data-i18n="legal.priv.ret9">Journal des échecs de l'Assistant IA : 90 jours, puis suppression automatique.</li>
+  <li data-i18n="legal.priv.ret10">Statistiques de fréquentation anonymes : 25 mois maximum, puis suppression automatique.</li>
 </ul>
 
 <h3 data-i18n="legal.priv.t5">3.5 Vos droits</h3>
@@ -276,17 +277,19 @@ l'autorité parentale, recueilli dans l'application lors de l'adhésion à un cl
 <h3 data-i18n="legal.priv.t7">3.7 Cookies et gestion du consentement</h3>
 <p data-i18n-html="legal.priv.p7">Sillance dépose des éléments de stockage <strong>strictement nécessaires</strong> au fonctionnement du site (authentification,
 langue, thème, préférences d'affichage) : ils sont actifs par défaut et ne requièrent pas de consentement (art. 82 de la loi
-Informatique et Libertés). Un bandeau affiché à votre première visite vous permet d'<strong>accepter ou refuser</strong> une
-catégorie optionnelle de <strong>mesure d'audience anonyme</strong> : si vous l'acceptez, la page consultée, le site
-d'origine et la langue d'affichage sont comptabilisés, sans cookie, sans identifiant et sans possibilité de vous
-identifier individuellement, sans traceur publicitaire ni revente de données. Vous pouvez modifier votre choix à tout
-moment via le bouton « cookies » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.</p>
+Informatique et Libertés). Sillance mesure aussi sa <strong>fréquentation de façon anonyme</strong>, dans le cadre de
+l'exemption de consentement prévue par la CNIL pour la mesure d'audience : pages consultées, site d'origine, source du lien
+(par exemple « linkedin »), langue, profondeur de lecture et clics sur les boutons des pages publiques. Un identifiant aléatoire,
+effacé à la fermeture de l'onglet, sert à compter les visites. Aucune adresse IP n'est conservée, aucune donnée de compte ni
+texte saisi n'est collecté, rien n'est croisé avec d'autres données, transmis à un tiers ou revendu, et les statistiques
+servent uniquement à Sillance. Vous pouvez vous y <strong>opposer</strong> à tout moment en désactivant la mesure d'audience
+dans le bandeau (bouton « cookies » en bas de l'écran) : plus rien n'est alors envoyé depuis votre navigateur.</p>
 <div class="table-wrap"><table>
   <tr><th data-i18n="legal.priv.ckth1">Élément</th><th data-i18n="legal.priv.ckth2">Finalité</th><th data-i18n="legal.priv.ckth3">Durée</th><th data-i18n="legal.priv.ckth4">Catégorie</th></tr>
   <tr><td data-i18n="legal.priv.ck1.a">Jeton d'authentification (Supabase)</td><td data-i18n="legal.priv.ck1.b">Garder la session connectée</td><td data-i18n="legal.priv.ck1.c">Jusqu'à déconnexion ou expiration du jeton</td><td data-i18n="legal.priv.necessary">Nécessaire</td></tr>
   <tr><td data-i18n="legal.priv.ck2.a">Préférences d'interface (langue, thème, filtres de graphiques, guides masqués)</td><td data-i18n="legal.priv.ck2.b">Mémoriser vos réglages d'affichage</td><td data-i18n="legal.priv.ck2.c">Persistant, jusqu'à suppression manuelle</td><td data-i18n="legal.priv.necessary">Nécessaire</td></tr>
   <tr><td data-i18n="legal.priv.ck3.a">Choix de consentement cookies</td><td data-i18n="legal.priv.ck3.b">Retenir votre réponse au bandeau</td><td data-i18n="legal.priv.ck3.c">12 mois, puis nouvelle demande</td><td data-i18n="legal.priv.necessary">Nécessaire</td></tr>
-  <tr><td data-i18n="legal.priv.ck4.a">Mesure d'audience</td><td data-i18n="legal.priv.ck4.b">Statistiques de fréquentation anonymes (page, site d'origine, langue)</td><td data-i18n="legal.priv.ck4.c">13 mois, en agrégat, sans identifiant individuel</td><td data-i18n="legal.priv.optional">Optionnelle (soumise à votre accord)</td></tr>
+  <tr><td data-i18n="legal.priv.ck4.a">Mesure d'audience</td><td data-i18n="legal.priv.ck4.b">Statistiques de fréquentation anonymes (pages, site d'origine, source du lien, langue, lecture, clics des pages publiques)</td><td data-i18n="legal.priv.ck4.c">Identifiant de visite effacé à la fermeture de l'onglet ; statistiques conservées 25 mois maximum</td><td data-i18n="legal.priv.exempt">Exemptée de consentement (opposition possible)</td></tr>
 </table></div>
 
 <h3 data-i18n="legal.priv.t8">3.8 Sécurité</h3>
@@ -302,8 +305,8 @@ CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.</p>
 
 </div>
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-legal.js?v=20261028f"></script>
-<script src="./sillance-cookies.js"></script>
-<script src="./sillance-analytics.js"></script>
+<script src="./sillance-i18n-legal.js?v=20261028b"></script>
+<script src="./sillance-cookies.js?v=20261028b"></script>
+<script src="./sillance-analytics.js?v=20261028b"></script>
 </body>
 </html>

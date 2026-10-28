@@ -6,9 +6,9 @@
      {v:CONSENT_VERSION, necessary:true, analytics:bool, ts}
    Catégories :
      - necessary  : toujours actif (session, langue, thème, préférences)
-     - analytics  : mesure d'audience anonyme — INACTIF tant que rien
-                    n'est branché ; le bandeau prépare le terrain pour
-                    le jour où un outil (Plausible/PostHog…) est ajouté.
+     - analytics  : mesure d'audience anonyme EXEMPTÉE (sillance-analytics.js,
+                    0078) : active par défaut, coupée si le visiteur la refuse
+                    (droit d'opposition).
    API publique : window.SilCookies.has('analytics'), .open(), .consent
    Événement : document 'sil:consentchange' {detail:{analytics:bool}}
    ============================================================ */
@@ -22,7 +22,7 @@
       necessaryTitle: 'Strictement nécessaires',
       necessaryDesc: 'Connexion, sécurité, préférences d’affichage. Toujours actifs, sans dépôt possible d’opposition.',
       analyticsTitle: 'Mesure d’audience',
-      analyticsDesc: 'Page visitée, site d’origine et langue, comptés de façon anonyme et agrégée. Aucun cookie, aucun identifiant, aucune donnée revendue.',
+      analyticsDesc: 'Statistiques anonymes de fréquentation (pages vues, site d’origine, clics sur les boutons), exemptées de consentement. Aucun cookie publicitaire, aucune donnée personnelle, rien de revendu. Désactive pour t’y opposer.',
       accept: 'Accepter tout',
       reject: 'Refuser',
       customize: 'Personnaliser',
@@ -36,7 +36,7 @@
       necessaryTitle: 'Strictly necessary',
       necessaryDesc: 'Login, security, display preferences. Always active, cannot be disabled.',
       analyticsTitle: 'Audience measurement',
-      analyticsDesc: 'Page visited, referring site and language, counted anonymously in aggregate. No cookie, no identifier, no data resold.',
+      analyticsDesc: 'Anonymous visit statistics (pages viewed, referring site, button clicks), exempt from consent. No advertising cookie, no personal data, nothing resold. Turn off to object.',
       accept: 'Accept all',
       reject: 'Reject',
       customize: 'Customize',
@@ -50,7 +50,7 @@
       necessaryTitle: 'Estrictamente necesarias',
       necessaryDesc: 'Conexión, seguridad, preferencias de visualización. Siempre activas, no se pueden desactivar.',
       analyticsTitle: 'Medición de audiencia',
-      analyticsDesc: 'Página visitada, sitio de origen e idioma, contados de forma anónima y agregada. Sin cookie, sin identificador, sin venta de datos.',
+      analyticsDesc: 'Estadísticas anónimas de visitas (páginas vistas, sitio de origen, clics en botones), exentas de consentimiento. Sin cookie publicitaria, sin datos personales, nada se vende. Desactiva para oponerte.',
       accept: 'Aceptar todo',
       reject: 'Rechazar',
       customize: 'Personalizar',

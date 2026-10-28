@@ -1128,6 +1128,8 @@ async function submitAuth() {
       if (pickedRole === "club_admin" && !clubName) { err.textContent = tr("auth.clubNameRequired"); return; }
       await PF.signUp({ email, password, firstName, lastName, role: pickedRole,
                         source, sourceDetail, sex, birthYear, captchaToken: turnstileToken });
+      // Mesure d'audience : inscription réussie (rôle seulement, rien de personnel).
+      try { window.SilTrack?.event("signup", pickedRole); } catch {}
       // Selon la config Supabase, une confirmation email peut être requise.
       await PF.signIn({ email, password, captchaToken: turnstileToken }).catch(() => {});
       if (!PF.user) { err.textContent = tr("auth.accountCreatedCheckEmail"); authMode = "signin"; renderAuth(); return; }
@@ -1411,6 +1413,8 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
 // activée pour lui, et affiche un message d'invitation. Coach/club/démo intacts.
 async function onLoggedIn() {
   setCloudBadge(true);
+  // Compte admin : cet appareil sort de la mesure d'audience (équivaut à ?moi=1).
+  if (isAdminUser()) { try { localStorage.setItem("sil_noTrack", "1"); } catch {} }
   // Accepte une éventuelle invitation présente dans l'URL (?invite=...).
   const tok = PF.pendingInviteToken?.();
   if (tok) { try { await PF.acceptInvite(tok); } catch (e) { console.warn("[PF] invite:", e); } }

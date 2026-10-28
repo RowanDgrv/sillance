@@ -167,6 +167,7 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.ret7": `Sauvegardes techniques de la base de données : rétention glissante de 30 jours maximum, à seule fin de continuité de service.`,
     "legal.priv.ret8": `Mesure d'audience (si acceptée) : 13 mois, en agrégat, sans identifiant permettant de relier plusieurs visites à une même personne.`,
     "legal.priv.ret9": `Journal des échecs de l'Assistant IA : 90 jours, puis suppression automatique.`,
+    "legal.priv.ret10": `Statistiques de fréquentation anonymes : 25 mois maximum, puis suppression automatique.`,
     "legal.priv.sub6.c": `États-Unis (Data Privacy Framework et clauses contractuelles types)`,
     "legal.priv.d8.c": `Intérêt légitime`,
     "legal.priv.d9.a": `Profil athlète : sexe et année de naissance (facultatifs)`,
@@ -192,11 +193,13 @@ l'autorité parentale, recueilli dans l'application lors de l'adhésion à un cl
     "legal.priv.t7": `3.7 Cookies et gestion du consentement`,
     "legal.priv.p7": `Sillance dépose des éléments de stockage <strong>strictement nécessaires</strong> au fonctionnement du site (authentification,
 langue, thème, préférences d'affichage) : ils sont actifs par défaut et ne requièrent pas de consentement (art. 82 de la loi
-Informatique et Libertés). Un bandeau affiché à votre première visite vous permet d'<strong>accepter ou refuser</strong> une
-catégorie optionnelle de <strong>mesure d'audience anonyme</strong> : si vous l'acceptez, la page consultée, le site
-d'origine et la langue d'affichage sont comptabilisés, sans cookie, sans identifiant et sans possibilité de vous
-identifier individuellement, sans traceur publicitaire ni revente de données. Vous pouvez modifier votre choix à tout
-moment via le bouton « cookies » affiché en bas de l'écran, ou en effaçant les données de site de votre navigateur.`,
+Informatique et Libertés). Sillance mesure aussi sa <strong>fréquentation de façon anonyme</strong>, dans le cadre de
+l'exemption de consentement prévue par la CNIL pour la mesure d'audience : pages consultées, site d'origine, source du lien
+(par exemple « linkedin »), langue, profondeur de lecture et clics sur les boutons des pages publiques. Un identifiant aléatoire,
+effacé à la fermeture de l'onglet, sert à compter les visites. Aucune adresse IP n'est conservée, aucune donnée de compte ni
+texte saisi n'est collecté, rien n'est croisé avec d'autres données, transmis à un tiers ou revendu, et les statistiques
+servent uniquement à Sillance. Vous pouvez vous y <strong>opposer</strong> à tout moment en désactivant la mesure d'audience
+dans le bandeau (bouton « cookies » en bas de l'écran) : plus rien n'est alors envoyé depuis votre navigateur.`,
     "legal.priv.ckth1": `Élément`,
     "legal.priv.ckth2": `Finalité`,
     "legal.priv.ckth3": `Durée`,
@@ -211,10 +214,11 @@ moment via le bouton « cookies » affiché en bas de l'écran, ou en effaçant 
     "legal.priv.ck3.b": `Retenir votre réponse au bandeau`,
     "legal.priv.ck3.c": `12 mois, puis nouvelle demande`,
     "legal.priv.ck4.a": `Mesure d'audience`,
-    "legal.priv.ck4.b": `Statistiques de fréquentation anonymes (page, site d'origine, langue)`,
-    "legal.priv.ck4.c": `13 mois, en agrégat, sans identifiant individuel`,
+    "legal.priv.ck4.b": `Statistiques de fréquentation anonymes (pages, site d'origine, source du lien, langue, lecture, clics des pages publiques)`,
+    "legal.priv.ck4.c": `Identifiant de visite effacé à la fermeture de l'onglet ; statistiques conservées 25 mois maximum`,
     "legal.priv.necessary": `Nécessaire`,
     "legal.priv.optional": `Optionnelle (soumise à votre accord)`,
+    "legal.priv.exempt": `Exemptée de consentement (opposition possible)`,
     "legal.priv.t8": `3.8 Sécurité`,
     "legal.priv.p8": `Données hébergées dans l'Union européenne, chiffrées en transit (TLS) et au repos ; cloisonnement des accès par
 rôle appliqué au niveau de la base de données (Row Level Security) ; paiements traités exclusivement par Stripe
@@ -387,6 +391,7 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.ret7": `Technical database backups: rolling retention of 30 days maximum, solely for service continuity.`,
     "legal.priv.ret8": `Audience measurement (if accepted): 13 months, in aggregate, with no identifier linking multiple visits to the same person.`,
     "legal.priv.ret9": `AI Assistant failure log: 90 days, then deleted automatically.`,
+    "legal.priv.ret10": `Anonymous visit statistics: 25 months maximum, then deleted automatically.`,
     "legal.priv.sub6.c": `United States (Data Privacy Framework and standard contractual clauses)`,
     "legal.priv.d8.c": `Legitimate interest`,
     "legal.priv.d9.a": `Athlete profile: sex and year of birth (optional)`,
@@ -411,11 +416,13 @@ complaint with the CNIL, the French data protection authority (<a href="https://
 parental authority, collected in the application when joining a club.`,
     "legal.priv.t7": `3.7 Cookies and consent management`,
     "legal.priv.p7": `Sillance stores <strong>strictly necessary</strong> items for the site to function (authentication, language, theme,
-display preferences): these are active by default and require no consent. A banner shown on your first visit lets you
-<strong>accept or reject</strong> an optional <strong>anonymous audience measurement</strong> category: if you accept it, the page
-visited, the referring site and the display language are counted, with no cookie, no identifier and no way to identify
-you individually, with no advertising tracker and no data resale. You can change your choice at any time via the
-"cookies" button shown at the bottom of the screen, or by clearing your browser's site data.`,
+display preferences): they are active by default and do not require consent (art. 82 of the French Data Protection Act).
+Sillance also measures its <strong>traffic anonymously</strong>, under the consent exemption the CNIL provides for audience
+measurement: pages viewed, referring site, link source (e.g. "linkedin"), language, reading depth and clicks on buttons of
+public pages. A random identifier, erased when the tab is closed, is used to count visits. No IP address is kept, no account
+data or typed text is collected, nothing is combined with other data, shared with a third party or sold, and the statistics
+are used by Sillance only. You can <strong>object</strong> at any time by turning off audience measurement in the banner
+("cookies" button at the bottom of the screen): nothing is then sent from your browser.`,
     "legal.priv.ckth1": `Item`,
     "legal.priv.ckth2": `Purpose`,
     "legal.priv.ckth3": `Duration`,
@@ -430,10 +437,11 @@ you individually, with no advertising tracker and no data resale. You can change
     "legal.priv.ck3.b": `Remember your answer to the banner`,
     "legal.priv.ck3.c": `12 months, then asked again`,
     "legal.priv.ck4.a": `Audience measurement`,
-    "legal.priv.ck4.b": `Anonymous visit statistics (page, referring site, language)`,
-    "legal.priv.ck4.c": `13 months, in aggregate, with no individual identifier`,
+    "legal.priv.ck4.b": `Anonymous visit statistics (pages, referring site, link source, language, reading depth, clicks on public pages)`,
+    "legal.priv.ck4.c": `Visit identifier erased when the tab closes; statistics kept 25 months maximum`,
     "legal.priv.necessary": `Necessary`,
     "legal.priv.optional": `Optional (subject to your consent)`,
+    "legal.priv.exempt": `Consent-exempt (you can object)`,
     "legal.priv.t8": `3.8 Security`,
     "legal.priv.p8": `Data hosted within the European Union, encrypted in transit (TLS) and at rest; access is partitioned by
 role at the database level (Row Level Security); payments are processed exclusively by Stripe
@@ -606,6 +614,7 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.ret7": `Copias de seguridad técnicas de la base de datos: retención móvil de 30 días como máximo, solo para la continuidad del servicio.`,
     "legal.priv.ret8": `Medición de audiencia (si se acepta): 13 meses, en conjunto agregado, sin identificador que vincule varias visitas a la misma persona.`,
     "legal.priv.ret9": `Registro de fallos del Asistente IA: 90 días, después eliminación automática.`,
+    "legal.priv.ret10": `Estadísticas de visitas anónimas: 25 meses como máximo, después eliminación automática.`,
     "legal.priv.sub6.c": `Estados Unidos (Data Privacy Framework y cláusulas contractuales tipo)`,
     "legal.priv.d8.c": `Interés legítimo`,
     "legal.priv.d9.a": `Perfil del atleta: sexo y año de nacimiento (opcionales)`,
@@ -629,13 +638,15 @@ reclamación ante la CNIL, la autoridad francesa de protección de datos (<a hre
     "legal.priv.p6": `El tratamiento de los datos de un menor de 15 años requiere el consentimiento conjunto del titular de
 la patria potestad, recogido en la aplicación al afiliarse a un club.`,
     "legal.priv.t7": `3.7 Cookies y gestión del consentimiento`,
-    "legal.priv.p7": `Sillance almacena elementos <strong>estrictamente necesarios</strong> para el funcionamiento del sitio (autenticación, idioma,
-tema, preferencias de visualización): están activos por defecto y no requieren consentimiento. Un banner mostrado en tu
-primera visita te permite <strong>aceptar o rechazar</strong> una categoría opcional de <strong>medición de audiencia anónima</strong>:
-si la aceptas, se contabilizan la página visitada, el sitio de origen y el idioma de visualización, sin cookie, sin
-identificador y sin posibilidad de identificarte individualmente, sin rastreador publicitario ni reventa de datos.
-Puedes cambiar tu elección en cualquier momento mediante el botón «cookies» que aparece en la parte inferior de la
-pantalla, o borrando los datos del sitio en tu navegador.`,
+    "legal.priv.p7": `Sillance almacena elementos <strong>estrictamente necesarios</strong> para el funcionamiento del sitio (autenticación,
+idioma, tema, preferencias de visualización): están activos por defecto y no requieren consentimiento (art. 82 de la ley
+francesa de Protección de Datos). Sillance también mide su <strong>audiencia de forma anónima</strong>, en el marco de la
+exención de consentimiento prevista por la CNIL para la medición de audiencia: páginas vistas, sitio de origen, fuente del
+enlace (por ejemplo «linkedin»), idioma, profundidad de lectura y clics en los botones de las páginas públicas. Un
+identificador aleatorio, borrado al cerrar la pestaña, sirve para contar las visitas. No se conserva ninguna dirección IP, no
+se recoge ningún dato de cuenta ni texto escrito, nada se cruza con otros datos, se transmite a terceros ni se vende, y las
+estadísticas solo las utiliza Sillance. Puedes <strong>oponerte</strong> en cualquier momento desactivando la medición de
+audiencia en el banner (botón «cookies» abajo de la pantalla): entonces no se envía nada desde tu navegador.`,
     "legal.priv.ckth1": `Elemento`,
     "legal.priv.ckth2": `Finalidad`,
     "legal.priv.ckth3": `Duración`,
@@ -650,10 +661,11 @@ pantalla, o borrando los datos del sitio en tu navegador.`,
     "legal.priv.ck3.b": `Recordar tu respuesta al banner`,
     "legal.priv.ck3.c": `12 meses, después se vuelve a preguntar`,
     "legal.priv.ck4.a": `Medición de audiencia`,
-    "legal.priv.ck4.b": `Estadísticas de visitas anónimas (página, sitio de origen, idioma)`,
-    "legal.priv.ck4.c": `13 meses, en conjunto agregado, sin identificador individual`,
+    "legal.priv.ck4.b": `Estadísticas de visitas anónimas (páginas, sitio de origen, fuente del enlace, idioma, lectura, clics en páginas públicas)`,
+    "legal.priv.ck4.c": `Identificador de visita borrado al cerrar la pestaña; estadísticas conservadas 25 meses como máximo`,
     "legal.priv.necessary": `Necesaria`,
     "legal.priv.optional": `Opcional (sujeta a tu consentimiento)`,
+    "legal.priv.exempt": `Exenta de consentimiento (puedes oponerte)`,
     "legal.priv.t8": `3.8 Seguridad`,
     "legal.priv.p8": `Datos alojados en la Unión Europea, cifrados en tránsito (TLS) y en reposo; segmentación de accesos por
 rol aplicada a nivel de base de datos (Row Level Security); pagos procesados exclusivamente por Stripe
