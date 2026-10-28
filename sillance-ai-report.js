@@ -246,10 +246,13 @@
     return {
       disponible: true, moyenne: f(data.avgSpeed), moyenne_ajustee_pente: disc === 'run' ? paceStr(data.avgGap) : undefined,
       premiere_moitie: f(s1), seconde_moitie: f(s2), split_negatif: s2 > s1,
-      ecart_moities_pct: s1 ? r1((s2 - s1) / s1 * 100) : null,
-      depart_10pct_vs_corps_pct: body ? r1((st - body) / body * 100) : null,
-      fin_10pct_vs_corps_pct: body ? r1((end - body) / body * 100) : null
+      // Écarts de VITESSE rendus en phrases : « fin +11,5 % » a été lu comme un
+      // ralentissement (fatigue) alors que l'athlète avait accéléré (28/10/2026).
+      seconde_moitie_vs_premiere: s1 ? vsTxt((s2 - s1) / s1 * 100) : null,
+      depart_10pct_vs_corps: body ? vsTxt((st - body) / body * 100) : null,
+      fin_10pct_vs_corps: body ? vsTxt((end - body) / body * 100) : null
     };
+    function vsTxt(pct){ var v = r1(Math.abs(pct)); return Math.abs(pct) < 1 ? 'même vitesse (écart < 1 %)' : (pct > 0 ? 'plus rapide de ' : 'plus lente de ') + v + ' % (en vitesse)'; }
   }
 
   function cadenceFacts(data, disc){
@@ -472,7 +475,7 @@
     if(!(real && window.__pf_aiAddon === true && PF.sessionReport)){
       frame(renderReport(factsOnly(dossier)), o.session.title); return;
     }
-    var key = 'r5|' + String(o.session.id || (o.session.title + '|' + (o.session.dur || '')));
+    var key = 'r6|' + String(o.session.id || (o.session.title + '|' + (o.session.dur || '')));
     var r = await PF.sessionReport({ session_key: key, athlete_id: o.athleteId || null, dossier: dossier });
     if(r && r.error){
       close();
