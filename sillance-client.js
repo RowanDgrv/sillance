@@ -104,13 +104,35 @@ export const PF = {
     document.body?.appendChild(el);
   },
 
-  async signUp({ email, password, fullName, role = "athlete", captchaToken }) {
+  // first_name / last_name / acquisition_* : recopiés dans profiles par
+  // handle_new_user (0072). full_name reste envoyé : c'est lui que lit la
+  // version précédente du trigger, et la colonne utilisée partout.
+  async signUp({ email, password, firstName = "", lastName = "", fullName, role = "athlete",
+                 source = "", sourceDetail = "", captchaToken }) {
+    const name = fullName ?? [firstName, lastName].filter(Boolean).join(" ");
     const { data, error } = await sb.auth.signUp({
       email, password,
-      options: { data: { full_name: fullName, role }, captchaToken },
+      options: {
+        data: { full_name: name, first_name: firstName, last_name: lastName, role,
+                acquisition_source: source, acquisition_detail: sourceDetail },
+        captchaToken,
+      },
     });
     if (error) throw error;
     return data;
+  },
+
+  // Compte sans nom (créé avant que prénom/nom soient obligatoires) : complété
+  // à la connexion. full_name d'abord (existe partout), puis first/last_name
+  // (0072) sans bloquer si la migration n'est pas encore passée.
+  async updateMyName({ firstName, lastName }) {
+    const full = [firstName, lastName].filter(Boolean).join(" ");
+    const { error } = await sb.from("profiles").update({ full_name: full }).eq("id", this.user.id);
+    if (error) throw error;
+    await sb.from("profiles").update({ first_name: firstName, last_name: lastName }).eq("id", this.user.id)
+      .then(({ error: e2 }) => { if (e2) console.warn("[PF] first/last_name :", e2.message); });
+    if (this.profile) Object.assign(this.profile, { full_name: full, first_name: firstName, last_name: lastName });
+    return true;
   },
 
   async signIn({ email, password, captchaToken }) {

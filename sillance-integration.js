@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261027a";
+import { PF } from "./sillance-client.js?v=20261028a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -804,6 +804,13 @@ function injectStyles() {
   .pf-auth-card .pf-consent{display:flex;gap:8px;align-items:flex-start;margin:14px 0 2px;font-size:11.5px;line-height:1.4;color:#9aa3b2}
   .pf-auth-card .pf-consent input{width:auto;margin:2px 0 0;flex-shrink:0}
   .pf-auth-card .pf-consent a{color:#46C2D8}
+  #pf-auth-overlay{overflow-y:auto;align-items:safe center;padding:16px 0}
+  .pf-auth-card.up{width:400px}
+  .pf-auth-card .pf-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pf-auth-card .pf-row2 label{margin-top:12px}
+  .pf-auth-card input.bad,.pf-auth-card select.bad{border-color:#ff6b81}
+  .pf-auth-card .pf-hint{font-size:11.5px;color:#6f7a85;margin-top:4px}
+  .pf-auth-card .pf-req{color:#46C2D8}
   .vcard.vlocked .thumb{filter:grayscale(.45) brightness(.62)}
   .vlock{position:absolute;top:8px;right:8px;z-index:3;background:rgba(8,10,13,.72);
     color:#ffd23f;border-radius:99px;padding:3px 8px;font-size:12px;font-weight:700}
@@ -966,11 +973,19 @@ function renderAuth() {
   const card = document.querySelector("#pf-auth-overlay .pf-auth-card");
   if (!card) return;
   const isUp = authMode === "signup";
+  const draft = saveAuthDraft(card);
+  card.classList.toggle("up", isUp);
+  const req = `<span class="pf-req" aria-hidden="true"> *</span>`;
+  const sources = ["google", "instagram", "facebook", "tiktok", "youtube", "linkedin", "strava",
+                   "friend", "club_coach", "event", "other"];
   card.innerHTML = `
     <h2>Sillance</h2>
     <p class="sub">${isUp ? tr("auth.createAccount") : tr("auth.logInToSpace")}</p>
     ${isUp ? `
-      <label>${tr("auth.fullName")}</label><input id="pf-name" placeholder="${tr("auth.fullNamePh")}">
+      <div class="pf-row2">
+        <div><label for="pf-first">${tr("auth.firstName")}${req}</label><input id="pf-first" autocomplete="given-name" placeholder="${tr("auth.firstNamePh")}"></div>
+        <div><label for="pf-last">${tr("auth.lastName")}${req}</label><input id="pf-last" autocomplete="family-name" placeholder="${tr("auth.lastNamePh")}"></div>
+      </div>
       <label>${tr("auth.iAm")}</label>
       <div class="row-roles">
         <div class="role" data-role="coach">${tr("mode.coach")}</div>
@@ -978,9 +993,18 @@ function renderAuth() {
         <div class="role" data-role="club_admin">${tr("mode.club")}</div>
       </div>
       ${pickedRole === "club_admin" ? `<label>${tr("auth.clubName")}</label><input id="pf-club-name" placeholder="${tr("auth.clubNamePh")}">` : ``}` : ``}
-    <label>${tr("common.email")}</label><input id="pf-email" type="email" placeholder="${tr("auth.emailPh")}">
-    <label>${tr("auth.password")}</label><input id="pf-pass" type="password" placeholder="••••••••">
-    <div class="err" id="pf-err"></div>
+    <label for="pf-email">${tr("common.email")}${isUp ? req : ""}</label><input id="pf-email" type="email" autocomplete="email" placeholder="${tr("auth.emailPh")}">
+    ${isUp ? `<label for="pf-email2">${tr("auth.emailConfirm")}${req}</label><input id="pf-email2" type="email" autocomplete="email" placeholder="${tr("auth.emailPh")}">` : ``}
+    <label for="pf-pass">${tr("auth.password")}${isUp ? req : ""}</label><input id="pf-pass" type="password" autocomplete="${isUp ? "new-password" : "current-password"}" placeholder="••••••••">
+    ${isUp ? `<div class="pf-hint">${tr("auth.passwordRule")}</div>
+      <label for="pf-pass2">${tr("auth.passwordConfirm")}${req}</label><input id="pf-pass2" type="password" autocomplete="new-password" placeholder="••••••••">
+      <label for="pf-source">${tr("auth.source")}${req}</label>
+      <select id="pf-source">
+        <option value="">${tr("auth.sourcePick")}</option>
+        ${sources.map((v) => `<option value="${v}">${tr("auth.src." + v)}</option>`).join("")}
+      </select>
+      <input id="pf-source-other" placeholder="${tr("auth.sourceOtherPh")}" style="margin-top:8px" hidden>` : ``}
+    <div class="err" id="pf-err" role="alert"></div>
     ${isUp ? `<label class="pf-consent"><input type="checkbox" id="pf-consent"><span>${tr("auth.consentText")} <a href="./legal.html#confidentialite" target="_blank" rel="noopener">${tr("auth.privacyPolicyLink")}</a>.</span></label>` : ``}
     <div id="pf-turnstile" style="margin:6px 0"></div>
     <button class="primary" id="pf-go">${isUp ? tr("auth.createMyAccount") : tr("auth.logIn")}</button>
@@ -994,7 +1018,28 @@ function renderAuth() {
   });
   card.querySelector("#pf-switch").onclick = () => { authMode = isUp ? "signin" : "signup"; renderAuth(); };
   card.querySelector("#pf-go").onclick = submitAuth;
+  restoreAuthDraft(card, draft);
+  const src = card.querySelector("#pf-source");
+  if (src) {
+    // Arrivé par un lien d'invitation de son coach : la provenance est connue.
+    if (!src.value && PF.pendingInviteToken?.()) src.value = "club_coach";
+    const other = card.querySelector("#pf-source-other");
+    const sync = () => { other.hidden = src.value !== "other"; };
+    src.onchange = sync; sync();
+  }
   renderTurnstile();
+}
+
+// renderAuth() reconstruit la carte à chaque clic sur un rôle : sans ça, tout
+// ce qui était déjà tapé (nom, email…) était effacé.
+const AUTH_DRAFT_IDS = ["pf-first", "pf-last", "pf-email", "pf-email2", "pf-pass", "pf-pass2", "pf-source", "pf-source-other", "pf-club-name"];
+function saveAuthDraft(card) {
+  const d = {};
+  AUTH_DRAFT_IDS.forEach((id) => { const el = card.querySelector("#" + id); if (el) d[id] = el.value; });
+  return d;
+}
+function restoreAuthDraft(card, d) {
+  AUTH_DRAFT_IDS.forEach((id) => { const el = card.querySelector("#" + id); if (el && d[id] != null) el.value = d[id]; });
 }
 
 // Supabase Auth ne traduit pas ses messages d'erreur (toujours en anglais
@@ -1020,16 +1065,31 @@ async function submitAuth() {
   const password = document.getElementById("pf-pass").value;
   try {
     if (authMode === "signup") {
-      const consent = document.getElementById("pf-consent");
+      const $ = (id) => document.getElementById(id);
+      document.querySelectorAll(".pf-auth-card .bad").forEach((el) => el.classList.remove("bad"));
+      const fail = (id, key) => { const el = $(id); if (el) { el.classList.add("bad"); el.focus(); } err.textContent = tr(key); };
+      const firstName = $("pf-first").value.trim();
+      const lastName = $("pf-last").value.trim();
+      const source = $("pf-source").value;
+      const sourceDetail = source === "other" ? $("pf-source-other").value.trim() : "";
+      if (!firstName) return fail("pf-first", "auth.errFirstName");
+      if (!lastName) return fail("pf-last", "auth.errLastName");
+      if (!email) return fail("pf-email", "auth.errInvalidEmail");
+      if (email.toLowerCase() !== $("pf-email2").value.trim().toLowerCase()) return fail("pf-email2", "auth.errEmailMismatch");
+      if (password.length < 8) return fail("pf-pass", "auth.errWeakPassword");
+      if (password !== $("pf-pass2").value) return fail("pf-pass2", "auth.errPasswordMismatch");
+      if (!source) return fail("pf-source", "auth.errSource");
+      if (source === "other" && !sourceDetail) return fail("pf-source-other", "auth.errSourceOther");
+      const consent = $("pf-consent");
       if (consent && !consent.checked) { err.textContent = tr("auth.pleaseAcceptConsent"); return; }
-      const fullName = document.getElementById("pf-name").value.trim();
       // Rôle "club" : le nom du club est obligatoire ici, pas demandé après
       // coup — sinon le compte atterrit en club_admin sans club réel (la
       // seule chose qui le fait apparaître dans myClubs()/__pf_ownsClub).
       const clubNameInput = document.getElementById("pf-club-name");
       const clubName = clubNameInput ? clubNameInput.value.trim() : "";
       if (pickedRole === "club_admin" && !clubName) { err.textContent = tr("auth.clubNameRequired"); return; }
-      await PF.signUp({ email, password, fullName, role: pickedRole, captchaToken: turnstileToken });
+      await PF.signUp({ email, password, firstName, lastName, role: pickedRole,
+                        source, sourceDetail, captchaToken: turnstileToken });
       // Selon la config Supabase, une confirmation email peut être requise.
       await PF.signIn({ email, password, captchaToken: turnstileToken }).catch(() => {});
       if (!PF.user) { err.textContent = tr("auth.accountCreatedCheckEmail"); authMode = "signin"; renderAuth(); return; }
@@ -1331,6 +1391,44 @@ async function onLoggedIn() {
   await hydrate();
   checkPaymentReturn();
   checkDeviceReturn();
+  askNameIfMissing();
+}
+
+/* -------- compte sans nom : demandé une fois à la connexion --------
+   Constat 27/10/2026 : full_name vide pour tous les comptes coach (champ
+   facultatif à l'époque) → emails « Salut coach », « Ton coach t'invite ».
+   On le demande tant qu'il manque ; on ne peut pas fermer sans le remplir. */
+function askNameIfMissing() {
+  if (!PF.user || (PF.profile?.full_name || "").trim()) return;
+  if (document.getElementById("pf-name-overlay")) return;
+  injectAuthOverlay(); closeAuth(true); // garantit le CSS de la carte
+  const ov = document.createElement("div");
+  ov.id = "pf-name-overlay";
+  ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", "pf-name-h");
+  ov.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)";
+  ov.innerHTML = `<div class="pf-auth-card">
+      <h2 id="pf-name-h">${tr("auth.nameAskTitle")}</h2>
+      <p class="sub">${tr("auth.nameAskText")}</p>
+      <div class="pf-row2">
+        <div><label for="pf-n-first">${tr("auth.firstName")}</label><input id="pf-n-first" autocomplete="given-name" placeholder="${tr("auth.firstNamePh")}"></div>
+        <div><label for="pf-n-last">${tr("auth.lastName")}</label><input id="pf-n-last" autocomplete="family-name" placeholder="${tr("auth.lastNamePh")}"></div>
+      </div>
+      <div class="err" id="pf-n-err" role="alert"></div>
+      <button class="primary" id="pf-n-go">${tr("auth.nameAskSave")}</button>
+    </div>`;
+  document.body.appendChild(ov);
+  const first = ov.querySelector("#pf-n-first"), last = ov.querySelector("#pf-n-last"), e = ov.querySelector("#pf-n-err");
+  first.focus();
+  ov.querySelector("#pf-n-go").onclick = async () => {
+    const f = first.value.trim(), l = last.value.trim();
+    first.classList.toggle("bad", !f); last.classList.toggle("bad", !l);
+    if (!f || !l) { e.textContent = tr(!f ? "auth.errFirstName" : "auth.errLastName"); return; }
+    try {
+      await PF.updateMyName({ firstName: f, lastName: l });
+      ov.remove();
+      setCloudBadge(true);
+    } catch (x) { e.textContent = tr("auth.connectionError"); }
+  };
 }
 
 /* -------- confirmation de connexion appareil (retour Strava/Garmin/Coros) --------
