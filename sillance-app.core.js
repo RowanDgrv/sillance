@@ -2913,23 +2913,69 @@ function saveWeekPulseCoach(key, wk){
    (week_reviews) : un clic répété ne redéclenche jamais le modèle IA.
    ============================================================ */
 let WEEK_REVIEW_CACHE = {}; // clé "athleteId|weekMondayIso" -> {mapped, isDemo}
+// Données envoyées à l'IA pour la semaine (refonte 28/10/2026) : avant, seules
+// les séances FAITES partaient, sans le plan, sans FC max ni zone cible →
+// l'IA inventait « 5+ séances prévues », « objectif typique > 300 min ».
+// Désormais : tout le plan de la semaine (fait / non fait / à venir), les
+// activités hors plan, et pour chaque séance le prévu, le réalisé et l'écart
+// DÉJÀ CALCULÉ (zone de la FC moyenne vs zone cible). L'IA ne fait que rédiger.
+function weekHrFacts(avgHr){
+  if(!avgHr) return null;
+  const fcMax=aiFcMax();
+  return { fc_moy: Math.round(avgHr), pct_fc_max: Math.round(avgHr/fcMax*100), zone_fc_moy: aiHrZone(avgHr, fcMax) };
+}
+function weekZoneCheck(type, cible, zoneReal){
+  if(!zoneReal) return 'pas de fréquence cardiaque : zone non vérifiable';
+  // Séance fractionnée : la FC MOYENNE mélange séries et récupérations, elle
+  // ne dit pas si les séries étaient dans la cible.
+  if(type==='vo2' || type==='seuil') return 'séance fractionnée : la FC moyenne ne suffit pas à juger les séries (voir l\'analyse de la séance)';
+  const n=z=>parseInt(String(z).replace(/\D/g,''),10)||0, d=n(zoneReal)-n(cible);
+  return d===0 ? 'zone cible respectée' : d>0 ? `plus intense que prévu (${zoneReal} au lieu de ${cible})` : `plus facile que prévu (${zoneReal} au lieu de ${cible})`;
+}
 function weekReviewSessions(mon){
-  const out=[];
+  const out=[], today=iso(new Date());
   for(let i=0;i<7;i++){
     const dKey = iso(addDays(mon,i));
-    (planning[dKey]||[]).filter(s=>s.done).forEach(s=>{
-      const a=s.linkedAct;
-      out.push({ date:dKey, title:s.title, disc:s.disc, dur:s.dur, tss:s.tss, zone:s.zone,
-        rpe:s.rpe||null, rpeMuscle:s.rpeMuscle||null,
-        realDur:a?a.dur:null, avgHr:a?a.avgHr:null, dist:a?a.dist:null, source:a?a.src:(s.done?'manuel':null) });
+    (planning[dKey]||[]).forEach(s=>{
+      const type=sessionType(s), cible=(s.objectif&&s.objectif.zone)||s.zone||aiTargetZone(type, s.objectif);
+      const a=s.linkedAct, hr=a?weekHrFacts(a.avgHr):null;
+      const statut = s.done ? 'réalisée' : (dKey<today ? 'non réalisée' : 'à venir');
+      const item={ date:dKey, statut,
+        prevu:{ titre:s.title, discipline:s.disc, duree_min:s.dur||null, zone_cible:cible, type } };
+      if(s.done){
+        item.realise={ duree_min:a?a.dur:null, distance_km:a?a.dist:null, rpe:s.rpe||null, source:a?a.src:'manuel', ...(hr||{}) };
+        item.constat=weekZoneCheck(type, cible, hr&&hr.zone_fc_moy);
+      }
+      out.push(item);
     });
     // activités faites sans séance prévue ce jour-là
     (realised[dKey]||[]).filter(a=>!a.linkedTo).forEach(a=>{
-      out.push({ date:dKey, title:a.name, disc:a.disc, dur:null, realDur:a.dur, avgHr:a.avgHr, dist:a.dist, source:a.src, horsPlan:true });
+      out.push({ date:dKey, statut:'hors plan',
+        realise:{ titre:a.name, discipline:a.disc, duree_min:a.dur, distance_km:a.dist, source:a.src, ...(weekHrFacts(a.avgHr)||{}) } });
     });
   }
   return out;
 }
+// Compteurs calculés ici (jamais par l'IA) + FC max de référence.
+function weekReviewPayload(mon){
+  const items=weekReviewSessions(mon);
+  const echues=items.filter(x=>x.statut==='réalisée'||x.statut==='non réalisée');
+  const sum=(arr,f)=>arr.reduce((t,x)=>t+(f(x)||0),0);
+  return {
+    semaine_du: iso(mon), aujourd_hui: iso(new Date()), fc_max_athlete: aiFcMax(),
+    bilan: {
+      seances_prevues_a_date: echues.length,
+      seances_realisees: items.filter(x=>x.statut==='réalisée').length,
+      seances_non_realisees: items.filter(x=>x.statut==='non réalisée').length,
+      seances_a_venir: items.filter(x=>x.statut==='à venir').length,
+      activites_hors_plan: items.filter(x=>x.statut==='hors plan').length,
+      duree_prevue_a_date_min: sum(echues, x=>x.prevu&&x.prevu.duree_min),
+      duree_realisee_min: sum(items, x=>x.realise&&x.realise.duree_min),
+    },
+    seances: items,
+  };
+}
+function weekHasRealised(mon){ return weekReviewSessions(mon).some(x=>x.statut==='réalisée'||x.statut==='hors plan'); }
 function weekReviewMapped(r){
   return {headline:r.headline, tenu:r.verdict, bullets:(r.bullets||[]).map(x=>({s:x.status,t:x.text})), recos:r.recos||[]};
 }
@@ -2943,9 +2989,9 @@ function renderWeekAiBtn(mon){
   const el = document.getElementById('weekAiAssist'); if(!el) return;
   if(mode!=='coach'){ el.hidden=true; return; }
   const key = activeAthleteKey();
-  if(!key || !weekReviewSessions(mon).length){ el.hidden=true; return; }
+  if(!key || !weekHasRealised(mon)){ el.hidden=true; return; }
   el.hidden=false;
-  const wk = iso(mon), ck = key+'|'+wk;
+  const wk = 'v2|'+iso(mon), ck = key+'|'+wk;
   const cached = WEEK_REVIEW_CACHE[ck];
   if(cached){
     el.innerHTML = aiResultHtml(null, null, cached.mapped, cached.isDemo, ['ai.weekFootDemo','ai.weekFootReal'])
@@ -2974,9 +3020,11 @@ function renderWeekAiConfirm(mon){
 function runWeekAi(mon){
   const el = document.getElementById('weekAiAssist'); if(!el) return;
   injectAiCss();
-  const key = activeAthleteKey(), wk = iso(mon), ck = key+'|'+wk;
-  const sessions = weekReviewSessions(mon);
-  if(!sessions.length){ el.innerHTML = `<p class="club-hint">${tr('weekAi.noSessions')}</p>`; return; }
+  // 'v2|' : nouveau format de données ; ignore les synthèses v1 en cache
+  // (faites sans le plan, avec des chiffres inventés).
+  const key = activeAthleteKey(), wk = 'v2|'+iso(mon), ck = key+'|'+wk;
+  const sessions = weekReviewPayload(mon);
+  if(!weekHasRealised(mon)){ el.innerHTML = `<p class="club-hint">${tr('weekAi.noSessions')}</p>`; return; }
   if(!aiUnlocked()){
     el.innerHTML = aiPaywallHtml();
     const btn=document.getElementById('aiActivate');
