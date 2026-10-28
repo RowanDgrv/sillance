@@ -222,6 +222,17 @@ button{font-family:inherit;cursor:pointer}
 .mp-gear span{font-size:11.5px;font-weight:600;padding:var(--space-1) 9px;border-radius:99px;
   background:rgba(47,217,255,.1);border:1px solid rgba(47,217,255,.3);color:var(--swim)}
 .morning-time{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+/* le menu prenait sa largeur native et sortait du bloc (capture 28/10/2026) */
+.morning-time select{min-width:0;max-width:100%}
+.morning-time label{flex:none}
+/* lien sidebar vers Paramètres > Rappels & alertes (réglages sortis de la page principale) */
+.rem-coach-link{display:flex;align-items:center;gap:8px;width:100%;margin-bottom:14px;padding:10px 12px;border-radius:12px;
+  border:1px solid var(--line-strong);background:var(--panel-2);color:var(--text);font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:left}
+.rem-coach-link:hover{border-color:var(--swim)}
+.rem-coach-link span{flex:1;min-width:0}
+.rem-coach-link small{color:var(--muted);font-weight:500;font-size:11.5px;white-space:nowrap}
+#setNotifs .sn-block{max-width:560px}
+.set-tab[hidden]{display:none}
 .morning-time label{font-size:var(--fs-base);font-weight:600;color:var(--muted)}
 .morning-time input{border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--text);
   font-family:var(--font-data);font-size:var(--fs-md);padding:6px 9px}
@@ -555,7 +566,8 @@ body.light .theme-toggle .tt-moon{display:none}
 /* même bug de spécificité que .cycle-modal ci-dessus, corrigé pareil */
 .modal.settings-modal{width:min(880px,100%)}
 .set-layout{display:grid;grid-template-columns:215px 1fr;gap:18px;margin-top:var(--space-2)}
-@media(max-width:760px){.set-layout{grid-template-columns:1fr}}
+@media(max-width:760px){.set-layout{grid-template-columns:minmax(0,1fr)}}
+.set-layout>*{min-width:0}
 .set-nav{display:flex;flex-direction:column;gap:5px}
 .set-tab{text-align:left;padding:10px var(--space-3);border-radius:var(--radius-sm);border:1px solid transparent;background:transparent;color:var(--soft);font-size:var(--fs-md);font-weight:600;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:var(--space-2)}
 .set-tab:hover{background:var(--panel-2)}
@@ -572,6 +584,8 @@ body.light .theme-toggle .tt-moon{display:none}
 .dash-alert-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px}
 .dash-alert-del:hover{color:var(--run)}
 .dash-alert-form{display:grid;grid-template-columns:1.6fr 0.7fr 0.8fr auto;gap:8px;align-items:center}
+.dash-alert-form>*{min-width:0}
+@media(max-width:560px){.dash-alert-form{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.dash-alert-form .btn{grid-column:1/-1}}
 .season-list{display:flex;flex-direction:column;gap:8px;margin:14px 0 16px;max-height:340px;overflow-y:auto}
 .season-row{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);padding:10px 13px}
 .season-row.past{opacity:.8}
@@ -3994,6 +4008,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
         <button class="set-tab" data-tab="coach"><i class="ic ic-brain"></i> Abonnement coach · IA</button>
         <button class="set-tab" data-tab="account"><i class="ic ic-credit-card"></i> Compte &amp; paiements</button>
         <button class="set-tab" data-tab="dashboard"><i class="ic ic-target"></i> Tableau de bord</button>
+        <button class="set-tab" data-tab="notifs" id="setTabNotifs"><i class="ic ic-bell"></i> <span data-i18n="settings.tabNotifs">Rappels &amp; alertes</span></button>
       </nav>
       <div class="set-body" id="setBody"></div>
     </div>
@@ -4157,8 +4172,8 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261028f"></script>
-<script src="./sillance-reminder.js?v=20261028f"></script>
+<script src="./sillance-i18n-app.js?v=20261028b"></script>
+<script src="./sillance-reminder.js?v=20261028g"></script>
 <script src="./sillance-ai-popup.js?v=20261028d"></script>
 <script src="./sillance-consigne.js?v=20261028d"></script>
 <script src="./sillance-ai-report.js?v=20261028i"></script>
@@ -4167,13 +4182,13 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-club-feed.js?v=20261009b"></script>
 <script src="./sillance-tour.js?v=20261028a"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
-<script src="./sillance-app.core.js?v=20261028k"></script>
+<script src="./sillance-app.core.js?v=20261028l"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script type="module" src="./sillance-integration.js?v=20261028o"></script>
-<script src="./sillance-cookies.js"></script>
-<script src="./sillance-analytics.js"></script>
+<script src="./sillance-cookies.js?v=20261028a"></script>
+<script src="./sillance-analytics.js?v=20261028a"></script>
 </body>
 </html>

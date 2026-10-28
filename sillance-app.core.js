@@ -2411,7 +2411,11 @@ let settingsTab='structure';
 function renderSettings(){
   document.querySelectorAll('#setNav .set-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===settingsTab));
   const body=document.getElementById('setBody');
-  body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsTab==='coach' ? settingsCoachHtml() : settingsTab==='dashboard' ? settingsDashboardHtml() : settingsAccountHtml();
+  // Rappels & alertes coach (28/10/2026) : sortis de la sidebar, rendus par
+  // sillance-reminder.js dans #setNotifs (compte réel uniquement).
+  body.innerHTML = settingsTab==='notifs' ? '<div id="setNotifs"><p class="hint">'+tr('settings.notifsLoading')+'</p></div>'
+    : settingsTab==='structure' ? settingsStructureHtml() : settingsTab==='coach' ? settingsCoachHtml() : settingsTab==='dashboard' ? settingsDashboardHtml() : settingsAccountHtml();
+  if(settingsTab==='notifs' && window.SilReminder?.paintSettings) window.SilReminder.paintSettings();
   wireCoachTiers(body, renderSettings);
   body.querySelectorAll('[data-dw]').forEach(cb=>cb.onchange=()=>{
     const p=dashWidgetPrefs(); p[cb.dataset.dw]=cb.checked; saveDashWidgetPrefs(p);
@@ -2491,10 +2495,13 @@ function renderSettings(){
 }
 function openSettings(tab){
   if(tab) settingsTab=tab;
+  const nt=document.getElementById('setTabNotifs'); if(nt) nt.hidden = !(mode==='coach' && window.PF?.user);
+  if(settingsTab==='notifs' && nt && nt.hidden) settingsTab='structure';
   renderSettings();
   document.getElementById('settingsOverlay').classList.add('open');
 }
 document.getElementById('settingsBtn').addEventListener('click', ()=> openSettings());
+window.openSettings = openSettings;
 document.getElementById('settingsClose').addEventListener('click', ()=> document.getElementById('settingsOverlay').classList.remove('open'));
 document.getElementById('settingsOverlay').addEventListener('click', e=>{ if(e.target.id==='settingsOverlay') document.getElementById('settingsOverlay').classList.remove('open'); });
 document.querySelectorAll('#setNav .set-tab').forEach(b=> b.addEventListener('click', ()=>{ settingsTab=b.dataset.tab; renderSettings(); }));

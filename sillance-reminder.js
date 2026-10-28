@@ -64,6 +64,9 @@
       'miss.statusOff': 'Alerte désactivée',
       'miss.saved': 'Alerte séances manquées enregistrée',
       'miss.offToast': 'Alerte séances manquées désactivée',
+      'link.title': 'Rappels & alertes',
+      'link.on': 'Actifs · régler',
+      'link.off': 'Désactivés · régler',
       'guide.coachLead': 'Quand un athlète n\'a pas encore sa semaine suivante : la liste des athlètes à planifier, avant ton jour limite.',
       'guide.coachStep': 'Reviens dans ton espace coach, bloc « Rappel de planification », choisis <b>Notification</b> puis touche <b>Autoriser</b>.',
       'guide.coachEmail': 'Le rappel par email est déjà actif par défaut, sans rien installer. Tu peux changer le canal, le jour limite ou le couper dans « Rappel de planification ».',
@@ -111,6 +114,9 @@
       'miss.statusOff': 'Alert off',
       'miss.saved': 'Missed sessions alert saved',
       'miss.offToast': 'Missed sessions alert turned off',
+      'link.title': 'Reminders & alerts',
+      'link.on': 'On · settings',
+      'link.off': 'Off · settings',
       'guide.coachLead': 'When an athlete doesn\'t have next week yet: the list of athletes to plan, before your deadline.',
       'guide.coachStep': 'Go back to your coach space, "Planning reminder" block, pick <b>Notification</b> then tap <b>Allow</b>.',
       'guide.coachEmail': 'The email reminder is already on by default, nothing to install. Change the channel, the deadline or turn it off in "Planning reminder".',
@@ -158,6 +164,9 @@
       'miss.statusOff': 'Alerta desactivada',
       'miss.saved': 'Alerta de sesiones perdidas guardada',
       'miss.offToast': 'Alerta de sesiones perdidas desactivada',
+      'link.title': 'Recordatorios y alertas',
+      'link.on': 'Activos · ajustar',
+      'link.off': 'Desactivados · ajustar',
       'guide.coachLead': 'Cuando un atleta aún no tiene su semana siguiente: la lista de atletas por planificar, antes de tu día límite.',
       'guide.coachStep': 'Vuelve a tu espacio de entrenador, bloque «Recordatorio de planificación», elige <b>Notificación</b> y toca <b>Permitir</b>.',
       'guide.coachEmail': 'El recordatorio por email ya está activo por defecto, sin instalar nada. Cambia el canal, el día límite o desactívalo en «Recordatorio de planificación».',
@@ -448,22 +457,33 @@
     }
     saveMiss({ threshold: coachPrefs.miss.threshold, channel: ch });
   });
+  /* Réglages complets : onglet « Rappels & alertes » des Paramètres
+     (#setNotifs). Sidebar : une seule ligne qui y mène (28/10/2026, les deux
+     blocs prenaient la moitié de la colonne et débordaient). */
   function paintCoach(){
+    if(!coachPrefs) return;
+    var host = document.getElementById('setNotifs');
+    if(host) host.innerHTML = '<div class="sn-block" id="remCoachBlock">' + coachBlockHtml() + '</div>';
     var anchor = document.getElementById('adhOpen');
-    if(!anchor || !coachPrefs) return;
-    var blk = document.getElementById('remCoachBlock');
-    if(!blk){
-      blk = document.createElement('div');
-      blk.className = 'sn-block'; blk.id = 'remCoachBlock'; blk.style.marginBottom = '14px';
-      anchor.parentNode.insertBefore(blk, anchor);
+    if(!anchor) return;
+    var link = document.getElementById('remCoachLink');
+    if(!link){
+      link = document.createElement('button');
+      link.type = 'button'; link.id = 'remCoachLink'; link.className = 'rem-coach-link';
+      anchor.parentNode.insertBefore(link, anchor);
     }
-    blk.innerHTML = coachBlockHtml();
+    var on = coachPrefs.channel !== 'none' || (coachPrefs.miss && coachPrefs.miss.threshold != null);
+    link.innerHTML = '<i class="ic ic-bell"></i><span>' + t('link.title') + '</span><small>' + (on ? t('link.on') : t('link.off')) + '</small>';
+  }
+  function paintSettings(){
+    if(coachPrefs){ paintCoach(); return; }
+    loadCoach();
   }
   function loadCoach(){
     var uid = window.PF && window.PF.user ? window.PF.user.id : null;
     if(uid !== coachLoadedFor){ coachPrefs = null; coachLoadedFor = null; }
     if(!uid || coachPrefs || coachLoading || !window.PF.getCoachReminderPrefs) return;
-    if(!document.getElementById('adhOpen')) return; // pas en vue coach
+    if(!document.getElementById('adhOpen') && !document.getElementById('setNotifs')) return; // pas en vue coach
     coachLoading = true;
     window.PF.getCoachReminderPrefs().then(function(p){
       coachLoading = false; coachLoadedFor = uid;
@@ -483,10 +503,12 @@
   }
   setInterval(function(){
     loadCoach();
-    if(coachPrefs && document.getElementById('adhOpen') && !document.getElementById('remCoachBlock')) paintCoach();
+    if(coachPrefs && ((document.getElementById('adhOpen') && !document.getElementById('remCoachLink'))
+      || (document.getElementById('setNotifs') && !document.getElementById('remCoachBlock')))) paintCoach();
   }, 1000);
   document.addEventListener('click', function(e){
     if(e.target.closest('[data-rem-coach-help]')){ e.preventDefault(); openGuide('coach'); return; }
+    if(e.target.closest('#remCoachLink')){ if(typeof window.openSettings === 'function') window.openSettings('notifs'); return; }
     var b = e.target.closest('[data-rem-day]'); if(!b || !coachPrefs) return;
     var prev = { day: coachPrefs.day, channel: coachPrefs.channel };
     if(b.dataset.remDay === prev.day) return;
@@ -511,5 +533,5 @@
     saveCoach({ day: prev.day, channel: ch }, prev);
   });
 
-  window.SilReminder = { openGuide: openGuide, needsInstall: needsInstall };
+  window.SilReminder = { openGuide: openGuide, needsInstall: needsInstall, paintSettings: paintSettings };
 })();
