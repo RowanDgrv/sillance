@@ -207,7 +207,7 @@
     var detail = (o && o.detail) || 'unknown';
     // Échec que le serveur n'a pas vu : on le signale pour l'email d'alerte.
     if(/^network/.test(detail) && window.PF && window.PF.user && window.PF.reportAiFailure){
-      window.PF.reportAiFailure({ fn: o.kind === 'week' ? 'week-review' : 'session-summary', detail: detail,
+      window.PF.reportAiFailure({ fn: o.kind === 'week' ? 'week-review' : o.kind === 'report' ? 'session-report' : 'session-summary', detail: detail,
         context: { page: location.pathname, online: String(navigator.onLine) } });
     }
     open(
