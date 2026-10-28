@@ -10501,8 +10501,15 @@ function aiResultHtml(s, b, r, isDemo, footKeys){
     <div class="ai-foot">${foot}</div>
   </div>`;
 }
-// Rapport de séance (28/10/2026, sillance-ai-report.js) : version allégée,
-// allure vs zones de vitesse (% VMA), FC vs FC max, RPE.
+// Rapport complet (28/10/2026, sillance-ai-report.js) : indicateurs calculés
+// ici puis rédaction IA. Charge (CTL/ATL) et objectif de course fournis par
+// l'app ; ACWR = ATL/CTL, à titre indicatif seulement (prédicteur contesté).
+function reportLoad(){
+  try{ const d=buildLoadDaily(new Date(),364).at(-1); if(!d) return null;
+    return { ctl_forme_chronique:Math.round(d.ctl), atl_fatigue_aigue:Math.round(d.atl), tsb_fraicheur:Math.round(d.tsb),
+      ratio_aigu_chronique:d.ctl?+(d.atl/d.ctl).toFixed(2):null, note:'ratio aigu/chronique à titre indicatif' }; }catch(e){ return null; }
+}
+function reportGoal(){ try{ const r=currentRace(); return r ? `${r.name}, dans ${r.days} jours` : null; }catch(e){ return null; } }
 function renderReportBtn(s, data){
   const wrap=document.getElementById('anAiWrap'); if(!wrap || !window.SilAiReport) return;
   let rb=document.getElementById('anReportBtn');
@@ -10511,7 +10518,7 @@ function renderReportBtn(s, data){
   // Compte réel sans activité de montre : jamais de rapport sur les données d'exemple.
   const realData = (window.PF?.user && !s._realData) ? null : data;
   rb.onclick=()=> window.SilAiReport.open({ session:s, data:realData, ref:ATHLETE_REF, zones:zonesFor('fc'),
-    speedZones:zonesFor('vma'), athleteId: s.athleteId || (rosterIsReal ? currentAthleteId : null) });
+    speedZones:zonesFor('vma'), load:reportLoad(), goal:reportGoal(), athleteId: s.athleteId || (rosterIsReal ? currentAthleteId : null) });
 }
 function renderAi(s, data){
   const wrap=document.getElementById('anAiWrap'); if(!wrap) return;

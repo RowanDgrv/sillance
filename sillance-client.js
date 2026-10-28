@@ -215,7 +215,25 @@ export const PF = {
   async summarizeWeek(payload) {
     return await this._invokeSoft("week-review", payload);
   },
-  // Rapport de séance (version allégée, 28/10/2026).
+  // Rapport complet de séance (28/10/2026) : contexte de forme des 28 derniers
+  // jours (check-ins, métriques montre) + sexe / année de naissance (0075).
+  // Chaque lecture est indépendante : une table illisible (droits, colonne
+  // absente) donne simplement « donnée non disponible » dans le rapport.
+  async getReportContext(athleteId) {
+    const since = new Date(Date.now() - 28 * 864e5).toISOString().slice(0, 10);
+    const [prof, ck, dm] = await Promise.all([
+      sb.from("athlete_profiles").select("sex, birth_year, fc_max, fc_repos").eq("user_id", athleteId).maybeSingle(),
+      sb.from("checkins").select("date, sommeil, fatigue, motivation, readiness, hrv, dispo, dispo_note, cycle_phase, cycle_day")
+        .eq("athlete_id", athleteId).gte("date", since).order("date", { ascending: false }),
+      sb.from("device_daily_metrics").select("day, resting_hr, hrv_avg").eq("user_id", athleteId).gte("day", since)
+        .order("day", { ascending: false }),
+    ]);
+    return {
+      profile: prof.error ? {} : (prof.data || {}),
+      checkins: ck.error ? [] : (ck.data || []),
+      daily: dm.error ? [] : (dm.data || []),
+    };
+  },
   async sessionReport(payload) {
     return await this._invokeSoft("session-report", payload);
   },
