@@ -1042,6 +1042,7 @@ function renderSidebar(){
     buildTemplates(document.getElementById('tplList'));
     renderPremiumUpsell();
     loadSillanceLibrary();
+    loadMyLibraryAndCycles();
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
     var _sgCta=document.getElementById('sgCta'); if(_sgCta) _sgCta.onclick=function(){ openBuilder(null,null); };
@@ -1857,6 +1858,25 @@ function libTemplateFromRow(r){
     durationLabel: r.duration_label, zoneLabel: r.zone_label || r.zone_hr,
   };
 }
+/* Bibliothèque perso + cycles du coach (28/10/2026) : enregistrés en base
+   mais jamais relus, ils disparaissaient au rechargement de la page. */
+let MY_LIB_LOADED_FOR = null;
+async function loadMyLibraryAndCycles(){
+  const uid = window.PF?.user?.id;
+  if(!uid || mode!=='coach' || MY_LIB_LOADED_FOR===uid || !PF.getTemplates) return;
+  MY_LIB_LOADED_FOR = uid;
+  try{
+    const [rows, cycles] = await Promise.all([PF.getTemplates(), PF.getCycles ? PF.getCycles() : null]);
+    (rows||[]).forEach(r=>{
+      if(TEMPLATES.some(t=>t.id===r.id)) return;
+      TEMPLATES.push({id:r.id, mine:true, disc:r.disc, title:r.title, dur:r.dur||0, dist:r.dist||0, tss:r.tss||0, zone:r.zone||'—',
+        blocksV2:{blocks:r.blocks||[], title:r.title, disc:r.disc}});
+    });
+    // compte réel : ses cycles à lui (le cycle exemple de la démo n'est pas le sien)
+    if(Array.isArray(cycles)){ CYCLES.length=0; cycles.forEach(c=>CYCLES.push({id:c.id, name:c.name, weeks:c.weeks, plan:c.plan||{}})); }
+  }catch(e){ console.warn('[PF] bibliothèque perso / cycles :', e); MY_LIB_LOADED_FOR=null; return; }
+  if(mode==='coach') renderSidebar();
+}
 async function loadSillanceLibrary(force){
   if(!window.PF?.user) return;
   if(LIBRARY_LOADED && !force) return;
@@ -2008,6 +2028,7 @@ function buildCycles(container){
     el.querySelector('.cy-del').addEventListener('click', e=>{
       e.stopPropagation();
       const i=CYCLES.findIndex(x=>x.id===c.id); if(i>-1) CYCLES.splice(i,1);
+      if(window.PF?.user && PF.deleteCycle && /^[0-9a-f-]{36}$/i.test(c.id)) PF.deleteCycle(c.id).catch(e=>console.warn('[PF] deleteCycle :', e));
       buildCycles(container); toast(tr('toast.cycleSupprime'));
     });
     el.addEventListener('click', ()=> openCycleBuilder(c));
@@ -2219,6 +2240,11 @@ function saveCycleFromModal(){
   const clean = {id:cycleState.id, name:cycleState.name, weeks:cycleState.weeks, plan:cycleState.plan};
   const i=CYCLES.findIndex(x=>x.id===clean.id);
   if(i>-1) CYCLES[i]=clean; else CYCLES.push(clean);
+  if(window.PF?.user && PF.saveCycle){
+    PF.saveCycle(clean).then(row=>{
+      if(row && row.id && row.id!==clean.id){ if(cycleState && cycleState.id===clean.id) cycleState.id=row.id; clean.id=row.id; }
+    }).catch(e=>{ console.warn('[PF] saveCycle :', e); toast(tr('toast.cycleSaveFailed'), 'error'); });
+  }
   if(mode==='coach') renderSidebar();
   return clean;
 }
@@ -9098,11 +9124,16 @@ document.getElementById('bRecurOn').addEventListener('change', e=>{
 // fermeture/toast ici, c'est l'appelant qui gère (il peut enchaîner d'autres
 // actions, ex. ouvrir l'attribution par groupe juste après).
 function saveSessionToLibrary(s){
-  TEMPLATES.push({id:'tpl'+(builderUid++), disc:s.disc, title:s.title, dur:s.dur, tss:s.tss, zone:s.zone, desc:s.desc, blocksV2:s.blocksV2});
+  const t={id:'tpl'+(builderUid++), disc:s.disc, title:s.title, dur:s.dur, tss:s.tss, zone:s.zone, desc:s.desc, blocksV2:s.blocksV2};
+  TEMPLATES.push(t);
   if(window.PF?.user){
     PF.saveTemplate({ disc:s.disc, title:s.title, dur:s.dur, dist:s.dist||0, tss:s.tss,
       zone:s.zone, activeRefs:builderState.activeRefs, blocks:(s.blocksV2&&s.blocksV2.blocks)||builderState.blocks })
-      .catch(e=> console.warn('[PF] saveTemplate échoué :', e));
+      // id de la base : c'est lui que les cycles retiennent (sinon référence
+      // perdue au rechargement)
+      .then(row=>{ if(row && row.id){ const old=t.id; t.id=row.id; t.mine=true;
+        CYCLES.forEach(c=>Object.values(c.plan).forEach(a=>a.forEach((x,i)=>{ if(x===old) a[i]=row.id; }))); } })
+      .catch(e=>{ console.warn('[PF] saveTemplate échoué :', e); toast(tr('toast.libSaveFailed'), 'error'); });
   }
   if(mode==='coach') renderSidebar();
 }

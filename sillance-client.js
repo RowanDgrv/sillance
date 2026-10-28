@@ -683,6 +683,24 @@ export const PF = {
     if (error) throw error; return data;
   },
 
+  // -------- CYCLES (programmes multi-semaines, 0079) --------
+  async getCycles() {
+    const { data, error } = await sb.from("coach_cycles").select("id, name, weeks, plan")
+      .eq("owner_id", this.user.id).order("created_at", { ascending: true });
+    if (error) { console.warn("[PF] coach_cycles :", error.message); return null; }
+    return data ?? [];
+  },
+  async saveCycle(c) {
+    const row = { owner_id: this.user.id, name: c.name || "", weeks: c.weeks || 4, plan: c.plan || {}, updated_at: new Date().toISOString() };
+    if (/^[0-9a-f-]{36}$/i.test(c.id || "")) row.id = c.id;
+    const { data, error } = await sb.from("coach_cycles").upsert(row).select("id").single();
+    if (error) throw error; return data;
+  },
+  async deleteCycle(id) {
+    const { error } = await sb.from("coach_cycles").delete().eq("id", id).eq("owner_id", this.user.id);
+    if (error) throw error; return true;
+  },
+
   // -------- BIBLIOTHÈQUE OFFICIELLE SILLANCE (incluse dans l'add-on IA) --------
   // 100 séances-types course & vélo. La RLS (my_library_access = has_ai_addon)
   // ne renvoie de lignes QUE si le compte a l'add-on (coach, club, ou staff).
