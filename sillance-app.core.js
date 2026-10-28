@@ -3303,6 +3303,13 @@ function sessionCard(s, dateKey){
    08/10/2026 : si le push échoue, on retombe automatiquement sur l'export
    .tcx (PFExport) plutôt que de juste afficher une erreur — c'est le cas
    Garmin/Polar qui n'ont pas d'écriture self-service. */
+/* Message clair selon le code renvoyé par push-session-to-watch. */
+function watchErrMsg(e){
+  const c = e && e.code;
+  const known = ['no_coros','polar_unsupported','past_date','unsupported_sport','empty_session','coros_auth','coros_rejected'];
+  if(known.includes(c)) return tr('watch.err.'+c, {detail: String(e.detail||'').slice(0,120)});
+  return tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)});
+}
 function pushSingleSessionToWatch(s, dateKey){
   if(!window.PF?.user){ toast(tr('watch.needAccount')); return; }
   if(!s.id){ toast(tr('watch.needSavedFirst')); return; }
@@ -3311,12 +3318,7 @@ function pushSingleSessionToWatch(s, dateKey){
     toast(tr('watch.sent'));
   }).catch(e=>{
     console.warn('[PF] pushSessionToWatch', e);
-    if(window.PFExport){
-      PFExport.download(s);
-      toast(tr('watch.exportFallback') || "Pas d'envoi direct possible — fichier .tcx téléchargé, mais Garmin Connect et Polar Flow n'acceptent pas l'import de séance structurée par ce biais.");
-    } else {
-      toast(tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)}));
-    }
+    toast(watchErrMsg(e), 'error');
   });
 }
 /* Déplace une séance vers une autre date — même logique que le drop du
@@ -3935,7 +3937,10 @@ const sendWeekWatchBtn = document.getElementById('sendWeekWatchBtn');
 function syncSendWeekButtonVisibility(){
   if(!sendWeekWatchBtn) return;
   const hasCoros = Array.isArray(window.__pf_providers) && window.__pf_providers.includes('coros');
-  sendWeekWatchBtn.hidden = (calViewMode==='day') || !hasCoros || !window.PF?.user;
+  // __pf_providers = les montres de l'UTILISATEUR connecté : côté coach, c'est
+  // la montre de l'athlète qui compte (le serveur vérifie et explique) →
+  // bouton visible pour le coach, masqué pour un athlète sans COROS.
+  sendWeekWatchBtn.hidden = (calViewMode==='day') || !window.PF?.user || (mode!=='coach' && !hasCoros);
 }
 async function pushWeekToWatch(){
   if(!window.PF?.user) return;
@@ -3947,14 +3952,21 @@ async function pushWeekToWatch(){
   }
   if(!targets.length){ toast(tr('watch.weekNothingToSend')); return; }
   toast(tr('watch.sendingWeek', {n:targets.length}));
-  let sent=0, failed=0;
+  let sent=0, failed=0, firstErr=null;
   for(const {s,key} of targets){
+    // séances passées : COROS les refuse, on ne les tente même pas
+    if(key < iso(new Date())){ continue; }
     try{ await PF.pushSessionToWatch(s.id, key); sent++; }
-    catch(e){ failed++; console.warn('[PF] pushSessionToWatch (semaine)', s.id, e); }
+    catch(e){
+      failed++; firstErr = firstErr || e; console.warn('[PF] pushSessionToWatch (semaine)', s.id, e);
+      // pas de COROS / Polar / connexion expirée : inutile d'insister
+      if(['no_coros','polar_unsupported','coros_auth'].includes(e?.code)) break;
+    }
   }
+  if(!sent && !failed){ toast(tr('watch.weekNothingToSend')); return; }
   toast(failed
-    ? tr('watch.weekSentWithFailures', {sent, failed})
-    : tr(sent>1?'watch.weekSentPlural':'watch.weekSentSingular', {n:sent}));
+    ? tr('watch.weekSentWithFailures', {sent, failed}) + ' · ' + watchErrMsg(firstErr)
+    : tr(sent>1?'watch.weekSentPlural':'watch.weekSentSingular', {n:sent}), failed?'error':undefined);
 }
 sendWeekWatchBtn?.addEventListener('click', pushWeekToWatch);
 /* Navigation du calendrier club (onglet Calendrier), indépendante du

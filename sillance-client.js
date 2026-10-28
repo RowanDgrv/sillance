@@ -1092,8 +1092,14 @@ export const PF = {
   // service côté API). scheduledSessionId = l'id retourné par scheduleSession.
   // Lève si la discipline n'est pas poussable (natation/renfo/hyrox) — le
   // message d'erreur invite alors à proposer l'export .FIT.
+  // Erreurs lisibles (28/10/2026) : le serveur renvoie un code stable
+  // (no_coros, polar_unsupported, past_date…), relu via _invokeSoft et levé
+  // en Error.code ; avant, invoke() masquait la raison et l'app téléchargeait
+  // un .tcx à la place.
   async pushSessionToWatch(scheduledSessionId, dateIso) {
-    return await this._invoke("push-session-to-watch", { scheduled_session_id: scheduledSessionId, date: dateIso });
+    const r = await this._invokeSoft("push-session-to-watch", { scheduled_session_id: scheduledSessionId, date: dateIso });
+    if (r && r.error) throw Object.assign(new Error(r.detail || r.error), { code: r.error, detail: r.detail || "", disc: r.disc });
+    return r;
   },
   // Activités importées, normalisées (disc/name/start_time/duration_s/distance_m…).
   async getActivities(limit = 20, athleteId = null) {

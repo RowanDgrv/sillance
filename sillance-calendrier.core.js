@@ -3025,6 +3025,13 @@ function sessionCard(s, dateKey){
    affiché pour décider à l'avance (my_devices = ses propres appareils
    seulement), donc on tente toujours le push d'abord et on bascule sur
    l'échec plutôt que de pré-filtrer côté client. */
+/* Message clair selon le code renvoyé par push-session-to-watch. */
+function watchErrMsg(e){
+  const c = e && e.code;
+  const known = ['no_coros','polar_unsupported','past_date','unsupported_sport','empty_session','coros_auth','coros_rejected'];
+  if(known.includes(c)) return tr('watch.err.'+c, {detail: String(e.detail||'').slice(0,120)});
+  return tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)});
+}
 function pushSingleSessionToWatch(s, dateKey){
   if(!window.PF?.user){ toast(tr('watch.needAccount')); return; }
   if(!s.id){ toast(tr('watch.needSavedFirst')); return; }
@@ -3033,12 +3040,7 @@ function pushSingleSessionToWatch(s, dateKey){
     toast(tr('watch.sent'));
   }).catch(e=>{
     console.warn('[PF] pushSessionToWatch', e);
-    if(window.PFExport){
-      PFExport.download(s);
-      toast(tr('watch.exportFallback') || "Pas d'envoi direct possible — fichier .tcx téléchargé, mais Garmin Connect et Polar Flow n'acceptent pas l'import de séance structurée par ce biais.");
-    } else {
-      toast(tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)}));
-    }
+    toast(watchErrMsg(e), 'error');
   });
 }
 /* Déplace une séance vers une autre date — même logique que le drop du
