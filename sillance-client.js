@@ -1306,9 +1306,14 @@ export const PF = {
     const { data, error } = await sb.functions.invoke(fn, { body });
     if (!error) return data;
     const res = error.context;
+    let status = "";
     if (res && typeof res.json === "function") {
+      status = res.status ? "_" + res.status : "";
       try { const j = await res.json(); if (j && j.error) return j; } catch (_) { /* corps non JSON */ }
     }
-    return { error: "network", detail: "network" };
+    // Détail précis (type d'erreur supabase-js + code HTTP) : « network » seul
+    // ne permettait pas de distinguer coupure réseau, passerelle et plantage.
+    const kind = error.name === "FunctionsRelayError" ? "relay" : error.name === "FunctionsFetchError" ? "fetch" : "http";
+    return { error: "network", detail: `network_${kind}${status}` };
   },
 };

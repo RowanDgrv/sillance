@@ -191,7 +191,8 @@
 
   function errKey(detail){
     var d = String(detail || 'unknown');
-    if(d === 'anthropic_credit' || d === 'missing_key' || d === 'bad_output' || d === 'add_on_required' || d === 'network') return 'aip.err.' + d;
+    if(d === 'anthropic_credit' || d === 'missing_key' || d === 'bad_output' || d === 'add_on_required') return 'aip.err.' + d;
+    if(/^network/.test(d)) return 'aip.err.network';
     if(/^anthropic_401|authentication|permission/.test(d)) return 'aip.err.auth';
     if(/^anthropic_404|not_found/.test(d)) return 'aip.err.model';
     if(/^anthropic_529|overloaded/.test(d)) return 'aip.err.overloaded';
