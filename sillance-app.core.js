@@ -1697,7 +1697,15 @@ function openStravaAnalysis(act, plan){
     if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
     // plan : la séance prévue liée → l'IA juge contre SA consigne (titre,
     // objectif, durée prévue) et non contre le nom donné par la montre.
-    openAnalysis(plan ? {...plan, _realData:res.data} : {id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
+    // Un plantage de l'AFFICHAGE ne doit pas se faire passer pour un échec de
+    // récupération (28/10/2026 : le catch ci-dessous affichait « récupération
+    // impossible » alors que les données étaient bien arrivées).
+    try{
+      openAnalysis(plan ? {...plan, _realData:res.data} : {id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
+    }catch(err){
+      console.error('[analyse] affichage impossible :', err);
+      toast(tr('sync.analysisRenderFailed')+' : '+(err && err.message ? err.message : String(err)), 'error');
+    }
   }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(e && e.serverReason ? e.message : tr('toast.recuperationDetailStravaImpossible'), 'error'); });
 }
 
