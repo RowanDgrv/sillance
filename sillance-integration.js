@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261028j";
+import { PF } from "./sillance-client.js?v=20261028k";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -324,10 +324,9 @@ async function hydrate() {
   // lieu d'être sommées en série. "planning" peut y rejoindre les autres
   // puisque defaultAthleteId est déjà connu à ce stade.
   await Promise.all([
-    section("refs", async () => {
-      const refs = await PF.getAthleteRefs();
-      if (refs) app.assignObj(app.data.ATHLETE_REF, mapRefs(refs));
-    }),
+    // (Références physio : chargées par loadPlanningFor, pour l'athlète
+    // AFFICHÉ — voir applyAthleteRefs. Avant le 28/10/2026, c'étaient toujours
+    // celles du compte connecté, et à défaut celles de la démo.)
 
     section("records", async () => {
       const recs = await PF.getRecords(uid);
@@ -723,6 +722,17 @@ function queueFeelingPrompts(pendingRaw, gearMapped) {
   renderFeelingPrompt();
 }
 
+// Références physiologiques de l'athlète AFFICHÉ (28/10/2026). On efface
+// d'abord tout : ni les valeurs de la démo (FC max 190, VMA 20,3, FTP 310…)
+// ni celles d'un autre athlète ne doivent survivre. Une valeur non
+// renseignée reste null : l'analyse dit « non renseignée » au lieu de
+// calculer des zones sur un chiffre inventé.
+function applyAthleteRefs(refs) {
+  const R = A().data.ATHLETE_REF;
+  ["ftp", "pma", "cpBike", "vma", "cv", "seuilRun", "css", "fcMax", "fcRepos", "hrvBase", "updatedAt"].forEach((k) => { R[k] = null; });
+  if (refs) A().assignObj(R, mapRefs(refs));
+}
+
 // (Re)charge le planning ET le matériel d'un athlète donné (null = soi-même),
 // puis re-render. Utilisé au chargement ET quand le coach change d'athlète.
 async function loadPlanningFor(athleteId) {
@@ -732,12 +742,14 @@ async function loadPlanningFor(athleteId) {
   const from = new Date(today); from.setDate(from.getDate() - 28);
   const to   = new Date(today); to.setDate(to.getDate() + 28);
   const iso = (d) => d.toISOString().slice(0, 10);
-  const [rows, gearRows, zones, acts] = await Promise.all([
+  const [rows, gearRows, zones, acts, refs] = await Promise.all([
     PF.getPlanning(target, iso(from), iso(to)),
     PF.getGear(target),
     PF.getAthleteZones(target).catch((e) => { console.warn("[PF] getAthleteZones :", e); return null; }),
     PF.getActivities(200, target).catch((e) => { console.warn("[PF] getActivities :", e); return []; }),
+    PF.getAthleteRefs(target).catch((e) => { console.warn("[PF] getAthleteRefs :", e); return null; }),
   ]);
+  applyAthleteRefs(refs);
   app.clearObj(app.data.planning);
   for (const s of rows) {
     (app.data.planning[s.date] ||= []).push(mapSession(s));

@@ -2930,6 +2930,7 @@ let WEEK_REVIEW_CACHE = {}; // clé "athleteId|weekMondayIso" -> {mapped, isDemo
 function weekHrFacts(avgHr){
   if(!avgHr) return null;
   const fcMax=aiFcMax();
+  if(!fcMax) return { fc_moy: Math.round(avgHr), pct_fc_max: 'FC max non renseignée', zone_fc_moy: null };
   return { fc_moy: Math.round(avgHr), pct_fc_max: Math.round(avgHr/fcMax*100), zone_fc_moy: aiHrZone(avgHr, fcMax) };
 }
 function weekZoneCheck(type, cible, zoneReal){
@@ -2952,7 +2953,7 @@ function weekReviewSessions(mon){
         prevu:{ titre:s.title, discipline:s.disc, duree_min:s.dur||null, zone_cible:cible, type } };
       if(s.done){
         item.realise={ duree_min:a?a.dur:null, distance_km:a?a.dist:null, rpe:s.rpe||null, source:a?a.src:'manuel', ...(hr||{}) };
-        item.constat=weekZoneCheck(type, cible, hr&&hr.zone_fc_moy);
+        item.constat=(hr && !hr.zone_fc_moy) ? 'FC max non renseignée : zone non vérifiable' : weekZoneCheck(type, cible, hr&&hr.zone_fc_moy);
       }
       out.push(item);
     });
@@ -9534,9 +9535,9 @@ function computeChargeTrimp(s, data){
   return {label:'TRIMP', value:Math.round(durMin*hrr*0.64*Math.exp(1.92*hrr)), hrr:+hrr.toFixed(2)};
 }
 function computeChargeFoster(s, data){
-  const fcMax=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:190;
+  const fcMax=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:null;
   const estimated=!s.rpe;
-  const rpe = s.rpe || Math.max(1,Math.min(10, Math.round(2+(data.maxHr/fcMax)*8)));
+  const rpe = s.rpe || (fcMax ? Math.max(1,Math.min(10, Math.round(2+(data.maxHr/fcMax)*8))) : 5);
   const durMin=data.pts[data.pts.length-1].t;
   return {label:tr('charge.foster'), value:Math.round(durMin*rpe), rpe, estimated};
 }
@@ -10287,11 +10288,14 @@ function renderDecouple(s, data){
    ============================================================ */
 // (AI_ADDON_PRICE déclaré plus haut, avant le premier renderSidebar)
 function aiUnlocked(){ return window.__pf_aiAddon===true || window.__pf_aiDemo===true; }
-function aiFcMax(){ return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:190; }
+// FC max de l'athlète affiché, ou null si non renseignée (28/10/2026) : plus
+// de 190 par défaut, qui classait les zones sur un chiffre inventé.
+function aiFcMax(){ return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.fcMax)?ATHLETE_REF.fcMax:null; }
 // Zones FC de L'ATHLÈTE (personnalisées par le coach si renseignées, sinon
 // 60/70/80/90 % FC max) — sinon un footing à 72 % serait jugé "trop rapide"
 // chez un athlète dont le coach a calé la Z2 jusqu'à 75 %.
 function aiHrZone(hr, fcMax){
+  if(!fcMax || !hr) return null;
   const p=hr/fcMax*100, zs=zonesFor('fc');
   for(let i=0;i<zs.length;i++){ if(p<zs[i][2]) return 'Z'+Math.min(5,i+1); }
   return 'Z'+Math.min(5,Math.max(1,zs.length));
@@ -10322,11 +10326,11 @@ function computeSessionBilan(s, data){
   const objectif=s.objectif||null, type=(objectif&&objectif.type)||(knownTitle?sessionType(s):'libre'), fcMax=aiFcMax(), target=aiTargetZone(type, objectif);
   const pts=data.pts, n=pts.length||1;
   const zc={Z1:0,Z2:0,Z3:0,Z4:0,Z5:0};
-  pts.forEach(p=>{ zc[aiHrZone(p.hr,fcMax)]++; });
+  pts.forEach(p=>{ const z=aiHrZone(p.hr,fcMax); if(z) zc[z]++; });
   const zonePct={}; Object.keys(zc).forEach(z=>zonePct[z]=Math.round(zc[z]/n*100));
   const dc=computeDecouple(data, s.disc);
   const hardReps=(data.laps||[]).filter(l=>l.hard).map(l=>({
-    n:l.n, peakPct:Math.round(l.maxHr/fcMax*100), avgPct:Math.round(l.avgHr/fcMax*100),
+    n:l.n, peakPct:fcMax?Math.round(l.maxHr/fcMax*100):null, avgPct:fcMax?Math.round(l.avgHr/fcMax*100):null,
     avgSpeed:l.avgSpeed, avgPower:l.avgPower, paceSec:Math.round(3600/Math.max(l.avgSpeed,1)) }));
   // dérive cardiaque : FC moyenne de la 2ᵉ moitié vs la 1ʳᵉ (en bpm)
   const half=Math.floor(n/2);
@@ -10335,11 +10339,11 @@ function computeSessionBilan(s, data){
   return { type, disc:s.disc, objectif, target,
     plannedDur:s.dur||null, plannedTss:s.tss||null, hrDrift:+(hr2-hr1).toFixed(1),
     dur:Math.round(pts[pts.length-1].t), dist:+(data.dist||0).toFixed(1),
-    avgHr:data.avgHr, maxHr:data.maxHr, fcMax,
-    pctFcMax:Math.round(data.maxHr/fcMax*100), avgPctFcMax:Math.round(data.avgHr/fcMax*100),
+    avgHr:data.avgHr, maxHr:data.maxHr, fcMax, fcMaxMissing:!fcMax,
+    pctFcMax:fcMax?Math.round(data.maxHr/fcMax*100):null, avgPctFcMax:fcMax?Math.round(data.avgHr/fcMax*100):null,
     zonePct, timeInTarget:zonePct[target]||0, decouple:dc?+dc.pct.toFixed(1):null,
     hardReps, np:(s.disc==='bike'?((currentSimMetrics(s,data)||{}).np||0):0),
-    hasHr:(data.avgHr||0)>0, surge:aiDetectSurge(pts, s.disc),
+    hasHr:(data.avgHr||0)>0 && !!fcMax, surge:aiDetectSurge(pts, s.disc),
     aboveTargetPct:['Z1','Z2','Z3','Z4','Z5'].slice(+String(target).replace('Z','')||5).reduce((a,z)=>a+(zonePct[z]||0),0) };
 }
 /* ============================================================
@@ -10520,6 +10524,18 @@ function reportLoad(){
 function reportGoal(){ try{ const r=currentRace(); return r ? `${r.name}, dans ${r.days} jours` : null; }catch(e){ return null; } }
 function renderReportBtn(s, data){
   const wrap=document.getElementById('anAiWrap'); if(!wrap || !window.SilAiReport) return;
+  // Bouton aussi en HAUT de l'analyse (28/10/2026 : en bas seulement, il
+  // fallait faire défiler toute la fenêtre pour le trouver) + alerte quand la
+  // FC max de l'athlète n'est pas renseignée (zones non calculables).
+  const title=document.getElementById('anTitle');
+  if(title){
+    let top=document.getElementById('anReportTop');
+    if(!top){ top=document.createElement('div'); top.id='anReportTop'; top.style.cssText='display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 4px'; title.insertAdjacentElement('afterend', top); }
+    top.style.display = mode==='coach' ? 'flex' : 'none';
+    const noFc = !(ATHLETE_REF && ATHLETE_REF.fcMax);
+    top.innerHTML=`<button class="btn" id="anReportTopBtn"><i class="ic ic-brain"></i> ${tr('rep.btn')}</button>`
+      + (noFc ? `<span class="club-hint" style="color:var(--bike)"><i class="ic ic-alert-triangle"></i> ${tr('analysis.fcMaxMissing')}</span>` : '');
+  }
   let rb=document.getElementById('anReportBtn');
   if(!rb){ rb=document.createElement('button'); rb.id='anReportBtn'; rb.className='btn ghost'; rb.style.cssText='margin-top:10px;width:100%'; wrap.appendChild(rb); }
   rb.innerHTML=`<i class="ic ic-brain"></i> ${tr('rep.btn')}`;
@@ -10527,6 +10543,7 @@ function renderReportBtn(s, data){
   const realData = (window.PF?.user && !s._realData) ? null : data;
   rb.onclick=()=> window.SilAiReport.open({ session:s, data:realData, ref:ATHLETE_REF, zones:zonesFor('fc'),
     speedZones:zonesFor('vma'), load:reportLoad(), goal:reportGoal(), athleteId: s.athleteId || (rosterIsReal ? currentAthleteId : null) });
+  const tb=document.getElementById('anReportTopBtn'); if(tb) tb.onclick=rb.onclick;
 }
 function renderAi(s, data){
   const wrap=document.getElementById('anAiWrap'); if(!wrap) return;

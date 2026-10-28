@@ -393,8 +393,10 @@ export const PF = {
   },
 
   // -------- DONNÉES ATHLÈTE --------
-  async getAthleteRefs() {
-    const { data, error } = await sb.from("athlete_profiles").select("*").eq("user_id", this.user.id).maybeSingle();
+  // userId : l'athlète affiché (coach → son athlète, policy « coach reads »),
+  // soi-même par défaut.
+  async getAthleteRefs(userId) {
+    const { data, error } = await sb.from("athlete_profiles").select("*").eq("user_id", userId || this.user.id).maybeSingle();
     if (error) console.warn("[PF] lecture athlete_profiles échouée :", error.message);
     return data;
   },
