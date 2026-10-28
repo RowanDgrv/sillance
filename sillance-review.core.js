@@ -1595,7 +1595,7 @@ function openStravaAnalysis(act){
     const res = PFFit.buildFromRaw(points, act.disc, laps||[], {ftp});
     if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
     openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
-  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(tr('toast.recuperationDetailStravaImpossible'), 'error'); });
+  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(e && e.serverReason ? e.message : tr('toast.recuperationDetailStravaImpossible'), 'error'); });
 }
 
 function connectStrava(){

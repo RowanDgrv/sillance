@@ -1698,7 +1698,7 @@ function openStravaAnalysis(act, plan){
     // plan : la séance prévue liée → l'IA juge contre SA consigne (titre,
     // objectif, durée prévue) et non contre le nom donné par la montre.
     openAnalysis(plan ? {...plan, _realData:res.data} : {id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
-  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(tr('toast.recuperationDetailStravaImpossible'), 'error'); });
+  }).catch(e=>{ console.warn('[PF] getActivityStreams:',e); toast(e && e.serverReason ? e.message : tr('toast.recuperationDetailStravaImpossible'), 'error'); });
 }
 
 function connectStrava(){

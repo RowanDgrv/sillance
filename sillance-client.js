@@ -1115,7 +1115,11 @@ export const PF = {
   // km côté front dans ce cas).
   async getActivityStreams(activityId, provider) {
     const fn = provider === "coros" ? "coros-activity-streams" : "strava-activity-streams";
-    const data = await this._invoke(fn, { activity_id: activityId });
+    // _invokeSoft : la raison renvoyée par le serveur (« fichier pas encore
+    // disponible côté COROS », « .fit introuvable »…) remonte jusqu'au toast ;
+    // avant, _invoke levait une erreur générique et masquait la cause (28/10/2026).
+    const data = await this._invokeSoft(fn, { activity_id: activityId });
+    if (data?.error) { const e = new Error(data.detail && data.detail !== data.error ? `${data.error} (${data.detail})` : data.error); e.serverReason = true; throw e; }
     return { points: data?.points ?? [], laps: data?.laps ?? [] };
   },
   // Persiste un import manuel .TCX/.GPX (window.PFFit.parseFile → { summary, data }).
