@@ -330,7 +330,18 @@ export const PF = {
     const { data, error } = await sb.from("profiles")
       .select("week_deadline_day, week_reminder_channel").eq("id", this.user.id).single();
     if (error) { console.warn("getCoachReminderPrefs:", error.message); return null; }
-    return { day: data?.week_deadline_day ?? "sunday", channel: data?.week_reminder_channel ?? "email" };
+    const out = { day: data?.week_deadline_day ?? "sunday", channel: data?.week_reminder_channel ?? "email" };
+    // Alerte séances manquées (0077) : lue à part pour ne pas casser le rappel
+    // de planification si la migration n'est pas encore passée.
+    const m = await sb.from("profiles").select("missed_alert_threshold, missed_alert_channel").eq("id", this.user.id).single();
+    if (!m.error) out.miss = { threshold: m.data?.missed_alert_threshold ?? null, channel: m.data?.missed_alert_channel ?? "email" };
+    return out;
+  },
+  async setMissedAlertPrefs({ threshold, channel }) {
+    const { error } = await sb.from("profiles")
+      .update({ missed_alert_threshold: threshold, missed_alert_channel: channel }).eq("id", this.user.id);
+    if (error) throw error;
+    return true;
   },
   async setCoachReminderPrefs({ day, channel }) {
     const { error } = await sb.from("profiles")

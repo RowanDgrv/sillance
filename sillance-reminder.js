@@ -56,6 +56,14 @@
       'coach.statusOn': 'Actif : {ch}, limite le {day}',
       'coach.saved': 'Rappel de planification enregistré',
       'coach.off': 'Rappel de planification désactivé',
+      'miss.title': 'Alerte séances manquées',
+      'miss.hint': 'Tu es prévenu à 9h quand un athlète enchaîne des séances prévues sans les faire (ni montre, ni validation). Une alerte par série.',
+      'miss.after': 'Dès',
+      'miss.unit': 'séances d\'affilée',
+      'miss.statusOn': 'Actif : dès {n} séance(s) manquée(s), {ch}',
+      'miss.statusOff': 'Alerte désactivée',
+      'miss.saved': 'Alerte séances manquées enregistrée',
+      'miss.offToast': 'Alerte séances manquées désactivée',
       'guide.coachLead': 'Quand un athlète n\'a pas encore sa semaine suivante : la liste des athlètes à planifier, avant ton jour limite.',
       'guide.coachStep': 'Reviens dans ton espace coach, bloc « Rappel de planification », choisis <b>Notification</b> puis touche <b>Autoriser</b>.',
       'guide.coachEmail': 'Le rappel par email est déjà actif par défaut, sans rien installer. Tu peux changer le canal, le jour limite ou le couper dans « Rappel de planification ».',
@@ -95,6 +103,14 @@
       'coach.statusOn': 'On: {ch}, deadline {day}',
       'coach.saved': 'Planning reminder saved',
       'coach.off': 'Planning reminder turned off',
+      'miss.title': 'Missed sessions alert',
+      'miss.hint': 'You get notified at 9am when an athlete misses planned sessions in a row (no watch activity, not validated). One alert per streak.',
+      'miss.after': 'After',
+      'miss.unit': 'in a row',
+      'miss.statusOn': 'On: after {n} missed session(s), {ch}',
+      'miss.statusOff': 'Alert off',
+      'miss.saved': 'Missed sessions alert saved',
+      'miss.offToast': 'Missed sessions alert turned off',
       'guide.coachLead': 'When an athlete doesn\'t have next week yet: the list of athletes to plan, before your deadline.',
       'guide.coachStep': 'Go back to your coach space, "Planning reminder" block, pick <b>Notification</b> then tap <b>Allow</b>.',
       'guide.coachEmail': 'The email reminder is already on by default, nothing to install. Change the channel, the deadline or turn it off in "Planning reminder".',
@@ -134,6 +150,14 @@
       'coach.statusOn': 'Activo: {ch}, límite el {day}',
       'coach.saved': 'Recordatorio de planificación guardado',
       'coach.off': 'Recordatorio de planificación desactivado',
+      'miss.title': 'Alerta de sesiones perdidas',
+      'miss.hint': 'Te avisamos a las 9h cuando un atleta encadena sesiones previstas sin hacerlas (ni reloj, ni validación). Una alerta por serie.',
+      'miss.after': 'Desde',
+      'miss.unit': 'seguidas',
+      'miss.statusOn': 'Activa: desde {n} sesión(es) perdida(s), {ch}',
+      'miss.statusOff': 'Alerta desactivada',
+      'miss.saved': 'Alerta de sesiones perdidas guardada',
+      'miss.offToast': 'Alerta de sesiones perdidas desactivada',
       'guide.coachLead': 'Cuando un atleta aún no tiene su semana siguiente: la lista de atletas por planificar, antes de tu día límite.',
       'guide.coachStep': 'Vuelve a tu espacio de entrenador, bloque «Recordatorio de planificación», elige <b>Notificación</b> y toca <b>Permitir</b>.',
       'guide.coachEmail': 'El recordatorio por email ya está activo por defecto, sin instalar nada. Cambia el canal, el día límite o desactívalo en «Recordatorio de planificación».',
@@ -371,8 +395,59 @@
           .map(function(o){ return '<option value="' + o[0] + '"' + (p.channel === o[0] ? ' selected' : '') + '>' + t(o[1]) + '</option>'; }).join('')
       + '</select></div>'
       + '<span class="rem-status' + (on ? ' on' : '') + '">' + (on ? t('coach.statusOn', { ch: chLabel(p.channel), day: dayLbl }) : t('rem.statusOff')) + '</span>'
-      + '<a class="morning-help" href="#" data-rem-coach-help>' + t('morning.howTo') + '</a>';
+      + '<a class="morning-help" href="#" data-rem-coach-help>' + t('morning.howTo') + '</a>'
+      + missBlockHtml();
   }
+  /* Alerte « séances manquées » : seuil (Off, 1, 2, 3 séances d'affilée) et
+     canal. Masquée tant que les colonnes n'existent pas (p.miss absent). */
+  function missBlockHtml(){
+    var m = coachPrefs.miss; if(!m) return '';
+    var on = m.threshold != null;
+    return '<div class="sn-head" style="margin-top:16px"><i class="ic ic-alert-triangle"></i> ' + t('miss.title') + '</div>'
+      + '<p class="club-hint">' + t('miss.hint') + '</p>'
+      + '<div class="pr-seg" role="group" aria-label="' + t('miss.title') + '"><span class="pr-seg-lbl">' + t('miss.after') + '</span>'
+      + [['off', t('rem.none')], ['1', '1'], ['2', '2'], ['3', '3']].map(function(o){
+          var sel = o[0] === 'off' ? !on : String(m.threshold) === o[0];
+          return '<button type="button" data-miss-n="' + o[0] + '" class="' + (sel ? 'sel' : '') + '">' + o[1] + '</button>'; }).join('')
+      + '<span class="pr-seg-lbl" style="margin-left:6px">' + t('miss.unit') + '</span></div>'
+      + (on ? '<div class="morning-time" style="margin-top:10px"><label for="remMissChannel">' + t('coach.receive') + '</label>'
+        + '<select id="remMissChannel">'
+        + [['email', 'morning.email'], ['push', 'morning.push'], ['both', 'morning.both']]
+            .map(function(o){ return '<option value="' + o[0] + '"' + (m.channel === o[0] ? ' selected' : '') + '>' + t(o[1]) + '</option>'; }).join('')
+        + '</select></div>' : '')
+      + '<span class="rem-status' + (on ? ' on' : '') + '">' + (on ? t('miss.statusOn', { n: m.threshold, ch: chLabel(m.channel) }) : t('miss.statusOff')) + '</span>';
+  }
+  function saveMiss(next){
+    var prev = coachPrefs.miss;
+    coachPrefs.miss = next; paintCoach();
+    return window.PF.setMissedAlertPrefs(next).then(function(){
+      if(typeof window.toast === 'function') window.toast(t(next.threshold == null ? 'miss.offToast' : 'miss.saved'));
+    }).catch(function(){
+      coachPrefs.miss = prev; paintCoach();
+      if(typeof window.toast === 'function') window.toast(t('rem.saveErr'), 'error');
+    });
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-miss-n]'); if(!b || !coachPrefs || !coachPrefs.miss) return;
+    var n = b.dataset.missN === 'off' ? null : +b.dataset.missN;
+    if(n === coachPrefs.miss.threshold) return;
+    saveMiss({ threshold: n, channel: coachPrefs.miss.channel });
+  });
+  document.addEventListener('change', function(e){
+    if(e.target.id !== 'remMissChannel' || !coachPrefs || !coachPrefs.miss) return;
+    var ch = e.target.value, prev = coachPrefs.miss.channel;
+    if(ch === 'push' || ch === 'both'){
+      if(needsInstall()){ e.target.value = prev; openGuide('coach'); return; }
+      if(typeof window.silEnablePush !== 'function'){ e.target.value = prev; return; }
+      window.silEnablePush().then(function(){ saveMiss({ threshold: coachPrefs.miss.threshold, channel: ch }); })
+        .catch(function(err){
+          e.target.value = prev;
+          if(typeof window.toast === 'function') window.toast(err && err.message ? err.message : t('rem.saveErr'), 'error');
+        });
+      return;
+    }
+    saveMiss({ threshold: coachPrefs.miss.threshold, channel: ch });
+  });
   function paintCoach(){
     var anchor = document.getElementById('adhOpen');
     if(!anchor || !coachPrefs) return;
@@ -397,6 +472,7 @@
     }).catch(function(){ coachLoading = false; });
   }
   function saveCoach(next, prev){
+    next.miss = coachPrefs && coachPrefs.miss; prev.miss = next.miss;
     coachPrefs = next; paintCoach();
     return window.PF.setCoachReminderPrefs(next).then(function(){
       if(typeof window.toast === 'function') window.toast(t(next.channel === 'none' ? 'coach.off' : 'coach.saved'));
