@@ -2933,6 +2933,12 @@ function weekReviewSessions(mon){
 function weekReviewMapped(r){
   return {headline:r.headline, tenu:r.verdict, bullets:(r.bullets||[]).map(x=>({s:x.status,t:x.text})), recos:r.recos||[]};
 }
+// « Semaine du 26 octobre · Léa Fontan » : contexte affiché en tête de la fenêtre IA.
+function weekAiTitle(mon){
+  const d = mon.toLocaleDateString(localeStr(), {day:'numeric', month:'long'});
+  const a = (typeof ROSTER!=='undefined' && ROSTER[selectedAthleteIdx]) ? ROSTER[selectedAthleteIdx].name : '';
+  return tr('aip.weekOf', {d}) + (a ? ' · '+a : '');
+}
 function renderWeekAiBtn(mon){
   const el = document.getElementById('weekAiAssist'); if(!el) return;
   if(mode!=='coach'){ el.hidden=true; return; }
@@ -2941,7 +2947,13 @@ function renderWeekAiBtn(mon){
   el.hidden=false;
   const wk = iso(mon), ck = key+'|'+wk;
   const cached = WEEK_REVIEW_CACHE[ck];
-  if(cached){ el.innerHTML = aiResultHtml(null, null, cached.mapped, cached.isDemo, ['ai.weekFootDemo','ai.weekFootReal']); return; }
+  if(cached){
+    el.innerHTML = aiResultHtml(null, null, cached.mapped, cached.isDemo, ['ai.weekFootDemo','ai.weekFootReal'])
+      + `<button class="btn ghost" id="weekAiOpen" style="margin-top:8px"><i class="ic ic-brain"></i> ${tr('aip.open')}</button>`;
+    const ob = document.getElementById('weekAiOpen');
+    if(ob) ob.onclick = ()=> window.SilAiPopup?.show({ kind:'week', title: weekAiTitle(mon), result: cached.mapped, isDemo: cached.isDemo });
+    return;
+  }
   el.innerHTML = `<button class="btn ghost" id="weekAiGo"><i class="ic ic-brain"></i> ${tr('weekAi.cta')}</button>`;
   const btn = document.getElementById('weekAiGo');
   if(btn) btn.onclick = ()=> renderWeekAiConfirm(mon);
@@ -2978,17 +2990,19 @@ function runWeekAi(mon){
   if(window.PF?.user && window.__pf_aiAddon===true && typeof PF.summarizeWeek==='function'){
     PF.summarizeWeek({ athlete_id: key, week_key: wk, sessions }).then(r=>{
       if(r && r.error){
+        // Avant : retour silencieux au bouton, rien à l'écran (28/10/2026).
         if(r.error==='add_on_required') window.__pf_aiAddon=false;
-        else toast(tr('toast.analyseIaIndisponibleResumeLocal'), 'error');
         renderWeekAiBtn(mon);
+        window.SilAiPopup?.showError({ kind:'week', detail: r.detail || r.error });
         return;
       }
       WEEK_REVIEW_CACHE[ck] = { mapped: weekReviewMapped(r), isDemo:false };
       renderWeekAiBtn(mon);
+      window.SilAiPopup?.show({ kind:'week', title: weekAiTitle(mon), result: WEEK_REVIEW_CACHE[ck].mapped });
     }).catch(e=>{
       console.warn('[PF] summarizeWeek échoué :', e);
-      toast(tr('toast.analyseIaIndisponibleResumeLocal'), 'error');
       renderWeekAiBtn(mon);
+      window.SilAiPopup?.showError({ kind:'week', detail:'network' });
     });
   } else {
     // démo (ou add-on démo déverrouillé sans compte réel) : pas d'appel réseau
@@ -2996,6 +3010,7 @@ function runWeekAi(mon){
       WEEK_REVIEW_CACHE[ck] = { mapped:{headline:tr('weekAi.demoHeadline'), tenu:'oui',
         bullets:[{s:'ok', t:tr('weekAi.demoBullet')}], recos:[]}, isDemo:true };
       renderWeekAiBtn(mon);
+      window.SilAiPopup?.show({ kind:'week', title: weekAiTitle(mon), result: WEEK_REVIEW_CACHE[ck].mapped, isDemo:true });
     }, 450);
   }
 }
@@ -10469,15 +10484,20 @@ function renderAi(s, data){
     }).then(r=>{
       if(r && r.error){
         if(r.error==='add_on_required') window.__pf_aiAddon=false;
-        else toast(tr('toast.analyseIaIndisponibleResumeLocal'), 'error');
         const rl=aiSummary(s, b); body.innerHTML=aiResultHtml(s, b, rl, true);
+        window.SilAiPopup?.showError({ kind:'session', detail: r.detail || r.error });
         return;
       }
       const mapped={headline:r.headline, tenu:r.verdict, bullets:(r.bullets||[]).map(x=>({s:x.status,t:x.text})), recos:r.recos||[]};
       body.innerHTML=aiResultHtml(s, b, mapped, false);
+      // Résultat tout juste généré : fenêtre bien visible. Relu du cache
+      // (séance déjà analysée) : seulement en ligne, pour ne pas ré-ouvrir
+      // la fenêtre à chaque consultation de la séance.
+      if(!r.cached) window.SilAiPopup?.show({ kind:'session', title: s.title, result: mapped });
     }).catch(e=>{
       console.warn('[PF] summarizeSession échoué :', e);
       const rl=aiSummary(s, b); body.innerHTML=aiResultHtml(s, b, rl, true);
+      window.SilAiPopup?.showError({ kind:'session', detail:'network' });
     });
   } else {
     setTimeout(()=>{

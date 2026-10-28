@@ -203,7 +203,7 @@ export const PF = {
   // payload : { session_key, bilan, athlete_id?, discipline?, objective?, force? }
   // Renvoie { verdict, headline, bullets, recos, model, cached } ou {error:'add_on_required'}.
   async summarizeSession(payload) {
-    return await this._invoke("session-summary", payload);
+    return await this._invokeSoft("session-summary", payload);
   },
   // Génère (ou relit depuis le cache) la synthèse IA de la SEMAINE (toutes
   // les séances réalisées par un athlète sur 7 jours), pour le bouton
@@ -211,7 +211,7 @@ export const PF = {
   // payload : { athlete_id?, week_key, sessions, force? }
   // Renvoie { verdict, headline, bullets, recos, model, cached } ou {error:'add_on_required'|'no_sessions'}.
   async summarizeWeek(payload) {
-    return await this._invoke("week-review", payload);
+    return await this._invokeSoft("week-review", payload);
   },
   // ---- Option « Vidéos » PAR ATHLÈTE (le coach paie un siège par athlète) ----
   // Liste des activations vidéo du coach connecté : [{athlete_id, active}].
@@ -1297,5 +1297,18 @@ export const PF = {
     const { data, error } = await sb.functions.invoke(fn, { body });
     if (error) throw error;
     return data;
+  },
+  // Variante qui RENVOIE le corps d'une réponse d'erreur ({error, detail})
+  // au lieu de lever : functions.invoke lève sur tout code non-2xx sans lire
+  // le corps, donc les {error:'add_on_required'} / {error:'ai_failed',
+  // detail} des fonctions IA n'arrivaient jamais à l'app (28/10/2026).
+  async _invokeSoft(fn, body) {
+    const { data, error } = await sb.functions.invoke(fn, { body });
+    if (!error) return data;
+    const res = error.context;
+    if (res && typeof res.json === "function") {
+      try { const j = await res.json(); if (j && j.error) return j; } catch (_) { /* corps non JSON */ }
+    }
+    return { error: "network", detail: "network" };
   },
 };

@@ -357,7 +357,11 @@
   // bloquée (rapporté 25/08/2026). On attend sa fermeture avant de démarrer.
   function welcomeOverlayOpen(){
     var ov = document.getElementById('welcomeOverlay');
-    return !!ov && getComputedStyle(ov).display !== 'none';
+    if(ov && getComputedStyle(ov).display !== 'none') return true;
+    // Même problème avec toute autre fenêtre bloquante (28/10/2026) : le tuto
+    // se lançait par-dessus la connexion, la fenêtre « Ton nom », le résultat
+    // de l'IA ou le guide d'installation. On attend qu'aucune ne soit ouverte.
+    return !!document.querySelector('#pf-auth-overlay.open, #pf-name-overlay, #pf-lock-overlay, .overlay.open');
   }
 
   // Auto-lancement réservé au tour "session" (onboarding création de séance) —

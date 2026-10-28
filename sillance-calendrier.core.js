@@ -9191,15 +9191,20 @@ function renderAi(s, data){
     }).then(r=>{
       if(r && r.error){
         if(r.error==='add_on_required') window.__pf_aiAddon=false;
-        else toast(tr('toast.analyseIaIndisponibleResumeLocal'), 'error');
         const rl=aiSummary(s, b); body.innerHTML=aiResultHtml(s, b, rl, true);
+        window.SilAiPopup?.showError({ kind:'session', detail: r.detail || r.error });
         return;
       }
       const mapped={headline:r.headline, tenu:r.verdict, bullets:(r.bullets||[]).map(x=>({s:x.status,t:x.text})), recos:r.recos||[]};
       body.innerHTML=aiResultHtml(s, b, mapped, false);
+      // Résultat tout juste généré : fenêtre bien visible. Relu du cache
+      // (séance déjà analysée) : seulement en ligne, pour ne pas ré-ouvrir
+      // la fenêtre à chaque consultation de la séance.
+      if(!r.cached) window.SilAiPopup?.show({ kind:'session', title: s.title, result: mapped });
     }).catch(e=>{
       console.warn('[PF] summarizeSession échoué :', e);
       const rl=aiSummary(s, b); body.innerHTML=aiResultHtml(s, b, rl, true);
+      window.SilAiPopup?.showError({ kind:'session', detail:'network' });
     });
   } else {
     setTimeout(()=>{
