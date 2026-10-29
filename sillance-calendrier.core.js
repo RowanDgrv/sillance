@@ -2183,6 +2183,9 @@ function saveCycleFromModal(){
   if(window.PF?.user && PF.saveCycle){
     PF.saveCycle(clean).then(row=>{
       if(row && row.id && row.id!==clean.id){ if(cycleState && cycleState.id===clean.id) cycleState.id=row.id; clean.id=row.id; }
+      // confirmation seulement quand la base a répondu (avant : affichée
+      // tout de suite, même si rien n'était enregistré)
+      toast(tr('toast.cycleSavedOnline'));
     }).catch(e=>{ console.warn('[PF] saveCycle :', e); toast(tr('toast.cycleSaveFailed'), 'error'); });
   }
   if(mode==='coach') renderSidebar();
@@ -2199,7 +2202,7 @@ document.getElementById('cyWeeks').addEventListener('change', e=>{
 document.getElementById('cySave').addEventListener('click', ()=>{
   saveCycleFromModal();
   document.getElementById('cycleOverlay').classList.remove('open');
-  toast(tr('toast.cycleEnregistre'));
+  if(!window.PF?.user) toast(tr('toast.cycleEnregistre')); // compte réel : confirmé par la base (saveCycleFromModal)
 });
 document.getElementById('cyApply').addEventListener('click', ()=>{
   const c=saveCycleFromModal();
