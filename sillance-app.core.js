@@ -2334,11 +2334,30 @@ function doAssign(kind, obj, dateIso, targets, opts){
 function openAssign(kind, obj){
   const isCycle = kind==='cycle', isWeek = kind==='week';
   const defDate = isWeek ? iso(addDays(obj.monday, 7)) : isCycle ? iso(nextMonday()) : iso(addDays(new Date(), 1));
-  const groups = (typeof CLUB_GROUPS!=='undefined' ? CLUB_GROUPS : []).filter(g=> ROSTER.some(a=>a.group===g.id));
-  const rows = ROSTER.map((a,i)=>{
+  // Destinataires (29/10/2026) : athlètes suivis + TOUS les membres du club
+  // (avant : seulement les suivis, donc un groupe du club dont les membres
+  // n'étaient pas reliés au coach ne recevait rien). Compte réel : un membre
+  // sans compte (nom seul) ne peut pas recevoir de séance → affiché grisé.
+  // La base autorise déjà le staff du club à planifier pour ses membres
+  // (policy « sched: club coach manages member plan »).
+  const cands = ROSTER.map(a=>({id:a.id, name:a.name, ini:a.ini, color:a.color, group:a.group||null, ok:true}));
+  const clubOn = rosterIsReal ? !!window.__pf_clubId : true;
+  if(clubOn && typeof CLUB_ATHLETES!=='undefined'){
+    CLUB_ATHLETES.forEach(m=>{
+      const uid = rosterIsReal ? m.athleteUid : 'club-'+m.id;
+      const dup = uid && cands.find(c=>c.id===uid);
+      if(dup){ if(!dup.group) dup.group=m.group||null; return; }
+      cands.push({id:uid||('nouid-'+m.id), name:m.name,
+        ini:(m.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+        color:(m.group && clubGroup(m.group)?.color) || '#8a949e', group:m.group||null, ok:!!uid});
+    });
+  }
+  const groups = (typeof CLUB_GROUPS!=='undefined' ? CLUB_GROUPS : []).filter(g=> cands.some(a=>a.ok && a.group===g.id));
+  const rows = cands.map((a,i)=>{
     const g = a.group && typeof clubGroup==='function' ? clubGroup(a.group) : null;
-    return `<label class="asg-row"><input type="checkbox" data-idx="${i}" ${a.group?`data-grp="${a.group}"`:''}>
+    return `<label class="asg-row${a.ok?'':' asg-off'}"><input type="checkbox" data-idx="${i}" ${a.group?`data-grp="${a.group}"`:''} ${a.ok?'':'disabled'}>
       <span class="ap-av" style="--ac:${a.color}">${a.ini}</span><span>${a.name}</span>
+      ${a.ok?'':`<span class="asg-noacc">${tr('assign.noAccount')}</span>`}
       ${g?`<span class="asg-grp" style="color:${g.color}">${g.name}</span>`:''}</label>`;
   }).join('');
   const el=document.createElement('div'); el.className='adh-overlay';
@@ -2352,7 +2371,7 @@ function openAssign(kind, obj){
     ${isWeek?`<p class="adh-sub" id="asgWeekHint" style="margin-top:-4px"></p>
       <label class="asg-all asg-replace"><input type="checkbox" id="asgReplace"> ${tr('copyWeek.replace')}</label>`:''}
     ${groups.length?`<div class="asg-groups">${groups.map(g=>{
-      const n=ROSTER.filter(a=>a.group===g.id).length;
+      const n=cands.filter(a=>a.ok && a.group===g.id).length;
       return `<button class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name} · ${n}</button>`;
     }).join('')}</div>`:''}
     <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">${tr('assign.noAthlete')}</div>`}</div>
@@ -2366,7 +2385,7 @@ function openAssign(kind, obj){
   el.addEventListener('click', e=>{ if(e.target===el) close(); });
   document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
   if(!rows) return;
-  const boxes=[...el.querySelectorAll('.asg-row input')];
+  const boxes=[...el.querySelectorAll('.asg-row input:not([disabled])')];
   const go=el.querySelector('#asgGo'), all=el.querySelector('#asgAll');
   if(isWeek){
     // n'importe quel jour choisi = la semaine qui le contient (lundi affiché)
@@ -2395,7 +2414,7 @@ function openAssign(kind, obj){
     sync();
   });
   go.onclick=()=>{
-    const targets=boxes.filter(b=>b.checked).map(b=>ROSTER[+b.dataset.idx]);
+    const targets=boxes.filter(b=>b.checked).map(b=>cands[+b.dataset.idx]);
     if(!targets.length) return;
     const dIso = el.querySelector('#asgDate').value || defDate;
     const replace = isWeek && el.querySelector('#asgReplace')?.checked;

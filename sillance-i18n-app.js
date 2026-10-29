@@ -551,7 +551,7 @@
     "assign.subCycle": `Pose ce cycle ({weeks} semaines, {n} séances) sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`,
     "assign.subSession": `Pose cette séance sur le calendrier de plusieurs athlètes d'un coup. Les cibles en % des références s'adaptent au niveau de chacun.`,
     "assign.weekOf": `Semaine du`, "assign.onDate": `Le`,
-    "assign.noAthlete": `Aucun athlète lié · invite ton premier athlète pour lui attribuer des séances.`,
+    "assign.noAthlete": `Aucun athlète lié · invite ton premier athlète pour lui attribuer des séances.`, "assign.noAccount": `pas de compte`,
     "assign.selectAll": `Tout sélectionner`, "assign.assign": `Attribuer`,
     "assign.assignToNPlural": `Attribuer à {n} athlètes`, "assign.assignToNSingular": `Attribuer à {n} athlète`,
 
@@ -2199,7 +2199,7 @@
     "assign.subCycle": `Apply this cycle ({weeks} weeks, {n} sessions) to multiple athletes' calendars at once. Targets in % of references adapt to each athlete's level.`,
     "assign.subSession": `Apply this session to multiple athletes' calendars at once. Targets in % of references adapt to each athlete's level.`,
     "assign.weekOf": `Week of`, "assign.onDate": `On`,
-    "assign.noAthlete": `No linked athlete · invite your first athlete to assign them sessions.`,
+    "assign.noAthlete": `No linked athlete · invite your first athlete to assign them sessions.`, "assign.noAccount": `no account`,
     "assign.selectAll": `Select all`, "assign.assign": `Assign`,
     "assign.assignToNPlural": `Assign to {n} athletes`, "assign.assignToNSingular": `Assign to {n} athlete`,
 
@@ -3745,7 +3745,7 @@
     "assign.subCycle": `Aplica este ciclo ({weeks} semanas, {n} sesiones) al calendario de varios atletas de una vez. Los objetivos en % de las referencias se adaptan al nivel de cada uno.`,
     "assign.subSession": `Aplica esta sesión al calendario de varios atletas de una vez. Los objetivos en % de las referencias se adaptan al nivel de cada uno.`,
     "assign.weekOf": `Semana del`, "assign.onDate": `El`,
-    "assign.noAthlete": `Ningún atleta vinculado · invita a tu primer atleta para asignarle sesiones.`,
+    "assign.noAthlete": `Ningún atleta vinculado · invita a tu primer atleta para asignarle sesiones.`, "assign.noAccount": `sin cuenta`,
     "assign.selectAll": `Seleccionar todo`, "assign.assign": `Asignar`,
     "assign.assignToNPlural": `Asignar a {n} atletas`, "assign.assignToNSingular": `Asignar a {n} atleta`,
 
