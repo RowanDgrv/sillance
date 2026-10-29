@@ -2566,6 +2566,24 @@ body[data-athview] .planner > .library{display:none}
 .sn-item:first-of-type{border-top:none}
 .sn-when{flex:none;min-width:120px;font-family:var(--font-data);font-size:var(--fs-sm);color:var(--soft);padding-top:1px}
 .sn-txt{font-size:var(--fs-md);color:var(--text);line-height:1.45}
+/* « Qui a besoin de toi » (29/10/2026) */
+.needs-open{display:block;margin-top:8px;background:none;border:none;padding:4px 0;color:var(--swim);font:inherit;font-size:var(--fs-sm);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.need-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px;flex:none}
+.need-dot.lvl-urgent{background:#FF5470}.need-dot.lvl-alert{background:#FF9A3D}.need-dot.lvl-warn{background:#E8C547}.need-dot.lvl-info{background:var(--muted)}
+.needs-modal{width:min(720px,100%)}
+.needs-h{margin:6px 0 4px}
+.needs-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.needs-tools button{border:1px solid var(--line-strong);background:var(--panel-2);color:var(--text);border-radius:8px;padding:7px 11px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.need-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--panel-2)}
+.need-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;margin-bottom:6px}
+.need-week{font-size:12px;color:var(--muted)}
+.need-row{display:flex;align-items:flex-start;gap:6px;padding:6px 0;border-top:1px solid var(--line)}
+.need-row:first-of-type{border-top:none}
+.need-row .need-dot{margin-top:6px}
+.need-txt{flex:1;min-width:0;font-size:14px;line-height:1.45}
+.need-row.is-done .need-txt{color:var(--muted);text-decoration:line-through}
+.need-done-btn{flex:none;border:1px solid var(--line-strong);background:transparent;color:var(--text);border-radius:7px;padding:4px 9px;font:inherit;font-size:12px;cursor:pointer}
+.need-go{margin-top:8px;border:none;background:none;color:var(--swim);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:2px 0}
 /* rappel planif coach : sélecteur du jour deadline (même recette que .ck-dispo-seg) */
 .pr-seg{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:var(--space-2);padding-top:var(--space-2);border-top:1px solid var(--line)}
 .pr-seg-lbl{font-size:var(--fs-xs);color:var(--muted);margin-right:2px}
@@ -4172,7 +4190,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261028d"></script>
+<script src="./sillance-i18n-app.js?v=20261029a"></script>
 <script src="./sillance-reminder.js?v=20261028g"></script>
 <script src="./sillance-ai-popup.js?v=20261028d"></script>
 <script src="./sillance-consigne.js?v=20261028d"></script>
@@ -4183,12 +4201,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-tour.js?v=20261028a"></script>
 <script src="./sillance-flow.js?v=20261006a"></script>
 <script src="./sillance-exercises.js?v=20261028a"></script>
-<script src="./sillance-app.core.js?v=20261028o"></script>
+<script src="./sillance-app.core.js?v=20261029a"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261028r"></script>
+<script type="module" src="./sillance-integration.js?v=20261029a"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>

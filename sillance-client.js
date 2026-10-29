@@ -683,6 +683,11 @@ export const PF = {
     if (error) throw error; return data;
   },
 
+  // -------- « QUI A BESOIN DE TOI » (coach-needs, 29/10/2026) --------
+  async coachNeeds() {
+    return await this._invokeSoft("coach-needs", {});
+  },
+
   // -------- CYCLES (programmes multi-semaines, 0079) --------
   async getCycles() {
     const { data, error } = await sb.from("coach_cycles").select("id, name, weeks, plan")

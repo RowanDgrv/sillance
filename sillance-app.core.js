@@ -951,13 +951,122 @@ function athNeedScore(a){
   if(!a.checkin){ score+=8; reasons.push(tr('need.noCheckinToday')); }
   return {score, reasons};
 }
+/* ============================================================
+   ÉCRAN « QUI A BESOIN DE TOI » (29/10/2026)
+   ------------------------------------------------------------
+   Compte réel : signaux calculés par le serveur (coach-needs) pour tout
+   le roster — séances manquées, semaine prochaine vide, plus d'activité,
+   check-in blessé/malade/fatigué/forme basse, check-in absent. Même règle
+   « séance réalisée » que l'alerte email de 9 h.
+   Démo : raisons de athNeedScore (check-in du jour, références).
+   « Traité » : mémorisé sur cet appareil, tant que l'événement ne change
+   pas (sig) ; un nouvel événement réapparaît.
+   ============================================================ */
+let NEEDS=null, NEEDS_AT=0, NEEDS_LOADING=false, NEEDS_ERR=false, NEEDS_FOR=null, needsShowDone=false;
+function loadNeeds(force){
+  if(!rosterIsReal || !window.PF?.user || !PF.coachNeeds || NEEDS_LOADING) return;
+  if(NEEDS_FOR!==PF.user.id){ NEEDS=null; NEEDS_FOR=PF.user.id; }
+  if(!force && NEEDS && Date.now()-NEEDS_AT < 5*60*1000) return;
+  NEEDS_LOADING=true;
+  PF.coachNeeds().then(r=>{
+    NEEDS_LOADING=false;
+    if(r && r.error){ NEEDS_ERR=true; console.warn('[PF] coach-needs :', r); return; }
+    NEEDS=r; NEEDS_AT=Date.now(); NEEDS_ERR=false;
+    if(mode==='coach') renderSidebar();
+    if(document.getElementById('needsOverlay')?.classList.contains('open')) renderNeedsOverlay();
+  }).catch(e=>{ NEEDS_LOADING=false; NEEDS_ERR=true; console.warn('[PF] coach-needs :', e); });
+}
+function needsDoneKey(){ return 'sil_needs_done_'+(window.PF?.user?.id||'demo'); }
+function needsDone(){ try{ return JSON.parse(localStorage.getItem(needsDoneKey())||'{}')||{}; }catch(e){ return {}; } }
+function setNeedDone(key, on){
+  const d=needsDone(); if(on) d[key]=Date.now(); else delete d[key];
+  try{ localStorage.setItem(needsDoneKey(), JSON.stringify(d)); }catch(e){}
+}
+function needDateTxt(iso){ return iso ? new Date(iso+'T12:00:00').toLocaleDateString(localeStr(),{weekday:'short', day:'numeric', month:'short'}) : ''; }
+function needItemText(it){
+  const p=it.params||{};
+  switch(it.kind){
+    case 'missed': return tr(p.n>1?'needs.k.missedPlural':'needs.k.missed', {n:p.n, dates:(p.dates||[]).map(needDateTxt).join(', ')});
+    case 'inactive': return p.days==null ? tr('needs.k.inactiveNever') : tr('needs.k.inactive', {days:p.days});
+    case 'next_week_empty': return tr('needs.k.nextWeekEmpty', {date:needDateTxt(p.monday)});
+    case 'no_checkin': return tr('needs.k.noCheckin', {days:p.days});
+    case 'low_readiness': return tr('needs.k.lowReadiness', {pct:p.readiness});
+    case 'injured': case 'sick': case 'tired':
+      return tr('needs.k.'+it.kind, {date:needDateTxt(p.date)}) + (p.note ? ' : « '+String(p.note).slice(0,120)+' »' : '');
+    default: return it.text || '';
+  }
+}
+/* Liste unifiée {aid, name, week, items:[{level, text, key, done}]} */
+function needsList(){
+  const done=needsDone();
+  let list;
+  if(rosterIsReal){
+    if(!NEEDS || NEEDS_FOR!==window.PF?.user?.id) return null;
+    list=(NEEDS.athletes||[]).map(a=>({aid:a.athlete_id, name:a.name, week:a.week,
+      items:a.items.map(it=>({level:it.level, text:needItemText(it), key:a.athlete_id+'|'+it.kind+'|'+it.sig}))}));
+  } else {
+    list=ROSTER.map(a=>{ const r=athNeedScore(a); return {aid:a.id, name:a.name, week:null,
+      items:r.reasons.map(t=>({level:/bless|injur|lesion/i.test(t)?'urgent':/malad|sick|enferm/i.test(t)?'alert':'warn', text:t, key:a.id+'|'+t}))}; });
+  }
+  list.forEach(a=>a.items.forEach(it=>{ it.done=!!done[it.key]; }));
+  return list;
+}
+const NEED_LVL={urgent:0, alert:1, warn:2, info:3};
 function needRadarHTML(){
   if(!ROSTER.length) return '';
-  const scored = ROSTER.map(a=>({a, ...athNeedScore(a)})).filter(x=>x.score>0).sort((x,y)=>y.score-x.score).slice(0,5);
-  if(!scored.length) return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-check"></i> Qui a besoin de toi</div><p class="club-hint">Rien d'urgent : le roster est propre aujourd'hui.</p></div>`;
-  return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-alert-triangle"></i> Qui a besoin de toi cette semaine</div>
-    ${scored.map(({a,reasons})=>`<div class="sn-item" style="cursor:pointer" data-need-aid="${a.id}"><div class="sn-when">${dispoSafe(a.name)}</div><div class="sn-txt">${reasons.map(dispoSafe).join(' · ')}</div></div>`).join('')}
+  if(rosterIsReal) loadNeeds();
+  const list=needsList();
+  const open=`<button type="button" class="needs-open" id="needsOpen">${tr('needs.seeAll')}</button>`;
+  if(list===null) return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-alert-triangle"></i> ${tr('needs.title')}</div><p class="club-hint">${NEEDS_ERR?tr('needs.loadError'):tr('needs.loading')}</p></div>`;
+  const top=list.map(a=>({...a, items:a.items.filter(i=>!i.done).sort((x,y)=>NEED_LVL[x.level]-NEED_LVL[y.level])}))
+    .filter(a=>a.items.length).sort((x,y)=>NEED_LVL[x.items[0].level]-NEED_LVL[y.items[0].level] || y.items.length-x.items.length).slice(0,5);
+  if(!top.length) return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-check"></i> ${tr('needs.title')}</div><p class="club-hint">${tr('needs.allGood')}</p>${open}</div>`;
+  return `<div class="sn-block" style="margin-bottom:14px"><div class="sn-head"><i class="ic ic-alert-triangle"></i> ${tr('needs.title')}</div>
+    ${top.map(a=>`<div class="sn-item" style="cursor:pointer" data-need-aid="${a.aid}"><div class="sn-when">${dispoSafe(a.name)}</div><div class="sn-txt"><span class="need-dot lvl-${a.items[0].level}"></span>${dispoSafe(a.items[0].text)}${a.items.length>1?` <span class="muted">+${a.items.length-1}</span>`:''}</div></div>`).join('')}
+    ${open}
   </div>`;
+}
+function ensureNeedsOverlay(){
+  let ov=document.getElementById('needsOverlay'); if(ov) return ov;
+  ov=document.createElement('div'); ov.className='overlay'; ov.id='needsOverlay';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML=`<div class="modal needs-modal"><button class="close" id="needsClose" aria-label="${tr('modal.closeAria')}"><i class="ic ic-x"></i></button><div id="needsBody"></div></div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+  ov.querySelector('#needsClose').onclick=()=>ov.classList.remove('open');
+  ov.addEventListener('click', e=>{
+    const d=e.target.closest('[data-need-done]');
+    if(d){ setNeedDone(d.dataset.needDone, d.dataset.on==='1'); renderNeedsOverlay(); if(mode==='coach') renderSidebar(); return; }
+    const go=e.target.closest('[data-need-go]');
+    if(go){ const idx=ROSTER.findIndex(x=>x.id===go.dataset.needGo); ov.classList.remove('open'); if(idx>-1){ selectAthlete(idx); render(); } return; }
+    if(e.target.closest('#needsShowDone')){ needsShowDone=!needsShowDone; renderNeedsOverlay(); return; }
+    if(e.target.closest('#needsRefresh')){ loadNeeds(true); return; }
+  });
+  return ov;
+}
+function renderNeedsOverlay(){
+  const body=document.getElementById('needsBody'); if(!body) return;
+  const list=needsList();
+  const head=`<span class="badge">${tr('needs.badge')}</span><h2 class="needs-h">${tr('needs.title')}</h2>
+    <p class="hint">${rosterIsReal?tr('needs.hintReal'):tr('needs.hintDemo')}</p>
+    <div class="needs-tools"><button type="button" class="btn-ghost" id="needsShowDone">${needsShowDone?tr('needs.hideDone'):tr('needs.showDone')}</button>${rosterIsReal?`<button type="button" class="btn-ghost" id="needsRefresh">${tr('needs.refresh')}</button>`:''}</div>`;
+  if(list===null){ body.innerHTML=head+`<p class="club-hint">${NEEDS_ERR?tr('needs.loadError'):tr('needs.loading')}</p>`; return; }
+  const rows=list.map(a=>({...a, items:a.items.filter(i=>needsShowDone||!i.done).sort((x,y)=>NEED_LVL[x.level]-NEED_LVL[y.level])}))
+    .filter(a=>a.items.length)
+    .sort((x,y)=>NEED_LVL[x.items[0].level]-NEED_LVL[y.items[0].level] || y.items.length-x.items.length);
+  const ok=list.filter(a=>!a.items.some(i=>!i.done)).length;
+  body.innerHTML=head + (rows.length ? rows.map(a=>`
+    <div class="need-card">
+      <div class="need-top"><b>${dispoSafe(a.name)}</b>${a.week&&a.week.planned?`<span class="need-week">${tr('needs.week',{done:a.week.done, planned:a.week.planned})}</span>`:''}</div>
+      ${a.items.map(i=>`<div class="need-row${i.done?' is-done':''}"><span class="need-dot lvl-${i.level}"></span><span class="need-txt">${dispoSafe(i.text)}</span>
+        <button type="button" class="need-done-btn" data-need-done="${dispoSafe(i.key)}" data-on="${i.done?'0':'1'}">${i.done?tr('needs.undo'):tr('needs.done')}</button></div>`).join('')}
+      <button type="button" class="need-go" data-need-go="${a.aid}">${tr('needs.openPlanning')}</button>
+    </div>`).join('') : `<p class="club-hint">${tr('needs.allGood')}</p>`)
+    + (ok && rows.length ? `<p class="hint" style="margin-top:12px">${tr(ok>1?'needs.okPlural':'needs.ok',{n:ok})}</p>` : '');
+}
+function openNeeds(){
+  ensureNeedsOverlay(); loadNeeds(); renderNeedsOverlay();
+  document.getElementById('needsOverlay').classList.add('open');
 }
 
 /* ============================================================
@@ -1048,6 +1157,7 @@ function renderSidebar(){
     var _sgCta=document.getElementById('sgCta'); if(_sgCta) _sgCta.onclick=function(){ openBuilder(null,null); };
     var _adhOpen=document.getElementById('adhOpen'); if(_adhOpen) _adhOpen.onclick=openAdherence;
     var _cmpAthOpen=document.getElementById('compareAthOpen'); if(_cmpAthOpen) _cmpAthOpen.onclick=openCompareAthletes;
+    var _needsOpen=document.getElementById('needsOpen'); if(_needsOpen) _needsOpen.onclick=(e)=>{ e.stopPropagation(); openNeeds(); };
     sidebarContent.querySelectorAll('[data-need-aid]').forEach(el=> el.onclick=()=>{
       const idx = ROSTER.findIndex(x=>x.id===el.dataset.needAid);
       if(idx>-1){ selectAthlete(idx); render(); }
