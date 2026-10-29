@@ -687,6 +687,11 @@ export const PF = {
   async coachNeeds() {
     return await this._invokeSoft("coach-needs", {});
   },
+  // Verdict de consigne d'une séance réalisée (session_compliance, 0080).
+  async saveCompliance(row) {
+    const { error } = await sb.from("session_compliance").upsert({ ...row, computed_at: new Date().toISOString() });
+    if (error) throw error; return true;
+  },
 
   // -------- CYCLES (programmes multi-semaines, 0079) --------
   async getCycles() {

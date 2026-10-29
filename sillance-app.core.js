@@ -974,9 +974,57 @@ function loadNeeds(force){
     NEEDS_LOADING=false;
     if(r && r.error){ NEEDS_ERR=true; console.warn('[PF] coach-needs :', r); return; }
     NEEDS=r; NEEDS_AT=Date.now(); NEEDS_ERR=false;
+    if(Array.isArray(r.to_check) && r.to_check.length) runComplianceQueue(r.to_check);
     if(mode==='coach') renderSidebar();
     if(document.getElementById('needsOverlay')?.classList.contains('open')) renderNeedsOverlay();
   }).catch(e=>{ NEEDS_LOADING=false; NEEDS_ERR=true; console.warn('[PF] coach-needs :', e); });
+}
+/* Contrôle de consigne en arrière-plan (29/10/2026) : pour chaque séance
+   réalisée sans verdict (liste fournie par coach-needs), même chaîne que la
+   fenêtre d'analyse — courbes de la montre → PFFit → SilConsigne avec les
+   références et zones DE CET ATHLÈTE — puis verdict stocké en base une
+   seule fois. Une séance à la fois, pour ménager l'API COROS. */
+let COMPLIANCE_RUNNING=false, COMPLIANCE_LEFT=0;
+const COMPLIANCE_TRIED=new Set(); // une séance n'est tentée qu'une fois par session (pas de boucle)
+const REFS_CACHE={};
+function refsFromRow(p){ return p ? {ftp:p.ftp, pma:p.pma, cpBike:p.cp_bike, vma:p.vma, cv:p.cv, seuilRun:p.seuil_run, css:p.css, fcMax:p.fc_max, fcRepos:p.fc_repos} : {}; }
+async function athleteRefsFor(aid){
+  if(REFS_CACHE[aid]) return REFS_CACHE[aid];
+  const [row, zones] = await Promise.all([
+    PF.getAthleteRefs(aid).catch(()=>null),
+    CUSTOM_ZONES[aid] ? null : PF.getAthleteZones(aid).catch(()=>null)]);
+  if(zones && Object.keys(zones).length && !CUSTOM_ZONES[aid]) CUSTOM_ZONES[aid]=zones;
+  return (REFS_CACHE[aid]=refsFromRow(row));
+}
+async function runComplianceQueue(list){
+  if(COMPLIANCE_RUNNING || !window.SilConsigne || !window.PFFit || !PF.saveCompliance) return;
+  list = list.filter(it=>!COMPLIANCE_TRIED.has(it.scheduled_session_id));
+  if(!list.length) return;
+  list.forEach(it=>COMPLIANCE_TRIED.add(it.scheduled_session_id));
+  COMPLIANCE_RUNNING=true; COMPLIANCE_LEFT=list.length; let stored=0;
+  if(document.getElementById('needsOverlay')?.classList.contains('open')) renderNeedsOverlay();
+  for(const it of list){
+    try{
+      const refs = await athleteRefsFor(it.athlete_id);
+      const {points, laps} = await PF.getActivityStreams(it.activity_id, it.provider);
+      if(!points || !points.length) continue; // fichier pas encore dispo côté montre : on réessaiera
+      const res = PFFit.buildFromRaw(points, it.disc, laps||[], {ftp: refs.ftp || 270});
+      if(!res.ok) continue;
+      const c = SilConsigne.evaluate({ blocks: it.blocks, disc: it.disc, data: res.data, refs,
+        zonesOf: k=>zonesFor(k, it.athlete_id), lineSec: ln=>lineMinutesFor(ln, it.disc)*60 });
+      const major = (c.constats||[]).find(x=>x.majeur) || (c.constats||[])[0];
+      const bad = (c.lignes||[]).find(l=>l.status==='bad') || (c.lignes||[]).find(l=>l.status==='partial');
+      await PF.saveCompliance({ scheduled_session_id: it.scheduled_session_id, athlete_id: it.athlete_id,
+        activity_id: it.activity_id, verdict: c.verdict || 'none',
+        summary: String((major && major.texte) || (bad && bad.text) || '').slice(0, 300),
+        issues: (c.constats||[]).slice(0, 6) });
+      stored++;
+    }catch(e){ console.warn('[consigne auto]', it.scheduled_session_id, e); }
+    finally{ COMPLIANCE_LEFT--; }
+  }
+  COMPLIANCE_RUNNING=false;
+  if(stored) loadNeeds(true);
+  else if(document.getElementById('needsOverlay')?.classList.contains('open')) renderNeedsOverlay();
 }
 function needsDoneKey(){ return 'sil_needs_done_'+(window.PF?.user?.id||'demo'); }
 function needsDone(){ try{ return JSON.parse(localStorage.getItem(needsDoneKey())||'{}')||{}; }catch(e){ return {}; } }
@@ -993,6 +1041,9 @@ function needItemText(it){
     case 'next_week_empty': return tr('needs.k.nextWeekEmpty', {date:needDateTxt(p.monday)});
     case 'no_checkin': return tr('needs.k.noCheckin', {days:p.days});
     case 'low_readiness': return tr('needs.k.lowReadiness', {pct:p.readiness});
+    case 'not_compliant': case 'partial':
+      return tr(it.kind==='partial'?'needs.k.partial':'needs.k.notCompliant', {title:p.title||'', date:needDateTxt(p.date)})
+        + (p.summary ? ' : '+String(p.summary).slice(0,160) : '');
     case 'injured': case 'sick': case 'tired':
       return tr('needs.k.'+it.kind, {date:needDateTxt(p.date)}) + (p.note ? ' : « '+String(p.note).slice(0,120)+' »' : '');
     default: return it.text || '';
@@ -1053,11 +1104,12 @@ function renderNeedsOverlay(){
     <p class="hint">${rosterIsReal?tr('needs.hintReal'):tr('needs.hintDemo')}</p>
     <div class="needs-tools"><button type="button" class="btn-ghost" id="needsShowDone">${needsShowDone?tr('needs.hideDone'):tr('needs.showDone')}</button>${rosterIsReal?`<button type="button" class="btn-ghost" id="needsRefresh">${tr('needs.refresh')}</button>`:''}</div>`;
   if(list===null){ body.innerHTML=head+`<p class="club-hint">${NEEDS_ERR?tr('needs.loadError'):tr('needs.loading')}</p>`; return; }
+  const running = COMPLIANCE_RUNNING && COMPLIANCE_LEFT>0 ? `<p class="club-hint" style="margin:-4px 0 12px"><i class="ic ic-loader"></i> ${tr('needs.checking',{n:COMPLIANCE_LEFT})}</p>` : '';
   const rows=list.map(a=>({...a, items:a.items.filter(i=>needsShowDone||!i.done).sort((x,y)=>NEED_LVL[x.level]-NEED_LVL[y.level])}))
     .filter(a=>a.items.length)
     .sort((x,y)=>NEED_LVL[x.items[0].level]-NEED_LVL[y.items[0].level] || y.items.length-x.items.length);
   const ok=list.filter(a=>!a.items.some(i=>!i.done)).length;
-  body.innerHTML=head + (rows.length ? rows.map(a=>`
+  body.innerHTML=head + running + (rows.length ? rows.map(a=>`
     <div class="need-card">
       <div class="need-top"><b>${dispoSafe(a.name)}</b>${a.week&&a.week.planned?`<span class="need-week">${tr('needs.week',{done:a.week.done, planned:a.week.planned})}</span>`:''}</div>
       ${a.items.map(i=>`<div class="need-row${i.done?' is-done':''}"><span class="need-dot lvl-${i.level}"></span><span class="need-txt">${dispoSafe(i.text)}</span>
