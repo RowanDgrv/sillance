@@ -694,6 +694,8 @@ function setActivityState(hasActivity){
 
 
 /* ---- utilitaires dates ---- */
+/* lundi (00:00) de la semaine contenant la date d */
+function mondayOfDate(d){ const m=new Date(d); m.setHours(0,0,0,0); m.setDate(m.getDate()-((m.getDay()+6)%7)); return m; }
 function mondayOf(offset){
   const d = new Date(); d.setHours(0,0,0,0);
   const day = (d.getDay()+6)%7;
@@ -2192,7 +2194,12 @@ function applyCycle(c, startIso){
 const ASSIGN_EXTRA = {};   // {athleteId: {dateKey: [sessions]}}
 
 function doAssign(kind, obj, dateIso, targets){
-  const entries = kind==='cycle' ? cycleEntries(obj, dateIso).out : [{ key: dateIso, t: obj }];
+  // 'week' (29/10/2026) : copie d'une semaine du calendrier, recalée sur le
+  // lundi de la semaine cible (jour de la semaine conservé).
+  const weekMon = kind==='week' ? mondayOfDate(new Date(dateIso+'T12:00:00')) : null;
+  const entries = kind==='cycle' ? cycleEntries(obj, dateIso).out
+    : kind==='week' ? obj.sessions.map(({dow, t})=>({ key: iso(addDays(weekMon, dow)), t }))
+    : [{ key: dateIso, t: obj }];
   const curId = rosterIsReal ? currentAthleteId : (ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].id);
   // démo : figer le plan de référence AVANT la pose, sinon une attribution faite
   // avant la première bascule entrerait dans BASE_PLANNING (dupliquée pour
@@ -2215,16 +2222,23 @@ function doAssign(kind, obj, dateIso, targets){
   if(kind==='cycle' && targets.some(a=>a.id===curId)){
     weekOffset = Math.round((cycleEntries(obj, dateIso).mon - mondayOf(0))/(7*864e5));
   }
+  if(kind==='week' && targets.some(a=>a.id===curId)){
+    weekOffset = Math.round((weekMon - mondayOf(0))/(7*864e5));
+  }
   render();
   const nA = targets.length;
+  if(kind==='week'){
+    toast(tr(nA>1?'copyWeek.donePlural':'copyWeek.doneSingular', {n:entries.length, a:nA, date:weekMon.toLocaleDateString(localeStr(),{day:'numeric', month:'long'})}));
+    return;
+  }
   toast(kind==='cycle'
     ? tr(nA>1?'assign.cyclePosedPlural':'assign.cyclePosedSingular', {name:obj.name, n:nA, entries:entries.length})
     : tr(nA>1?'assign.sessionAssignedPlural':'assign.sessionAssignedSingular', {title:obj.title, n:nA}));
 }
 
 function openAssign(kind, obj){
-  const isCycle = kind==='cycle';
-  const defDate = isCycle ? iso(nextMonday()) : iso(addDays(new Date(), 1));
+  const isCycle = kind==='cycle', isWeek = kind==='week';
+  const defDate = isWeek ? iso(addDays(obj.monday, 7)) : isCycle ? iso(nextMonday()) : iso(addDays(new Date(), 1));
   const groups = (typeof CLUB_GROUPS!=='undefined' ? CLUB_GROUPS : []).filter(g=> ROSTER.some(a=>a.group===g.id));
   const rows = ROSTER.map((a,i)=>{
     const g = a.group && typeof clubGroup==='function' ? clubGroup(a.group) : null;
@@ -2235,18 +2249,19 @@ function openAssign(kind, obj){
   const el=document.createElement('div'); el.className='adh-overlay';
   el.innerHTML=`<div class="adh-modal asg-modal" role="dialog" aria-label="${tr('assign.dialogAria')}">
     <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
-    <h3>${tr('assign.title', {name:isCycle?obj.name:obj.title})}</h3>
-    <p class="adh-sub">${isCycle
-      ? tr('assign.subCycle', {weeks:obj.weeks, n:cycleCount(obj)})
+    <h3>${isWeek ? tr('copyWeek.title', {date:obj.monday.toLocaleDateString(localeStr(),{day:'numeric', month:'long'})}) : tr('assign.title', {name:isCycle?obj.name:obj.title})}</h3>
+    <p class="adh-sub">${isWeek ? tr('copyWeek.sub', {n:obj.sessions.length, from:obj.fromName})
+      : isCycle ? tr('assign.subCycle', {weeks:obj.weeks, n:cycleCount(obj)})
       : tr('assign.subSession')}</p>
-    <div class="asg-date"><span>${isCycle?tr('assign.weekOf'):tr('assign.onDate')}</span><input type="date" id="asgDate" value="${defDate}"></div>
+    <div class="asg-date"><span>${(isCycle||isWeek)?tr('assign.weekOf'):tr('assign.onDate')}</span><input type="date" id="asgDate" value="${defDate}"></div>
+    ${isWeek?`<p class="adh-sub" id="asgWeekHint" style="margin-top:-4px"></p>`:''}
     ${groups.length?`<div class="asg-groups">${groups.map(g=>{
       const n=ROSTER.filter(a=>a.group===g.id).length;
       return `<button class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name} · ${n}</button>`;
     }).join('')}</div>`:''}
     <div class="asg-list">${rows || `<div style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">${tr('assign.noAthlete')}</div>`}</div>
     ${rows?`<label class="asg-all"><input type="checkbox" id="asgAll"> ${tr('assign.selectAll')}</label>
-    <button class="btn asg-go" id="asgGo" disabled>${tr('assign.assign')}</button>`:''}
+    <button class="btn asg-go" id="asgGo" disabled>${isWeek?tr('copyWeek.btn'):tr('assign.assign')}</button>`:''}
   </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('open'));
@@ -2257,10 +2272,18 @@ function openAssign(kind, obj){
   if(!rows) return;
   const boxes=[...el.querySelectorAll('.asg-row input')];
   const go=el.querySelector('#asgGo'), all=el.querySelector('#asgAll');
+  if(isWeek){
+    // n'importe quel jour choisi = la semaine qui le contient (lundi affiché)
+    const hint=el.querySelector('#asgWeekHint'), din=el.querySelector('#asgDate');
+    const upd=()=>{ const m=mondayOfDate(new Date((din.value||defDate)+'T12:00:00'));
+      hint.textContent=tr('copyWeek.target', {date:m.toLocaleDateString(localeStr(),{weekday:'long', day:'numeric', month:'long'})}); };
+    din.addEventListener('change', upd); upd();
+  }
   const sync=()=>{
     const n=boxes.filter(b=>b.checked).length;
     go.disabled=!n;
-    go.textContent = n ? tr(n>1?'assign.assignToNPlural':'assign.assignToNSingular', {n}) : tr('assign.assign');
+    go.textContent = isWeek ? (n ? tr(n>1?'copyWeek.goPlural':'copyWeek.goSingular', {n}) : tr('copyWeek.btn'))
+      : n ? tr(n>1?'assign.assignToNPlural':'assign.assignToNSingular', {n}) : tr('assign.assign');
     all.checked = n===boxes.length;
     el.querySelectorAll('.asg-chip').forEach(ch=>{
       const m=boxes.filter(b=>b.dataset.grp===ch.dataset.g);
@@ -4070,7 +4093,24 @@ if(calWeeksSelect){
    de l'athlète. Visible seulement si COROS est connecté (comme le bouton
    par séance dans la fiche athlète). */
 const sendWeekWatchBtn = document.getElementById('sendWeekWatchBtn');
+/* Copier la semaine affichée vers d'autres athlètes et/ou une autre semaine
+   (29/10/2026) : réutilise la fenêtre d'attribution multi-athlètes. */
+const copyWeekBtn = document.getElementById('copyWeekBtn');
+function openCopyWeek(){
+  const mon = mondayOf(weekOffset), sessions=[];
+  for(let d=0; d<7; d++){
+    (planning[iso(addDays(mon,d))]||[]).forEach(s=>{
+      if(s.creneau || s.isRace) return;
+      sessions.push({dow:d, t:{disc:s.disc, title:s.title, dur:s.dur, dist:s.dist||0, tss:s.tss, zone:s.zone, desc:s.desc, blocksV2:s.blocksV2}});
+    });
+  }
+  if(!sessions.length){ toast(tr('copyWeek.empty')); return; }
+  const cur = ROSTER.find(a=>a.id===(rosterIsReal ? currentAthleteId : ROSTER[selectedAthleteIdx]?.id));
+  openAssign('week', {monday:mon, sessions, fromName: cur ? cur.name : ''});
+}
+copyWeekBtn?.addEventListener('click', openCopyWeek);
 function syncSendWeekButtonVisibility(){
+  if(copyWeekBtn) copyWeekBtn.hidden = (calViewMode==='day') || mode!=='coach';
   if(!sendWeekWatchBtn) return;
   const hasCoros = Array.isArray(window.__pf_providers) && window.__pf_providers.includes('coros');
   // __pf_providers = les montres de l'UTILISATEUR connecté : côté coach, c'est
