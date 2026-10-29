@@ -33,7 +33,9 @@
   'use strict';
 
   var SHORT_SEC = 180, HR_LAG_SEC = 90, OK = 0.8, PARTIAL = 0.6;
-  var REC_TYPES = { contre: 1, rec: 1, recup: 1, recovery: 1, repos: 1 };
+  // 'recov' = clé réelle des lignes « Récup » du constructeur (LINE_TYPES) :
+  // absente jusqu'au 29/10/2026, les récups étaient jugées comme des efforts.
+  var REC_TYPES = { contre: 1, rec: 1, recov: 1, recup: 1, recovery: 1, repos: 1 };
   var EDGE_TYPES = { warmup: 1, cooldown: 1 };
 
   function mean(a){ return a.length ? a.reduce(function(s, x){ return s + x; }, 0) / a.length : null; }
