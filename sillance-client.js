@@ -687,6 +687,14 @@ export const PF = {
   async coachNeeds() {
     return await this._invokeSoft("coach-needs", {});
   },
+  // « Traité » de l'écran Qui a besoin de toi (coach_need_dismissals, 0081).
+  async setNeedDismissed(key, on) {
+    const q = on
+      ? sb.from("coach_need_dismissals").upsert({ coach_id: this.user.id, need_key: key })
+      : sb.from("coach_need_dismissals").delete().eq("coach_id", this.user.id).eq("need_key", key);
+    const { error } = await q;
+    if (error) throw error; return true;
+  },
   // Verdict de consigne d'une séance réalisée (session_compliance, 0080).
   async saveCompliance(row) {
     const { error } = await sb.from("session_compliance").upsert({ ...row, computed_at: new Date().toISOString() });

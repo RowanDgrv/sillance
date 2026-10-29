@@ -974,6 +974,16 @@ function loadNeeds(force){
     NEEDS_LOADING=false;
     if(r && r.error){ NEEDS_ERR=true; console.warn('[PF] coach-needs :', r); return; }
     NEEDS=r; NEEDS_AT=Date.now(); NEEDS_ERR=false;
+    // marques « Traité » faites avant 0081 (navigateur seul) : envoyées une fois en base
+    if(Array.isArray(r.done_keys) && PF.setNeedDismissed){
+      let local={}; try{ local=JSON.parse(localStorage.getItem(needsDoneKey())||'{}')||{}; }catch(e){}
+      const flag='sil_needs_migrated_'+PF.user.id;
+      let migrated=false; try{ migrated=localStorage.getItem(flag)==='1'; }catch(e){}
+      if(!migrated){
+        Object.keys(local).filter(k=>!r.done_keys.includes(k)).forEach(k=>{ r.done_keys.push(k); PF.setNeedDismissed(k, true).catch(()=>{}); });
+        try{ localStorage.setItem(flag,'1'); }catch(e){}
+      }
+    }
     if(Array.isArray(r.to_check) && r.to_check.length) runComplianceQueue(r.to_check);
     if(mode==='coach') renderSidebar();
     if(document.getElementById('needsOverlay')?.classList.contains('open')) renderNeedsOverlay();
@@ -1027,9 +1037,27 @@ async function runComplianceQueue(list){
   else if(document.getElementById('needsOverlay')?.classList.contains('open')) renderNeedsOverlay();
 }
 function needsDoneKey(){ return 'sil_needs_done_'+(window.PF?.user?.id||'demo'); }
-function needsDone(){ try{ return JSON.parse(localStorage.getItem(needsDoneKey())||'{}')||{}; }catch(e){ return {}; } }
+/* « Traité » : en base pour un compte réel (0081, partagé entre appareils,
+   relu via coach-needs → done_keys) ; localStorage en démo et comme cache
+   immédiat de l'action. */
+function needsDone(){
+  let d={}; try{ d=JSON.parse(localStorage.getItem(needsDoneKey())||'{}')||{}; }catch(e){}
+  if(rosterIsReal && NEEDS && Array.isArray(NEEDS.done_keys)){
+    // la base fait foi : une marque retirée sur un autre appareil disparaît ici aussi
+    const db={}; NEEDS.done_keys.forEach(k=>{ db[k]=1; });
+    return db;
+  }
+  return d;
+}
 function setNeedDone(key, on){
-  const d=needsDone(); if(on) d[key]=Date.now(); else delete d[key];
+  let d={}; try{ d=JSON.parse(localStorage.getItem(needsDoneKey())||'{}')||{}; }catch(e){}
+  if(rosterIsReal && window.PF?.user && PF.setNeedDismissed){
+    if(NEEDS && Array.isArray(NEEDS.done_keys)){
+      NEEDS.done_keys = NEEDS.done_keys.filter(k=>k!==key); if(on) NEEDS.done_keys.push(key);
+    }
+    PF.setNeedDismissed(key, on).catch(e=>{ console.warn('[PF] need dismiss :', e); toast(tr('needs.saveFailed'), 'error'); });
+  }
+  if(on) d[key]=Date.now(); else delete d[key];
   try{ localStorage.setItem(needsDoneKey(), JSON.stringify(d)); }catch(e){}
 }
 function needDateTxt(iso){ return iso ? new Date(iso+'T12:00:00').toLocaleDateString(localeStr(),{weekday:'short', day:'numeric', month:'short'}) : ''; }
