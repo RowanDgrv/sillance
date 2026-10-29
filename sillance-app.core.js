@@ -2273,7 +2273,22 @@ function applyCycle(c, startIso){
    ============================================================ */
 const ASSIGN_EXTRA = {};   // {athleteId: {dateKey: [sessions]}}
 
-function doAssign(kind, obj, dateIso, targets){
+function doAssign(kind, obj, dateIso, targets, opts){
+  // Copie de semaine en mode « remplacer » : on vide d'abord la semaine cible
+  // (séances non réalisées) de chaque athlète, PUIS on copie.
+  if(kind==='week' && opts && opts.replace && !opts._cleared){
+    const mon = mondayOfDate(new Date(dateIso+'T12:00:00')), from=iso(mon), to=iso(addDays(mon,6));
+    const curId0 = rosterIsReal ? currentAthleteId : (ROSTER[selectedAthleteIdx] && ROSTER[selectedAthleteIdx].id);
+    const clearLocal = (map)=>{ for(let d=0; d<7; d++){ const k=iso(addDays(mon,d)); if(map[k]) map[k]=map[k].filter(x=>x.done || x.creneau); } };
+    targets.forEach(a=>{ if(ASSIGN_EXTRA[a.id]) clearLocal(ASSIGN_EXTRA[a.id]); if(a.id===curId0) clearLocal(planning); });
+    if(rosterIsReal && window.PF?.user && PF.deletePlannedRange){
+      Promise.all(targets.map(a=>PF.deletePlannedRange(a.id, from, to)))
+        .then(()=> doAssign(kind, obj, dateIso, targets, {...opts, _cleared:true}))
+        .catch(e=>{ console.warn('[PF] deletePlannedRange :', e); toast(tr('copyWeek.replaceFailed'), 'error'); });
+      return;
+    }
+    return doAssign(kind, obj, dateIso, targets, {...opts, _cleared:true});
+  }
   // 'week' (29/10/2026) : copie d'une semaine du calendrier, recalée sur le
   // lundi de la semaine cible (jour de la semaine conservé).
   const weekMon = kind==='week' ? mondayOfDate(new Date(dateIso+'T12:00:00')) : null;
@@ -2334,7 +2349,8 @@ function openAssign(kind, obj){
       : isCycle ? tr('assign.subCycle', {weeks:obj.weeks, n:cycleCount(obj)})
       : tr('assign.subSession')}</p>
     <div class="asg-date"><span>${(isCycle||isWeek)?tr('assign.weekOf'):tr('assign.onDate')}</span><input type="date" id="asgDate" value="${defDate}"></div>
-    ${isWeek?`<p class="adh-sub" id="asgWeekHint" style="margin-top:-4px"></p>`:''}
+    ${isWeek?`<p class="adh-sub" id="asgWeekHint" style="margin-top:-4px"></p>
+      <label class="asg-all asg-replace"><input type="checkbox" id="asgReplace"> ${tr('copyWeek.replace')}</label>`:''}
     ${groups.length?`<div class="asg-groups">${groups.map(g=>{
       const n=ROSTER.filter(a=>a.group===g.id).length;
       return `<button class="asg-chip" data-g="${g.id}" style="--gc:${g.color}"><span class="dotc"></span>${g.name} · ${n}</button>`;
@@ -2381,7 +2397,13 @@ function openAssign(kind, obj){
   go.onclick=()=>{
     const targets=boxes.filter(b=>b.checked).map(b=>ROSTER[+b.dataset.idx]);
     if(!targets.length) return;
-    doAssign(kind, obj, el.querySelector('#asgDate').value || defDate, targets);
+    const dIso = el.querySelector('#asgDate').value || defDate;
+    const replace = isWeek && el.querySelector('#asgReplace')?.checked;
+    if(replace){
+      const m=mondayOfDate(new Date(dIso+'T12:00:00')).toLocaleDateString(localeStr(),{day:'numeric', month:'long'});
+      if(!confirm(tr('copyWeek.replaceConfirm', {date:m, n:targets.length}))) return;
+    }
+    doAssign(kind, obj, dIso, targets, {replace});
     close();
   };
 }

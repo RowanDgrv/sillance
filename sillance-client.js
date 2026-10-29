@@ -586,6 +586,13 @@ export const PF = {
     }
     if (error) throw error; return data;
   },
+  // « Remplacer la semaine » (copie de semaine, 29/10/2026) : supprime les
+  // séances NON réalisées d'un athlète sur une plage de dates.
+  async deletePlannedRange(athleteId, fromIso, toIso) {
+    const { data, error } = await sb.from("scheduled_sessions").delete()
+      .eq("athlete_id", athleteId).gte("date", fromIso).lte("date", toIso).eq("done", false).select("id");
+    if (error) throw error; return (data ?? []).length;
+  },
   async deleteScheduled(id) {
     const { error } = await sb.from("scheduled_sessions").delete().eq("id", id);
     if (error) throw error; return true;
