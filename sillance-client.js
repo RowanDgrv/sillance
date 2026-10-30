@@ -702,6 +702,13 @@ export const PF = {
     const { error } = await q;
     if (error) throw error; return true;
   },
+  // Fichier .FIT de séance pour montres Garmin (export-fit-workout) :
+  // renvoie un Blob ; refs = références de l'athlète (cibles en zone → valeurs).
+  async fitWorkoutBlob(session, refs) {
+    const { data, error } = await sb.functions.invoke("export-fit-workout", { body: { session, refs } });
+    if (error) throw error;
+    return data instanceof Blob ? data : new Blob([data], { type: "application/octet-stream" });
+  },
   // Carnet de musculation (scheduled_sessions.strength_log, 0082).
   async saveStrengthLog(id, log) {
     const { error } = await sb.from("scheduled_sessions").update({ strength_log: log }).eq("id", id);

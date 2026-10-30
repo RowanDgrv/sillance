@@ -3116,6 +3116,7 @@ function openSessionActions(s, dateKey){
       <button class="addath-choice" data-act="lib" type="button"><i class="ic ic-book"></i> <span class="addath-t">Enregistrer dans la bibliothèque</span></button>
       <button class="addath-choice" data-act="assign" type="button"><i class="ic ic-users"></i> <span class="addath-t">Programmer pour un autre athlète</span></button>
       <button class="addath-choice" data-act="watch" type="button"><i class="ic ic-send"></i> <span class="addath-t">${tr('watch.sendToWatch')}</span></button>
+      <button class="addath-choice" data-act="fit" type="button"><i class="ic ic-download"></i> <span class="addath-t">${tr('fit.btn')}</span></button>
       <button class="addath-choice" data-act="del" type="button" style="color:var(--danger,#e5484d)"><i class="ic ic-x"></i> <span class="addath-t">Supprimer la séance prévue</span></button>
     </div>
   </div>`;
@@ -3133,6 +3134,7 @@ function openSessionActions(s, dateKey){
   };
   el.querySelector('[data-act="assign"]').onclick=()=>{ close(); openAssign('session', s); };
   el.querySelector('[data-act="watch"]').onclick=()=>{ close(); pushSingleSessionToWatch(s, dateKey); };
+  el.querySelector('[data-act="fit"]').onclick=()=>{ close(); downloadGarminFit(s); };
   el.querySelector('[data-act="del"]').onclick=()=>{
     if(window.PF?.user && s.id){ PF.deleteScheduled(s.id).catch(err=>console.warn('[PF] deleteScheduled', err)); }
     planning[dateKey] = (planning[dateKey]||[]).filter(x=>x.id!==s.id);
@@ -3497,6 +3499,40 @@ function sessionNotesHTML(s){
 /* Carnet de musculation (30/10/2026) : l'athlète (ou son coach) saisit les
    séries réellement faites ; comparées au prévu par sillance-strength.js.
    Le verdict est aussi stocké dans session_compliance → « Qui a besoin de toi ». */
+/* Fichier .FIT pour montres Garmin (30/10/2026) : Garmin n'autorise pas
+   l'envoi direct d'une séance par une app tierce sans partenariat ; le .FIT
+   « workout » officiel se copie sur la montre en USB (dossier GARMIN/NewFiles).
+   Cibles en zone converties avec les références de l'athlète affiché. */
+function downloadGarminFit(s){
+  if(!window.PF?.user){ toast(tr('fit.needAccount')); return; }
+  const blocks=(s.blocksV2&&s.blocksV2.blocks)||[];
+  if(!blocks.length){ toast(tr('fit.empty')); return; }
+  const R=(typeof ATHLETE_REF!=='undefined' && ATHLETE_REF) || {};
+  const refs={ftp:R.ftp, pma:R.pma, cpBike:R.cpBike, vma:R.vma, cv:R.cv, seuilRun:R.seuilRun, fcMax:R.fcMax};
+  toast(tr('fit.preparing'));
+  PF.fitWorkoutBlob({ title:s.title, disc:s.disc, blocks }, refs).then(blob=>{
+    const name=(String(s.title||'seance').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9-_]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'seance')+'.fit';
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    openGarminHowTo(name);
+  }).catch(e=>{ console.warn('[PF] fit', e); toast(tr('fit.failed'), 'error'); });
+}
+function openGarminHowTo(name){
+  const el=document.createElement('div'); el.className='adh-overlay';
+  el.innerHTML=`<div class="adh-modal" role="dialog" aria-label="${tr('fit.howTitle')}">
+    <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
+    <h3>${tr('fit.howTitle')}</h3>
+    <p class="adh-sub">${tr('fit.howSub', {name: dispoSafe(name)})}</p>
+    <ol class="fit-steps">
+      <li>${tr('fit.step1')}</li><li>${tr('fit.step2')}</li><li>${tr('fit.step3')}</li><li>${tr('fit.step4')}</li>
+    </ol>
+    <p class="cr-note">${tr('fit.macNote')}</p>
+    <p class="cr-note">${tr('fit.phoneNote')}</p>
+  </div>`;
+  document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
+  el.querySelector('.adh-close').onclick=close; el.addEventListener('click', e=>{ if(e.target===el) close(); });
+}
 function strengthLoggable(s){
   return s && s.disc==='strength' && window.SilStrength && SilStrength.plannedExercises((s.blocksV2&&s.blocksV2.blocks)||[]).length>0;
 }
@@ -3550,12 +3586,15 @@ function openModal(s, dateKey){
     ${strengthLoggable(s)&&s.strengthLog?SilStrength.renderCompare((s.blocksV2&&s.blocksV2.blocks)||[], s.strengthLog):''}
     ${strengthLoggable(s)?`<button class="btn" id="modalStrengthLog" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-clipboard"></i> ${SilStrength.t(s.strengthLog?'editLog':'openLog')}</button>`:''}
     ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> ${tr('modal.detailedAnalysis')}</button>`:''}
+    ${(s.blocksV2&&s.blocksV2.blocks&&s.blocksV2.blocks.length)?`<button class="btn" id="modalFit" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-download"></i> ${tr('fit.btn')}</button>`:''}
     ${canShowWatchBtn?`<button class="btn" id="modalSendWatch" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-send"></i> ${tr('watch.sendToMyWatch')}</button>`:''}
     ${!s.done?`<button class="btn" id="modalMove" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-calendar"></i> ${tr('builder.moveSession') || 'Déplacer la séance'}</button>`:''}
     <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?tr('common.close'):tr('modal.gotItCoach')}</button>`;
   overlay.classList.add('open');
   modal.querySelector('.close').onclick = closeModal;
-  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch' && btn.id!=='modalMove' && btn.id!=='modalStrengthLog') btn.onclick = closeModal; });
+  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch' && btn.id!=='modalMove' && btn.id!=='modalStrengthLog' && btn.id!=='modalFit') btn.onclick = closeModal; });
+  const mf = modal.querySelector('#modalFit');
+  if(mf) mf.onclick = ()=>{ downloadGarminFit(s); };
   const sl = modal.querySelector('#modalStrengthLog');
   if(sl) sl.onclick = ()=>{ closeModal(); openStrengthLogger(s, ()=>{ render(); openModal(s, dateKey); }); };
   const an = modal.querySelector('#openAnalysis');
