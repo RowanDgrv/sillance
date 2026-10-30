@@ -2110,6 +2110,9 @@ function saveCycleFromModal(){
   const clean = {id:cycleState.id, name:cycleState.name, weeks:cycleState.weeks, plan:cycleState.plan};
   const i=CYCLES.findIndex(x=>x.id===clean.id);
   if(i>-1) CYCLES[i]=clean; else CYCLES.push(clean);
+  // Cas silencieux rendus visibles (30/10/2026) : app pas à jour (client sans
+  // saveCycle) ou pas connecté (démo) — avant, aucun message dans ces deux cas.
+  if(window.PF?.user && !PF.saveCycle) toast(tr('toast.cycleAppOutdated'), 'error');
   if(window.PF?.user && PF.saveCycle){
     PF.saveCycle(clean).then(row=>{
       if(row && row.id && row.id!==clean.id){ if(cycleState && cycleState.id===clean.id) cycleState.id=row.id; clean.id=row.id; }
@@ -2132,7 +2135,7 @@ document.getElementById('cyWeeks').addEventListener('change', e=>{
 document.getElementById('cySave').addEventListener('click', ()=>{
   saveCycleFromModal();
   document.getElementById('cycleOverlay').classList.remove('open');
-  if(!window.PF?.user) toast(tr('toast.cycleEnregistre')); // compte réel : confirmé par la base (saveCycleFromModal)
+  if(!window.PF?.user) toast(tr('toast.cycleDemoOnly')); // compte réel : confirmé par la base (saveCycleFromModal)
 });
 document.getElementById('cyApply').addEventListener('click', ()=>{
   const c=saveCycleFromModal();
