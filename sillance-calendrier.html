@@ -2379,7 +2379,22 @@ body[data-athview] .planner > .library{display:none}
 @media (max-width:640px){.ln-hyrox{grid-template-columns:18px 1fr 1fr !important}}
 /* lignes Renforcement (reps × charge) — réutilise .hx-target/.hx-weight (Hyrox) */
 .ln-strength{grid-template-columns:18px 108px 1.2fr 66px 76px 60px auto !important}
-@media (max-width:640px){.ln-strength{grid-template-columns:18px 1fr 1fr !important}}
+@media (max-width:640px){
+  /* mobile (30/10/2026) : nom de l'exercice sur toute la ligne (il était réduit
+     à quelques lettres), puis type + répétitions + supprimer, puis kg + RPE
+     (ils se chevauchaient dans la colonne de 18 px de la poignée). */
+  .ln-strength{grid-template-columns:18px 1fr 1fr auto !important}
+  .ln-strength .ln-exwrap{grid-column:1/-1;grid-row:1}
+  .ln-strength .ln-grip{grid-column:1;grid-row:2}
+  .ln-strength .ln-type{grid-column:2;grid-row:2}
+  .ln-strength .hx-target{grid-column:3;grid-row:2}
+  .ln-strength .ln-actions{grid-column:4;grid-row:2}
+  .ln-strength .hx-weight{grid-column:2;grid-row:3}
+  .ln-strength .ln-rpe{grid-column:3;grid-row:3}
+  .ln-strength>*{min-width:0}
+  .ln-strength .ln-type{width:100%}
+  .ln-strength .ln-note{grid-column:1/-1}
+}
 .ln-exwrap{display:flex;align-items:center;gap:6px;min-width:0}
 .ln-exercise{flex:1;min-width:0;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
   font-family:var(--font-ui);font-size:12.5px;font-weight:600;padding:7px var(--space-2)}
@@ -2941,7 +2956,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
           <span><i style="background:#46C2D8"></i>Natation</span>
           <span><i style="background:#D9962F"></i>Vélo</span>
           <span><i style="background:#DD5C72"></i>Course</span>
-          <span><i style="background:#8E7FD0"></i>Renfo</span>
+          <span><i style="background:#8E7FD0"></i>Muscu</span>
         </div>
       </div>
 
@@ -3237,7 +3252,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
           <option value="swim">Natation</option>
           <option value="bike">Vélo</option>
           <option value="run">Course</option>
-          <option value="strength">Renfo</option>
+          <option value="strength">Muscu</option>
         </select>
       </div>
       <div class="b-fld"><label for="crTitle" data-i18n="slot.titleLabel">Intitulé</label><input type="text" id="crTitle" placeholder="Ex. Séance piste collective" data-i18n-attr="placeholder:slot.titlePh"></div>
@@ -3756,7 +3771,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
           <option value="swim">Natation</option>
           <option value="bike">Vélo</option>
           <option value="run">Course</option>
-          <option value="strength">Renfo</option>
+          <option value="strength">Muscu</option>
           <option value="hyrox">Hyrox</option>
         </select>
         <select id="bObjectif" title="Objectif de la séance · sert à l'analyse IA" aria-label="Objectif de la séance" data-i18n-attr="title:session.goalTitle,aria-label:session.goalAria" style="background:var(--panel-2);border:1px solid var(--line-strong);color:var(--soft);border-radius:var(--radius-sm);padding:0 10px;height:38px;font-size:12.5px;font-family:inherit;cursor:pointer">
@@ -3874,16 +3889,16 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261029g"></script>
+<script src="./sillance-i18n-app.js?v=20261030d"></script>
 <script src="./sillance-reminder.js?v=20261028f"></script>
 <script src="./sillance-ai-popup.js?v=20261028c"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-workout-export.js?v=20261009a"></script>
 <script src="./sillance-club-feed.js?v=20261009b"></script>
 <script src="./sillance-tour.js"></script>
-<script src="./sillance-exercises.js?v=20261030b"></script>
+<script src="./sillance-exercises.js?v=20261030d"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
-<script src="./sillance-calendrier.core.js?v=20261030c"></script>
+<script src="./sillance-calendrier.core.js?v=20261030d"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

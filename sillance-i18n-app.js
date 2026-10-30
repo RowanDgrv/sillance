@@ -25,7 +25,7 @@
     "payReturn.clubConnect.cancel": `La mise en relation avec Stripe n'est pas terminée pour le club. Réessaie depuis les réglages de facturation.`,
     "payReturn.premium.success": `Sillance Premium Club est actif : l'Assistant IA et la bibliothèque sont débloqués pour le staff du club.`,
     "payReturn.premium.cancel": `L'abonnement Sillance Premium Club n'a pas été activé.`,
-    "disc.swim": `Natation`, "disc.bike": `Vélo`, "disc.run": `Course`, "disc.strength": `Renfo`, "disc.hyrox": `Hyrox`,
+    "disc.swim": `Natation`, "disc.bike": `Vélo`, "disc.run": `Course`, "disc.strength": `Muscu`, "disc.hyrox": `Hyrox`,
     "gear.swim1": `maillot de bain`, "gear.swim2": `bonnet`, "gear.swim3": `lunettes`,
     "gear.bike1": `vélo`, "gear.bike2": `casque`, "gear.bike3": `tenue vélo`, "gear.bike4": `bidon`,
     "gear.run1": `chaussures de course`, "gear.run2": `tenue running`,
@@ -389,7 +389,7 @@
     "date.today": `auj.`, "date.yesterday": `hier`, "date.daysAgo": `il y a {days} j`,
 
     "zoneCat.vo2max": `VO2max / VMA`, "zoneCat.threshold": `Seuil`, "zoneCat.tempo": `Tempo`,
-    "zoneCat.endurance": `Endurance`, "zoneCat.recovery": `Récupération`, "zoneCat.strengthOther": `Renfo / autre`,
+    "zoneCat.endurance": `Endurance`, "zoneCat.recovery": `Récupération`, "zoneCat.strengthOther": `Muscu / autre`,
 
     "lib.filterBySport": `Filtrer par sport`, "lib.allSports": `Tous les sports`,
     "lib.filterByType": `Filtrer par type de séance`, "lib.allTypes": `Tous les types de séance`,
@@ -1097,7 +1097,7 @@
     "durab.after": `après {kj} kJ`, "durab.retained": `{pct}% conservé`,
     "durab.retainedAt5min": `{pct}% à 5 min <span style="font-size:12px;color:var(--muted)">@ {kj} kJ</span>`,
 
-    "loadMix.note": `Charge = mix <b>TSS</b> vélo · <b>rTSS</b> course · <b>sTSS</b> nat · <b>hrTSS</b> FC · <b>sRPE</b> renfo/Hyrox, calibré <b>1 h seuil = 100</b>. Estimé · le coach tranche.`,
+    "loadMix.note": `Charge = mix <b>TSS</b> vélo · <b>rTSS</b> course · <b>sTSS</b> nat · <b>hrTSS</b> FC · <b>sRPE</b> muscu/Hyrox, calibré <b>1 h seuil = 100</b>. Estimé · le coach tranche.`,
 
     "hyrox.runTitle": `Run {n} : {pace}/km`,
     "hyrox.aerobicLoad": `Charge aérobie`, "hyrox.muscularLoad": `Charge musculaire`,
@@ -1175,7 +1175,7 @@
     "tpl.t6.desc": `20' échauffement + gammes · 6×800m allure 5km, récup 2' trot · 10' retour au calme.`,
     "tpl.t7.title": `Brick vélo→course`,
     "tpl.t7.desc": `45' vélo Z3 puis enchaînement immédiat 30' course allure triathlon. Travailler la transition T2.`,
-    "tpl.t8.title": `Renfo &amp; gainage`,
+    "tpl.t8.title": `Muscu &amp; gainage`,
     "tpl.t8.desc": `3 tours : squats ×15, fentes ×12/jambe, pompes ×12, planche 60s, gainage latéral 45s/côté, hip thrust ×15.`,
     "tpl.t9.title": `Seuil 20×200 départ 3'00`,
     "tpl.t9.desc": `1000m échauffement · 20×200m départ 3'00 par blocs de 5 : nage complète, pull, nage complète, pull-plaquettes · 200m souple.`,
@@ -1572,7 +1572,7 @@
     "notif.checkinBody": `Sommeil {sommeil}/10 · Fatigue {fatigue}/10 · Motiv. {motiv}/10`,
 
     "loadLog.threshold2x20": `Sortie seuil 2×20`, "loadLog.tempo8k": `Tempo 8 km`,
-    "loadLog.lowerBodyStrength": `Renfo bas du corps`, "loadLog.techniqueThreshold": `Technique + seuil`,
+    "loadLog.lowerBodyStrength": `Muscu bas du corps`, "loadLog.techniqueThreshold": `Technique + seuil`,
     "loadLog.hyroxSim": `Hyrox · simulation`, "loadLog.recoveryJog": `Footing récup`,
 
     "tour.welcome.title": `Bienvenue sur Sillance !`,

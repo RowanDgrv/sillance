@@ -165,5 +165,87 @@
     return null;
   }
   function groupLabel(key){ var g = G[key]; return g ? g[lang() - 1] : null; }
+  /* ---------- Sélecteur avec filtres par zone (30/10/2026) ----------
+     Remplace la liste native (datalist), trop longue à faire défiler :
+     au focus du champ exercice, un panneau propose des filtres (bas du
+     corps, haut du corps, abdos…) et la liste filtrée ; la saisie filtre
+     aussi. Le champ reste libre. */
+  var FILTERS = [
+    { id: 'all',   groups: null,                    l: ['Tout', 'All', 'Todo'] },
+    { id: 'lower', groups: ['legs', 'glutes'],      l: ['Bas du corps', 'Lower body', 'Tren inferior'] },
+    { id: 'upper', groups: ['push', 'pull', 'arms'], l: ['Haut du corps', 'Upper body', 'Tren superior'] },
+    { id: 'core',  groups: ['core'],                l: ['Abdos / gainage', 'Core / abs', 'Core / abdominales'] },
+    { id: 'full',  groups: ['full'],                l: ['Corps entier / Hyrox', 'Full body / Hyrox', 'Cuerpo completo / Hyrox'] },
+    { id: 'power', groups: ['power'],               l: ['Explosivité', 'Power', 'Potencia'] },
+    { id: 'run',   groups: ['run'],                 l: ['Course', 'Running', 'Carrera'] }
+  ];
+  var EMPTY = ['Aucun exercice : garde ton texte tel quel.', 'No exercise: keep your own text.', 'Ningún ejercicio: conserva tu texto.'];
+  var curFilter = 'all', panel = null, curInput = null;
+  function css(){
+    if(document.getElementById('silExoCss')) return;
+    var st = document.createElement('style'); st.id = 'silExoCss';
+    st.textContent = '.sxp{position:fixed;z-index:9000;background:var(--panel,#fff);color:var(--text,#111);border:1px solid var(--line-strong,#ccd);border-radius:12px;box-shadow:0 12px 30px -12px rgba(0,0,0,.35);overflow:hidden;display:flex;flex-direction:column}'
+      + '.sxp-chips{display:flex;gap:6px;padding:8px;overflow-x:auto;border-bottom:1px solid var(--line,#e3e6ee);flex:none;-webkit-overflow-scrolling:touch}'
+      + '.sxp-chips button{flex:none;border:1px solid var(--line-strong,#ccd);background:transparent;color:inherit;border-radius:99px;padding:5px 10px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}'
+      + '.sxp-chips button.on{background:var(--swim,#2FD9FF);border-color:var(--swim,#2FD9FF);color:#06222a}'
+      + '.sxp-list{overflow-y:auto;max-height:240px;padding:4px 0}'
+      + '.sxp-item{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;cursor:pointer;font-size:14px}'
+      + '.sxp-item:hover,.sxp-item.act{background:var(--panel-2,#eef2f8)}'
+      + '.sxp-item small{color:var(--muted,#8a949e);font-size:11.5px;white-space:nowrap}'
+      + '.sxp-empty{padding:10px 12px;font-size:12.5px;color:var(--muted,#8a949e)}';
+    document.head.appendChild(st);
+  }
+  function place(){
+    if(!panel || !curInput) return;
+    var r = curInput.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+    var w = Math.min(Math.max(r.width, 300), vw - 16), left = Math.min(Math.max(8, r.left), vw - w - 8);
+    var below = vh - r.bottom, h = Math.min(320, Math.max(below, r.top) - 12);
+    panel.style.width = w + 'px'; panel.style.left = left + 'px'; panel.style.maxHeight = h + 'px';
+    if(below >= 200 || below >= r.top){ panel.style.top = (r.bottom + 4) + 'px'; panel.style.bottom = ''; }
+    else { panel.style.top = ''; panel.style.bottom = (vh - r.top + 4) + 'px'; }
+    var list = panel.querySelector('.sxp-list'); if(list) list.style.maxHeight = Math.max(120, h - 52) + 'px';
+  }
+  function render(){
+    if(!panel || !curInput) return;
+    var i = lang(), q = norm(curInput.value), f = FILTERS.filter(function(x){ return x.id === curFilter; })[0] || FILTERS[0];
+    var items = EX.filter(function(e){ return (!f.groups || f.groups.indexOf(e[0]) >= 0) && (!q || norm(e[i]).indexOf(q) >= 0 || norm(e[1]).indexOf(q) >= 0); });
+    panel.innerHTML = '<div class="sxp-chips">' + FILTERS.map(function(x){ return '<button type="button" data-sxf="' + x.id + '" class="' + (x.id === curFilter ? 'on' : '') + '">' + esc(x.l[i - 1]) + '</button>'; }).join('') + '</div>'
+      + '<div class="sxp-list">' + (items.length ? items.map(function(e){ return '<div class="sxp-item" data-sxv="' + esc(e[i]) + '"><span>' + esc(e[i]) + '</span><small>' + esc(G[e[0]][i - 1]) + '</small></div>'; }).join('')
+        : '<div class="sxp-empty">' + esc(EMPTY[i - 1]) + '</div>') + '</div>';
+    place();
+  }
+  function open(inp){
+    css(); curInput = inp; inp.removeAttribute('list');
+    if(!panel){
+      panel = document.createElement('div'); panel.className = 'sxp';
+      // mousedown : choisir avant que le champ perde le focus
+      panel.addEventListener('mousedown', function(e){
+        e.preventDefault();
+        var c = e.target.closest('[data-sxf]'); if(c){ curFilter = c.dataset.sxf; render(); return; }
+        var it = e.target.closest('[data-sxv]'); if(it && curInput){ pick(it.dataset.sxv); }
+      });
+      panel.addEventListener('touchend', function(e){
+        var c = e.target.closest('[data-sxf]'); if(c){ e.preventDefault(); curFilter = c.dataset.sxf; render(); return; }
+        var it = e.target.closest('[data-sxv]'); if(it && curInput && !panel._moved){ e.preventDefault(); pick(it.dataset.sxv); }
+      });
+      panel.addEventListener('touchstart', function(){ panel._moved = false; }, { passive: true });
+      panel.addEventListener('touchmove', function(){ panel._moved = true; }, { passive: true });
+    }
+    document.body.appendChild(panel); render();
+  }
+  function pick(v){
+    var inp = curInput; close();
+    inp.value = v;
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function close(){ if(panel && panel.parentNode) panel.parentNode.removeChild(panel); curInput = null; }
+  document.addEventListener('focusin', function(e){ if(e.target.classList && e.target.classList.contains('ln-exercise')) open(e.target); });
+  document.addEventListener('input', function(e){ if(e.target === curInput) render(); });
+  document.addEventListener('focusout', function(e){ if(e.target === curInput) setTimeout(function(){ if(document.activeElement !== curInput) close(); }, 150); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && curInput) close(); });
+  window.addEventListener('resize', place);
+  document.addEventListener('scroll', function(e){ if(curInput && !(panel && panel.contains(e.target))) place(); }, true);
+
   window.SilExercises = { ensure: ensure, count: EX.length, groupOf: groupOf, groupLabel: groupLabel };
 })();

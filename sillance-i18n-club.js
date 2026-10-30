@@ -42,7 +42,7 @@
     "club.priceUpdated": `Tarif mis à jour`,
     "club.primaryActionToast": `Création de créneau / invitation, branché au back-end dans l'app réelle (démo).`,
     "club.spotsFree": `{n} places libres`,
-    "club.strengthForce": `Renfo / Force`,
+    "club.strengthForce": `Muscu / Force`,
     "club.sub.bill": `Abonnements + à la carte, encaissés par Stripe.`,
     "club.sub.dash": `Vue d'ensemble de la salle : aujourd'hui, jeudi.`,
     "club.sub.members": `Gère les formules et les coachs.`,

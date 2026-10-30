@@ -7469,7 +7469,7 @@ function lineHTML(blk, ln){
       <select class="ln-type" data-f="type">${Object.entries(LINE_TYPES).map(([k,v])=>`<option value="${k}" ${k===ln.type?'selected':''}>${v.l}</option>`).join('')}</select>
       <div class="ln-exwrap">
         <button class="ln-mswitch" data-act="metricswitch" title="${tr('builder.switchRepsTime')}">⇄</button>
-        <input type="text" class="ln-exercise" list="silExoList" autocomplete="off" placeholder="${tr('builder.exercisePlaceholder')}" value="${dispoSafe(ln.exercise||'')}" data-f="exercise">
+        <input type="text" class="ln-exercise" autocomplete="off" placeholder="${tr('builder.exercisePlaceholder')}" value="${dispoSafe(ln.exercise||'')}" data-f="exercise">
       </div>
       <div class="hx-target"><input type="number" min="1" max="100" value="${ln.reps||1}" data-f="reps"><span>${tr('builder.repsUnit')}</span></div>
       <div class="hx-weight"><input type="number" min="0" max="500" step="0.5" value="${ln.weight||0}" data-f="weight"><span>kg</span></div>
