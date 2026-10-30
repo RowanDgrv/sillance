@@ -3491,6 +3491,25 @@ function sessionNotesHTML(s){
   return `<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> ${tr('session.coachInstructionsPerInterval')}</div>${items.join('')}</div>`;
 }
 
+/* Carnet de musculation (30/10/2026) : l'athlète (ou son coach) saisit les
+   séries réellement faites ; comparées au prévu par sillance-strength.js.
+   Le verdict est aussi stocké dans session_compliance → « Qui a besoin de toi ». */
+function strengthLoggable(s){
+  return s && s.disc==='strength' && window.SilStrength && SilStrength.plannedExercises((s.blocksV2&&s.blocksV2.blocks)||[]).length>0;
+}
+function openStrengthLogger(s, after){
+  SilStrength.openLogger({ session:s, onSave:(log)=>{
+    s.strengthLog=log;
+    if(!window.PF?.user || !s.id) { if(after) after(); return Promise.resolve(); }
+    return PF.saveStrengthLog(s.id, log).then(()=>{
+      const c=SilStrength.compare((s.blocksV2&&s.blocksV2.blocks)||[], log);
+      const aid = mode==='coach' ? (typeof currentAthleteId!=='undefined' && currentAthleteId) || PF.user.id : PF.user.id;
+      if(c.verdict && PF.saveCompliance) PF.saveCompliance({ scheduled_session_id:s.id, athlete_id:aid, activity_id:null, verdict:c.verdict,
+        summary:String(((c.constats||[])[0]||{}).texte||'').slice(0,300), issues:(c.constats||[]).slice(0,6) }).catch(e=>console.warn('[muscu] compliance', e));
+      if(after) after();
+    });
+  }});
+}
 function openModal(s, dateKey){
   const D = DISC[s.disc];
   modal.style.setProperty('--c', D.color);
@@ -3525,13 +3544,17 @@ function openModal(s, dateKey){
         <div class="nutri-head"><i class="ic ic-utensils"></i> ${tr('modal.afterSession')}</div>
         <div class="nutri-txt">${n.post}</div>
       </div>`; })()}
+    ${strengthLoggable(s)&&s.strengthLog?SilStrength.renderCompare((s.blocksV2&&s.blocksV2.blocks)||[], s.strengthLog):''}
+    ${strengthLoggable(s)?`<button class="btn" id="modalStrengthLog" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-clipboard"></i> ${SilStrength.t(s.strengthLog?'editLog':'openLog')}</button>`:''}
     ${s.done?`<button class="btn" id="openAnalysis" style="width:100%;margin-bottom:9px;background:var(--swim)"><i class="ic ic-chart"></i> ${tr('modal.detailedAnalysis')}</button>`:''}
     ${canShowWatchBtn?`<button class="btn" id="modalSendWatch" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-send"></i> ${tr('watch.sendToMyWatch')}</button>`:''}
     ${!s.done?`<button class="btn" id="modalMove" style="width:100%;margin-bottom:9px;background:transparent;border:1px solid var(--line-strong);color:var(--text)"><i class="ic ic-calendar"></i> ${tr('builder.moveSession') || 'Déplacer la séance'}</button>`:''}
     <button class="btn" style="${s.done?'width:100%;background:transparent;border:1px solid var(--line-strong);color:var(--text)':''}">${s.done?tr('common.close'):tr('modal.gotItCoach')}</button>`;
   overlay.classList.add('open');
   modal.querySelector('.close').onclick = closeModal;
-  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch' && btn.id!=='modalMove') btn.onclick = closeModal; });
+  modal.querySelectorAll('.btn').forEach(btn=>{ if(btn.id!=='openAnalysis' && btn.id!=='modalSendWatch' && btn.id!=='modalMove' && btn.id!=='modalStrengthLog') btn.onclick = closeModal; });
+  const sl = modal.querySelector('#modalStrengthLog');
+  if(sl) sl.onclick = ()=>{ closeModal(); openStrengthLogger(s, ()=>{ render(); openModal(s, dateKey); }); };
   const an = modal.querySelector('#openAnalysis');
   if(an) an.onclick = ()=>{ closeModal(); openAnalysis(s); };
   const sw = modal.querySelector('#modalSendWatch');

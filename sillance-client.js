@@ -702,6 +702,11 @@ export const PF = {
     const { error } = await q;
     if (error) throw error; return true;
   },
+  // Carnet de musculation (scheduled_sessions.strength_log, 0082).
+  async saveStrengthLog(id, log) {
+    const { error } = await sb.from("scheduled_sessions").update({ strength_log: log }).eq("id", id);
+    if (error) throw error; return true;
+  },
   // Verdict de consigne d'une séance réalisée (session_compliance, 0080).
   async saveCompliance(row) {
     const { error } = await sb.from("session_compliance").upsert({ ...row, computed_at: new Date().toISOString() });
