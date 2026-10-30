@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261030c";
+import { PF } from "./sillance-client.js?v=20261030g";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -62,6 +62,14 @@ const isAdminUser = () => ADMIN_EMAILS.includes((PF.user?.email || "").toLowerCa
 const gateParams = new URLSearchParams(location.search);
 const gateMode = gateParams.get("login") === "1";
 const gateRoleParam = gateParams.get("role"); // 'coach' | 'club'
+// Lien d'équipe du coach (?coach=<token>, 0083) : mémorisé tout de suite, pour
+// survivre à la confirmation d'e-mail (le lien de confirmation ramène sur
+// l'app SANS le paramètre). Consommé après connexion (onLoggedIn).
+const coachJoinParam = /^[0-9a-f]{16,64}$/.test(gateParams.get("coach") || "") ? gateParams.get("coach") : null;
+if (coachJoinParam) { try { localStorage.setItem("sil_pending_coach", coachJoinParam); } catch {} }
+const pendingCoachToken = () => { try { return coachJoinParam || localStorage.getItem("sil_pending_coach"); } catch { return coachJoinParam; } };
+let joinGate = false;          // arrivée par le lien d'équipe : inscription athlète directe
+let joinCoachName = "";
 
 /* -------- échappement anti-XSS --------
    L'app construit son UI via innerHTML (100+ points) sans échapper. Toute
@@ -802,6 +810,7 @@ function injectStyles() {
   #pf-auth-overlay.open{display:flex}
   .pf-auth-card{width:340px;max-width:92vw;background:#11151a;border:1px solid #262c34;border-radius:16px;
     padding:26px 24px;color:#e7edf3;font-family:system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .pf-join-banner{margin:6px 0 10px;padding:10px 12px;border-radius:10px;background:rgba(70,194,216,.12);border:1px solid rgba(70,194,216,.35);color:#e7edf3;font-size:14px;line-height:1.45}
   .pf-auth-card h2{margin:0 0 4px;font:700 22px/1.1 'Oswald',system-ui;letter-spacing:.4px;text-transform:uppercase}
   .pf-auth-card p.sub{margin:0 0 18px;color:#8a949e;font-size:13px}
   .pf-auth-card label{display:block;font-size:12px;color:#8a949e;margin:12px 0 5px}
@@ -1003,18 +1012,19 @@ function renderAuth() {
                    "friend", "club_coach", "event", "other"];
   card.innerHTML = `
     <h2>Sillance</h2>
-    <p class="sub">${isUp ? tr("auth.createAccount") : tr("auth.logInToSpace")}</p>
+    ${joinGate ? `<div class="pf-join-banner">${joinCoachName ? tr("join.banner", { coach: esc(joinCoachName) }) : tr("join.bannerNoName")}</div>` : ``}
+    <p class="sub">${isUp ? (joinGate ? tr("join.sub") : tr("auth.createAccount")) : tr("auth.logInToSpace")}</p>
     ${isUp ? `
       <div class="pf-row2">
         <div><label for="pf-first">${tr("auth.firstName")}${req}</label><input id="pf-first" autocomplete="given-name" placeholder="${tr("auth.firstNamePh")}"></div>
         <div><label for="pf-last">${tr("auth.lastName")}${req}</label><input id="pf-last" autocomplete="family-name" placeholder="${tr("auth.lastNamePh")}"></div>
       </div>
-      <label>${tr("auth.iAm")}</label>
+      ${joinGate ? `` : `<label>${tr("auth.iAm")}</label>
       <div class="row-roles">
         <div class="role" data-role="coach">${tr("mode.coach")}</div>
         ${hardGate ? `` : `<div class="role" data-role="athlete">${tr("mode.athlete")}</div>`}
         <div class="role" data-role="club_admin">${tr("mode.club")}</div>
-      </div>
+      </div>`}
       ${pickedRole === "club_admin" ? `<label>${tr("auth.clubName")}</label><input id="pf-club-name" placeholder="${tr("auth.clubNamePh")}">` : ``}
       ${pickedRole === "athlete" ? `
       <div class="pf-row2">
@@ -1416,6 +1426,22 @@ async function onLoggedIn() {
   setCloudBadge(true);
   // Compte admin : cet appareil sort de la mesure d'audience (équivaut à ?moi=1).
   if (isAdminUser()) { try { localStorage.setItem("sil_noTrack", "1"); } catch {} }
+  // Lien d'équipe du coach (?coach=…, gardé en localStorage) : relie le compte
+  // à ce coach. Le nom affiché au coach est celui du profil (formulaire).
+  const ct = pendingCoachToken();
+  if (ct && PF.joinCoach) {
+    try {
+      const r = await PF.joinCoach(ct);
+      if (r && r.ok) window.toast?.(tr(r.already ? "join.already" : "join.done", { coach: esc(r.coach_name || "") }));
+      else if (r && r.error === "own_link") window.toast?.(tr("join.ownLink"));
+      else if (r && r.error) window.toast?.(tr("join.invalid"), "error");
+      if (r && (r.ok || r.error === "own_link" || r.error === "invalid_link")) {
+        try { localStorage.removeItem("sil_pending_coach"); } catch {}
+        if (coachJoinParam) { const u = new URL(location.href); u.searchParams.delete("coach"); history.replaceState(null, "", u); }
+      }
+    } catch (e) { console.warn("[PF] join-coach:", e); }
+    joinGate = false;
+  }
   // Accepte une éventuelle invitation présente dans l'URL (?invite=...).
   const tok = PF.pendingInviteToken?.();
   if (tok) { try { await PF.acceptInvite(tok); } catch (e) { console.warn("[PF] invite:", e); } }
@@ -1585,6 +1611,16 @@ function showPaymentReturnModal(success, message) {
     await PF.init();
     if (PF.user) {
       await onLoggedIn();            // session existante → on hydrate
+    } else if (coachJoinParam) {
+      // Lien d'équipe : formulaire d'inscription ATHLÈTE direct, pas de démo.
+      setCloudBadge(false);
+      joinGate = true; authMode = "signup"; pickedRole = "athlete";
+      const w = document.getElementById("welcomeOverlay"); if (w) w.style.display = "none";
+      openAuth(true);
+      PF.peekCoachLink?.(coachJoinParam).then((r) => {
+        if (r && r.coach_name) { joinCoachName = r.coach_name; renderAuth(); }
+        else if (r && r.error) { joinCoachName = ""; renderAuth(); }
+      }).catch(() => {});
     } else if (gateMode) {
       setCloudBadge(false);
       openAuth(true);                // "Connexion" landing → mur bloquant, pas de démo visible

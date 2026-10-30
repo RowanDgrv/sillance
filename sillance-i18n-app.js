@@ -674,7 +674,7 @@
     "invite.send": `Envoyer l'invitation`,
     "invite.emailSentTo": `Email envoyé à {email}. Garde ce lien de secours au cas où :`,
     "invite.copyLink": `Copie ce lien et envoie-le toi-même (WhatsApp, SMS…) :`,
-    "invite.copyLinkBtn": `Copier le lien`,
+    "invite.copyLinkBtn": `Copier le lien`, "join.banner": `<b>{coach}</b> t'invite à rejoindre son équipe sur Sillance.`, "join.bannerNoName": `Ton coach t'invite à rejoindre son équipe sur Sillance.`, "join.sub": `Crée ton compte avec ton prénom et ton nom : c'est ce que ton coach verra.`, "join.done": `C'est fait : tu es dans l'équipe de {coach}.`, "join.already": `Tu es déjà dans l'équipe de {coach}.`, "join.ownLink": `C'est ton propre lien d'équipe : partage-le à tes athlètes.`, "join.invalid": `Ce lien d'équipe n'est plus valable : demande le nouveau lien à ton coach.`, "join.teamLinkTitle": `Lien d'équipe`, "join.teamLinkSub": `Le même lien pour tous tes athlètes (groupe WhatsApp, club…). Chacun crée son compte avec son prénom et son nom et rejoint ton équipe.`, "join.loading": `Chargement…`, "join.loadError": `Lien indisponible pour l'instant.`, "join.regen": `Nouveau lien`, "join.regenConfirm": `Créer un nouveau lien ? L'ancien ne fonctionnera plus (les athlètes déjà inscrits restent dans ton équipe).`, "join.regenDone": `Nouveau lien créé : l'ancien ne fonctionne plus.`, "join.orEmail": `Ou invite une personne précise par e-mail :`, "join.waMessage": `Rejoins mon équipe sur Sillance pour retrouver ton plan d'entraînement : {url}`,
     "invite.afterJoinNote": `Une fois qu'il aura rejoint, retrouve « Fiche athlète » dans son bandeau pour renseigner VO2max, records, blessures et habitudes.`,
     "invite.waMessage": `Rejoins-moi sur Sillance pour ton suivi d'entraînement : {url}`,
 
@@ -2322,7 +2322,7 @@
     "invite.send": `Send invitation`,
     "invite.emailSentTo": `Email sent to {email}. Keep this backup link just in case:`,
     "invite.copyLink": `Copy this link and send it yourself (WhatsApp, SMS…):`,
-    "invite.copyLinkBtn": `Copy link`,
+    "invite.copyLinkBtn": `Copy link`, "join.banner": `<b>{coach}</b> invites you to join their team on Sillance.`, "join.bannerNoName": `Your coach invites you to join their team on Sillance.`, "join.sub": `Create your account with your first and last name: that's what your coach will see.`, "join.done": `Done: you're on {coach}'s team.`, "join.already": `You're already on {coach}'s team.`, "join.ownLink": `This is your own team link: share it with your athletes.`, "join.invalid": `This team link is no longer valid: ask your coach for the new one.`, "join.teamLinkTitle": `Team link`, "join.teamLinkSub": `One link for all your athletes (WhatsApp group, club…). Each one creates an account with their own name and joins your team.`, "join.loading": `Loading…`, "join.loadError": `Link unavailable right now.`, "join.regen": `New link`, "join.regenConfirm": `Create a new link? The old one will stop working (athletes already signed up stay on your team).`, "join.regenDone": `New link created: the old one no longer works.`, "join.orEmail": `Or invite one person by email:`, "join.waMessage": `Join my team on Sillance to get your training plan: {url}`,
     "invite.afterJoinNote": `Once they join, find "Athlete profile" in their band to fill in VO2max, records, injuries and habits.`,
     "invite.waMessage": `Join me on Sillance for your training tracking: {url}`,
 
@@ -3868,7 +3868,7 @@
     "invite.send": `Enviar la invitación`,
     "invite.emailSentTo": `Email enviado a {email}. Guarda este enlace de repuesto por si acaso:`,
     "invite.copyLink": `Copia este enlace y envíaselo tú mismo (WhatsApp, SMS…):`,
-    "invite.copyLinkBtn": `Copiar el enlace`,
+    "invite.copyLinkBtn": `Copiar el enlace`, "join.banner": `<b>{coach}</b> te invita a unirte a su equipo en Sillance.`, "join.bannerNoName": `Tu entrenador te invita a unirte a su equipo en Sillance.`, "join.sub": `Crea tu cuenta con tu nombre y apellido: es lo que verá tu entrenador.`, "join.done": `Hecho: estás en el equipo de {coach}.`, "join.already": `Ya estás en el equipo de {coach}.`, "join.ownLink": `Es tu propio enlace de equipo: compártelo con tus atletas.`, "join.invalid": `Este enlace de equipo ya no es válido: pide el nuevo a tu entrenador.`, "join.teamLinkTitle": `Enlace de equipo`, "join.teamLinkSub": `El mismo enlace para todos tus atletas (grupo de WhatsApp, club…). Cada uno crea su cuenta con su nombre y se une a tu equipo.`, "join.loading": `Cargando…`, "join.loadError": `Enlace no disponible por ahora.`, "join.regen": `Nuevo enlace`, "join.regenConfirm": `¿Crear un nuevo enlace? El anterior dejará de funcionar (los atletas ya inscritos siguen en tu equipo).`, "join.regenDone": `Nuevo enlace creado: el anterior ya no funciona.`, "join.orEmail": `O invita a una persona concreta por e-mail:`, "join.waMessage": `Únete a mi equipo en Sillance para ver tu plan de entrenamiento: {url}`,
     "invite.afterJoinNote": `Una vez que se una, encuentra «Ficha del atleta» en su banda para indicar VO2max, récords, lesiones y hábitos.`,
     "invite.waMessage": `Únete a mí en Sillance para tu seguimiento de entrenamiento: {url}`,
 

@@ -786,6 +786,24 @@ export const PF = {
   async inviteAthlete(email) {
     return await this._invoke("invite-athlete", { email });
   },
+  // -------- LIEN D'ÉQUIPE DU COACH (0083, join-coach) --------
+  // Un seul lien réutilisable par coach ; créé à la première demande.
+  async getMyJoinLink() {
+    let { data } = await sb.from("coach_join_links").select("token").eq("coach_id", this.user.id).maybeSingle();
+    if (!data) {
+      const ins = await sb.from("coach_join_links").insert({ coach_id: this.user.id }).select("token").single();
+      if (ins.error) throw ins.error; data = ins.data;
+    }
+    return `${location.origin}${location.pathname.replace(/[^/]*$/, "")}sillance-app.html?coach=${data.token}`;
+  },
+  // Nouveau lien : l'ancien ne fonctionne plus.
+  async regenerateJoinLink() {
+    const del = await sb.from("coach_join_links").delete().eq("coach_id", this.user.id);
+    if (del.error) throw del.error;
+    return await this.getMyJoinLink();
+  },
+  async peekCoachLink(token) { return await this._invokeSoft("join-coach", { action: "peek", token }); },
+  async joinCoach(token) { return await this._invokeSoft("join-coach", { action: "join", token }); },
   // Athlète connecté : accepte via le token (?invite=... dans l'URL).
   async acceptInvite(token) {
     return await this._invoke("accept-invite", { token });

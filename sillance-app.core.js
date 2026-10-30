@@ -4515,6 +4515,17 @@ function openInviteAthlete(){
   const formHTML=()=>`<div class="adh-modal" role="dialog" aria-label="${tr('sidebar.inviteAthlete')}">
     <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
     <h3>${tr('sidebar.inviteAthlete')}</h3>
+    ${window.PF?.user ? `<div class="join-box">
+      <b>${tr('join.teamLinkTitle')}</b>
+      <p class="adh-sub" style="margin:4px 0 8px">${tr('join.teamLinkSub')}</p>
+      <div class="invite-linkrow"><input type="text" id="joinLink" readonly value="${tr('join.loading')}"></div>
+      <div class="invite-share">
+        <button class="invite-copy cc-btn" id="joinCopy" disabled>${tr('invite.copyLinkBtn')}</button>
+        <button class="invite-wa" id="joinWa" disabled>WhatsApp</button>
+        <button class="join-regen" id="joinRegen" disabled>${tr('join.regen')}</button>
+      </div>
+    </div>
+    <p class="adh-sub" style="margin-top:14px">${tr('join.orEmail')}</p>` : ''}
     <p class="adh-sub">${tr('invite.subtitle')}</p>
     <div class="invite-linkrow">
       <input type="email" id="invAthEmail" placeholder="${tr('invite.emailPh')}" autocomplete="email">
@@ -4533,6 +4544,19 @@ function openInviteAthlete(){
     document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown',esc); } });
   };
   wireClose();
+  // Lien d'équipe (0083) : le même pour tous, chacun s'inscrit avec son nom.
+  if(window.PF?.user && PF.getMyJoinLink){
+    const inp=el.querySelector('#joinLink'), cp=el.querySelector('#joinCopy'), wa=el.querySelector('#joinWa'), rg=el.querySelector('#joinRegen');
+    const show=(url)=>{ inp.value=url; [cp,wa,rg].forEach(b=>b.disabled=false); };
+    PF.getMyJoinLink().then(show).catch(e=>{ console.warn('[PF] join link', e); inp.value=tr('join.loadError'); });
+    cp.onclick=()=>{ inp.select(); try{ navigator.clipboard.writeText(inp.value); }catch(e){ document.execCommand && document.execCommand('copy'); } toast(tr('toast.lienCopie')); };
+    wa.onclick=()=> window.open(`https://wa.me/?text=${encodeURIComponent(tr('join.waMessage', {url:inp.value}))}`, '_blank');
+    rg.onclick=()=>{
+      if(!confirm(tr('join.regenConfirm'))) return;
+      [cp,wa,rg].forEach(b=>b.disabled=true);
+      PF.regenerateJoinLink().then(url=>{ show(url); toast(tr('join.regenDone')); }).catch(e=>{ console.warn('[PF] regen', e); toast(tr('join.loadError'), 'error'); [cp,wa,rg].forEach(b=>b.disabled=false); });
+    };
+  }
   const showResult=(inviteUrl, emailed, email)=>{
     const msg = emailed
       ? `<div class="cc-s" style="color:#39e6a3;margin-bottom:8px"><i class="ic ic-check"></i> ${tr('invite.emailSentTo', {email})}</div>`
