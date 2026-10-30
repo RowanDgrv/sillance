@@ -429,7 +429,7 @@
     "guide.step2Title": `Ajoute un athlète`, "guide.step2Text": `invite-le par e-mail, il voit son plan.`,
     "guide.step3Title": `Connecte sa montre`, "guide.step3Text": `Garmin, Coros ou .FIT, ses séances remontent analysées.`,
     "guide.step4Title": `Planifie sa semaine`, "guide.step4Text": `glisse tes séances sur le calendrier.`,
-    "guide.cta": `Créer ma première séance`,
+    "guide.cta": `Créer ma première séance`, "guide.s.athlete.t": `Ajoute ton premier athlète`, "guide.s.athlete.d": `Invite-le par e-mail ou lien, ou suis-toi toi-même.`, "guide.s.athlete.btn": `Ajouter`, "guide.s.session.t": `Crée sa première séance`, "guide.s.session.d": `Dans le constructeur, en % de ses références : chacun garde ses allures.`, "guide.s.session.btn": `Créer`, "guide.s.watch.t": `Sa montre remonte ses séances`, "guide.s.watch.d": `Il connecte COROS, Polar ou Strava depuis son espace : ses activités arrivent analysées. Avec COROS, tu peux aussi lui envoyer ses séances.`, "guide.s.notifs.t": `Règle tes rappels et alertes`, "guide.s.notifs.d": `Semaine à planifier, séances manquées : choisis quand et comment être prévenu.`, "guide.s.notifs.btn": `Régler`,
 
     "invite.emailPh": `email@athlete.fr`,
     "meta.appTitle": `Sillance · Coaching triathlon`,
@@ -2077,7 +2077,7 @@
     "guide.step2Title": `Add an athlete`, "guide.step2Text": `invite them by email, they see their plan.`,
     "guide.step3Title": `Connect their watch`, "guide.step3Text": `Garmin, Coros or .FIT · their sessions sync in, analyzed.`,
     "guide.step4Title": `Plan their week`, "guide.step4Text": `drag your sessions onto the calendar.`,
-    "guide.cta": `Create my first session`,
+    "guide.cta": `Create my first session`, "guide.s.athlete.t": `Add your first athlete`, "guide.s.athlete.d": `Invite them by email or link, or coach yourself.`, "guide.s.athlete.btn": `Add`, "guide.s.session.t": `Create their first session`, "guide.s.session.d": `In the builder, in % of their references: everyone keeps their own paces.`, "guide.s.session.btn": `Create`, "guide.s.watch.t": `Their watch syncs their sessions`, "guide.s.watch.d": `They connect COROS, Polar or Strava from their space: activities arrive analysed. With COROS you can also send them their sessions.`, "guide.s.notifs.t": `Set your reminders and alerts`, "guide.s.notifs.d": `Week to plan, missed sessions: choose when and how you're notified.`, "guide.s.notifs.btn": `Set up`,
 
     "invite.emailPh": `email@athlete.com`,
     "meta.appTitle": `Sillance · Triathlon coaching`,
@@ -3623,7 +3623,7 @@
     "guide.step2Title": `Añade un atleta`, "guide.step2Text": `invítalo por email, verá su plan.`,
     "guide.step3Title": `Conecta su reloj`, "guide.step3Text": `Garmin, Coros o .FIT, sus sesiones se sincronizan analizadas.`,
     "guide.step4Title": `Planifica su semana`, "guide.step4Text": `arrastra tus sesiones al calendario.`,
-    "guide.cta": `Crear mi primera sesión`,
+    "guide.cta": `Crear mi primera sesión`, "guide.s.athlete.t": `Añade tu primer atleta`, "guide.s.athlete.d": `Invítalo por e-mail o enlace, o entrénate a ti mismo.`, "guide.s.athlete.btn": `Añadir`, "guide.s.session.t": `Crea su primera sesión`, "guide.s.session.d": `En el constructor, en % de sus referencias: cada uno conserva sus ritmos.`, "guide.s.session.btn": `Crear`, "guide.s.watch.t": `Su reloj sube sus sesiones`, "guide.s.watch.d": `Conecta COROS, Polar o Strava desde su espacio: sus actividades llegan analizadas. Con COROS también puedes enviarle sus sesiones.`, "guide.s.notifs.t": `Ajusta tus recordatorios y alertas`, "guide.s.notifs.d": `Semana por planificar, sesiones perdidas: elige cuándo y cómo recibir el aviso.`, "guide.s.notifs.btn": `Ajustar`,
 
     "invite.emailPh": `email@atleta.com`,
     "meta.appTitle": `Sillance · Coaching de triatlón`,

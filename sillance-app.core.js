@@ -877,19 +877,48 @@ function readinessAdvice(s){
 /* ---- sidebar dynamique selon le mode ---- */
 const AI_ADDON_PRICE = 12; // €/mois — add-on Assistant IA (voir plan financier)
 const sidebarContent = document.getElementById('sidebarContent');
+/* ============================================================
+   LISTE DE DÉMARRAGE DU COACH (30/10/2026)
+   ------------------------------------------------------------
+   Avant : texte figé de 4 étapes (dont une promesse Garmin fausse, et les
+   cycles mis en avant). Maintenant chaque étape se coche toute seule à
+   partir des vraies données, avec un bouton qui fait l'action :
+     1. un athlète dans le roster (ou soi-même)
+     2. une séance enregistrée (marque posée au premier enregistrement)
+     3. une activité montre reçue pour le roster (coach-needs.last_activity)
+     4. l'onglet Rappels & alertes ouvert une fois
+   Disparaît quand tout est fait ; masquable. Démo : étapes 1 et 3 vues
+   faites (roster et activités de démonstration).
+   ============================================================ */
+function sgKey(k){ return 'sil_sg_'+k+'_'+(window.PF?.user?.id||'demo'); }
+function sgMark(k){ try{ localStorage.setItem(sgKey(k),'1'); }catch(e){} }
+function sgHas(k){ try{ return localStorage.getItem(sgKey(k))==='1'; }catch(e){ return false; } }
+function coachGuideSteps(){
+  const real = rosterIsReal;
+  const hasAth = ROSTER.length>0;
+  const hasSession = sgHas('session') || Object.values(planning||{}).some(l=>(l||[]).some(x=>x && !x.creneau && (!real || /^[0-9a-f-]{36}$/i.test(String(x.id||'')))));
+  // NEEDS est déclaré plus bas (let) : accès protégé si la sidebar se rend avant
+  let hasActivity = !real;
+  try{ if(real) hasActivity = !!(NEEDS && (NEEDS.athletes||[]).some(a=>a.last_activity)); }catch(e){}
+  return [
+    {k:'athlete', done:hasAth, act:'athlete'},
+    {k:'session', done:hasSession, act:'session'},
+    {k:'watch', done:hasActivity, act:null},
+    {k:'notifs', done:sgHas('notifs') || !real, act: real?'notifs':null},
+  ];
+}
 function coachGuideHTML(){
   if(localStorage.getItem('sil_coach_guide')==='off') return '';
+  const steps=coachGuideSteps(), n=steps.filter(x=>x.done).length;
+  if(n===steps.length) return '';
+  const next=steps.find(x=>!x.done);
   return `
       <div class="startguide" id="startGuide">
-        <div class="sg-head"><b><i class="ic ic-lightbulb"></i> ${tr('guide.whereToStart')}</b><button class="sg-x" id="sgClose" title="${tr('common.hide')}"><i class="ic ic-x"></i></button></div>
-        <p class="sg-sub">${tr('guide.subtitle')}</p>
-        <ol class="sg-steps">
-          <li><b>${tr('guide.step1Title')}</b> : ${tr('guide.step1Text')}</li>
-          <li><b>${tr('guide.step2Title')}</b> : ${tr('guide.step2Text')}</li>
-          <li><b>${tr('guide.step3Title')}</b> : ${tr('guide.step3Text')}</li>
-          <li><b>${tr('guide.step4Title')}</b> : ${tr('guide.step4Text')}</li>
+        <div class="sg-head"><b><i class="ic ic-lightbulb"></i> ${tr('guide.whereToStart')} · ${n}/${steps.length}</b><button class="sg-x" id="sgClose" title="${tr('common.hide')}"><i class="ic ic-x"></i></button></div>
+        <div class="sg-prog"><i style="width:${Math.round(n/steps.length*100)}%"></i></div>
+        <ol class="sg-steps sg-live">
+          ${steps.map(x=>`<li class="${x.done?'done':''}${x===next?' next':''}"><span class="sg-dot">${x.done?'✓':''}</span><span><b>${tr('guide.s.'+x.k+'.t')}</b><br><small>${tr('guide.s.'+x.k+'.d')}</small></span>${!x.done&&x.act?`<button type="button" class="sg-go" data-sg="${x.act}">${tr('guide.s.'+x.k+'.btn')}</button>`:''}</li>`).join('')}
         </ol>
-        <button class="sg-cta" id="sgCta">${tr('guide.cta')}</button>
       </div>`;
 }
 /* ============================================================
@@ -1236,7 +1265,12 @@ function renderSidebar(){
     loadMyLibraryAndCycles();
     document.getElementById('createSessionBtn').addEventListener('click', ()=> openBuilder(null, null));
     var _sgClose=document.getElementById('sgClose'); if(_sgClose) _sgClose.onclick=function(){ localStorage.setItem('sil_coach_guide','off'); renderSidebar(); };
-    var _sgCta=document.getElementById('sgCta'); if(_sgCta) _sgCta.onclick=function(){ openBuilder(null,null); };
+    sidebarContent.querySelectorAll('[data-sg]').forEach(function(b){ b.onclick=function(){
+      var a=b.dataset.sg;
+      if(a==='athlete') openAddAthleteChoice();
+      else if(a==='session') openBuilder(null,null);
+      else if(a==='notifs' && typeof openSettings==='function') openSettings('notifs');
+    }; });
     var _adhOpen=document.getElementById('adhOpen'); if(_adhOpen) _adhOpen.onclick=openAdherence;
     var _cmpAthOpen=document.getElementById('compareAthOpen'); if(_cmpAthOpen) _cmpAthOpen.onclick=openCompareAthletes;
     var _needsOpen=document.getElementById('needsOpen'); if(_needsOpen) _needsOpen.onclick=(e)=>{ e.stopPropagation(); openNeeds(); };
@@ -2781,6 +2815,7 @@ function renderSettings(){
 }
 function openSettings(tab){
   if(tab) settingsTab=tab;
+  if(settingsTab==='notifs' && !sgHas('notifs')){ sgMark('notifs'); if(mode==='coach') setTimeout(renderSidebar, 0); }
   const nt=document.getElementById('setTabNotifs'); if(nt) nt.hidden = !(mode==='coach' && window.PF?.user);
   if(settingsTab==='notifs' && nt && nt.hidden) settingsTab='structure';
   renderSettings();
@@ -2790,7 +2825,7 @@ document.getElementById('settingsBtn').addEventListener('click', ()=> openSettin
 window.openSettings = openSettings;
 document.getElementById('settingsClose').addEventListener('click', ()=> document.getElementById('settingsOverlay').classList.remove('open'));
 document.getElementById('settingsOverlay').addEventListener('click', e=>{ if(e.target.id==='settingsOverlay') document.getElementById('settingsOverlay').classList.remove('open'); });
-document.querySelectorAll('#setNav .set-tab').forEach(b=> b.addEventListener('click', ()=>{ settingsTab=b.dataset.tab; renderSettings(); }));
+document.querySelectorAll('#setNav .set-tab').forEach(b=> b.addEventListener('click', ()=>{ settingsTab=b.dataset.tab; if(settingsTab==='notifs' && !sgHas('notifs')){ sgMark('notifs'); if(mode==='coach') renderSidebar(); } renderSettings(); }));
 
 /* ---- rendu calendrier ---- */
 const calGrid = document.getElementById('calGrid');
@@ -9605,7 +9640,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
     if(window.PF?.user){
       PF.scheduleSession(currentAthleteId || PF.user.id, k, { disc:occ.disc, title:occ.title, dur:occ.dur,
         dist:occ.dist||0, tss:occ.tss, zone:occ.zone, blocks:(occ.blocksV2&&occ.blocksV2.blocks)||[] })
-        .then(saved=>{ if(saved) occ.id = saved.id; })
+        .then(saved=>{ if(saved){ occ.id = saved.id; if(!sgHas('session')){ sgMark('session'); if(mode==='coach') renderSidebar(); } } })
         .catch(e=> scheduleFailed(e, occ, k));
     }
   });
