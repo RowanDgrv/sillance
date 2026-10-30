@@ -6383,6 +6383,16 @@ function builderTotals(){
 }
 function updateBuilderSummary(){
   const {min,tss}=builderTotals();
+  // Profil muscu (30/10/2026) : force / hypertrophie / endurance, groupes
+  // musculaires, tonnage — sillance-strength.js, règles de code.
+  const sumEl=document.getElementById('bSummary');
+  let stp=document.getElementById('bStrengthProfile');
+  if(builderState.disc==='strength' && window.SilStrength && sumEl){
+    // sous les blocs, dans la zone qui défile (pas dans le pied fixe de la fenêtre)
+    const host=document.getElementById('bBlocks')?.parentElement;
+    if(!stp && host){ stp=document.createElement('div'); stp.id='bStrengthProfile'; stp.style.marginTop='12px'; host.appendChild(stp); }
+    if(stp){ stp.hidden=false; stp.innerHTML=SilStrength.renderPlan(builderState.blocks); }
+  } else if(stp) stp.hidden=true;
   const nbBlocks=builderState.blocks.length;
   const nbLines=builderState.blocks.reduce((a,b)=>a+b.lines.length*b.series,0);
   document.getElementById('bSummary').innerHTML=tr('builder.summary', {dur:fmtDur(min), tss, nbBlocks:tr(nbBlocks>1?'builder.nBlocksPlural':'builder.nBlocksSingular', {n:nbBlocks}), nLines:nbLines});

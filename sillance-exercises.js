@@ -152,5 +152,18 @@
     dl.innerHTML = EX.map(function(e){ return '<option value="' + esc(e[i]) + '" label="' + esc(G[e[0]][gi]) + '"></option>'; }).join('');
     built = i;
   }
-  window.SilExercises = { ensure: ensure, count: EX.length };
+  /* Groupe musculaire d'un nom saisi librement (toutes langues) : nom exact,
+     sinon le nom de catalogue le plus long contenu dans la saisie
+     (« Squat bulgare haltères » → Squat bulgare → jambes). null si inconnu. */
+  function norm(x){ return String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
+  var INDEX = null;
+  function groupOf(name){
+    var n = norm(name); if(!n) return null;
+    if(!INDEX){ INDEX = []; EX.forEach(function(e){ [e[1], e[2], e[3]].forEach(function(v){ INDEX.push([norm(v), e[0]]); }); }); INDEX.sort(function(a, b){ return b[0].length - a[0].length; }); }
+    for(var i = 0; i < INDEX.length; i++){ if(INDEX[i][0] === n) return INDEX[i][1]; }
+    for(var j = 0; j < INDEX.length; j++){ var k = INDEX[j][0]; if(k.length >= 4 && (' ' + n + ' ').indexOf(' ' + k + ' ') >= 0) return INDEX[j][1]; }
+    return null;
+  }
+  function groupLabel(key){ var g = G[key]; return g ? g[lang() - 1] : null; }
+  window.SilExercises = { ensure: ensure, count: EX.length, groupOf: groupOf, groupLabel: groupLabel };
 })();
