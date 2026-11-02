@@ -961,8 +961,23 @@ export const PF = {
       .eq("id", requestId);
     if (error) throw error;
   },
-  // Habillage du club (0085) — propriétaire uniquement (RLS "clubs: owner all").
-  async saveClubTheme(clubId, theme) {
+  // Habillage du club (0085) — Rowan crée les propositions (admin-crm,
+  // service_role, vérif ADMIN_EMAILS côté serveur), le gérant choisit.
+  async adminGetClub(clubId) {
+    const { data, error } = await sb.functions.invoke("admin-crm", { body: { action: "getClub", clubId } });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    return data.club;
+  },
+  async adminSetClubThemeOptions(clubId, options) {
+    const { data, error } = await sb.functions.invoke("admin-crm", { body: { action: "setClubThemeOptions", clubId, options } });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+  },
+  // Le GÉRANT choisit l'une des propositions (ou null = style Sillance) :
+  // RLS "clubs: owner all" + trigger clubs_theme_guard (0085) qui refuse
+  // tout habillage absent de theme_options.
+  async setMyClubTheme(clubId, theme) {
     const { error } = await sb.from("clubs").update({ theme }).eq("id", clubId);
     if (error) throw error;
   },

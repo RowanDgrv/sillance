@@ -16,6 +16,7 @@
    est trop foncée ; l'interface est sombre → le fond est assombri s'il
    est trop clair. Un club ne peut donc pas rendre l'app illisible.
 
+   Modification : ADMIN uniquement (admin-crm setClubTheme, trigger 0085).
    Mise en cache locale (sil_club_theme) : appliqué dès le <head> au
    rechargement, sans flash du thème Sillance.
    ============================================================ */
@@ -42,24 +43,24 @@
   };
 
   var I18N = {
-    fr:{colors:'Couleurs', title:'Apparence du club', sub:'Les membres de ton club voient Sillance à ces couleurs.', presets:'Styles prêts à l\'emploi',
+    fr:{proposals:'Propositions pour ce club', newProp:'+ Nouvelle proposition', propName:'Nom de la proposition', propNamePh:'Ex. Braise', addProp:'Ajouter aux propositions', updateProp:'Mettre à jour la proposition', edit:'Modifier', del:'Supprimer', close:'Fermer', propSaved:'Propositions enregistrées : le gérant peut les choisir.', noProps:'Aucune proposition pour l’instant : crée la première ci-dessous.', maxProps:'8 propositions maximum par club.', pickSub:'Choisis parmi les habillages préparés pour ton club. Tes membres verront l’app à ces couleurs.', pickNone:'Aucun habillage n’a encore été préparé pour ton club. Écris à contact@sillance.app pour en obtenir un.', applyBtn:'Appliquer', sillanceStyle:'Style Sillance', applied:'Habillage appliqué : tes membres le voient à leur prochaine ouverture.', active:'Actif', studioTitle:'Habillages du club', colors:'Couleurs', title:'Apparence du club', sub:'Les membres de ce club voient Sillance à ces couleurs.', presets:'Styles prêts à l\'emploi',
         accent:'Couleur principale', accent2:'Couleur secondaire', bg:'Fond', font:'Police des titres', logo:'Logo',
         logoAdd:'Ajouter un logo', logoDel:'Retirer', save:'Enregistrer', cancel:'Annuler', reset:'Revenir au style Sillance',
-        saved:'Apparence enregistrée : tes membres la voient à leur prochaine ouverture.', err:'Enregistrement impossible.',
+        saved:'Apparence enregistrée : les membres la voient à leur prochaine ouverture.', err:'Enregistrement impossible.',
         outdated:'Apparence non enregistrée : la mise à jour de la base n\'est pas encore faite (0085).',
         adjusted:'Couleur éclaircie automatiquement pour garder les boutons lisibles.', bgAdjusted:'Fond assombri pour garder le texte lisible.',
         logoBig:'Image illisible ou trop lourde.', via:'avec Sillance', open:'Apparence', preview:'Aperçu en direct sur la page.'},
-    en:{colors:'Colours', title:'Club appearance', sub:'Your club members see Sillance in these colours.', presets:'Ready-made styles',
+    en:{proposals:'Proposals for this club', newProp:'+ New proposal', propName:'Proposal name', propNamePh:'e.g. Ember', addProp:'Add to proposals', updateProp:'Update proposal', edit:'Edit', del:'Delete', close:'Close', propSaved:'Proposals saved: the club manager can choose them.', noProps:'No proposal yet: create the first one below.', maxProps:'8 proposals maximum per club.', pickSub:'Choose from the looks prepared for your club. Your members will see the app in these colours.', pickNone:'No look has been prepared for your club yet. Write to contact@sillance.app to get one.', applyBtn:'Apply', sillanceStyle:'Sillance style', applied:'Look applied: your members will see it next time they open the app.', active:'Active', studioTitle:'Club looks', colors:'Colours', title:'Club appearance', sub:'Members of this club see Sillance in these colours.', presets:'Ready-made styles',
         accent:'Main colour', accent2:'Secondary colour', bg:'Background', font:'Heading font', logo:'Logo',
         logoAdd:'Add a logo', logoDel:'Remove', save:'Save', cancel:'Cancel', reset:'Back to the Sillance style',
-        saved:'Appearance saved: your members will see it next time they open the app.', err:'Could not save.',
+        saved:'Appearance saved: members will see it next time they open the app.', err:'Could not save.',
         outdated:'Appearance not saved: the database update has not been applied yet (0085).',
         adjusted:'Colour lightened automatically to keep buttons readable.', bgAdjusted:'Background darkened to keep text readable.',
         logoBig:'Unreadable or too large image.', via:'with Sillance', open:'Appearance', preview:'Live preview on the page.'},
-    es:{colors:'Colores', title:'Apariencia del club', sub:'Los miembros de tu club ven Sillance con estos colores.', presets:'Estilos listos',
+    es:{proposals:'Propuestas para este club', newProp:'+ Nueva propuesta', propName:'Nombre de la propuesta', propNamePh:'Ej. Brasa', addProp:'Añadir a las propuestas', updateProp:'Actualizar la propuesta', edit:'Editar', del:'Eliminar', close:'Cerrar', propSaved:'Propuestas guardadas: el responsable del club puede elegirlas.', noProps:'Aún no hay propuestas: crea la primera abajo.', maxProps:'8 propuestas como máximo por club.', pickSub:'Elige entre los estilos preparados para tu club. Tus miembros verán la app con estos colores.', pickNone:'Aún no se ha preparado ningún estilo para tu club. Escribe a contact@sillance.app para obtener uno.', applyBtn:'Aplicar', sillanceStyle:'Estilo Sillance', applied:'Estilo aplicado: tus miembros lo verán la próxima vez que abran la app.', active:'Activo', studioTitle:'Estilos del club', colors:'Colores', title:'Apariencia del club', sub:'Los miembros de este club ven Sillance con estos colores.', presets:'Estilos listos',
         accent:'Color principal', accent2:'Color secundario', bg:'Fondo', font:'Fuente de títulos', logo:'Logo',
         logoAdd:'Añadir un logo', logoDel:'Quitar', save:'Guardar', cancel:'Cancelar', reset:'Volver al estilo Sillance',
-        saved:'Apariencia guardada: tus miembros la verán la próxima vez que abran la app.', err:'No se pudo guardar.',
+        saved:'Apariencia guardada: los miembros la verán la próxima vez que abran la app.', err:'No se pudo guardar.',
         outdated:'Apariencia no guardada: la actualización de la base aún no está aplicada (0085).',
         adjusted:'Color aclarado automáticamente para que los botones sigan legibles.', bgAdjusted:'Fondo oscurecido para que el texto siga legible.',
         logoBig:'Imagen ilegible o demasiado pesada.', via:'con Sillance', open:'Apariencia', preview:'Vista previa en directo en la página.'}
@@ -89,7 +90,10 @@
     var base = PRESETS[theme.preset] || PRESETS.sillance;
     var bg = safeBg(hexOk(theme.bg) ? theme.bg : base.bg);
     return {
-      v:1, preset: PRESETS[theme.preset] ? theme.preset : 'custom',
+      v:1,
+      id: typeof theme.id === 'string' ? theme.id.slice(0, 40) : undefined,
+      label: typeof theme.label === 'string' ? theme.label.slice(0, 40) : undefined,
+      preset: PRESETS[theme.preset] ? theme.preset : 'custom',
       accent: safeAccent(hexOk(theme.accent) ? theme.accent : base.accent),
       accent2: safeOnBg(hexOk(theme.accent2) ? theme.accent2 : base.accent2, bg),
       bg: bg,
@@ -198,18 +202,28 @@
       '.cth-logo img{width:48px;height:48px;border-radius:10px;object-fit:contain;background:var(--panel-2)}' +
       '.cth-foot{position:fixed;bottom:0;right:0;width:min(380px,100%);display:flex;gap:8px;justify-content:flex-end;padding:12px 18px;background:var(--panel);border-top:1px solid var(--line)}' +
       '.cth-ghost{background:none;border:1px solid var(--line-strong);color:var(--soft);border-radius:10px;padding:8px 12px;font:inherit;font-size:13px;cursor:pointer}' +
+      '.cth-props{display:flex;flex-direction:column;gap:8px}' +
+      '.cth-prop{display:flex;align-items:center;gap:10px;border:1px solid var(--line-strong);border-radius:10px;padding:8px 10px;background:var(--ink);color:var(--text);cursor:pointer;text-align:left;font:inherit;width:100%}' +
+      '.cth-prop.on{outline:2px solid var(--accent);outline-offset:1px}' +
+      '.cth-prop img{width:28px;height:28px;border-radius:7px;object-fit:contain}' +
+      '.cth-prop .sw{display:flex;gap:3px}.cth-prop .sw i{width:12px;height:12px;border-radius:50%}' +
+      '.cth-prop .nm{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+      '.cth-prop .act{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}' +
+      '.cth-prop .ops{display:flex;gap:4px}.cth-prop .ops button{background:none;border:1px solid var(--line-strong);color:var(--soft);border-radius:7px;padding:3px 7px;font:inherit;font-size:11.5px;cursor:pointer}' +
+      '.cth-name{width:100%;box-sizing:border-box;background:var(--panel-2);color:var(--text);border:1px solid var(--line-strong);border-radius:8px;height:36px;padding:0 10px;font:inherit;font-size:14px}' +
+      '.cth-empty{color:var(--muted);font-size:12.5px}' +
       '.cth-link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:12px;cursor:pointer;padding:0;margin-top:14px}';
     document.head.appendChild(st);
   }
 
-  function apply(theme, name){
+  function apply(theme, name, o){
     var th = normalize(theme);
     if(!th){ clearVars(); current = null; }
     else {
       th.preset === 'sillance' ? clearVars() : setVars(th);   // style Sillance : variables d'origine, mais logo + nom du club
       current = {theme: th, name: name};
     }
-    try { current ? localStorage.setItem(KEY, JSON.stringify(current)) : localStorage.removeItem(KEY); } catch(_){}
+    if(!o || o.persist !== false){ try { current ? localStorage.setItem(KEY, JSON.stringify(current)) : localStorage.removeItem(KEY); } catch(_){} }
     injectCss();
     if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderBrand, {once:true});
     else renderBrand();
@@ -237,16 +251,30 @@
     });
   }
 
-  /* ---------- éditeur (propriétaire du club) ---------- */
-  // opts = { name, theme, onSave(theme) → Promise }
+  function swatches(th){
+    return '<span class="sw"><i style="background:' + th.accent + '"></i><i style="background:' + th.accent2 + '"></i><i style="background:' + th.bg + ';outline:1px solid var(--line-strong)"></i></span>';
+  }
+  function errText(err){
+    return /theme|column|schema/i.test(String(err && err.message)) ? t('outdated') : t('err') + (err && err.message ? ' (' + err.message + ')' : '');
+  }
+
+  /* ---------- atelier ADMIN : créer les propositions d'un club ----------
+     opts = { name, proposals:[theme], active:theme|null, persist:false,
+              onSaveProposals(list) → Promise, onClose() }                 */
   function openEditor(opts){
     injectCss();
     var before = current ? JSON.parse(JSON.stringify(current)) : null;
-    var st = normalize(opts.theme) || normalize({preset:'sillance'});
+    var list = (opts.proposals || []).map(normalize).filter(Boolean);
+    var activeId = opts.active && opts.active.id;
+    var editingId = null;
+    var st = normalize({preset:'feu'});
     var ov = document.createElement('div');
     ov.className = 'cth-ov';
-    ov.innerHTML = '<div class="cth" role="dialog" aria-modal="true" aria-label="' + esc(t('title')) + '">'
-      + '<h3>' + esc(t('title')) + '</h3><p class="cth-sub">' + esc(t('sub')) + ' ' + esc(t('preview')) + '</p>'
+    ov.innerHTML = '<div class="cth" role="dialog" aria-modal="true" aria-label="' + esc(t('studioTitle')) + '">'
+      + '<h3>' + esc(t('studioTitle')) + ' · ' + esc(opts.name) + '</h3><p class="cth-sub">' + esc(t('preview')) + '</p>'
+      + '<div class="cth-lbl">' + esc(t('proposals')) + '</div><div class="cth-props"></div>'
+      + '<button type="button" class="cth-ghost cth-new" style="margin-top:8px">' + esc(t('newProp')) + '</button>'
+      + '<div class="cth-lbl">' + esc(t('propName')) + '</div><input class="cth-name" maxlength="40" placeholder="' + esc(t('propNamePh')) + '">'
       + '<div class="cth-lbl">' + esc(t('presets')) + '</div><div class="cth-presets"></div>'
       + '<div class="cth-lbl">' + esc(t('logo')) + '</div><div class="cth-logo"><img alt="" hidden><label class="cth-ghost">' + esc(t('logoAdd'))
       + '<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label><button type="button" class="cth-ghost cth-logo-del" hidden>' + esc(t('logoDel')) + '</button></div>'
@@ -258,14 +286,23 @@
       + Object.keys(FONTS).map(function(f){ return '<option value="' + f + '" style="font-family:\'' + f + '\'">' + f + '</option>'; }).join('')
       + '</select></div>'
       + '<div class="cth-note" aria-live="polite"></div>'
-      + '<button type="button" class="cth-link cth-reset">' + esc(t('reset')) + '</button>'
-      + '<div class="cth-foot"><button type="button" class="cth-ghost cth-cancel">' + esc(t('cancel')) + '</button>'
-      + '<button type="button" class="btn cth-save">' + esc(t('save')) + '</button></div></div>';
+      + '<div class="cth-foot"><button type="button" class="cth-ghost cth-cancel">' + esc(t('close')) + '</button>'
+      + '<button type="button" class="btn cth-save"></button></div></div>';
     document.body.appendChild(ov);
     Object.keys(FONTS).forEach(loadFont);
 
-    var q = function(s){ return ov.querySelector(s); };
+    var q = function(sel){ return ov.querySelector(sel); };
     var note = q('.cth-note');
+    function renderList(){
+      q('.cth-props').innerHTML = list.length ? list.map(function(th){
+        return '<div class="cth-prop' + (th.id === editingId ? ' on' : '') + '" data-id="' + esc(th.id) + '">'
+          + (th.logo ? '<img alt="" src="' + th.logo + '">' : '') + swatches(th)
+          + '<span class="nm" style="font-family:\'' + th.font + '\'">' + esc(th.label || '—') + '</span>'
+          + (th.id === activeId ? '<span class="act">' + esc(t('active')) + '</span>' : '')
+          + '<span class="ops"><button type="button" data-op="edit">' + esc(t('edit')) + '</button><button type="button" data-op="del">' + esc(t('del')) + '</button></span></div>';
+      }).join('') : '<div class="cth-empty">' + esc(t('noProps')) + '</div>';
+      q('.cth-save').textContent = editingId ? t('updateProp') : t('addProp');
+    }
     function sync(){
       ov.querySelectorAll('input[type=color]').forEach(function(i){ i.value = st[i.dataset.k]; });
       q('select[data-k=font]').value = st.font;
@@ -277,18 +314,47 @@
         return '<button type="button" class="cth-pre' + (st.preset === k ? ' on' : '') + '" data-p="' + k + '" style="background:' + p.bg + '">'
           + '<i style="background:' + p.accent + '"></i><i style="background:' + p.accent2 + '"></i><br><span style="font-family:\'' + p.font + '\';font-size:14px">' + esc(p.label) + '</span></button>';
       }).join('');
+      renderList();
     }
     function preview(raw){
-      var asked = {accent: raw.accent, accent2: raw.accent2, bg: raw.bg};
+      var asked = {accent: raw.accent, bg: raw.bg};
       st = normalize(raw);
       var msgs = [];
       if(asked.accent && st.accent.toLowerCase() !== asked.accent.toLowerCase()) msgs.push(t('adjusted'));
       if(asked.bg && st.bg.toLowerCase() !== asked.bg.toLowerCase()) msgs.push(t('bgAdjusted'));
       note.textContent = msgs.join(' ');
-      apply(st, opts.name);
+      apply(st, opts.name, {persist: opts.persist});
       sync();
     }
-    sync();
+    function startNew(){
+      editingId = null; q('.cth-name').value = '';
+      var p = PRESETS.feu;
+      preview({preset:'feu', accent:p.accent, accent2:p.accent2, bg:p.bg, font:p.font, logo: st.logo});
+    }
+    function persist(newList, okMsg){
+      var btn = q('.cth-save'); btn.disabled = true;
+      return Promise.resolve(opts.onSaveProposals(newList)).then(function(){
+        list = newList;
+        if(activeId && !list.some(function(x){ return x.id === activeId; })) activeId = null;
+        btn.disabled = false; renderList();
+        window.toast && window.toast(okMsg || t('propSaved'));
+      }).catch(function(err){ btn.disabled = false; note.textContent = errText(err); });
+    }
+    preview(st);
+    q('.cth-new').addEventListener('click', startNew);
+    q('.cth-props').addEventListener('click', function(e){
+      var row = e.target.closest('[data-id]'); if(!row) return;
+      var th = list.find(function(x){ return x.id === row.dataset.id; }); if(!th) return;
+      var op = e.target.closest('[data-op]');
+      if(op && op.dataset.op === 'del'){
+        if(!confirm(t('del') + ' « ' + (th.label || '') + ' » ?')) return;
+        if(editingId === th.id) editingId = null;
+        persist(list.filter(function(x){ return x.id !== th.id; }));
+        return;
+      }
+      editingId = th.id; q('.cth-name').value = th.label || '';
+      preview(th);
+    });
     q('.cth-presets').addEventListener('click', function(e){
       var b = e.target.closest('[data-p]'); if(!b) return;
       var p = PRESETS[b.dataset.p];
@@ -305,22 +371,75 @@
         .catch(function(){ note.textContent = t('logoBig'); });
     });
     q('.cth-logo-del').addEventListener('click', function(){ preview(Object.assign({}, st, {logo: null})); });
-    q('.cth-reset').addEventListener('click', function(){ var p = PRESETS.sillance; preview({preset:'sillance', accent:p.accent, accent2:p.accent2, bg:p.bg, font:p.font, logo: st.logo}); });
+    function close(){
+      before ? apply(before.theme, before.name, {persist: opts.persist}) : apply(null, '', {persist: opts.persist});
+      ov.remove();
+      if(opts.onClose) opts.onClose();
+    }
+    q('.cth-cancel').addEventListener('click', close);
+    ov.addEventListener('click', function(e){ if(e.target === ov) close(); });
+    q('.cth-save').addEventListener('click', function(){
+      if(!editingId && list.length >= 8){ note.textContent = t('maxProps'); return; }
+      var label = q('.cth-name').value.trim() || ('Proposition ' + (list.length + 1));
+      var item = Object.assign({}, st, {id: editingId || ('p' + Date.now().toString(36)), label: label});
+      var newList = editingId ? list.map(function(x){ return x.id === editingId ? item : x; }) : list.concat([item]);
+      editingId = item.id;
+      persist(newList);
+    });
+  }
+
+  /* ---------- sélecteur du GÉRANT : choisir parmi les propositions ----------
+     opts = { name, options:[theme], active:theme|null, onPick(theme|null) → Promise } */
+  function openPicker(opts){
+    injectCss();
+    var before = current ? JSON.parse(JSON.stringify(current)) : null;
+    var options = (opts.options || []).filter(function(o){ return o && o.id; });
+    var chosen = opts.active && opts.active.id ? opts.active.id : '';
+    var ov = document.createElement('div');
+    ov.className = 'cth-ov';
+    ov.innerHTML = '<div class="cth" role="dialog" aria-modal="true" aria-label="' + esc(t('title')) + '">'
+      + '<h3>' + esc(t('title')) + '</h3><p class="cth-sub">' + esc(options.length ? t('pickSub') : t('pickNone')) + '</p>'
+      + '<div class="cth-props"></div><div class="cth-note" aria-live="polite"></div>'
+      + '<div class="cth-foot"><button type="button" class="cth-ghost cth-cancel">' + esc(t('cancel')) + '</button>'
+      + (options.length ? '<button type="button" class="btn cth-save">' + esc(t('applyBtn')) + '</button>' : '') + '</div></div>';
+    document.body.appendChild(ov);
+    var q = function(sel){ return ov.querySelector(sel); };
+    options.forEach(function(o){ loadFont(o.font); });
+    function render(){
+      var sil = PRESETS.sillance;
+      q('.cth-props').innerHTML = options.length ? ['<div class="cth-prop' + (chosen === '' ? ' on' : '') + '" data-id="">' + swatches(sil)
+        + '<span class="nm">' + esc(t('sillanceStyle')) + '</span></div>'].concat(options.map(function(o){
+          var th = normalize(o);
+          return '<div class="cth-prop' + (chosen === o.id ? ' on' : '') + '" data-id="' + esc(o.id) + '">'
+            + (th.logo ? '<img alt="" src="' + th.logo + '">' : '') + swatches(th)
+            + '<span class="nm" style="font-family:\'' + th.font + '\'">' + esc(o.label || '—') + '</span>'
+            + (opts.active && opts.active.id === o.id ? '<span class="act">' + esc(t('active')) + '</span>' : '') + '</div>';
+        })).join('') : '';
+    }
+    render();
+    q('.cth-props').addEventListener('click', function(e){
+      var row = e.target.closest('[data-id]'); if(!row) return;
+      chosen = row.dataset.id;
+      var o = options.find(function(x){ return x.id === chosen; });
+      o ? apply(o, opts.name) : apply({preset:'sillance'}, opts.name);
+      render();
+    });
     function close(restore){
       if(restore) before ? apply(before.theme, before.name) : apply(null);
       ov.remove();
     }
     q('.cth-cancel').addEventListener('click', function(){ close(true); });
     ov.addEventListener('click', function(e){ if(e.target === ov) close(true); });
-    q('.cth-save').addEventListener('click', function(){
-      var btn = q('.cth-save'); btn.disabled = true;
-      Promise.resolve(opts.onSave(st)).then(function(){
+    var save = q('.cth-save');
+    if(save) save.addEventListener('click', function(){
+      save.disabled = true;
+      // l'objet EXACT de la proposition (le trigger 0085 compare à theme_options)
+      var o = options.find(function(x){ return x.id === chosen; }) || null;
+      Promise.resolve(opts.onPick(o)).then(function(){
+        o ? apply(o, opts.name) : apply(null);
         close(false);
-        window.toast && window.toast(t('saved'));
-      }).catch(function(err){
-        btn.disabled = false;
-        note.textContent = /theme|column|schema/i.test(String(err && err.message)) ? t('outdated') : t('err');
-      });
+        window.toast && window.toast(t('applied'));
+      }).catch(function(err){ save.disabled = false; q('.cth-note').textContent = errText(err); });
     });
   }
 
@@ -334,5 +453,5 @@
     else if(cached && cached.theme) apply(cached.theme, cached.name);
   } catch(_){}
 
-  window.SilClubTheme = { PRESETS: PRESETS, FONTS: FONTS, apply: apply, clear: clear, openEditor: openEditor, normalize: normalize, label: function(){ return t('open'); } };
+  window.SilClubTheme = { PRESETS: PRESETS, FONTS: FONTS, apply: apply, clear: clear, openEditor: openEditor, openPicker: openPicker, normalize: normalize, label: function(){ return t('open'); } };
 })();

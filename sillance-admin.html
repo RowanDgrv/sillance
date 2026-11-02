@@ -519,7 +519,7 @@ function renderPanel() {
     const hasBox = document.getElementById("pClubHasBox");
     const createBox = document.getElementById("pClubCreateBox");
     if (u.club) {
-      hasBox.innerHTML = `<div class="psec-hint manual">Gère le club <b>${esc(u.club.name)}</b>.</div>`;
+      hasBox.innerHTML = `<div class="psec-hint manual">Gère le club <b>${esc(u.club.name)}</b>. <a href="./sillance-app.html?habillage=${encodeURIComponent(u.club.id)}" target="_blank" rel="noopener" style="color:inherit;font-weight:700;margin-left:6px">Habillage du club →</a></div>`;
       hasBox.hidden = false;
       createBox.hidden = true;
     } else {

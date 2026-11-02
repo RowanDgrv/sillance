@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261102a";
+import { PF } from "./sillance-client.js?v=20261102c";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -199,15 +199,16 @@ function hideHydrateLoader() {
 // l'app — extrait de la section "club" de hydrate() pour être rejouable
 // depuis le sélecteur de club (renderClubSwitcher) sans repasser par toute
 // l'hydratation. `app`/`uid` passés en paramètres (locaux à hydrate()).
-// Habillage du club (0085) : appliqué à tous ceux qui voient ce club ; seul
-// le propriétaire a le bouton « Apparence » (RLS : lui seul peut écrire).
+// Habillage du club (0085) : appliqué à tous ceux qui voient ce club.
+// Rowan crée les propositions (page admin → « Habillage du club → » →
+// ?habillage=<club>) ; le GÉRANT choisit parmi elles (bouton « Apparence »).
 function applyClubTheme(club, uid) {
   const T = window.SilClubTheme;
-  if (!T) return;
+  if (!T || sessionStorage.getItem("sil_habillage")) return;   // atelier admin en cours
   T.apply(club?.theme ?? null, club?.name ?? "");
-  const head = document.querySelector("#clubPanel .club-head > div");
   let btn = document.getElementById("clubThemeBtn");
-  if (!club || club.owner_id !== uid) { btn?.remove(); return; }
+  if (!club || !uid || club.owner_id !== uid) { btn?.remove(); return; }
+  const head = document.querySelector("#clubPanel .club-head > div");
   if (!btn && head) {
     btn = document.createElement("button");
     btn.id = "clubThemeBtn";
@@ -218,10 +219,35 @@ function applyClubTheme(club, uid) {
   }
   if (!btn) return;
   btn.innerHTML = `<i class="ic ic-edit-3"></i> ${T.label()}`;
-  btn.onclick = () => T.openEditor({
-    name: club.name, theme: club.theme,
-    onSave: async (theme) => { await PF.saveClubTheme(club.id, theme); club.theme = theme; },
+  btn.onclick = () => T.openPicker({
+    name: club.name, options: club.theme_options || [], active: club.theme,
+    onPick: async (theme) => { await PF.setMyClubTheme(club.id, theme); club.theme = theme; },
   });
+}
+// Atelier de l'admin, dans la vraie app : il voit exactement ce que verront
+// les membres. Rien n'est mis en cache sur son propre compte.
+async function openAdminThemeEditor() {
+  const clubId = new URLSearchParams(location.search).get("habillage");
+  const T = window.SilClubTheme;
+  if (!clubId || !T || !isAdminUser()) return;
+  sessionStorage.setItem("sil_habillage", clubId);
+  const done = () => {
+    sessionStorage.removeItem("sil_habillage");
+    T.apply(null, "", { persist: false });
+    history.replaceState(null, "", location.pathname);
+  };
+  try {
+    const club = await PF.adminGetClub(clubId);
+    T.openEditor({
+      name: club.name, proposals: club.theme_options || [], active: club.theme,
+      persist: false, onClose: done,
+      onSaveProposals: (list) => PF.adminSetClubThemeOptions(club.id, list),
+    });
+  } catch (e) {
+    console.warn("[PF] habillage admin :", e);
+    window.toast?.("Club introuvable ou accès refusé.");
+    done();
+  }
 }
 
 async function loadClubData(club, app, uid) {
@@ -468,7 +494,7 @@ async function hydrate() {
         if (el) el.textContent = tr("club.myClubFallback");
         renderClubSwitcher(clubs, null);
         // Athlète membre d'un club : il voit l'app aux couleurs de son club.
-        applyClubTheme(await PF.myMemberClub().catch(() => null), uid);
+        applyClubTheme(await PF.myMemberClub().catch(() => null));
         return;
       }
       const savedId = localStorage.getItem("sil_active_club");
@@ -1486,6 +1512,7 @@ async function onLoggedIn() {
     } catch (e) { console.warn("[PF] join club:", e); }
   }
   await hydrate();
+  openAdminThemeEditor().catch(() => {});
   checkPaymentReturn();
   checkDeviceReturn();
   askNameIfMissing();
