@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261030h";
+import { PF } from "./sillance-client.js?v=20261102a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -199,8 +199,34 @@ function hideHydrateLoader() {
 // l'app — extrait de la section "club" de hydrate() pour être rejouable
 // depuis le sélecteur de club (renderClubSwitcher) sans repasser par toute
 // l'hydratation. `app`/`uid` passés en paramètres (locaux à hydrate()).
+// Habillage du club (0085) : appliqué à tous ceux qui voient ce club ; seul
+// le propriétaire a le bouton « Apparence » (RLS : lui seul peut écrire).
+function applyClubTheme(club, uid) {
+  const T = window.SilClubTheme;
+  if (!T) return;
+  T.apply(club?.theme ?? null, club?.name ?? "");
+  const head = document.querySelector("#clubPanel .club-head > div");
+  let btn = document.getElementById("clubThemeBtn");
+  if (!club || club.owner_id !== uid) { btn?.remove(); return; }
+  if (!btn && head) {
+    btn = document.createElement("button");
+    btn.id = "clubThemeBtn";
+    btn.type = "button";
+    btn.className = "cth-ghost";
+    btn.style.marginTop = "10px";
+    head.appendChild(btn);
+  }
+  if (!btn) return;
+  btn.innerHTML = `<i class="ic ic-edit-3"></i> ${T.label()}`;
+  btn.onclick = () => T.openEditor({
+    name: club.name, theme: club.theme,
+    onSave: async (theme) => { await PF.saveClubTheme(club.id, theme); club.theme = theme; },
+  });
+}
+
 async function loadClubData(club, app, uid) {
   window.__pf_clubId = club.id;   // exposé pour les écritures (création créneau)
+  applyClubTheme(club, uid);
   const [members, creneaux, attendance, competitions] = await Promise.all([
     PF.getClubMembers(club.id),
     PF.getCreneaux(club.id),
@@ -441,6 +467,8 @@ async function hydrate() {
         const el = document.getElementById("clubName");
         if (el) el.textContent = tr("club.myClubFallback");
         renderClubSwitcher(clubs, null);
+        // Athlète membre d'un club : il voit l'app aux couleurs de son club.
+        applyClubTheme(await PF.myMemberClub().catch(() => null), uid);
         return;
       }
       const savedId = localStorage.getItem("sil_active_club");

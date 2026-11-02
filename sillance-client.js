@@ -961,6 +961,21 @@ export const PF = {
       .eq("id", requestId);
     if (error) throw error;
   },
+  // Habillage du club (0085) — propriétaire uniquement (RLS "clubs: owner all").
+  async saveClubTheme(clubId, theme) {
+    const { error } = await sb.from("clubs").update({ theme }).eq("id", clubId);
+    if (error) throw error;
+  },
+  // Club dont je suis MEMBRE (athlète) — pour lui appliquer l'habillage du
+  // club. Lecture via la policy "clubs: member reads" (is_club_member).
+  async myMemberClub() {
+    if (!this.user) return null;
+    const { data, error } = await sb.from("club_members")
+      .select("club_id, clubs(id, name, theme)")
+      .eq("athlete_id", this.user.id).limit(5);
+    if (error) { console.warn("[PF] lecture club membre échouée :", error.message); return null; }
+    return (data ?? []).map((r) => r.clubs).find(Boolean) ?? null;
+  },
   async getClubMembers(clubId) {
     // profiles(full_name,email) : un membre rejoint via accept-club-invite n'a
     // pas toujours de display_name posé (fix 0057/accept-club-invite côté
