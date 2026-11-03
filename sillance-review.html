@@ -2052,6 +2052,8 @@ body[data-analysis="open"]:not([data-athview="stats"]) .analysis-bar{display:fle
 .ln-dur{display:flex;align-items:center;gap:var(--space-1)}
 .ln-dur input{width:46px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
   font-family:var(--font-data);font-size:12.5px;text-align:center;padding:6px var(--space-1)}
+/* distance (m) : jusqu'à 5 chiffres (10000) — 46 px coupait « 1000 » en « 10 » (03/11/2026) */
+.ln-dur input[data-f="dist"]{width:72px}
 .ln-dur span{font-size:var(--fs-sm);color:var(--muted)}
 .ln-mswitch{width:20px;height:20px;flex:none;border:1px solid var(--line-strong);border-radius:6px;background:var(--panel-2);
   color:var(--swim);font-size:var(--fs-sm);font-weight:700;padding:0;display:grid;place-items:center;transition:.15s}

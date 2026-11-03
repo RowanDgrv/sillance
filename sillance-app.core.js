@@ -8601,16 +8601,40 @@ function zoneMidPct(modelKey, zoneIdx){
 function parseRunBikeShorthandSegment(raw, isFirst){
   const txt = raw.trim();
   if(!txt) return null;
+  // Fractionné court « 30/30 », « 10x45/15 », « 8x30"/30" » : secondes
+  // d'effort / secondes de récup (03/11/2026). Intensité par défaut :
+  // vitesse (zone 6), sauf mot-clé contraire dans la suite du segment.
+  let ff = txt.match(/^(?:(\d+)\s*[x×]\s*)?(\d{1,3})\s*(?:"|''|s)?\s*\/\s*(\d{1,3})\s*(?:"|''|s)?(?=\s|$)(.*)$/i);
+  if(ff){
+    let zone=null; for(const [re,z] of RUNBIKE_ZONE_KEYWORDS){ if(re.test(ff[4])){ zone=z; break; } }
+    return { reps:Math.max(1,+(ff[1]||1)), metric:'time', dist:0, h:0, mins:0, secs:+ff[2], type:'exo', zone: zone||6, restSec:+ff[3] };
+  }
   // répétitions ("6x3'", "10x400m") : toujours en tête du segment.
   let reps=1, rest=txt;
   let m = txt.match(/^(\d+)\s*[x×]\s*/i);
   if(m){ reps=Math.max(1,+m[1]); rest=txt.slice(m[0].length); }
 
+  // Clause de récupération entre répétitions, RETIRÉE du texte avant de
+  // lire l'effort (03/11/2026, retour Rowan) : sinon le mot « récup » de
+  // « 5x5' seuil récup 2' » faisait de tout l'effort une récupération, et
+  // les 2' n'étaient qu'une note (ni sur la montre ni dans la durée).
+  //   « r2' » « récup 2' » « repos 2min » = minutes ; « r1'30 » = 1 min 30 ;
+  //   « repos 90 » « récup 45s » = secondes.
+  let restSec=null;
+  const RK = '(?:\\b(?:repos|r[ée]cup(?:[ée]ration)?|passif)\\b|\\br(?=\\s*\\d))';
+  let rr = rest.match(new RegExp(RK + "\\s*:?\\s*(\\d{1,3})\\s*(?:'|min\\b|mn\\b)\\s*(\\d{1,2})?\\s*(?:\"|'')?", 'i'));
+  if(rr){ restSec = (+rr[1])*60 + (+(rr[2]||0)); }
+  else {
+    rr = rest.match(new RegExp(RK + "\\s*:?\\s*(\\d{1,3})\\s*(?:s\\b|sec\\b|\"|'')?", 'i'));
+    if(rr) restSec = +rr[1];
+  }
+  if(rr) rest = (rest.slice(0, rr.index) + ' ' + rest.slice(rr.index + rr[0].length)).trim();
+
   // distance/durée : n'importe où dans le segment, PAS forcément en tête —
   // contrairement à la natation ("200m échauffement"), le coach course/vélo
   // tape souvent le mot-clé d'abord ("footing 40'", cf. spec 19/10/2026).
   // Recherche dans l'ordre : heures composées, km, m, puis minutes/apostrophe.
-  let metric=null, dist=0, h=0, mins=0;
+  let metric=null, dist=0, h=0, mins=0, secs=0;
   let dm = rest.match(/(\d+)\s*h\s*(\d{1,2})?\b/i);            // "1h30"
   if(dm){ metric='time'; h=+dm[1]; mins=+(dm[2]||0); }
   else {
@@ -8620,38 +8644,45 @@ function parseRunBikeShorthandSegment(raw, isFirst){
       dm = rest.match(/(\d+)\s*m\b(?!in)/i);                    // "400m" (pas "min")
       if(dm){ metric='dist'; dist=+dm[1]; }
       else {
-        // \b DANS l'alternative (pas après le groupe) : après une apostrophe
-        // suivie d'un espace, les deux caractères sont non-mot donc \b ne
-        // matche jamais à cette frontière — "40' " ne matchait pas avant.
-        dm = rest.match(/(\d+)\s*(?:'|min(?:ute)?s?\b)/i);      // "40'" / "40min"
-        if(dm){ metric='time'; mins=+dm[1]; }
+        dm = rest.match(/(\d+)\s*(?:'|min(?:ute)?s?\b)\s*(\d{1,2})?/i);   // "40'" / "40min" / "3'30"
+        if(dm){ metric='time'; mins=+dm[1]; secs=+(dm[2]||0); }
+        else {
+          dm = rest.match(/(\d{1,3})\s*(?:"|''|s\b|sec\b)/i);   // "45s" / "30''"
+          if(dm){ metric='time'; secs=+dm[1]; }
+        }
       }
     }
   }
+  // « récup 2' » seul sur sa ligne : la clause de repos a tout absorbé →
+  // c'est une récupération autonome (rattachée au bloc précédent si besoin).
+  if(!metric && restSec) return { reps, metric:'time', dist:0, h:0, mins:Math.floor(restSec/60), secs:restSec%60, type:'recov', zone:1, restSec:null };
   if(!metric) return {unparsed:txt};
-
-  let type=null;
-  for(const [re,t] of RUNBIKE_TYPE_KEYWORDS){ if(re.test(rest)){ type=t; break; } }
-  if(!type) type = isFirst ? 'warmup' : 'exo';
 
   let zone=null;
   for(const [re,z] of RUNBIKE_ZONE_KEYWORDS){ if(re.test(rest)){ zone=z; break; } }
-  if(!zone) zone=2; // "footing" seul, ou aucun mot-clé d'intensité → endurance
 
-  // repos entre répétitions : "r2'"/"récup 2'" = minutes, "repos 90" = secondes.
-  // Pas de notation composée "r1'30" en v1 (lu comme 1min) — même limite
-  // assumée que le "pas de répétitions imbriquées" du parseur natation.
-  let restSec=null;
-  let rr = rest.match(/(?:repos|r[ée]cup(?:[ée]ration)?|passif|\br)\D{0,4}(\d{1,3})\s*(?:'|min)/i);
-  if(rr) restSec = (+rr[1])*60;
-  else { rr = rest.match(/(?:repos|r[ée]cup(?:[ée]ration)?|passif)\D{0,6}(\d{1,3})/i); if(rr) restSec = +rr[1]; }
+  // sans mot-clé de type : échauffement seulement pour une 1ʳᵉ ligne
+  // simple et facile (« 20' footing ») — « 5x5' seuil » en tête de séance
+  // est un effort, pas un échauffement.
+  let type=null;
+  for(const [re,t] of RUNBIKE_TYPE_KEYWORDS){ if(re.test(rest)){ type=t; break; } }
+  if(!type) type = (isFirst && reps===1 && (!zone || zone<=2)) ? 'warmup' : 'exo';
 
-  return { reps, metric, dist, h, mins, type, zone, restSec };
+  if(!zone) zone = (type==='recov' || type==='cooldown') ? 1 : 2; // "footing" seul, ou aucun mot-clé d'intensité → endurance
+
+  return { reps, metric, dist, h, mins, secs, type, zone, restSec };
 }
 function parseRunBikeShorthand(text, disc){
   const segments = String(text||'').split(/\n|\+|,/).map(s=>s.trim()).filter(Boolean);
   const blocks=[]; const unparsed=[];
   const def = {run:'vma', bike:'ftp'}[disc] || 'vma';
+  const timeLine = (type, secsTotal, zone)=>{
+    const ln = defaultLine(type, disc);
+    ln.metric = 'time';
+    ln.dur = {h:Math.floor(secsTotal/3600), m:Math.floor((secsTotal%3600)/60), s:secsTotal%60};
+    ln.model = def; ln.pct = zoneMidPct(def, zone); ln.rpe = rpeFromPct(ln.pct);
+    return ln;
+  };
   segments.forEach((seg,i)=>{
     const p = parseRunBikeShorthandSegment(seg, i===0);
     if(!p) return;
@@ -8659,12 +8690,21 @@ function parseRunBikeShorthand(text, disc){
     const work = defaultLine(p.type, disc);
     work.metric = p.metric;
     if(p.metric==='dist') work.dist = p.dist;
-    else work.dur = {h:p.h, m:p.mins, s:0};
+    else work.dur = {h:p.h, m:p.mins, s:p.secs||0};
     work.model = def;
     work.pct = zoneMidPct(def, p.zone);
     work.rpe = rpeFromPct(work.pct);
-    if(p.restSec) work.note = tr('builder.shorthandRestNote', {sec:p.restSec});
-    blocks.push({bid:'b'+(builderUid++), series:p.reps, title:'', lines:[work]});
+    // « 6x1000m seuil » puis « 2' récup » sur la ligne suivante : la récup
+    // rejoint le bloc de répétitions (répétée avec l'effort), au lieu de
+    // devenir un bloc isolé joué une seule fois après les 6 efforts.
+    const prev = blocks[blocks.length-1];
+    if(p.type==='recov' && p.reps===1 && prev && prev.series>1 && prev.lines.length===1){
+      prev.lines.push(work);
+      return;
+    }
+    const lines = [work];
+    if(p.restSec) lines.push(timeLine('recov', p.restSec, 1));
+    blocks.push({bid:'b'+(builderUid++), series:p.reps, title:'', lines});
   });
   return {blocks, unparsed};
 }
