@@ -526,6 +526,8 @@ export const PF = {
       athlete_id: athleteId, created_by: this.user.id, date: dateIso,
       disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,
       zone: s.zone, blocks: s.blocks ?? [], source_session_id: s.id ?? null,
+      // paire de baskets choisie par le coach (0086) — seulement si renseignée
+      ...(s.shoeId ? { shoe_id: s.shoeId } : {}),
     }).select().single();
     if (error) throw error; return data;
   },
@@ -565,6 +567,9 @@ export const PF = {
     const { data, error } = await sb.from("scheduled_sessions").update({
       disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,
       zone: s.zone, blocks: s.blocks ?? [],
+      // undefined = appel qui ne gère pas la paire (on n'y touche pas) ;
+      // null = le coach est revenu à « Automatique »
+      ...(s.shoeId !== undefined ? { shoe_id: s.shoeId } : {}),
     }).eq("id", id).select().single();
     if (error) throw error; return data;
   },

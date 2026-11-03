@@ -99,6 +99,7 @@ const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s
   ...(s.rpe_muscle != null ? { rpeMuscle: s.rpe_muscle } : {}), note: esc(s.note),
   coachNote: esc(s.coach_note),
   ...(s.strength_log ? { strengthLog: s.strength_log } : {}),
+  ...(s.shoe_id ? { shoeId: s.shoe_id } : {}),
   blocksV2: s.blocks && s.blocks.length ? { blocks: s.blocks } : undefined });
 // Nom du profil lié prioritaire SI un compte est rattaché (athlete_id) —
 // display_name n'est qu'un repère pour un membre SANS compte, et devient une

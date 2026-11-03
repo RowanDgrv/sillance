@@ -101,17 +101,32 @@ const GEAR_TAGS = {
   'plaquette':'plaquettes', 'pull':'pull-buoy', 'pullbuoy':'pull-buoy', 'pull-buoy':'pull-buoy',
   'élastique':'élastique', 'frein':'palmes', 'palme':'palmes', 'tuba':'tuba',
   'ht':'home-trainer', 'home trainer':'home-trainer', 'hometrainer':'home-trainer',
-  'piste':'pointes (piste)', 'vma':'montre GPS', 'vo2max':'montre GPS',
+  'vma':'montre GPS', 'vo2max':'montre GPS',
   'capteur':'capteur de puissance', 'ftp':'capteur de puissance',
   'longue':'ravitaillement (gels/barres)', 'ld':'ravitaillement (gels/barres)'
 };
-/* montre connectée recommandée dès qu'il y a une séance à intensité */
+/* montre GPS recommandée dès qu'il y a une séance à intensité — une seule
+   mention (« montre connectée » faisait doublon avec « montre GPS », retour
+   Rowan 03/11/2026). Course : « baskets » + la paire du jour, celle choisie
+   par le coach à la création de la séance (s.shoeId), sinon celle conseillée
+   selon le type de séance parmi les paires de l'athlète (recommendShoe). */
+function shoeForSession(s){
+  if(!s || s.disc!=='run') return null;
+  try {
+    if(s.shoeId){ const g = GEAR.find(x=>x.id===s.shoeId); if(g) return g; }
+    return recommendShoe(s)?.shoe || null;
+  } catch(_){ return null; }   // GEAR pas encore déclaré au tout premier rendu
+}
 function gearForSession(s){
-  const base = (DISC[s.disc].gear||[]).slice();
+  let base = (DISC[s.disc].gear||[]).slice();
   const title = (s.title||'').toLowerCase();
   for(const k in GEAR_TAGS){ if(title.includes(k)) base.push(GEAR_TAGS[k]); }
-  if(['Z4','Z5'].includes(s.zone) || /vma|vo2|seuil|intervalle|fractionn|lt2/i.test(title)) base.push('montre connectée');
-  return base;
+  if(['Z4','Z5'].includes(s.zone) || /vma|vo2|seuil|intervalle|fractionn|lt2/i.test(title)) base.push('montre GPS');
+  if(s.disc==='run'){
+    const shoe = shoeForSession(s);
+    if(shoe) base = base.map(g=> g===tr('gear.run1') ? tr('gear.shoesNamed', {name:shoe.name}) : g);
+  }
+  return [...new Set(base)];
 }
 
 /* ============================================================
@@ -2968,7 +2983,9 @@ function openRpeModal(s){
     closeModal(); render();
     // — attribution intelligente du matériel (course à pied) —
     if(s.disc==='run' && typeof recommendShoe==='function'){
-      const rec = recommendShoe(s);
+      // paire choisie par le coach pour cette séance en priorité
+      const picked = s.shoeId ? GEAR.find(g=>g.id===s.shoeId) : null;
+      const rec = picked ? {shoe:picked} : recommendShoe(s);
       if(rec && rec.shoe){
         const dist = Math.round((s.km || (s.dur||60)/60*11) * 10)/10;
         addGearKm(rec.shoe, dist);
@@ -5864,11 +5881,41 @@ function openBuilder(dateKey, existing){
   document.getElementById('bObjectif').value = builderState.objectif||'';
   document.getElementById('builderBadge').textContent = existing ? tr('builder.editSession') : tr('builder.newSession');
   document.getElementById('bDiscPick').value = builderState.disc;
+  builderState.shoeId = existing?.shoeId || null;
   toggleShorthandPanel();
+  renderShoePick();
   renderRefs();
   renderBlocks();
   initBuilderNutrition(existing);
   document.getElementById('builderOverlay').classList.add('open');
+}
+/* Paire de baskets recommandée par le coach (course) — 03/11/2026.
+   Liste les paires ENCORE VIVANTES de l'athlète (GEAR = matériel de
+   l'athlète sélectionné en mode coach) ; « Automatique » = conseil selon le
+   type de séance (recommendShoe). Masqué hors course ou sans paire. */
+function renderShoePick(){
+  const row = document.querySelector('#builderOverlay .builder-meta-row');
+  if(!row) return;
+  let sel = document.getElementById('bShoe');
+  let shoes = [];
+  try { shoes = GEAR.filter(g=>g.type==='shoe' && g.km < g.max); } catch(_){}
+  const show = builderState.disc==='run' && shoes.length > 0;
+  if(!show){ if(sel) sel.style.display='none'; return; }
+  if(!sel){
+    sel = document.createElement('select');
+    sel.id = 'bShoe';
+    sel.className = 'b-disc-select';
+    sel.style.cssText = 'max-width:240px';
+    sel.addEventListener('change', ()=>{ builderState.shoeId = sel.value || null; });
+    row.appendChild(sel);
+  }
+  sel.title = tr('builder.shoeTitle');
+  sel.setAttribute('aria-label', tr('builder.shoeTitle'));
+  sel.innerHTML = `<option value="">${tr('builder.shoeAuto')}</option>`
+    + shoes.map(g=>`<option value="${g.id}">${tr('builder.shoeOption', {name:g.name, km:Math.round(g.km), max:g.max})}</option>`).join('');
+  if(builderState.shoeId && !shoes.some(g=>g.id===builderState.shoeId)) builderState.shoeId = null;
+  sel.value = builderState.shoeId || '';
+  sel.style.display = '';
 }
 /* encadré "écris ta séance" (texte libre → blocs) — natation uniquement pour l'instant */
 function toggleShorthandPanel(){
@@ -6456,6 +6503,7 @@ function builderToSession(){
     done:false, id:'s'+(uid++)
   };
   if(pre||post){ s.nutrition = {pre, post, during:'', key: detectNutriKey(s)}; }
+  if(builderState.disc==='run') s.shoeId = builderState.shoeId || null;
   return s;
 }
 /* détecte le macro-clé pour la notif, à partir du contenu nutrition saisi */
@@ -6495,6 +6543,7 @@ document.getElementById('bDiscPick').addEventListener('change', e=>{
     builderState.disc=e.target.value;
     builderState.activeRefs=defaultActiveRefs(builderState.disc);
     toggleShorthandPanel();
+    renderShoePick();
     if(builderState.disc==='hyrox'){
       // convertit chaque bloc en stations Hyrox (une station par défaut si vide)
       builderState.blocks.forEach(blk=>{
@@ -6609,7 +6658,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
     if(i>-1) list[i] = s; else list.push(s);
     if(window.PF?.user){
       PF.updateScheduled(id, { disc:s.disc, title:s.title, dur:s.dur,
-        dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[] })
+        dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[], shoeId:s.shoeId })
         .catch(e=> scheduleFailed(e));
     }
     builderEditing = null;
@@ -6640,7 +6689,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
     // Persistance backend (si connecté) — récupère l'id DB pour les futurs done/rpe.
     if(window.PF?.user){
       PF.scheduleSession(currentAthleteId || PF.user.id, k, { disc:occ.disc, title:occ.title, dur:occ.dur,
-        dist:occ.dist||0, tss:occ.tss, zone:occ.zone, blocks:(occ.blocksV2&&occ.blocksV2.blocks)||[] })
+        dist:occ.dist||0, tss:occ.tss, zone:occ.zone, blocks:(occ.blocksV2&&occ.blocksV2.blocks)||[], shoeId:occ.shoeId })
         .then(saved=>{ if(saved) occ.id = saved.id; })
         .catch(e=> scheduleFailed(e, occ, k));
     }
