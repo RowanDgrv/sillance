@@ -4501,6 +4501,8 @@ function updateVideolibVisibility(){
   if(gs) gs.textContent = mode==='coach'
     ? tr('gear.subCoach')
     : tr('gear.subAthlete');
+  // inventaire (sillance-equipment.js) : lecture seule côté coach
+  window.SilEquip?.setReadOnly(mode==='coach');
 }
 // branchement des onglets
 document.querySelectorAll('.ath-tab').forEach(b=>{

@@ -830,6 +830,13 @@ async function loadPlanningFor(athleteId) {
   }
   // Matériel de CET athlète — vide si rien de renseigné, jamais celui d'un autre.
   app.setGear?.(gearRows.map(mapGear));
+  // Inventaire (0087) : ceinture cardio, plaquettes, palmes… — modifiable par
+  // l'athlète lui-même, en lecture seule pour son coach.
+  const own = target === PF.user.id;
+  window.SilEquip?.set(await PF.getEquipment(target).catch(() => []), {
+    readOnly: !own,
+    onToggle: own ? (key, on, label) => PF.setEquipmentItem(key, on, label) : null,
+  });
   // Zones de travail perso de CET athlète (utilisées par le builder).
   app.setAthleteZones?.(target, zones || null);
   app.render?.();

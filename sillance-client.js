@@ -513,6 +513,20 @@ export const PF = {
     await sb.from("push_subscriptions").delete().eq("endpoint", endpoint);
   },
 
+  // Inventaire du matériel (0087) — athlète : le sien ; coach : lecture.
+  async getEquipment(athleteId = this.user.id) {
+    const { data, error } = await sb.from("athlete_equipment").select("item_key, label").eq("athlete_id", athleteId);
+    if (error) { console.warn("[PF] lecture athlete_equipment échouée :", error.message); return []; }
+    return data ?? [];
+  },
+  async setEquipmentItem(itemKey, on, label = null) {
+    const q = on
+      ? sb.from("athlete_equipment").upsert({ athlete_id: this.user.id, item_key: itemKey, label })
+      : sb.from("athlete_equipment").delete().eq("athlete_id", this.user.id).eq("item_key", itemKey);
+    const { error } = await q;
+    if (error) throw error;
+  },
+
   // planning[date] -> séances de l'athlète sur une fenêtre de dates
   async getPlanning(athleteId, fromIso, toIso) {
     const { data, error } = await sb.from("scheduled_sessions").select("*")
