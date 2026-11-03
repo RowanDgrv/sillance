@@ -5919,7 +5919,13 @@ function renderShoePick(){
     sel = document.createElement('select');
     sel.id = 'bShoe';
     sel.className = 'b-disc-select';
-    sel.style.cssText = 'max-width:340px;min-width:260px';
+    // largeur : à côté du sport sur ordinateur ; sur sa propre ligne sur
+    // téléphone (sinon « Course » / « Objectif » devenaient « Cou » / « Obje »).
+    if(!document.getElementById('bShoeCss')){
+      const st=document.createElement('style'); st.id='bShoeCss';
+      st.textContent='#bShoe{min-width:260px;max-width:340px}@media(max-width:640px){#bShoe{min-width:0;max-width:none;flex:1 1 100%}}';
+      document.head.appendChild(st);
+    }
     sel.addEventListener('change', ()=>{ builderState.shoeId = sel.value || null; });
     row.appendChild(sel);
   }
@@ -6081,7 +6087,9 @@ function estimateLineSpeedFor(ln, disc){
   // (trouvé 03/11/2026).
   if(disc==='swim'){ const sPer100 = (ATHLETE_REF.css||110) * ((ln.pct||105)/100); return 0.1/(sPer100/3600); }
   if(disc==='run'){ return (ATHLETE_REF.vma||16)*((ln.pct||70)/100); }
-  if(disc==='bike'){ return 32*((ln.pct||70)/100); }
+  // vélo : la vitesse suit ~ la racine cubique de la puissance (traînée
+  // aéro), pas la puissance elle-même — 65 % FTP donnait 21 km/h (03/11/2026).
+  if(disc==='bike'){ return 36*Math.cbrt((ln.pct||70)/100); }
   return 12*((ln.pct||70)/100);
 }
 function lineMinutesFor(ln, disc){
@@ -6452,7 +6460,7 @@ function estimateLineSpeed(ln){
   // mode zone : on déduit de la référence VMA/CV et du %
   if(disc==='swim'){ const sPer100 = (ATHLETE_REF.css||110) * ((ln.pct||105)/100); return 0.1/(sPer100/3600); } // CSS, pas la CV course (03/11/2026)
   if(disc==='run'){ return (ATHLETE_REF.vma||16)*(ln.pct/100); }
-  if(disc==='bike'){ return 32*(ln.pct/100); }
+  if(disc==='bike'){ return 36*Math.cbrt((ln.pct||70)/100); } // racine cubique (03/11/2026)
   return 12*(ln.pct/100);
 }
 function estimateLineTss(ln, disc){
