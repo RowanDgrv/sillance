@@ -542,11 +542,13 @@ export const PF = {
       zone: s.zone, blocks: s.blocks ?? [], source_session_id: s.id ?? null,
       // paire de baskets choisie par le coach (0086) — seulement si renseignée
       ...(s.shoeId ? { shoe_id: s.shoeId } : {}),
+      // matériel demandé (0088) : pull-buoy, plaquettes…
+      ...(s.gear && s.gear.length ? { gear: s.gear } : {}),
     };
     let { data, error } = await sb.from("scheduled_sessions").insert(row).select().single();
-    // base pas encore migrée (0086) : la séance passe quand même, sans la paire
-    if (error && "shoe_id" in row && /shoe_id/.test(error.message || "")) {
-      delete row.shoe_id;
+    // base pas encore migrée : la séance passe quand même, sans ces champs
+    if (error && /shoe_id|gear/.test(error.message || "")) {
+      delete row.shoe_id; delete row.gear;
       ({ data, error } = await sb.from("scheduled_sessions").insert(row).select().single());
     }
     if (error) throw error; return data;
@@ -590,10 +592,11 @@ export const PF = {
       // undefined = appel qui ne gère pas la paire (on n'y touche pas) ;
       // null = le coach est revenu à « Automatique »
       ...(s.shoeId !== undefined ? { shoe_id: s.shoeId } : {}),
+      ...(s.gear !== undefined ? { gear: s.gear && s.gear.length ? s.gear : null } : {}),
     };
     let { data, error } = await sb.from("scheduled_sessions").update(patch).eq("id", id).select().single();
-    if (error && "shoe_id" in patch && /shoe_id/.test(error.message || "")) {
-      delete patch.shoe_id;
+    if (error && /shoe_id|gear/.test(error.message || "")) {
+      delete patch.shoe_id; delete patch.gear;
       ({ data, error } = await sb.from("scheduled_sessions").update(patch).eq("id", id).select().single());
     }
     if (error) throw error; return data;

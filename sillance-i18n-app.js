@@ -28,7 +28,7 @@
     "disc.swim": `Natation`, "disc.bike": `Vélo`, "disc.run": `Course`, "disc.strength": `Muscu`, "disc.hyrox": `Hyrox`,
     "gear.swim1": `maillot de bain`, "gear.swim2": `bonnet`, "gear.swim3": `lunettes`,
     "gear.bike1": `vélo`, "gear.bike2": `casque`, "gear.bike3": `tenue vélo`, "gear.bike4": `bidon`,
-    "gear.run1": `baskets`, "gear.shoesNamed": `baskets : {name}`, "builder.shoeTitle": `Proposer une basket à l'athlète pour cette séance`, "builder.shoeAuto": `Proposer une basket : auto (selon la séance)`, "builder.shoeOption": `Proposer : {name} ({km}/{max} km)`, "gear.run2": `tenue running`,
+    "gear.run1": `baskets`, "gear.shoesNamed": `baskets : {name}`, "builder.gearAsked": `Matériel demandé :`, "builder.gearMissing": `Non déclaré dans le matériel de l'athlète`, "builder.shoeTitle": `Proposer une basket à l'athlète pour cette séance`, "builder.shoeAuto": `Proposer une basket : auto (selon la séance)`, "builder.shoeOption": `Proposer : {name} ({km}/{max} km)`, "gear.run2": `tenue running`,
     "gear.strength1": `tapis`, "gear.strength2": `tenue confortable`,
     "gear.hyrox1": `chaussures`, "gear.hyrox2": `gants`, "gear.hyrox3": `tenue`, "gear.hyrox4": `eau`,
 
@@ -1676,7 +1676,7 @@
     "disc.swim": `Swimming`, "disc.bike": `Cycling`, "disc.run": `Running`, "disc.strength": `Strength`, "disc.hyrox": `Hyrox`,
     "gear.swim1": `swimsuit`, "gear.swim2": `swim cap`, "gear.swim3": `goggles`,
     "gear.bike1": `bike`, "gear.bike2": `helmet`, "gear.bike3": `cycling kit`, "gear.bike4": `bottle`,
-    "gear.run1": `running shoes`, "gear.shoesNamed": `running shoes: {name}`, "builder.shoeTitle": `Suggest a pair of shoes to the athlete for this session`, "builder.shoeAuto": `Suggest shoes: auto (based on the session)`, "builder.shoeOption": `Suggest: {name} ({km}/{max} km)`, "gear.run2": `running gear`,
+    "gear.run1": `running shoes`, "gear.shoesNamed": `running shoes: {name}`, "builder.gearAsked": `Equipment needed:`, "builder.gearMissing": `Not in the athlete's equipment list`, "builder.shoeTitle": `Suggest a pair of shoes to the athlete for this session`, "builder.shoeAuto": `Suggest shoes: auto (based on the session)`, "builder.shoeOption": `Suggest: {name} ({km}/{max} km)`, "gear.run2": `running gear`,
     "gear.strength1": `mat`, "gear.strength2": `comfortable clothing`,
     "gear.hyrox1": `shoes`, "gear.hyrox2": `gloves`, "gear.hyrox3": `kit`, "gear.hyrox4": `water`,
 
@@ -3222,7 +3222,7 @@
     "disc.swim": `Natación`, "disc.bike": `Ciclismo`, "disc.run": `Carrera`, "disc.strength": `Fuerza`, "disc.hyrox": `Hyrox`,
     "gear.swim1": `bañador`, "gear.swim2": `gorro`, "gear.swim3": `gafas`,
     "gear.bike1": `bici`, "gear.bike2": `casco`, "gear.bike3": `ropa de ciclismo`, "gear.bike4": `bidón`,
-    "gear.run1": `zapatillas`, "gear.shoesNamed": `zapatillas: {name}`, "builder.shoeTitle": `Proponer unas zapatillas al atleta para esta sesión`, "builder.shoeAuto": `Proponer zapatillas: auto (según la sesión)`, "builder.shoeOption": `Proponer: {name} ({km}/{max} km)`, "gear.run2": `ropa de running`,
+    "gear.run1": `zapatillas`, "gear.shoesNamed": `zapatillas: {name}`, "builder.gearAsked": `Material necesario:`, "builder.gearMissing": `No figura en el material del atleta`, "builder.shoeTitle": `Proponer unas zapatillas al atleta para esta sesión`, "builder.shoeAuto": `Proponer zapatillas: auto (según la sesión)`, "builder.shoeOption": `Proponer: {name} ({km}/{max} km)`, "gear.run2": `ropa de running`,
     "gear.strength1": `esterilla`, "gear.strength2": `ropa cómoda`,
     "gear.hyrox1": `zapatillas`, "gear.hyrox2": `guantes`, "gear.hyrox3": `ropa`, "gear.hyrox4": `agua`,
 

@@ -98,11 +98,9 @@ function hyroxStation(key){ return HYROX_STATIONS.find(s=>s.key===key); }
 /* matériel optionnel déclenché par mots-clés dans le titre de la séance.
    Ajoute ici tes propres tags (plaquettes, pull-buoy, etc.). */
 const GEAR_TAGS = {
-  'plaquette':'plaquettes', 'pull':'pull-buoy', 'pullbuoy':'pull-buoy', 'pull-buoy':'pull-buoy',
-  'élastique':'élastique', 'frein':'palmes', 'palme':'palmes', 'tuba':'tuba',
-  'ht':'home-trainer', 'home trainer':'home-trainer', 'hometrainer':'home-trainer',
+  // plaquettes, pull-buoy, palmes, tuba, home-trainer… : désormais détectés
+  // par le catalogue du matériel (sillance-equipment.js, SilEquip.detect).
   'vma':'montre GPS', 'vo2max':'montre GPS',
-  'capteur':'capteur de puissance', 'ftp':'capteur de puissance',
   'longue':'ravitaillement (gels/barres)', 'ld':'ravitaillement (gels/barres)'
 };
 /* montre GPS recommandée dès qu'il y a une séance à intensité — une seule
@@ -125,6 +123,18 @@ function gearForSession(s){
   if(s.disc==='run'){
     const shoe = shoeForSession(s);
     if(shoe) base = base.map(g=> g===tr('gear.run1') ? tr('gear.shoesNamed', {name:shoe.name}) : g);
+  }
+  // Matériel demandé par la séance (coché par le coach ou détecté dans la
+  // notation : « 400 pull plaquettes ») + capteurs que l'athlète POSSÈDE :
+  // ceinture cardio pour une séance à intensité en course/vélo, capteur de
+  // puissance pour le vélo (03/11/2026, demande Rowan).
+  const EQ = window.SilEquip;
+  if(EQ){
+    const keys = new Set([...(s.gear||[]), ...EQ.detect(s)]);
+    const intense = ['Z4','Z5'].includes(s.zone) || /vma|vo2|seuil|intervalle|fractionn|lt2/i.test(title);
+    if(intense && ['run','bike'].includes(s.disc) && EQ.owns('hr_strap')) keys.add('hr_strap');
+    if(s.disc==='bike' && EQ.owns('power_meter')) keys.add('power_meter');
+    keys.forEach(k=> base.push(EQ.gearLabel(k)));
   }
   return [...new Set(base)];
 }
@@ -5884,8 +5894,10 @@ function openBuilder(dateKey, existing){
   document.getElementById('builderBadge').textContent = existing ? tr('builder.editSession') : tr('builder.newSession');
   document.getElementById('bDiscPick').value = builderState.disc;
   builderState.shoeId = existing?.shoeId || null;
+  builderState.gear = Array.isArray(existing?.gear) ? existing.gear.slice() : [];
   toggleShorthandPanel();
   renderShoePick();
+  renderGearPick();
   renderRefs();
   renderBlocks();
   initBuilderNutrition(existing);
@@ -5918,6 +5930,40 @@ function renderShoePick(){
   if(builderState.shoeId && !shoes.some(g=>g.id===builderState.shoeId)) builderState.shoeId = null;
   sel.value = builderState.shoeId || '';
   sel.style.display = '';
+}
+/* « Matériel demandé » (03/11/2026) — sous les références du constructeur.
+   Puces = matériel que l'athlète POSSÈDE (inventaire, SilEquip) pour ce
+   sport + ce que la séance demande déjà. Un objet demandé mais non déclaré
+   par l'athlète est signalé (⚠). Enregistré dans scheduled_sessions.gear. */
+function renderGearPick(){
+  const EQ = window.SilEquip;
+  const refsRow = document.querySelector('#builderOverlay .b-refs-row');
+  if(!EQ || !refsRow) return;
+  let row = document.getElementById('bGearRow');
+  if(!row){
+    row = document.createElement('div');
+    row.id = 'bGearRow';
+    row.className = 'b-refs-row';
+    refsRow.parentNode.insertBefore(row, refsRow.nextSibling);
+    row.addEventListener('click', e=>{
+      const chip = e.target.closest('[data-gk]'); if(!chip) return;
+      const k = chip.dataset.gk, g = builderState.gear || (builderState.gear = []);
+      const i = g.indexOf(k); i>-1 ? g.splice(i,1) : g.push(k);
+      renderGearPick();
+    });
+  }
+  const disc = builderState.disc;
+  const GROUPS = {run:['run','sensor','mob'], bike:['bike','sensor','mob'], swim:['swim','sensor','mob'], strength:['mob','sensor'], hyrox:['mob','sensor','run']}[disc] || ['sensor','mob'];
+  const wanted = builderState.gear || [];
+  const owned = EQ.ownedKeys().filter(k=> GROUPS.includes(EQ.groupOf(k)) || EQ.groupOf(k)==='other');
+  const keys = [...new Set([...owned, ...wanted])];
+  if(!keys.length){ row.style.display='none'; return; }
+  row.style.display = '';
+  row.innerHTML = `<span class="b-refs-lbl">${tr('builder.gearAsked')}</span><div class="b-refs">`
+    + keys.map(k=>{
+        const on = wanted.includes(k), missing = on && !EQ.owns(k);
+        return `<span class="b-ref-chip ${on?'on':''}" data-gk="${k}" ${missing?`title="${tr('builder.gearMissing')}" style="border-style:dashed"`:''}>${missing?'⚠ ':''}${EQ.label(k)}</span>`;
+      }).join('') + `</div>`;
 }
 /* encadré "écris ta séance" (texte libre → blocs) — natation uniquement pour l'instant */
 function toggleShorthandPanel(){
@@ -6029,7 +6075,11 @@ function estimateLineSpeedFor(ln, disc){
     if(ex.kind==='time100'){ const s=(ex.m||0)*60+(ex.s||0); return s? (0.1/(s/3600)) : 0; }
     if(ex.kind==='power') return disc==='bike' && ATHLETE_REF.vma ? 30 : 28;
   }
-  if(disc==='swim'){ const cvKmh = ATHLETE_REF.cv? (0.1/(ATHLETE_REF.cv/3600)) : 4.5; return cvKmh*((ln.pct||70)/100); }
+  // Natation : allure = CSS (s/100 m) × % — modèle INVERSÉ (% > 100 = plus
+  // lent). Utilisait ATHLETE_REF.cv, la vitesse critique de COURSE (km/h) :
+  // 1600 m nagés « en 4 min », durée et TSS natation très sous-estimés
+  // (trouvé 03/11/2026).
+  if(disc==='swim'){ const sPer100 = (ATHLETE_REF.css||110) * ((ln.pct||105)/100); return 0.1/(sPer100/3600); }
   if(disc==='run'){ return (ATHLETE_REF.vma||16)*((ln.pct||70)/100); }
   if(disc==='bike'){ return 32*((ln.pct||70)/100); }
   return 12*((ln.pct||70)/100);
@@ -6400,7 +6450,7 @@ function estimateLineSpeed(ln){
     if(ex.kind==='power') return disc==='bike' && ATHLETE_REF.vma ? 30 : 28; // approx vélo
   }
   // mode zone : on déduit de la référence VMA/CV et du %
-  if(disc==='swim'){ const cvKmh = ATHLETE_REF.cv? (0.1/(ATHLETE_REF.cv/3600)) : 4.5; return cvKmh*(ln.pct/100); }
+  if(disc==='swim'){ const sPer100 = (ATHLETE_REF.css||110) * ((ln.pct||105)/100); return 0.1/(sPer100/3600); } // CSS, pas la CV course (03/11/2026)
   if(disc==='run'){ return (ATHLETE_REF.vma||16)*(ln.pct/100); }
   if(disc==='bike'){ return 32*(ln.pct/100); }
   return 12*(ln.pct/100);
@@ -6506,6 +6556,7 @@ function builderToSession(){
   };
   if(pre||post){ s.nutrition = {pre, post, during:'', key: detectNutriKey(s)}; }
   if(builderState.disc==='run') s.shoeId = builderState.shoeId || null;
+  if(builderState.gear && builderState.gear.length) s.gear = builderState.gear.slice();
   return s;
 }
 /* détecte le macro-clé pour la notif, à partir du contenu nutrition saisi */
@@ -6546,6 +6597,7 @@ document.getElementById('bDiscPick').addEventListener('change', e=>{
     builderState.activeRefs=defaultActiveRefs(builderState.disc);
     toggleShorthandPanel();
     renderShoePick();
+    renderGearPick();
     if(builderState.disc==='hyrox'){
       // convertit chaque bloc en stations Hyrox (une station par défaut si vide)
       builderState.blocks.forEach(blk=>{
@@ -6660,7 +6712,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
     if(i>-1) list[i] = s; else list.push(s);
     if(window.PF?.user){
       PF.updateScheduled(id, { disc:s.disc, title:s.title, dur:s.dur,
-        dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[], shoeId:s.shoeId })
+        dist:s.dist||0, tss:s.tss, zone:s.zone, blocks:(s.blocksV2&&s.blocksV2.blocks)||[], shoeId:s.shoeId, gear:s.gear })
         .catch(e=> scheduleFailed(e));
     }
     builderEditing = null;
@@ -6691,7 +6743,7 @@ document.getElementById('bSaveCal').addEventListener('click', ()=>{
     // Persistance backend (si connecté) — récupère l'id DB pour les futurs done/rpe.
     if(window.PF?.user){
       PF.scheduleSession(currentAthleteId || PF.user.id, k, { disc:occ.disc, title:occ.title, dur:occ.dur,
-        dist:occ.dist||0, tss:occ.tss, zone:occ.zone, blocks:(occ.blocksV2&&occ.blocksV2.blocks)||[], shoeId:occ.shoeId })
+        dist:occ.dist||0, tss:occ.tss, zone:occ.zone, blocks:(occ.blocksV2&&occ.blocksV2.blocks)||[], shoeId:occ.shoeId, gear:occ.gear })
         .then(saved=>{ if(saved) occ.id = saved.id; })
         .catch(e=> scheduleFailed(e, occ, k));
     }

@@ -189,6 +189,10 @@
   window.SilEquip = {
     CATALOG: CATALOG, label: label, detect: detect, render: render,
     owns: function(k){ return state.owned.has(k); },
+    ownedKeys: function(){ return Array.from(state.owned.keys()); },
+    groupOf: function(k){ return BY_KEY[k] ? BY_KEY[k].g : 'other'; },
+    // libellé en minuscule initiale pour la liste « À prévoir » (« pull-buoy »)
+    gearLabel: function(k){ var l = label(k, state.owned.get(k)); return l.charAt(0).toLowerCase() + l.slice(1); },
     // owned : [{item_key, label}] ; opts : {readOnly, demo, onToggle(k, on, label)}
     set: function(rows, opts){
       opts = opts || {};

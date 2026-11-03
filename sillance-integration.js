@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261103a";
+import { PF } from "./sillance-client.js?v=20261103c";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -100,6 +100,7 @@ const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s
   coachNote: esc(s.coach_note),
   ...(s.strength_log ? { strengthLog: s.strength_log } : {}),
   ...(s.shoe_id ? { shoeId: s.shoe_id } : {}),
+  ...(Array.isArray(s.gear) && s.gear.length ? { gear: s.gear } : {}),
   blocksV2: s.blocks && s.blocks.length ? { blocks: s.blocks } : undefined });
 // Nom du profil lié prioritaire SI un compte est rattaché (athlete_id) —
 // display_name n'est qu'un repère pour un membre SANS compte, et devient une
