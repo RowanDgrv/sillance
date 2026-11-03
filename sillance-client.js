@@ -536,13 +536,19 @@ export const PF = {
     return data ?? [];
   },
   async scheduleSession(athleteId, dateIso, s) {
-    const { data, error } = await sb.from("scheduled_sessions").insert({
+    const row = {
       athlete_id: athleteId, created_by: this.user.id, date: dateIso,
       disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,
       zone: s.zone, blocks: s.blocks ?? [], source_session_id: s.id ?? null,
       // paire de baskets choisie par le coach (0086) — seulement si renseignée
       ...(s.shoeId ? { shoe_id: s.shoeId } : {}),
-    }).select().single();
+    };
+    let { data, error } = await sb.from("scheduled_sessions").insert(row).select().single();
+    // base pas encore migrée (0086) : la séance passe quand même, sans la paire
+    if (error && "shoe_id" in row && /shoe_id/.test(error.message || "")) {
+      delete row.shoe_id;
+      ({ data, error } = await sb.from("scheduled_sessions").insert(row).select().single());
+    }
     if (error) throw error; return data;
   },
   // Variante "upsert" pour une séance matérialisée depuis un créneau (0059) :
@@ -578,13 +584,18 @@ export const PF = {
     if (error) throw error; return true;
   },
   async updateScheduled(id, s) {
-    const { data, error } = await sb.from("scheduled_sessions").update({
+    const patch = {
       disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,
       zone: s.zone, blocks: s.blocks ?? [],
       // undefined = appel qui ne gère pas la paire (on n'y touche pas) ;
       // null = le coach est revenu à « Automatique »
       ...(s.shoeId !== undefined ? { shoe_id: s.shoeId } : {}),
-    }).eq("id", id).select().single();
+    };
+    let { data, error } = await sb.from("scheduled_sessions").update(patch).eq("id", id).select().single();
+    if (error && "shoe_id" in patch && /shoe_id/.test(error.message || "")) {
+      delete patch.shoe_id;
+      ({ data, error } = await sb.from("scheduled_sessions").update(patch).eq("id", id).select().single());
+    }
     if (error) throw error; return data;
   },
   // Change la date d'une séance déjà programmée (déplacer, drag&drop sur un
