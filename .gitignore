@@ -25,3 +25,4 @@ prd_outputs/
 .env.*
 !.env.example
 .agents/
+*.local.js

@@ -137,6 +137,18 @@
       'html.club-th body:not(.light){background-image:linear-gradient(180deg,' + mix(th.bg, '#000000', .3) + ' 0%,var(--ink) 38%)}' +
       // bulle de discussion : posée sur --swim (couleur de données) → couleur du club
       'html.club-th .chat-fab{background:var(--accent)}' +
+      // espace club : sa couleur « club » était le violet muscu (--strength,
+      // codé en dur) → couleur du club. Limité au panneau club et à ses
+      // fenêtres (groupe, compétition) : les données muscu ailleurs gardent
+      // leur violet.
+      'html.club-th #clubPanel,html.club-th #groupOverlay,html.club-th #competitionOverlay{--strength:var(--accent)}' +
+      // constructeur de séance : puces sélectionnées et encadré « Écris ta
+      // séance » (teal codé en dur / couleur natation) → couleur du club
+      'html.club-th .b-ref-chip.on{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:var(--accent)}' +
+      'html.club-th .b-ref-chip.on::before,html.club-th .b-shorthand-lbl{color:var(--accent)}' +
+      'html.club-th .b-shorthand{border-color:color-mix(in srgb,var(--accent) 35%,transparent);background:color-mix(in srgb,var(--accent) 5%,var(--panel))}' +
+      'html.club-th .club-tab.active{background:color-mix(in srgb,var(--accent) 22%,transparent)}' +
+      'html.club-th .accept-grp.sel,html.club-th .club-ath-youth.on{background:color-mix(in srgb,var(--accent) 12%,transparent)}' +
       // étiquettes « À prévoir » du rappel du matin (teal codé en dur)
       'html.club-th .mp-gear span{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:color-mix(in srgb,var(--accent) 35%,transparent)}' +
       'html.club-th .aurora{background:' +
