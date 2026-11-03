@@ -5905,7 +5905,7 @@ function renderShoePick(){
     sel = document.createElement('select');
     sel.id = 'bShoe';
     sel.className = 'b-disc-select';
-    sel.style.cssText = 'max-width:240px';
+    sel.style.cssText = 'max-width:340px;min-width:260px';
     sel.addEventListener('change', ()=>{ builderState.shoeId = sel.value || null; });
     row.appendChild(sel);
   }
