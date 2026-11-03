@@ -137,6 +137,8 @@
       'html.club-th body:not(.light){background-image:linear-gradient(180deg,' + mix(th.bg, '#000000', .3) + ' 0%,var(--ink) 38%)}' +
       // bulle de discussion : posée sur --swim (couleur de données) → couleur du club
       'html.club-th .chat-fab{background:var(--accent)}' +
+      // étiquettes « À prévoir » du rappel du matin (teal codé en dur)
+      'html.club-th .mp-gear span{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:color-mix(in srgb,var(--accent) 35%,transparent)}' +
       'html.club-th .aurora{background:' +
         'radial-gradient(40% 46% at 12% 20%,' + th.accent + '6b,transparent 72%),' +
         'radial-gradient(38% 44% at 88% 82%,' + th.accent2 + '57,transparent 72%),' +
