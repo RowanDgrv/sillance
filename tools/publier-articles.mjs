@@ -91,7 +91,7 @@ for (const a of live) {
 }
 
 // 2 ter) calculateurs : « Pour aller plus loin » vers les articles publiés du même sujet
-for (const t of ['outils/calcul-css-natation/index.html', 'outils/allures-vma/index.html', 'outils/zones-puissance-ftp/index.html']) {
+for (const t of ['calcul-css-natation', 'allures-vma', 'zones-puissance-ftp', 'prediction-temps-course', 'zones-frequence-cardiaque', 'convertisseur-allure-vitesse'].map((x) => `outils/${x}/index.html`)) {
   const s = read(t);
   const n = s.replace(/<!-- outil-lies:([a-z0-9,-]+) -->[\s\S]*?<!-- \/outil-lies -->/, (all, list) => {
     const pub = list.split(',').map((sl) => live.find((x) => x.slug === sl)).filter(Boolean);

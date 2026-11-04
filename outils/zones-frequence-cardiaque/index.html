@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Zones de fréquence cardiaque : calcul avec la méthode de Karvonen | Sillance</title>
+<meta name="description" content="Calcule tes 5 zones de fréquence cardiaque avec la méthode de Karvonen (FC de réserve) et en % de FC max, à partir de ta FC max et de ta FC de repos. Gratuit.">
+<link rel="canonical" href="https://sillance.app/outils/zones-frequence-cardiaque/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Sillance">
+<meta property="og:title" content="Zones de fréquence cardiaque : calcul avec la méthode de Karvonen | Sillance"><meta property="og:description" content="Calcule tes 5 zones de fréquence cardiaque avec la méthode de Karvonen (FC de réserve) et en % de FC max, à partir de ta FC max et de ta FC de repos. Gratuit.">
+<meta property="og:image" content="https://sillance.app/og-image.png"><meta property="og:url" content="https://sillance.app/outils/zones-frequence-cardiaque/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/seo.css?v=20261105b">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Sillance", "item": "https://sillance.app/"}, {"@type": "ListItem", "position": 2, "name": "Outils", "item": "https://sillance.app/outils/"}, {"@type": "ListItem", "position": 3, "name": "Zones de fréquence cardiaque", "item": "https://sillance.app/outils/zones-frequence-cardiaque/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Zones de fréquence cardiaque · Sillance", "url": "https://sillance.app/outils/zones-frequence-cardiaque/", "applicationCategory": "SportsApplication", "operatingSystem": "Web", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@id": "https://sillance.app/#organisation"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Karvonen ou pourcentage de FC max : lequel choisir ?", "acceptedAnswer": {"@type": "Answer", "text": "Les deux fonctionnent si tu restes cohérent. Karvonen est plus individualisé car il intègre ta FC de repos ; le pourcentage de FC max est plus simple et c'est souvent ce qu'affichent les montres."}}, {"@type": "Question", "name": "Ma FC monte en fin de séance alors que je garde la même allure, c'est normal ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui : par temps chaud ou sur une séance longue, la fréquence cardiaque monte souvent à allure égale. Ce n'est pas forcément un signe de méforme."}}, {"@type": "Question", "name": "À quelle fréquence refaire le calcul ?", "acceptedAnswer": {"@type": "Answer", "text": "Quand ta FC de repos change durablement, ou après un test d'effort. La FC max, elle, évolue surtout avec l'âge."}}]}</script>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links"><a href="../">Tous les outils</a><a href="../../logiciel-coach-triathlon/">Coachs</a><a href="../../logiciel-club-triathlon/">Clubs</a></div>
+  <a class="btn primary" href="../../sillance-app.html">Découvrir Sillance</a>
+</div></nav>
+<main>
+  <div class="wrap crumb"><a href="../../">Sillance</a> › <a href="../">Outils</a> › Zones de fréquence cardiaque</div>
+  <section class="hero" style="padding-bottom:40px"><div class="wrap">
+    <span class="kicker">Outil gratuit · endurance</span>
+    <h1>Tes <em>zones de fréquence cardiaque</em></h1>
+    <p class="lead">Entre ta FC max et ta FC de repos : tu obtiens tes 5 zones avec la méthode de Karvonen, et en pourcentage de FC max pour comparer.</p>
+    <div class="tool"><form data-tool="karvonen" data-out="fcOut" novalidate>
+  <label>FC max <small>en bpm, ex. 188</small><input name="fcmax" inputmode="numeric" placeholder="188" autocomplete="off"></label>
+  <label>FC de repos <small>au réveil, ex. 52</small><input name="fcrepos" inputmode="numeric" placeholder="52" autocomplete="off"></label>
+  <span class="or">ou</span>
+  <label>Ton âge <small>si tu ne connais pas ta FC max</small><input name="age" inputmode="numeric" placeholder="35" autocomplete="off"></label>
+  <button class="btn primary" type="submit">Calculer mes zones</button>
+</form><div id="fcOut" aria-live="polite"></div></div>
+  </div></section>
+  <section class="block prose"><div class="wrap"><span class="kicker">Comprendre</span>
+<h2>La méthode de <em>Karvonen</em></h2>
+<p>Décrite par le Finlandais Martti Karvonen et ses collègues en 1957, elle calcule les zones à partir de la <b>fréquence cardiaque de réserve</b>, l'écart entre ta FC max et ta FC de repos :</p>
+<p><b>FC cible = FC de repos + % × (FC max − FC de repos)</b></p>
+<p>Elle tient compte de ta condition physique : un athlète entraîné a souvent une FC de repos basse, donc une réserve plus grande. Pour une même FC max, ses zones d'endurance sont plus hautes qu'en simple pourcentage de FC max.</p>
+<span class="kicker">Les mesures</span>
+<h2>Bien mesurer <em>tes deux valeurs</em></h2>
+<ul>
+<li><b>FC de repos</b> : le matin au réveil, encore allongé, sur plusieurs jours. Garde la valeur la plus basse ou la moyenne.</li>
+<li><b>FC max</b> : idéalement lors d'un test d'effort, ou à la fin d'une course très dure. Les formules ne donnent qu'une moyenne.</li>
+<li>Si tu ne la connais pas, l'outil l'estime avec <b>208 − 0,7 × âge</b>, issue d'une méta-analyse de Tanaka et ses collègues (2001). Elle a montré que l'ancienne formule « 220 − âge » <b>sous-estime</b> la FC max des personnes plus âgées.</li>
+</ul>
+<p>Dans Sillance, les zones de fréquence cardiaque sont calculées en % de FC max à partir des références de l'athlète, et le coach peut les personnaliser.</p>
+<h2>Sources</h2><ol style="font-size:14px;line-height:1.7;padding-left:20px"><li>Karvonen MJ, Kentala E, Mustala O. The effects of training on heart rate; a longitudinal study. <i>Ann Med Exp Biol Fenn</i>, 1957. <a href="https://pubmed.ncbi.nlm.nih.gov/13470504/" rel="noopener">PubMed</a></li><li>Tanaka H, Monahan KD, Seals DR. Age-predicted maximal heart rate revisited. <i>J Am Coll Cardiol</i>, 2001. <a href="https://pubmed.ncbi.nlm.nih.gov/11153730/" rel="noopener">PubMed</a></li></ol></div></section>
+  <section class="block faq"><div class="wrap"><span class="kicker">Questions fréquentes</span><h2>Bon à <em>savoir</em></h2><details><summary>Karvonen ou pourcentage de FC max : lequel choisir ?</summary><p>Les deux fonctionnent si tu restes cohérent. Karvonen est plus individualisé car il intègre ta FC de repos ; le pourcentage de FC max est plus simple et c&#x27;est souvent ce qu&#x27;affichent les montres.</p></details><details><summary>Ma FC monte en fin de séance alors que je garde la même allure, c&#x27;est normal ?</summary><p>Oui : par temps chaud ou sur une séance longue, la fréquence cardiaque monte souvent à allure égale. Ce n&#x27;est pas forcément un signe de méforme.</p></details><details><summary>À quelle fréquence refaire le calcul ?</summary><p>Quand ta FC de repos change durablement, ou après un test d&#x27;effort. La FC max, elle, évolue surtout avec l&#x27;âge.</p></details></div></section>
+  <!-- outil-lies:variabilite-frequence-cardiaque-vfc,entrainement-polarise-80-20,desentrainement-perte-de-forme --><!-- /outil-lies -->
+  <section class="final"><div class="wrap"><span class="kicker">Avec Sillance</span><h2>Des séances <em>à la bonne intensité</em></h2><p class="lead" style="margin:0 auto">Dans Sillance, chaque séance s'écrit en zones et chaque athlète reçoit ses propres fréquences cardiaques sur sa montre.</p><div class="ctas"><a class="btn primary" href="../../logiciel-run-club/">Sillance pour les run clubs</a><a class="btn ghost" href="../../logiciel-coach-triathlon/">Sillance pour les coachs</a></div></div></section>
+</main>
+<footer><div class="wrap">
+  <a href="../../">Sillance</a>
+  <a href="../">Outils</a>
+  <a href="../calcul-css-natation/">Calcul CSS natation</a>
+  <a href="../allures-vma/">Allures VMA</a>
+  <a href="../zones-puissance-ftp/">Zones de puissance FTP</a>
+  <a href="../prediction-temps-course/">Prédiction de temps</a>
+  <a href="../zones-frequence-cardiaque/">Zones de FC</a>
+  <a href="../convertisseur-allure-vitesse/">Allure et vitesse</a>
+  <a href="../../logiciel-coach-triathlon/">Coach triathlon</a>
+  <a href="../../logiciel-club-triathlon/">Club de triathlon</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../../assets/outils.js?v=20261105a"></script>
+<script src="../../sillance-cookies.js?v=20261104a"></script>
+<script src="../../sillance-analytics.js?v=20261028b"></script>
+</body></html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Prédiction de temps de course : 5 km, 10 km, semi et marathon (formule de Riegel) | Sillance</title>
+<meta name="description" content="Estime ton temps sur 5 km, 10 km, semi-marathon et marathon à partir d&#x27;une course récente, avec la formule de Riegel. Gratuit, avec ses limites expliquées.">
+<link rel="canonical" href="https://sillance.app/outils/prediction-temps-course/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Sillance">
+<meta property="og:title" content="Prédiction de temps de course : 5 km, 10 km, semi et marathon (formule de Riegel) | Sillance"><meta property="og:description" content="Estime ton temps sur 5 km, 10 km, semi-marathon et marathon à partir d&#x27;une course récente, avec la formule de Riegel. Gratuit, avec ses limites expliquées.">
+<meta property="og:image" content="https://sillance.app/og-image.png"><meta property="og:url" content="https://sillance.app/outils/prediction-temps-course/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/seo.css?v=20261105b">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Sillance", "item": "https://sillance.app/"}, {"@type": "ListItem", "position": 2, "name": "Outils", "item": "https://sillance.app/outils/"}, {"@type": "ListItem", "position": 3, "name": "Prédiction de temps de course", "item": "https://sillance.app/outils/prediction-temps-course/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Prédiction de temps de course · Sillance", "url": "https://sillance.app/outils/prediction-temps-course/", "applicationCategory": "SportsApplication", "operatingSystem": "Web", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@id": "https://sillance.app/#organisation"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Quelle course choisir comme référence ?", "acceptedAnswer": {"@type": "Answer", "text": "Une course récente (moins de 6 semaines), courue à fond, sur un parcours mesuré, et si possible d'une distance proche de celle que tu vises."}}, {"@type": "Question", "name": "Pourquoi mon marathon réel est plus lent que l'estimation ?", "acceptedAnswer": {"@type": "Answer", "text": "Au-delà de 2 à 3 heures d'effort, d'autres facteurs comptent : réserves de glucides, volume d'entraînement, résistance musculaire. La formule ne les connaît pas, d'où des estimations souvent optimistes pour les coureurs peu préparés au marathon."}}, {"@type": "Question", "name": "Cela marche-t-il pour le trail ?", "acceptedAnswer": {"@type": "Answer", "text": "Non : le dénivelé et le terrain changent tout. La formule vaut pour des courses sur route ou sur piste."}}]}</script>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links"><a href="../">Tous les outils</a><a href="../../logiciel-coach-triathlon/">Coachs</a><a href="../../logiciel-club-triathlon/">Clubs</a></div>
+  <a class="btn primary" href="../../sillance-app.html">Découvrir Sillance</a>
+</div></nav>
+<main>
+  <div class="wrap crumb"><a href="../../">Sillance</a> › <a href="../">Outils</a> › Prédiction de temps de course</div>
+  <section class="hero" style="padding-bottom:40px"><div class="wrap">
+    <span class="kicker">Outil gratuit · course à pied</span>
+    <h1>Prédire ton <em>temps de course</em></h1>
+    <p class="lead">Entre une course récente : tu obtiens une estimation de ton temps et de ton allure sur 5 km, 10 km, semi-marathon et marathon.</p>
+    <div class="tool"><form data-tool="riegel" data-out="riegelOut" novalidate>
+  <label>Distance courue <small>une course récente, à fond</small><select name="dist"><option value="5">5 km</option><option value="10" selected>10 km</option><option value="21.0975">Semi-marathon</option><option value="42.195">Marathon</option><option value="autre">Autre distance</option></select></label>
+  <label>Autre distance <small>en km, si « Autre »</small><input name="distAutre" inputmode="decimal" placeholder="15" autocomplete="off"></label>
+  <label>Ton temps <small>h:mm:ss ou mm:ss</small><input name="temps" inputmode="numeric" placeholder="48:30" autocomplete="off"></label>
+  <button class="btn primary" type="submit">Estimer mes temps</button>
+</form><div id="riegelOut" aria-live="polite"></div></div>
+  </div></section>
+  <section class="block prose"><div class="wrap"><span class="kicker">Comprendre</span>
+<h2>La formule de <em>Riegel</em></h2>
+<p>En 1981, l'ingénieur américain Peter Riegel a publié dans <i>American Scientist</i> une analyse des records en course, en natation et en marche. Il a montré que le temps augmente un peu plus vite que la distance, selon une loi simple :</p>
+<p><b>T2 = T1 × (D2 / D1)<sup>1,06</sup></b></p>
+<p>T1 est ton temps sur la distance D1, T2 le temps estimé sur la distance D2. L'exposant 1,06 traduit la fatigue : doubler la distance fait un peu plus que doubler le temps. La relation a été établie pour des efforts d'environ <b>3,5 à 230 minutes</b>.</p>
+<p>Exemple : un 10 km couru en 50 minutes donne environ <b>1h50'19"</b> sur semi-marathon et <b>3h50'01"</b> sur marathon.</p>
+<span class="kicker">Les limites</span>
+<h2>Une estimation, <em>pas une promesse</em></h2>
+<ul>
+<li>La formule suppose que tu es <b>entraîné pour la distance visée</b>. Sans sorties longues ni volume suffisant, le semi et surtout le marathon seront plus lents que prévu.</li>
+<li>Elle a été établie à partir de <b>records</b>, donc de coureurs très bien préparés.</li>
+<li>Plus la distance visée est éloignée de ta course de référence, plus l'écart possible est grand : pour prédire un marathon, un semi récent est une meilleure base qu'un 5 km.</li>
+</ul>
+<p>Dans Sillance, le coach fixe les allures de chaque séance à partir des références de l'athlète (VMA, seuil, fréquence cardiaque), et les ajuste au fil des courses.</p>
+<h2>Sources</h2><ol style="font-size:14px;line-height:1.7;padding-left:20px"><li>Riegel PS. Athletic Records and Human Endurance. <i>American Scientist</i>, 1981, 69(3), 285-290. <a href="https://en.wikipedia.org/wiki/Peter_Riegel" rel="noopener">Présentation</a></li></ol></div></section>
+  <section class="block faq"><div class="wrap"><span class="kicker">Questions fréquentes</span><h2>Bon à <em>savoir</em></h2><details><summary>Quelle course choisir comme référence ?</summary><p>Une course récente (moins de 6 semaines), courue à fond, sur un parcours mesuré, et si possible d&#x27;une distance proche de celle que tu vises.</p></details><details><summary>Pourquoi mon marathon réel est plus lent que l&#x27;estimation ?</summary><p>Au-delà de 2 à 3 heures d&#x27;effort, d&#x27;autres facteurs comptent : réserves de glucides, volume d&#x27;entraînement, résistance musculaire. La formule ne les connaît pas, d&#x27;où des estimations souvent optimistes pour les coureurs peu préparés au marathon.</p></details><details><summary>Cela marche-t-il pour le trail ?</summary><p>Non : le dénivelé et le terrain changent tout. La formule vaut pour des courses sur route ou sur piste.</p></details></div></section>
+  <!-- outil-lies:affutage-avant-competition,entrainement-polarise-80-20,fractionne-4x4-vo2max --><!-- /outil-lies -->
+  <section class="final"><div class="wrap"><span class="kicker">Avec Sillance</span><h2>Des allures qui suivent <em>tes progrès</em></h2><p class="lead" style="margin:0 auto">Dans Sillance, chaque séance donne à chaque coureur ses propres allures, ajustées quand ses références changent.</p><div class="ctas"><a class="btn primary" href="../../logiciel-run-club/">Sillance pour les run clubs</a><a class="btn ghost" href="../../logiciel-coach-triathlon/">Sillance pour les coachs</a></div></div></section>
+</main>
+<footer><div class="wrap">
+  <a href="../../">Sillance</a>
+  <a href="../">Outils</a>
+  <a href="../calcul-css-natation/">Calcul CSS natation</a>
+  <a href="../allures-vma/">Allures VMA</a>
+  <a href="../zones-puissance-ftp/">Zones de puissance FTP</a>
+  <a href="../prediction-temps-course/">Prédiction de temps</a>
+  <a href="../zones-frequence-cardiaque/">Zones de FC</a>
+  <a href="../convertisseur-allure-vitesse/">Allure et vitesse</a>
+  <a href="../../logiciel-coach-triathlon/">Coach triathlon</a>
+  <a href="../../logiciel-club-triathlon/">Club de triathlon</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../../assets/outils.js?v=20261105a"></script>
+<script src="../../sillance-cookies.js?v=20261104a"></script>
+<script src="../../sillance-analytics.js?v=20261028b"></script>
+</body></html>
