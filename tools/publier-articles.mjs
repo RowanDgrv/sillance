@@ -90,6 +90,19 @@ for (const a of live) {
   if (n !== s) write('index.html', n);
 }
 
+// 2 ter) calculateurs : « Pour aller plus loin » vers les articles publiés du même sujet
+for (const t of ['outils/calcul-css-natation/index.html', 'outils/allures-vma/index.html', 'outils/zones-puissance-ftp/index.html']) {
+  const s = read(t);
+  const n = s.replace(/<!-- outil-lies:([a-z0-9,-]+) -->[\s\S]*?<!-- \/outil-lies -->/, (all, list) => {
+    const pub = list.split(',').map((sl) => live.find((x) => x.slug === sl)).filter(Boolean);
+    const inner = pub.length
+      ? `<section class="block"><div class="wrap"><span class="kicker">Pour aller plus loin</span><h2>Ce que disent <em>les études</em></h2><ul>${pub.map((x) => `<li><a href="../../guides/${x.slug}/">${esc(x.titre)}</a></li>`).join('')}</ul></div></section>`
+      : '';
+    return `<!-- outil-lies:${list} -->${inner}<!-- /outil-lies -->`;
+  });
+  if (n !== s) write(t, n);
+}
+
 // 3) flux RSS des articles publiés
 const items = [...live].sort((a, b) => b.publie.localeCompare(a.publie)).map((a) => `  <item>
     <title>${esc(a.titre)}</title>
