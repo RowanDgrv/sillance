@@ -50,87 +50,14 @@
   "mainEntity": [
     {"@type":"Question","name":"Combien d'entraîneurs du club peuvent utiliser Sillance ?","acceptedAnswer":{"@type":"Answer","text":"Autant que vous voulez : les entraîneurs sont illimités. Le tarif du club dépend uniquement du nombre d'athlètes suivis."}},
     {"@type":"Question","name":"Nos athlètes ont des montres différentes, ou pas de montre du tout. Ça marche ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Les séances s'envoient directement sur les montres COROS, et en fichier .FIT pour les montres Garmin. Sans montre, l'athlète consulte sa séance dans l'application et peut importer ses fichiers .FIT, .TCX ou .GPX."}},
-    {"@type":"Question","name":"Comment gérer les jeunes et les athlètes mineurs ?","acceptedAnswer":{"@type":"Answer","text":"Le suivi jeunes garde les chronos de référence en natation et en course à pied sur toute la saison. Pour les compétitions, l'athlète, ou son parent s'il est mineur, confirme sa participation."}},
+    {"@type":"Question","name":"Comment gérer les jeunes et les athlètes mineurs ?","acceptedAnswer":{"@type":"Answer","text":"Le suivi jeunes garde les chronos de référence en natation et en course à pied sur toute la saison. Les compétitions sont ciblées par groupe, ce qui permet de suivre séparément les jeunes et les adultes."}},
     {"@type":"Question","name":"Combien de temps pour mettre le club en place ?","acceptedAnswer":{"@type":"Answer","text":"Nous créons l'espace de votre club avec vous. Vous partagez ensuite un lien d'invitation unique : chaque licencié crée son compte, et vous l'affectez au bon groupe."}},
     {"@type":"Question","name":"Où sont hébergées les données des licenciés ?","acceptedAnswer":{"@type":"Answer","text":"En Europe, conformément au RGPD. Les données de santé ne sont traitées qu'avec le consentement explicite de l'athlète, qui peut retirer l'accès à tout moment."}},
     {"@type":"Question","name":"Combien coûte Sillance pour un club ?","acceptedAnswer":{"@type":"Answer","text":"50 € par mois jusqu'à 50 athlètes, 112,50 € jusqu'à 150 athlètes, 150 € jusqu'à 300 athlètes. Les 10 premiers clubs de chaque palier bénéficient d'un tarif fondateur bloqué à vie (25 €, 56,25 € ou 75 € par mois)."}}
   ]
 }
 </script>
-<style>
-  :root{ --paper:#0B1120; --panel:#111a2e; --panel2:#16213a; --text:#F3F6FC; --muted:#9AA6BF; --line:rgba(150,165,200,.16);
-    --accent:#46C2D8; --accent2:#FF9A3D; --display:'Oswald',sans-serif; --body:'Archivo',sans-serif; --mono:'JetBrains Mono',monospace; }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{background:var(--paper);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;
-    background-image:radial-gradient(900px 600px at 10% -10%,rgba(70,194,216,.14),transparent 60%),radial-gradient(800px 600px at 100% 20%,rgba(255,154,61,.08),transparent 60%)}
-  a{color:var(--accent)}
-  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
-  /* nav */
-  .nav{position:sticky;top:0;z-index:20;background:rgba(11,17,32,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-  .nav .wrap{display:flex;align-items:center;gap:20px;height:64px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.06em;color:var(--text);text-decoration:none;text-transform:uppercase}
-  .nav-links{display:flex;gap:22px;margin-left:auto}
-  .nav-links a{color:var(--muted);text-decoration:none;font-size:15px}
-  .nav-links a:hover{color:var(--text)}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:12px;font:600 15px var(--body);text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap}
-  .btn.primary{background:var(--accent);color:#06222A}
-  .btn.ghost{border-color:var(--line);color:var(--text);background:rgba(255,255,255,.03)}
-  .nav .btn{height:40px;padding:0 16px}
-  /* contenu */
-  .crumb{font:500 13px var(--mono);color:var(--muted);padding-top:22px}
-  .crumb a{color:var(--muted);text-decoration:none}
-  .kicker{font:700 13px var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--accent2)}
-  h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.08;letter-spacing:.005em}
-  h1{font-size:clamp(36px,4.6vw,54px);text-transform:uppercase;margin:14px 0 18px}
-  h1 em,h2 em{font-style:normal;color:var(--accent)}
-  h2{font-size:clamp(30px,4vw,44px);margin:12px 0 14px}
-  h3{font-size:22px;margin-bottom:6px}
-  .lead{font-size:20px;color:#C9D3E6;max-width:640px}
-  .hero{padding:30px 0 70px}
-  .hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:48px;align-items:center}
-  .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-  .note{font-size:14px;color:var(--muted);margin-top:14px}
-  .shot{border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -20px rgba(0,0,0,.7),0 0 60px -20px rgba(70,194,216,.25);background:var(--panel)}
-  .shot img{display:block;width:100%;height:auto}
-  section.block{padding:70px 0;border-top:1px solid var(--line)}
-  .feat{display:grid;grid-template-columns:1fr 1.15fr;gap:52px;align-items:center}
-  .feat.rev .txt{order:2}
-  .feat p{color:#C9D3E6;margin-bottom:12px}
-  .feat ul{list-style:none;margin-top:8px}
-  .feat li{padding-left:26px;position:relative;margin:8px 0;color:#DCE3F1}
-  .feat li::before{content:"";position:absolute;left:0;top:10px;width:12px;height:2px;background:var(--accent2)}
-  .gains{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
-  .card p{color:var(--muted);font-size:15.5px}
-  .mini{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
-  .mini .card h3{font-size:19px}
-  .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
-  .price .amt{font:700 44px var(--display);margin:10px 0 2px}
-  .price .amt small{font:500 16px var(--body);color:var(--muted)}
-  .price .cap{color:var(--muted);font-size:14.5px}
-  .price .founder{margin-top:14px;padding:10px 12px;border-radius:10px;background:rgba(255,154,61,.1);border:1px solid rgba(255,154,61,.35);font-size:14.5px}
-  .faq details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:12px}
-  .faq summary{font:600 18px var(--body);cursor:pointer;list-style:none}
-  .faq summary::-webkit-details-marker{display:none}
-  .faq summary::after{content:"+";float:right;color:var(--accent);font-weight:700}
-  .faq details[open] summary::after{content:"–"}
-  .faq p{color:#C9D3E6;margin-top:10px}
-  .final{text-align:center;padding:80px 0}
-  .final .ctas{justify-content:center}
-  footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--muted);font-size:14px}
-  footer .wrap{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
-  footer a{color:var(--muted);text-decoration:none}
-  footer .sp{margin-left:auto}
-  @media (max-width:900px){
-    .hero-grid,.feat{grid-template-columns:1fr;gap:28px}
-    .feat.rev .txt{order:0}
-    .gains,.prices{grid-template-columns:1fr}
-    .mini{grid-template-columns:1fr 1fr}
-    .nav-links{display:none}
-  }
-  @media (max-width:520px){ .mini{grid-template-columns:1fr} .nav .btn.ghost{display:none} body{font-size:16px} }
-</style>
+<link rel="stylesheet" href="../assets/seo.css?v=20261104a">
 </head>
 <body>
 <nav class="nav"><div class="wrap">
@@ -179,7 +106,7 @@
       <p>Organisez vos licenciés en groupes : jeunes loisir, jeunes compétition, distance M, half, Ironman… Une séance créée par un entraîneur part en un clic à tout le groupe.</p>
       <ul>
         <li>Les cibles en % de VMA, de FTP ou de CSS s'adaptent aux références de chaque athlète.</li>
-        <li>Séances récurrentes (la piste du mardi) et cycles de plusieurs semaines.</li>
+        <li>Séances récurrentes : la piste du mardi se programme une fois pour toute la saison.</li>
         <li>Plusieurs entraîneurs sur le même club, sans surcoût.</li>
       </ul>
     </div>
@@ -226,9 +153,9 @@
     <div class="txt">
       <span class="kicker">Compétitions</span>
       <h2>Préparer les <em>compétitions de la saison</em></h2>
-      <p>Créez les courses objectifs du club, départementales, régionales ou nationales, et suivez les participations : l'athlète, ou son parent s'il est mineur, confirme sa présence.</p>
+      <p>Créez les courses objectifs du club, départementales, régionales ou nationales, ciblez le groupe concerné et suivez qui y participe.</p>
     </div>
-    <div class="shot"><img src="../img/club-triathlon/competitions.webp" width="1600" height="1036" alt="Compétitions objectifs de la saison d'un club de triathlon dans Sillance, avec confirmations des athlètes" loading="lazy"></div>
+    <div class="shot"><img src="../img/club-triathlon/competitions.webp" width="1600" height="1036" alt="Compétitions objectifs de la saison d'un club de triathlon dans Sillance" loading="lazy"></div>
   </div></section>
 
   <section class="block"><div class="wrap feat rev">
@@ -259,7 +186,7 @@
       <div class="card price"><h3>Grand club</h3><div class="amt">112,50 € <small>/ mois</small></div><div class="cap">jusqu'à 150 athlètes</div><div class="founder"><b>Fondateurs : 56,25 €/mois à vie</b> · 10 premiers clubs</div></div>
       <div class="card price"><h3>Club illimité</h3><div class="amt">150 € <small>/ mois</small></div><div class="cap">jusqu'à 300 athlètes</div><div class="founder"><b>Fondateurs : 75 €/mois à vie</b> · 10 premiers clubs</div></div>
     </div>
-    <p class="note">Le détail des offres est sur la <a href="../#pricing">page tarifs</a>.</p>
+    <p class="note">Le détail des offres est sur la <a href="../#pricing">page tarifs</a>. Vous êtes un run club ou un club de course à pied ? Voir le <a href="../logiciel-run-club/">logiciel pour run club</a>.</p>
   </div></section>
 
   <section class="block faq" id="faq"><div class="wrap">
@@ -267,7 +194,7 @@
     <h2>Les questions des <em>clubs de triathlon</em></h2>
     <details><summary>Combien d'entraîneurs du club peuvent utiliser Sillance ?</summary><p>Autant que vous voulez : les entraîneurs sont illimités. Le tarif du club dépend uniquement du nombre d'athlètes suivis.</p></details>
     <details><summary>Nos athlètes ont des montres différentes, ou pas de montre du tout. Ça marche ?</summary><p>Oui. Les séances s'envoient directement sur les montres COROS, et en fichier .FIT pour les montres Garmin. Sans montre, l'athlète consulte sa séance dans l'application et peut importer ses fichiers .FIT, .TCX ou .GPX.</p></details>
-    <details><summary>Comment gérer les jeunes et les athlètes mineurs ?</summary><p>Le suivi jeunes garde les chronos de référence en natation et en course à pied sur toute la saison. Pour les compétitions, l'athlète, ou son parent s'il est mineur, confirme sa participation.</p></details>
+    <details><summary>Comment gérer les jeunes et les athlètes mineurs ?</summary><p>Le suivi jeunes garde les chronos de référence en natation et en course à pied sur toute la saison. Les compétitions sont ciblées par groupe, ce qui permet de suivre séparément les jeunes et les adultes.</p></details>
     <details><summary>Combien de temps pour mettre le club en place ?</summary><p>Nous créons l'espace de votre club avec vous. Vous partagez ensuite un lien d'invitation unique : chaque licencié crée son compte, et vous l'affectez au bon groupe.</p></details>
     <details><summary>Où sont hébergées les données des licenciés ?</summary><p>En Europe, conformément au RGPD. Les données de santé ne sont traitées qu'avec le consentement explicite de l'athlète, qui peut retirer l'accès à tout moment. Le détail est dans la <a href="../legal.html#confidentialite">politique de confidentialité</a>.</p></details>
     <details><summary>Combien coûte Sillance pour un club ?</summary><p>50 € par mois jusqu'à 50 athlètes, 112,50 € jusqu'à 150 athlètes, 150 € jusqu'à 300 athlètes. Les 10 premiers clubs de chaque palier bénéficient d'un tarif fondateur bloqué à vie (25 €, 56,25 € ou 75 € par mois).</p></details>
@@ -286,6 +213,7 @@
 
 <footer><div class="wrap">
   <a href="../">Sillance</a>
+  <a href="../logiciel-run-club/">Run club</a>
   <a href="../sillance-aide.html">Aide &amp; guide</a>
   <a href="../contact.html">Contact</a>
   <a href="../legal.html#mentions">Mentions légales</a>
