@@ -5446,7 +5446,7 @@ function creneauCanSee(c, member){
 }
 const CLUB_DAYS = [tr('day.mon'),tr('day.tue'),tr('day.wed'),tr('day.thu'),tr('day.fri'),tr('day.sat'),tr('day.sun')];
 let CRENEAUX = [
-  {id:'c1', disc:'run', get title(){return tr('cre.c1.title')}, day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7'], groups:['g2','g3']},
+  {id:'c1', disc:'run', get title(){return tr('cre.c1.title')}, day:1, time:'18:30', dur:90, place:'Stade Nelson Paillou, Muret', cap:24, coach:'Éric', price:0, attendees:['a1','a2','a4','a7'], declined:['a3'], groups:['g2','g3']},
   {id:'c2', disc:'swim', get title(){return tr('cre.c2.title')}, day:2, time:'12:15', dur:60, place:'Piscine Nakache, Muret', cap:16, coach:'Julie', price:0, attendees:['a2','a6'], groups:[]},
   {id:'c3', disc:'bike', get title(){return tr('cre.c3.title')}, day:5, time:'19:00', dur:150, place:'Départ Vélodrome, Muret', cap:12, coach:'Karim', price:0, attendees:['a3','a5','a8'], groups:['g6']},
   {id:'c4', disc:'bike', get title(){return tr('cre.c4.title')}, day:6, time:'08:00', dur:180, place:'Départ Base de loisirs, Muret', cap:30, coach:'Éric', price:0, attendees:['a1','a4','a7'], groups:[]}
@@ -5829,7 +5829,7 @@ function myClubData(){
   const resp = {}; COMPETITIONS.forEach(c=>{ const r=COMPETITION_RESPONSES[compResponseKey(c.id, ME_CLUB_ID)]; if(r) resp[c.id]=r.status; });
   return { demo:true, name: document.getElementById('clubName')?.textContent || tr('myClub.title'), memberId: ME_CLUB_ID,
     group: me?.group || null, creneaux: CRENEAUX, comps: COMPETITIONS, resp,
-    mine: new Set(CRENEAUX.filter(c=>(c.attendees||[]).includes(ME_CLUB_ID)).map(c=>c.id)) };
+    ans: Object.fromEntries(CRENEAUX.map(c=>[c.id, (c.attendees||[]).includes(ME_CLUB_ID)?'yes':((c.declined||[]).includes(ME_CLUB_ID)?'no':null)]).filter(([,v])=>v)) };
 }
 function renderMyClubCard(){
   const box=document.getElementById('myClubCard'); if(!box) return;
@@ -5849,11 +5849,14 @@ function renderMyClubCard(){
   box.innerHTML = `
     <div class="rec-head"><h3><i class="ic ic-users"></i> ${tr('myClub.title')} · ${d.name}</h3></div>
     <div class="mc-sub">${tr('myClub.sorties')}</div>
-    ${sorties.length ? sorties.map(({c,date})=>{ const D=DISC[c.disc]; const inIt=d.mine.has(c.id); return `
+    ${sorties.length ? sorties.map(({c,date})=>{ const D=DISC[c.disc]; const a=d.ans[c.id]||null; return `
       <div class="mc-row" data-cr="${c.id}">
         <span class="mc-ic" style="color:${D?D.color:'var(--accent)'}">${D?discIcon(D):''}</span>
         <div class="mc-b"><b>${c.title}</b><span>${fmt(date)} · ${c.time||''}${c.place?' · '+c.place:''}</span></div>
-        <button class="mc-btn ${inIt?'on':''}" data-act="join" type="button">${inIt?`<i class="ic ic-check"></i> ${tr('myClub.going')}`:(c.price>0?tr('myClub.joinPrice',{price:c.price}):tr('myClub.join'))}</button>
+        <div class="mc-duo">
+          <button class="mc-btn ${a==='yes'?'on':''}" data-ans="yes" type="button">${a==='yes'?`<i class="ic ic-check"></i> `:''}${c.price>0?tr('myClub.joinPrice',{price:c.price}):tr('myClub.join')}</button>
+          <button class="mc-btn ghost ${a==='no'?'off':''}" data-ans="no" type="button">${tr('myClub.no')}</button>
+        </div>
       </div>`; }).join('') : `<p class="mc-empty">${tr('myClub.noSorties')}</p>`}
     <div class="mc-sub">${tr('myClub.comps')}</div>
     ${comps.length ? comps.map(c=>{ const st=d.resp[c.id]||'pending'; return `
@@ -5865,30 +5868,30 @@ function renderMyClubCard(){
           <button class="mc-btn ghost ${st==='declined'?'off':''}" data-st="declined" type="button">${tr('myClub.no')}</button>
         </div>
       </div>`; }).join('') : `<p class="mc-empty">${tr('myClub.noComps')}</p>`}`;
+  // Sorties : « Je viens » / « Pas cette fois » pour la PROCHAINE séance ;
+  // re-cliquer la réponse active la retire (présence non confirmée).
   box.querySelectorAll('[data-cr]').forEach(row=>{
     const c = d.creneaux.find(x=>x.id===row.dataset.cr);
-    row.querySelector('[data-act="join"]').onclick = ()=>{
-      const date = nextCreneauDate(c);
-      if(d.mine.has(c.id)){
-        d.mine.delete(c.id);
-        if(d.demo){ const i=(c.attendees||[]).indexOf(d.memberId); if(i>-1) c.attendees.splice(i,1); }
-        else {
-          PF.leaveCreneau(c.id, d.memberId).catch(e=>{ console.warn('[PF] leaveCreneau :', e); toast(tr('myClub.saveFailed'),'error'); });
-          if(c.sessionTemplate) PF.unscheduleFromCreneau(PF.user.id, c.id, date).catch(e=>console.warn('[PF] unscheduleFromCreneau :', e));
-        }
-        toast(tr('toast.inscriptionAnnulee'));
+    row.querySelectorAll('[data-ans]').forEach(b=> b.onclick = ()=>{
+      const date = nextCreneauDate(c), prev = d.ans[c.id]||null;
+      const next = (prev===b.dataset.ans) ? null : b.dataset.ans;
+      if(next==='yes' && prev!=='yes' && d.demo && c.cap && (c.attendees||[]).length>=c.cap){ toast(tr('toast.creneauComplet')); return; }
+      if(next) d.ans[c.id]=next; else delete d.ans[c.id];
+      if(d.demo){
+        c.attendees=(c.attendees||[]).filter(x=>x!==d.memberId); c.declined=(c.declined||[]).filter(x=>x!==d.memberId);
+        if(next==='yes') c.attendees.push(d.memberId); else if(next==='no') c.declined.push(d.memberId);
       } else {
-        if(d.demo && c.cap && (c.attendees||[]).length>=c.cap){ toast(tr('toast.creneauComplet')); return; }
-        d.mine.add(c.id);
-        if(d.demo){ (c.attendees ||= []).push(d.memberId); }
-        else {
-          PF.joinCreneau(c.id, d.memberId).catch(e=>{ console.warn('[PF] joinCreneau :', e); d.mine.delete(c.id); renderMyClubCard(); toast(tr('myClub.saveFailed'),'error'); });
-          if(c.sessionTemplate) PF.scheduleSessionFromCreneau(PF.user.id, date, c.sessionTemplate, c.id).catch(e=>console.warn('[PF] scheduleSessionFromCreneau :', e));
+        const undo = e=>{ console.warn('[PF] réponse créneau :', e); if(prev) d.ans[c.id]=prev; else delete d.ans[c.id]; renderMyClubCard(); toast(tr('myClub.saveFailed'),'error'); };
+        (next ? PF.answerCreneau(c.id, d.memberId, next, date) : PF.leaveCreneau(c.id, d.memberId)).catch(undo);
+        if(c.sessionTemplate){
+          if(next==='yes' && prev!=='yes') PF.scheduleSessionFromCreneau(PF.user.id, date, c.sessionTemplate, c.id).catch(e=>console.warn('[PF] scheduleSessionFromCreneau :', e));
+          if(prev==='yes' && next!=='yes') PF.unscheduleFromCreneau(PF.user.id, c.id, date).catch(e=>console.warn('[PF] unscheduleFromCreneau :', e));
         }
-        toast(c.price>0 ? tr('creneau.registeredPricePay', {price:c.price}) : (c.sessionTemplate ? tr('myClub.joinedWithSession') : tr('creneau.registeredToSlot')));
       }
+      toast(next==='yes' ? (c.price>0 ? tr('creneau.registeredPricePay', {price:c.price}) : (c.sessionTemplate ? tr('myClub.joinedWithSession') : tr('myClub.comingToast')))
+        : next==='no' ? tr('myClub.absentToast') : tr('myClub.unansweredToast'));
       renderMyClubCard();
-    };
+    });
   });
   box.querySelectorAll('[data-cp]').forEach(row=>{
     row.querySelectorAll('[data-st]').forEach(b=> b.onclick = ()=>{
@@ -5953,6 +5956,7 @@ function renderCreneaux(){
         return chips+body+pend; })()}
       <div class="cr-fill"><i style="width:${fillPct}%"></i></div>
       <div class="cr-fillrow"><span>${tr('clubDash.nRegistered', {n:c.attendees.length, cap:c.cap})}</span><span>${tr('creneau.spotsLeft', {n:c.cap-c.attendees.length})}</span></div>
+      ${(()=>{ const sm=crAnswerSummary(c); return `<div class="cr-answers"><span class="ok">${tr(sm.yes.length===1?'crd.sumComingOne':'crd.sumComing',{n:sm.yes.length})}</span><span class="no">${tr(sm.no.length===1?'crd.sumAbsentOne':'crd.sumAbsent',{n:sm.no.length})}</span><span class="pend">${tr(sm.pending.length===1?'crd.sumUnconfirmedOne':'crd.sumUnconfirmed',{n:sm.pending.length})}</span></div>`; })()}
       <div class="cr-attendees">${avatars||`<span class="cr-roster">${tr('creneau.noOneRegistered')}</span>`}</div>
       <div class="cr-cta">
         ${(c.invited||[]).includes(ME_CLUB_ID)
@@ -7890,6 +7894,14 @@ document.getElementById('grpSave').onclick=()=>{
    récurrence : hebdomadaire ou séance ponctuelle datée).
    ============================================================ */
 let crdCurrent=null, crdTab='desc';
+/* réponses d'une sortie pour sa prochaine séance : yes / no / invited / pending */
+function crAnswerSummary(c){
+  const yes=[...(c.attendees||[])], no=(c.declined||[]).filter(id=>!yes.includes(id));
+  const invited=(c.invited||[]).filter(id=>!yes.includes(id)&&!no.includes(id));
+  const expected=(c.groups&&c.groups.length) ? CLUB_ATHLETES.filter(a=>c.groups.includes(a.group)) : CLUB_ATHLETES;
+  const pending=expected.map(a=>a.id).filter(id=>!yes.includes(id)&&!no.includes(id)&&!invited.includes(id));
+  return {yes, no, invited, pending};
+}
 function openCreneauDetail(c, tab){
   crdCurrent=c; crdTab=tab||'desc';
   const D=DISC[c.disc];
@@ -7922,15 +7934,18 @@ function renderCreneauDetail(){
       : `<div class="crd-desc locked"><i class="ic ic-lock"></i> ${tr('creneau.groupOnlyContentDot', {name:groupNames})}</div>`;
   }
   else if(crdTab==='participants'){
-    const rows=[
-      ...c.attendees.map(id=>({id, st:'ok'})),
-      ...((c.invited||[]).map(id=>({id, st:'wait'})))
-    ].map(r=>{
-      const a=CLUB_ATHLETES.find(x=>x.id===r.id);
-      return `<div class="crd-p"><div class="cr-att">${a?initials(a.name):'?'}</div>${a?a.name:'—'}
-        <span class="st ${r.st}">${r.st==='ok'?tr('crd.present'):tr('crd.invitedPending')}</span></div>`;
-    }).join('');
-    body.innerHTML = rows ? `<div class="crd-list">${rows}</div>` : `<p class="club-hint">${tr('crd.noOneYet')}</p>`;
+    // Réponses pour la prochaine séance (04/11/2026, demande Rowan) :
+    // Je viens / Absent (« pas cette fois ») / Présence non confirmée (rien
+    // répondu, parmi les adhérents des groupes visés, ou tout le club).
+    const sum = crAnswerSummary(c);
+    const label = {ok:tr('crd.coming'), wait:tr('crd.invitedPending'), no:tr('crd.absent'), pend:tr('crd.unconfirmed')};
+    const sec = (title, ids, st)=> ids.length ? `<div class="crd-sec">${title} · ${ids.length}</div>` + ids.map(id=>{
+      const a=CLUB_ATHLETES.find(x=>x.id===id);
+      return `<div class="crd-p"><div class="cr-att">${a?initials(a.name):'?'}</div>${a?a.name:'?'}<span class="st ${st}">${label[st]}</span></div>`;
+    }).join('') : '';
+    const html = sec(tr('crd.secComing'), sum.yes, 'ok') + sec(tr('crd.secInvited'), sum.invited, 'wait')
+      + sec(tr('crd.secAbsent'), sum.no, 'no') + sec(tr('crd.secUnconfirmed'), sum.pending, 'pend');
+    body.innerHTML = html ? `<div class="crd-date">${tr('crd.forSession', {date:new Date(nextCreneauDate(c)+'T00:00:00').toLocaleDateString(localeStr(),{weekday:'long',day:'numeric',month:'long'})})}</div><div class="crd-list">${html}</div>` : `<p class="club-hint">${tr('crd.noOneYet')}</p>`;
   }
   else {
     body.innerHTML = `

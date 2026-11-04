@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261105a";
+import { PF } from "./sillance-client.js?v=20261105b";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -252,6 +252,17 @@ async function openAdminThemeEditor() {
   }
 }
 
+// Prochaine date d'un créneau (même logique que nextCreneauDate du core :
+// day 0 = lundi) et réponse valable pour CETTE séance (0090) :
+// for_date vide = inscription permanente ; for_date passée = plus de réponse.
+const nextCrDate = (c) => {
+  if (c.recur === "once" && c.date) return c.date;
+  const t = new Date(), d = ((c.day - (t.getDay() + 6) % 7) % 7 + 7) % 7;
+  const x = new Date(t); x.setDate(t.getDate() + d); return x.toLocaleDateString("fr-CA");
+};
+const answerFor = (row, next) => !row.for_date ? (row.status === "no" ? null : "yes")
+  : (row.for_date === next ? (row.status || "yes") : null);
+
 async function loadClubData(club, app, uid) {
   window.__pf_clubId = club.id;   // exposé pour les écritures (création créneau)
   applyClubTheme(club, uid);
@@ -286,9 +297,16 @@ async function loadClubData(club, app, uid) {
   app.assignObj(app.data.COMPETITION_RESPONSES, respByKey);
   // Présences réelles (audit 22/09/2026 : mapCreneau posait attendees:[]
   // en dur, aucun pointage n'était donc jamais visible pour un vrai club).
-  const attByCreneau = {};
-  for (const a of attendance) (attByCreneau[a.creneau_id] ||= []).push(a.athlete_id);
-  app.replaceArray(app.data.CRENEAUX, creneaux.map((c) => ({ ...mapCreneau(c), attendees: attByCreneau[c.id] || [] })));
+  // + réponses « pas cette fois » (0090) : declined, pour afficher Absent
+  const attByCreneau = {}, noByCreneau = {}, crById = {};
+  creneaux.forEach((c) => { crById[c.id] = mapCreneau(c); });
+  for (const a of attendance) {
+    const c = crById[a.creneau_id]; if (!c) continue;
+    const ans = answerFor(a, nextCrDate(c));
+    if (ans === "yes") (attByCreneau[a.creneau_id] ||= []).push(a.athlete_id);
+    else if (ans === "no") (noByCreneau[a.creneau_id] ||= []).push(a.athlete_id);
+  }
+  app.replaceArray(app.data.CRENEAUX, creneaux.map((c) => ({ ...crById[c.id], attendees: attByCreneau[c.id] || [], declined: noByCreneau[c.id] || [] })));
   // titre du club affiché
   const clubNameEl = document.getElementById("clubName");
   if (clubNameEl) clubNameEl.textContent = club.name;
@@ -505,7 +523,10 @@ async function hydrate() {
             app.setMyClub({ name: esc(ov.club.name), memberId: ov.memberId, group: ov.groupId,
               creneaux: ov.creneaux.map(mapCreneau),
               comps: ov.competitions.map((c) => ({ id: c.id, name: esc(c.name), date: c.date, level: c.level, targetGroupId: c.target_group_id })),
-              resp, mine: new Set(ov.attending) });
+              resp, ans: Object.fromEntries(ov.attending.map((r) => {
+                const c = ov.creneaux.find((x) => x.id === r.creneau_id);
+                return [r.creneau_id, c ? answerFor(r, nextCrDate(mapCreneau(c))) : null];
+              }).filter(([, v]) => v)) });
           }
         } catch (e) { console.warn("[PF] Mon club :", e); }
         return;

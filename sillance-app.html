@@ -2007,6 +2007,12 @@ table.cbill td{padding:10px 9px;border-bottom:1px solid var(--line)}
 .crd-p .st{margin-left:auto;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px}
 .crd-p .st.ok{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
 .crd-p .st.wait{color:var(--bike);background:color-mix(in srgb,var(--bike) 12%,transparent)}
+.crd-p .st.no{color:var(--danger,#e5484d);background:color-mix(in srgb,var(--danger,#e5484d) 12%,transparent)}
+.crd-p .st.pend{color:var(--muted);background:color-mix(in srgb,var(--muted) 14%,transparent)}
+.crd-sec{margin:10px 0 4px;font:700 10.5px var(--mono,monospace);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.crd-date{font-size:12.5px;color:var(--soft);margin-bottom:6px}
+.cr-answers{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 2px;font-size:11.5px;font-weight:700}
+.cr-answers .ok{color:var(--good)} .cr-answers .no{color:var(--danger,#e5484d)} .cr-answers .pend{color:var(--muted)}
 .crd-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .crd-form .b-fld.full{grid-column:1/-1}
 .crd-form label{display:block;font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--space-1)}
@@ -4279,7 +4285,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261105b"></script>
+<script src="./sillance-i18n-app.js?v=20261105c"></script>
 <script src="./sillance-reminder.js?v=20261028g"></script>
 <script src="./sillance-ai-popup.js?v=20261028d"></script>
 <script src="./sillance-consigne.js?v=20261029a"></script>
@@ -4292,12 +4298,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-exercises.js?v=20261030d"></script>
 <script src="./sillance-equipment.js?v=20261103c"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
-<script src="./sillance-app.core.js?v=20261105d"></script>
+<script src="./sillance-app.core.js?v=20261105e"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261105a"></script>
+<script type="module" src="./sillance-integration.js?v=20261105b"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>

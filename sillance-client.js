@@ -1037,12 +1037,13 @@ export const PF = {
     const [cr, cp, att, resp] = await Promise.all([
       sb.from("creneaux").select("*").eq("club_id", m.club_id).order("day"),
       sb.from("club_competitions").select("id, name, date, level, target_group_id").eq("club_id", m.club_id).gte("date", today).order("date"),
-      sb.from("creneau_attendees").select("creneau_id").eq("athlete_id", m.id),
+      sb.from("creneau_attendees").select("creneau_id, status, for_date").eq("athlete_id", m.id)
+        .then((r) => r.error ? sb.from("creneau_attendees").select("creneau_id").eq("athlete_id", m.id) : r),
       sb.from("club_competition_responses").select("competition_id, status").eq("athlete_id", this.user.id),
     ]);
     return { club: m.clubs, memberId: m.id, groupId: m.group_id,
       creneaux: cr.data ?? [], competitions: cp.data ?? [],
-      attending: (att.data ?? []).map((r) => r.creneau_id),
+      attending: att.data ?? [],
       responses: resp.data ?? [] };
   },
   async getClubMembers(clubId) {
@@ -1065,9 +1066,11 @@ export const PF = {
   // Présences de TOUS les créneaux du club en un appel (jointure via creneaux
   // pour filtrer par club_id, creneau_attendees n'a pas cette colonne).
   async getClubAttendance(clubId) {
-    const { data, error } = await sb.from("creneau_attendees")
-      .select("creneau_id, athlete_id, creneaux!inner(club_id)")
+    let { data, error } = await sb.from("creneau_attendees")
+      .select("creneau_id, athlete_id, status, for_date, creneaux!inner(club_id)")
       .eq("creneaux.club_id", clubId);
+    if (error) ({ data, error } = await sb.from("creneau_attendees")   // avant 0090
+      .select("creneau_id, athlete_id, creneaux!inner(club_id)").eq("creneaux.club_id", clubId));
     if (error) console.warn("[PF] lecture creneau_attendees échouée :", error.message);
     return data ?? [];
   },
@@ -1143,6 +1146,17 @@ export const PF = {
     const { error } = await sb.from("creneau_attendees")
       .upsert({ creneau_id: creneauId, athlete_id: memberId }, { onConflict: "creneau_id,athlete_id" });
     if (error) throw error; return true;
+  },
+  // Réponse de présence pour UNE séance (0090) : 'yes' | 'no', for_date = date
+  // de la séance. Sans la migration 0090 : retombe sur inscrire/désinscrire.
+  async answerCreneau(creneauId, memberId, status, forDate) {
+    const { error } = await sb.from("creneau_attendees")
+      .upsert({ creneau_id: creneauId, athlete_id: memberId, status, for_date: forDate }, { onConflict: "creneau_id,athlete_id" });
+    if (!error) return true;
+    if (/status|for_date|column/i.test(error.message || "")) {
+      return status === "yes" ? this.joinCreneau(creneauId, memberId) : this.leaveCreneau(creneauId, memberId);
+    }
+    throw error;
   },
   async leaveCreneau(creneauId, memberId) {
     const { error } = await sb.from("creneau_attendees")
