@@ -2005,20 +2005,20 @@ function buildCycles(container){
 function cycleEntries(c, startIso){
   const start = startIso ? new Date(startIso+'T00:00:00') : nextMonday();
   const mon = addDays(start, -((start.getDay()+6)%7));
-  const out = [];
+  const out = []; let missing = 0;
   for(let w=0; w<c.weeks; w++) for(let d=0; d<7; d++){
     (c.plan[w+'-'+d]||[]).forEach(tid=>{
-      const t = TEMPLATES.find(x=>x.id===tid); if(!t) return;
+      const t = TEMPLATES.find(x=>x.id===tid); if(!t){ missing++; return; }
       out.push({ key: iso(addDays(mon, w*7+d)), t });
     });
   }
-  return { mon, out };
+  return { mon, out, missing };
 }
 
 /* pose le cycle sur le calendrier de l'athlète, à partir du lundi
    de la semaine choisie (défaut : lundi prochain) */
 function applyCycle(c, startIso){
-  const { mon, out } = cycleEntries(c, startIso);
+  const { mon, out, missing } = cycleEntries(c, startIso);
   out.forEach(({key, t})=>{
     const s = {...t, id:'s'+(uid++), done:false};
     (planning[key] ||= []).push(s);
@@ -2032,6 +2032,8 @@ function applyCycle(c, startIso){
   weekOffset = Math.round((mon - mondayOf(0))/(7*864e5));
   render();
   toast(tr('cycles.appliedToast', {name:c.name, n:out.length, weeks:c.weeks}));
+  // séances du cycle introuvables (supprimées de la bibliothèque) : on le dit
+  if(missing) setTimeout(()=>toast(tr('cycles.missingToast', {n:missing}), 'error'), 1600);
 }
 
 /* ============================================================
@@ -8203,7 +8205,14 @@ function saveSessionToLibrary(s){
     PF.saveTemplate({ disc:s.disc, title:s.title, dur:s.dur, dist:s.dist||0, tss:s.tss,
       zone:s.zone, activeRefs:builderState.activeRefs, blocks:(s.blocksV2&&s.blocksV2.blocks)||builderState.blocks })
       .then(row=>{ if(row && row.id){ const old=t.id; t.id=row.id; t.mine=true;
-        CYCLES.forEach(c=>Object.values(c.plan).forEach(a=>a.forEach((x,i)=>{ if(x===old) a[i]=row.id; }))); } })
+        // …et on RÉENREGISTRE les cycles touchés : avant (bug de persistance
+        // des cycles, corrigé 05/11/2026), seul l'état en mémoire changeait ;
+        // la base gardait l'id temporaire « tplN » et la séance disparaissait
+        // du cycle au rechargement.
+        CYCLES.forEach(c=>{ let hit=false;
+          Object.values(c.plan).forEach(a=>a.forEach((x,i)=>{ if(x===old){ a[i]=row.id; hit=true; } }));
+          if(hit && PF.saveCycle && /^[0-9a-f-]{36}$/i.test(c.id||'')) PF.saveCycle(c).catch(e=>console.warn('[PF] saveCycle (remap) :', e));
+        }); } })
       .catch(e=>{ console.warn('[PF] saveTemplate échoué :', e); toast(tr('toast.libSaveFailed'), 'error'); });
   }
   if(mode==='coach') renderSidebar();

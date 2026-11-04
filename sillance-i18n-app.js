@@ -399,6 +399,7 @@
     "cycles.empty": `Aucun cycle · crée ton premier programme.`, "cycles.weeks": `semaines`, "cycles.sessions": `séances`,
     "cycles.addToAthlete": `Ajouter à l'athlète`, "cycles.assignMultiple": `Attribuer à plusieurs`, "cycles.deleteAria": `Supprimer le cycle`,
     "cycles.appliedToast": `Cycle « {name} » posé : {n} séances sur {weeks} semaines`,
+    "cycles.missingToast": `{n} séance(s) du cycle introuvable(s) dans ta bibliothèque : ajoute-les à la main ou mets le cycle à jour.`,
 
     "assign.cyclePosedPlural": `Cycle « {name} » posé pour {n} athlètes : {entries} séances chacun`,
     "assign.cyclePosedSingular": `Cycle « {name} » posé pour {n} athlète : {entries} séances chacun`,
@@ -2047,6 +2048,7 @@
     "cycles.empty": `No cycles · create your first program.`, "cycles.weeks": `weeks`, "cycles.sessions": `sessions`,
     "cycles.addToAthlete": `Add to athlete`, "cycles.assignMultiple": `Assign to multiple`, "cycles.deleteAria": `Delete cycle`,
     "cycles.appliedToast": `Cycle "{name}" applied: {n} sessions over {weeks} weeks`,
+    "cycles.missingToast": `{n} session(s) in this cycle are no longer in your library: add them manually or update the cycle.`,
 
     "assign.cyclePosedPlural": `Cycle "{name}" applied for {n} athletes: {entries} sessions each`,
     "assign.cyclePosedSingular": `Cycle "{name}" applied for {n} athlete: {entries} sessions each`,
@@ -3593,6 +3595,7 @@
     "cycles.empty": `Ningún ciclo · crea tu primer programa.`, "cycles.weeks": `semanas`, "cycles.sessions": `sesiones`,
     "cycles.addToAthlete": `Añadir al atleta`, "cycles.assignMultiple": `Asignar a varios`, "cycles.deleteAria": `Eliminar el ciclo`,
     "cycles.appliedToast": `Ciclo «{name}» aplicado: {n} sesiones en {weeks} semanas`,
+    "cycles.missingToast": `{n} sesión(es) del ciclo ya no están en tu biblioteca: añádelas a mano o actualiza el ciclo.`,
 
     "assign.cyclePosedPlural": `Ciclo «{name}» aplicado para {n} atletas: {entries} sesiones cada uno`,
     "assign.cyclePosedSingular": `Ciclo «{name}» aplicado para {n} atleta: {entries} sesiones cada uno`,
