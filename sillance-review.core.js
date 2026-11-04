@@ -2621,6 +2621,22 @@ function profLineMin(ln, disc){
   }
   return (ln.dur?.h||0)*60 + (ln.dur?.m||0) + (ln.dur?.s||0)/60;
 }
+/* Modèles INVERSÉS (% CSS natation, % allure seuil course : le % multiplie
+   un TEMPS de référence, 112 % = plus lent = plus facile). On repère la zone
+   du modèle où tombe le %, puis on renvoie l'intensité équivalente sur
+   l'échelle générique (zoneFromPct / IF du TSS). 1/pct seul ne suffisait
+   pas : en natation l'échelle est très resserrée (112 % CSS = récup, pas
+   « 89 % » = seuil) — 04/11/2026. */
+const INVERTED_EQUIV = { css:[55,70,95,108,118], seuilRun:[65,80,95,103,110] };
+function invertedEquivPct(model, pct){
+  const m = INTENSITY_MODELS[model]; const eq = INVERTED_EQUIV[model];
+  if(!m || !m.invert || !eq || !pct) return null;
+  const z = m.zones;                      // [nom, borne lente, borne rapide] du plus facile au plus dur
+  if(pct >= z[0][1]) return eq[0] - Math.min(10, (pct - z[0][1]));          // plus lent que la 1re zone
+  if(pct <= z[z.length-1][2]) return eq[eq.length-1];                        // plus rapide que la dernière
+  for(let i=0;i<z.length;i++){ if(pct <= z[i][1] && pct >= z[i][2]) return eq[Math.min(i, eq.length-1)]; }
+  return 10000/pct;
+}
 function profLinePct(ln){
   if(ln.type==='station') return 96;
   if(ln.metric==='reps') return Math.min(130, (ln.rpe||7)*12);
@@ -2633,6 +2649,11 @@ function profLinePct(ln){
     if(ex.kind==='rpe')     return (ex.rpe||6)*12;
     return 85;
   }
+  // Modèle INVERSÉ (% CSS natation : le % multiplie un TEMPS de référence,
+  // 112 % = plus lent que le seuil = plus facile) → intensité = 100/pct.
+  // Lu tel quel, un échauffement à 112 % CSS apparaissait comme un effort
+  // maximal (profil tout rouge, séance classée Z5, TSS gonflé) — 04/11/2026.
+  if(ln.pct && INTENSITY_MODELS[ln.model]?.invert) return invertedEquivPct(ln.model, ln.pct) ?? 10000/ln.pct;
   return ln.pct||70;
 }
 const ZONE_PCT = {Z1:55, Z2:65, Z3:80, Z4:95, Z5:108, Z6:118};
@@ -6470,6 +6491,7 @@ function estimateLineTss(ln, disc){
     return lineMinutes(ln)/60*ir*ir*100;
   }
   let pct = ln.pct;
+  if(pct && INTENSITY_MODELS[ln.model]?.invert) pct = invertedEquivPct(ln.model, pct) ?? 10000/pct;   // % CSS / allure seuil inversés (cf. profLinePct)
   if(ln.mode==='exact' && ln.exact){
     // déduit une intensité relative approchée depuis la valeur absolue
     const ex=ln.exact;

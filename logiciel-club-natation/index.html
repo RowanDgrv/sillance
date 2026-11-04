@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Logiciel pour club de natation : séances, groupes et suivi des nageurs | Sillance</title>
+<meta name="description" content="Le logiciel d'entraînement des clubs de natation : séances écrites comme sur un carnet (départs, nages, éducatifs), zones CSS, matériel du bassin, présences, suivi des chronos des jeunes. Entraîneurs illimités.">
+<link rel="canonical" href="https://sillance.app/logiciel-club-natation/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sillance">
+<meta property="og:title" content="Sillance · Le logiciel d'entraînement des clubs de natation">
+<meta property="og:description" content="Séances écrites comme sur un carnet, zones CSS, matériel du bassin, présences et chronos des jeunes. Entraîneurs illimités.">
+<meta property="og:image" content="https://sillance.app/og-image.png">
+<meta property="og:url" content="https://sillance.app/logiciel-club-natation/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/seo.css?v=20261104a">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Sillance","item":"https://sillance.app/"},
+  {"@type":"ListItem","position":2,"name":"Logiciel pour club de natation","item":"https://sillance.app/logiciel-club-natation/"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Sillance pour les clubs de natation","url":"https://sillance.app/logiciel-club-natation/",
+ "applicationCategory":"SportsApplication","operatingSystem":"Web",
+ "description":"Logiciel d'entraînement pour clubs de natation : séances écrites en notation rapide (départs, nages, éducatifs), zones CSS par nageur, matériel du bassin, présences aux créneaux, suivi des chronos des jeunes, rappels du matin.",
+ "offers":[{"@type":"Offer","name":"Club (jusqu'à 50 nageurs)","price":"50","priceCurrency":"EUR"},{"@type":"Offer","name":"Grand club (jusqu'à 150 nageurs)","price":"112.50","priceCurrency":"EUR"},{"@type":"Offer","name":"Club illimité (jusqu'à 300 nageurs)","price":"150","priceCurrency":"EUR"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+ {"@type":"Question","name":"Comment écrit-on une séance de natation dans Sillance ?","acceptedAnswer":{"@type":"Answer","text":"Comme sur un carnet : « 400m échauffement 4 nages », « 6x200m seuil crawl départ 3'20 », « 400m pull plaquettes ». Sillance construit la séance avec les distances, les nages, les départs, l'intensité et le matériel."}},
+ {"@type":"Question","name":"Les intensités sont-elles adaptées à chaque nageur ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Les intensités s'expriment en pourcentage de la CSS (vitesse critique de nage) de chaque nageur. Une même séance donne donc des temps au 100 m différents selon le niveau de chacun."}},
+ {"@type":"Question","name":"Nos nageurs doivent-ils avoir une montre ?","acceptedAnswer":{"@type":"Answer","text":"Non. Le nageur consulte sa séance dans l'application. S'il nage avec une montre, il peut importer ses fichiers .FIT ; les montres COROS remontent leurs séances automatiquement."}},
+ {"@type":"Question","name":"Peut-on suivre la progression des jeunes nageurs ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Le suivi jeunes garde les chronos de référence de chaque nageur sur la saison : meilleur temps, écart avec le test précédent et gain depuis le début de la saison."}},
+ {"@type":"Question","name":"Combien coûte Sillance pour un club de natation ?","acceptedAnswer":{"@type":"Answer","text":"50 € par mois jusqu'à 50 nageurs suivis, 112,50 € jusqu'à 150, 150 € jusqu'à 300, entraîneurs illimités. Les 10 premiers clubs de chaque palier bénéficient d'un tarif fondateur bloqué à vie."}}]}
+</script>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links"><a href="#fonctionnalites">Fonctionnalités</a><a href="#tarifs">Tarifs</a><a href="#faq">FAQ</a></div>
+  <a class="btn ghost" href="../sillance-app.html">Explorer la démo</a>
+  <a class="btn primary" href="../contact.html">Demander une démo</a>
+</div></nav>
+
+<main>
+  <div class="wrap crumb"><a href="../">Sillance</a> › Logiciel pour club de natation</div>
+
+  <section class="hero"><div class="wrap hero-grid">
+    <div>
+      <span class="kicker">Clubs de natation</span>
+      <h1>Le logiciel d'entraînement des <em>clubs de natation</em></h1>
+      <p class="lead">Écrivez vos séances comme sur votre carnet de bord de bassin, avec les départs, les nages et le matériel. Chaque nageur reçoit sa séance avec des temps adaptés à son niveau, et vous suivez les présences et les chronos des jeunes sur toute la saison.</p>
+      <div class="ctas">
+        <a class="btn primary" href="../contact.html">Demander une démo pour mon club</a>
+        <a class="btn ghost" href="../sillance-app.html">Explorer la démo</a>
+      </div>
+      <p class="note">Entraîneurs illimités · Zones CSS par nageur · Données hébergées en Europe</p>
+    </div>
+    <div class="shot"><img src="../img/club-natation/creation-seance-natation.webp" width="1600" height="842" alt="Séance de natation écrite en notation rapide dans Sillance : échauffement 4 nages, éducatifs palmes, 6x200 seuil, pull plaquettes" fetchpriority="high"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap">
+    <span class="kicker">Au bord du bassin</span>
+    <h2>Une ligne d'eau, <em>plusieurs niveaux</em></h2>
+    <p class="lead">Dans une même ligne, les nageurs n'ont ni les mêmes temps ni les mêmes départs. Les séances recopiées au tableau blanc ou envoyées en photo sur WhatsApp ne s'adaptent à personne.</p>
+    <div class="gains">
+      <div class="card"><h3>Écrire vite</h3><p>La notation que vous utilisez déjà devient une séance complète, avec la durée et la charge.</p></div>
+      <div class="card"><h3>Des temps pour chacun</h3><p>Les intensités en % de CSS donnent à chaque nageur ses propres temps au 100 m.</p></div>
+      <div class="card"><h3>Le bon matériel</h3><p>Plaquettes, pull-buoy, palmes, tuba : chaque nageur sait le matin ce qu'il doit apporter.</p></div>
+    </div>
+  </div></section>
+
+  <section class="block" id="fonctionnalites"><div class="wrap feat">
+    <div class="txt">
+      <span class="kicker">Notation de bassin</span>
+      <h2>Une séance de natation <em>comme sur un carnet</em></h2>
+      <p>Tapez « 400m échauffement 4 nages », « 8x50m éducatif palmes », « 6x200m seuil crawl départ 3'20 » ou « 400m pull plaquettes » : Sillance reconnaît les distances, les nages, les départs, les intensités et le matériel.</p>
+      <ul>
+        <li>Échauffement, éducatifs, séries, récupération, retour au calme.</li>
+        <li>Profil d'intensité de la séance et durée estimée selon la CSS du nageur.</li>
+        <li>Le matériel cité est ajouté automatiquement à la séance.</li>
+      </ul>
+    </div>
+    <div class="shot"><img src="../img/club-natation/creation-seance-natation.webp" width="1600" height="842" alt="Profil d'intensité d'une séance de natation et matériel demandé dans Sillance" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap feat rev">
+    <div class="txt">
+      <span class="kicker">Avant d'aller au bassin</span>
+      <h2>Le maillot, le bonnet <em>et les plaquettes</em></h2>
+      <p>Chaque matin, le nageur reçoit le rappel de sa séance avec la liste de ce qu'il doit apporter : maillot, bonnet, lunettes, et le matériel demandé par la séance. Fini les 30 minutes de route pour découvrir qu'on a oublié son maillot.</p>
+    </div>
+    <div class="shot" style="max-width:520px;justify-self:center"><img src="../img/club-natation/rappel-materiel-natation.webp" width="840" height="640" alt="Rappel du matin Sillance pour un nageur : maillot, bonnet, lunettes, palmes, plaquettes, pull-buoy" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap feat">
+    <div class="txt">
+      <span class="kicker">École de natation</span>
+      <h2>Les <em>chronos des jeunes</em>, test après test</h2>
+      <p>Gardez les chronos de référence de chaque jeune nageur sur la saison : son meilleur temps, l'écart avec le test précédent et ce qu'il a gagné depuis la rentrée. Les progrès se voient, et se partagent avec les familles.</p>
+    </div>
+    <div class="shot"><img src="../img/club-natation/suivi-jeunes.webp" width="1600" height="1036" alt="Suivi des chronos de référence des jeunes nageurs dans Sillance" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap">
+    <span class="kicker">Et aussi</span>
+    <h2>Tout le club, <em>au même endroit</em></h2>
+    <div class="mini">
+      <div class="card"><h3>Groupes</h3><p>Avenirs, jeunes, compétition, maîtres, loisir : une séance pour tout un groupe en un clic.</p></div>
+      <div class="card"><h3>Créneaux et présences</h3><p>Les créneaux de bassin, leur capacité et la liste des présents.</p></div>
+      <div class="card"><h3>Compétitions</h3><p>Les meetings de la saison, ciblés par groupe.</p></div>
+      <div class="card"><h3>Aux couleurs du club</h3><p>Logo et couleurs du club dans l'application de vos nageurs.</p></div>
+    </div>
+  </div></section>
+
+  <section class="block" id="tarifs"><div class="wrap">
+    <span class="kicker">Tarifs club</span>
+    <h2>Un prix au nombre de nageurs suivis, <em>entraîneurs illimités</em></h2>
+    <div class="prices">
+      <div class="card price"><h3>Club</h3><div class="amt">50 € <small>/ mois</small></div><div class="cap">jusqu'à 50 nageurs</div><div class="founder"><b>Fondateurs : 25 €/mois à vie</b> · 10 premiers clubs</div></div>
+      <div class="card price"><h3>Grand club</h3><div class="amt">112,50 € <small>/ mois</small></div><div class="cap">jusqu'à 150 nageurs</div><div class="founder"><b>Fondateurs : 56,25 €/mois à vie</b> · 10 premiers clubs</div></div>
+      <div class="card price"><h3>Club illimité</h3><div class="amt">150 € <small>/ mois</small></div><div class="cap">jusqu'à 300 nageurs</div><div class="founder"><b>Fondateurs : 75 €/mois à vie</b> · 10 premiers clubs</div></div>
+    </div>
+    <p class="note">Le détail des offres est sur la <a href="../#pricing">page tarifs</a>. Voir aussi : <a href="../logiciel-club-triathlon/">club de triathlon</a> · <a href="../logiciel-run-club/">run club</a> · <a href="../logiciel-coach-triathlon/">coach indépendant</a>.</p>
+  </div></section>
+
+  <section class="block faq" id="faq"><div class="wrap">
+    <span class="kicker">Questions fréquentes</span>
+    <h2>Les questions des <em>clubs de natation</em></h2>
+    <details><summary>Comment écrit-on une séance de natation dans Sillance ?</summary><p>Comme sur un carnet : « 400m échauffement 4 nages », « 6x200m seuil crawl départ 3'20 », « 400m pull plaquettes ». Sillance construit la séance avec les distances, les nages, les départs, l'intensité et le matériel.</p></details>
+    <details><summary>Les intensités sont-elles adaptées à chaque nageur ?</summary><p>Oui. Les intensités s'expriment en pourcentage de la CSS (vitesse critique de nage) de chaque nageur. Une même séance donne donc des temps au 100 m différents selon le niveau de chacun.</p></details>
+    <details><summary>Nos nageurs doivent-ils avoir une montre ?</summary><p>Non. Le nageur consulte sa séance dans l'application. S'il nage avec une montre, il peut importer ses fichiers .FIT ; les montres COROS remontent leurs séances automatiquement.</p></details>
+    <details><summary>Peut-on suivre la progression des jeunes nageurs ?</summary><p>Oui. Le suivi jeunes garde les chronos de référence de chaque nageur sur la saison : meilleur temps, écart avec le test précédent et gain depuis le début de la saison.</p></details>
+    <details><summary>Combien coûte Sillance pour un club de natation ?</summary><p>50 € par mois jusqu'à 50 nageurs suivis, 112,50 € jusqu'à 150, 150 € jusqu'à 300, entraîneurs illimités. Les 10 premiers clubs de chaque palier bénéficient d'un tarif fondateur bloqué à vie.</p></details>
+  </div></section>
+
+  <section class="final"><div class="wrap">
+    <span class="kicker">Votre club</span>
+    <h2>On vous montre Sillance <em>sur votre club</em> ?</h2>
+    <p class="lead" style="margin:0 auto">20 minutes avec vos groupes, vos créneaux de bassin et vos séances.</p>
+    <div class="ctas"><a class="btn primary" href="../contact.html">Demander une démo</a><a class="btn ghost" href="../sillance-app.html">Explorer la démo seul</a></div>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  <a href="../">Sillance</a>
+  <a href="../logiciel-club-triathlon/">Club de triathlon</a>
+  <a href="../logiciel-run-club/">Run club</a>
+  <a href="../logiciel-coach-triathlon/">Coach indépendant</a>
+  <a href="../sillance-aide.html">Aide &amp; guide</a>
+  <a href="../contact.html">Contact</a>
+  <a href="../legal.html#mentions">Mentions légales</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../sillance-cookies.js?v=20261104a"></script>
+<script src="../sillance-analytics.js?v=20261028b"></script>
+</body></html>
