@@ -99,3 +99,20 @@
 .tools-grid a.card{text-decoration:none;color:var(--text);transition:border-color .2s}
 .tools-grid a.card:hover{border-color:var(--accent)}
 @media (max-width:900px){ .tools-grid{grid-template-columns:1fr} .ztab{font-size:14px} .ztab th:nth-child(2),.ztab td:nth-child(2){display:none} }
+
+/* ---------- articles (guides) ---------- */
+.article{max-width:780px}
+.article h1{font-size:clamp(34px,4.4vw,50px);text-transform:none;letter-spacing:0}
+.article h2{font-size:clamp(26px,3vw,34px);margin:38px 0 12px}
+.article h3{font-size:21px;margin:24px 0 8px}
+.article p,.article li{color:#D3DBEA;font-size:18px;line-height:1.7}
+.article p{margin:0 0 16px}
+.article ul,.article ol{margin:0 0 18px 22px}
+.article li{margin:6px 0}
+.article .meta{font:500 14px var(--mono);color:var(--muted);margin:6px 0 26px}
+.article .tip{padding:16px 18px;border-radius:14px;background:rgba(70,194,216,.08);border:1px solid rgba(70,194,216,.25);margin:20px 0}
+.article .tip b{color:var(--text)}
+.author{display:flex;gap:16px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:40px 0 10px}
+.author .av{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font:700 20px var(--display);color:#06222A;flex:none}
+.author p{margin:0;font-size:15px;color:var(--muted)}
+.author b{color:var(--text)}
