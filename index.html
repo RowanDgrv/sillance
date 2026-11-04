@@ -28,8 +28,34 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://sillance.app/#organisation",
+      "name": "Sillance",
+      "url": "https://sillance.app/",
+      "logo": "https://sillance.app/icon-512.png",
+      "email": "contact@sillance.app",
+      "founder": {"@type": "Person", "name": "Rowan Degraeve"},
+      "description": "Logiciel de coaching pour coachs et clubs de triathlon, course à pied et natation."
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://sillance.app/#site",
+      "name": "Sillance",
+      "url": "https://sillance.app/",
+      "inLanguage": "fr-FR",
+      "publisher": {"@id": "https://sillance.app/#organisation"}
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Sillance",
+  "publisher": {"@id": "https://sillance.app/#organisation"},
   "url": "https://sillance.app/",
   "applicationCategory": "SportsApplication",
   "operatingSystem": "Web",
@@ -84,7 +110,7 @@
   --paper:#0B1120; --panel:#121A2B; --panel-2:#18213400;
   --text:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8;
   --line:rgba(150,165,200,.14); --line-strong:rgba(150,165,200,.28);
-  --accent:#46C2D8;
+  --accent:#46C2D8; --accent-ink:var(--accent);
   --accent2:#FF9A3D;
   --nav-bg:rgba(11,17,32,.55);
   --display:'Oswald',sans-serif; --ui:'Archivo',sans-serif; --mono:'JetBrains Mono',monospace;
@@ -98,13 +124,18 @@
   --text:#101828; --soft:#3C4656; --muted:#6B7585;
   --line:rgba(16,24,40,.10); --line-strong:rgba(16,24,40,.18);
   --nav-bg:rgba(245,247,250,.75);
+  /* Contraste (audit SEO/Lighthouse 05/11/2026) : le teal #46C2D8 et le gris
+     #6B7585 tombaient sous 4,5:1 sur fond clair. Le hero, resté sombre,
+     re-pin ses propres valeurs plus bas. */
+  --accent-ink:#0B7285; --muted:#5A6474;
+  --good:#0F7350;
 }
 /* Le hero garde un fond sombre quel que soit le thème (commentaire ci-dessus) :
    son texte doit donc rester clair lui aussi — sans ça le mode jour rendait
    le titre et le lede illisibles, texte foncé sur fond resté sombre (signalé
    07/10/2026, captures à l'appui). Re-pin local des 3 variables à leurs
    valeurs sombres d'origine, qui ne cascade qu'aux descendants du hero. */
-.hero{--text:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8; color:var(--text)}
+.hero{--text:#F3F6FC; --soft:#C2CBDD; --muted:#8A93A8; --accent-ink:#46C2D8; color:var(--text)}
 /* `color` est une propriété héritée : body{color:var(--text)} la calcule
    UNE FOIS au niveau body puis la transmet déjà résolue — redéfinir
    --text sur .hero (ci-dessus) ne suffit pas pour .h1 (aucun color
@@ -138,7 +169,7 @@ main,.nav,footer{position:relative;z-index:1}
 .nav .wrap{display:flex;align-items:center;height:66px;gap:18px}
 .brand{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:700;font-size:22px}
 .brand .orb{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
-.brand b{color:var(--accent)}
+.brand b{color:var(--accent-ink)}
 .beta-badge{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--accent2);
   border:1px solid var(--accent2);border-radius:99px;padding:2px 9px;margin-left:2px;vertical-align:middle;text-transform:uppercase}
 /* nav-links en "tabs continus" : pilule unique, surbrillance qui glisse
@@ -220,9 +251,9 @@ main,.nav,footer{position:relative;z-index:1}
 }
 
 /* ---------- type ---------- */
-.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent)}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent-ink)}
 .h1{font-family:var(--display);font-weight:700;font-size:clamp(48px,9vw,112px);line-height:.96;letter-spacing:-.01em;text-transform:uppercase}
-.h1 .alt{color:var(--accent)}
+.h1 .alt{color:var(--accent-ink)}
 .h1 .alt2{color:var(--accent2)}
 .lede{font-family:var(--ui);font-weight:300;font-size:clamp(17px,1.7vw,21px);line-height:1.6;color:var(--soft);max-width:52ch}
 .h2{font-family:var(--display);font-weight:600;font-size:clamp(28px,4vw,46px);line-height:1.05;text-transform:uppercase;letter-spacing:-.005em}
@@ -266,7 +297,9 @@ main,.nav,footer{position:relative;z-index:1}
 .role .rk{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .role h3{font-family:var(--display);font-weight:600;font-size:30px;text-transform:uppercase}
 .role p{color:var(--soft);font-size:15px;line-height:1.6;font-weight:300}
-.role a{margin-top:auto;font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:6px}
+.seo-links{margin-top:22px;font-size:14px;color:var(--soft);line-height:1.8}
+.seo-links a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:3px}
+.role a{margin-top:auto;font-family:var(--mono);font-size:13px;color:var(--accent-ink);padding-top:6px}
 .role a:hover{text-decoration:underline}
 @media(max-width:880px){.role{grid-column:span 12}}
 
@@ -280,7 +313,7 @@ main,.nav,footer{position:relative;z-index:1}
   background:radial-gradient(260px 200px at var(--gx) var(--gy), rgba(255,255,255,.08), transparent 62%)}
 .feat:hover{border-color:var(--line-strong);box-shadow:0 22px 48px rgba(0,0,0,.35)}
 .feat:hover::after{opacity:1}
-.feat .num{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;transform:translateZ(28px)}
+.feat .num{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--accent-ink);font-variant-numeric:tabular-nums;transform:translateZ(28px)}
 .feat h3{font-family:var(--display);font-weight:600;font-size:21px;text-transform:uppercase;margin-bottom:8px;transform:translateZ(18px)}
 .feat p{color:var(--soft);font-size:14.5px;line-height:1.6;font-weight:300}
 @media(max-width:680px){.feat{grid-column:span 12}}
@@ -305,7 +338,7 @@ main,.nav,footer{position:relative;z-index:1}
 .race-visual{background:linear-gradient(180deg,var(--panel),rgba(18,26,43,.35));border:1px solid var(--line);
   border-radius:18px;padding:24px;font-family:var(--mono)}
 .rv-hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:16px}
-.rv-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+.rv-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin-bottom:6px}
 .rv-name{font-family:var(--display);font-size:22px;text-transform:uppercase;color:var(--text)}
 .rv-name span{color:var(--muted);font-family:var(--mono);font-size:14px;text-transform:none}
 .rv-total{text-align:right}
@@ -328,8 +361,8 @@ main,.nav,footer{position:relative;z-index:1}
 .price{grid-column:span 4;display:flex;flex-direction:column;gap:8px;padding:28px 24px;border-radius:16px;
   border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),rgba(18,26,43,.35))}
 .price.feature{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset,0 24px 60px -30px rgba(70,194,216,.5)}
-.price .tier{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
-.price.feature .tier{color:var(--accent)}
+.price .tier{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink)}
+.price.feature .tier{color:var(--accent-ink)}
 .price .amt{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;color:var(--text);margin-top:4px}
 .price .amt .per{font-family:var(--ui);font-size:14px;font-weight:400;color:var(--muted);margin-left:4px}
 .price .amt .amt-eq{display:block;font-family:var(--ui);font-size:12px;font-weight:400;color:var(--muted);margin-top:4px}
@@ -393,7 +426,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
 footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 .legal-links{border-top:1px solid var(--line);margin-top:26px;padding-top:22px;display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--mono);font-size:12.5px;letter-spacing:.03em}
 .legal-links a{color:var(--muted)}
-.legal-links a:hover{color:var(--accent)}
+.legal-links a:hover{color:var(--accent-ink)}
 
 /* ---------- faq ---------- */
 .faq-list{display:flex;flex-direction:column;gap:12px;max-width:900px}
@@ -402,11 +435,11 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 .faq-item summary{list-style:none;cursor:pointer;padding:20px 0;display:flex;justify-content:space-between;align-items:baseline;gap:20px;
   font-family:var(--display);font-weight:600;font-size:clamp(15px,1.8vw,17px);text-transform:none;letter-spacing:-.005em;color:var(--text)}
 .faq-item summary::-webkit-details-marker{display:none}
-.faq-item summary::after{content:"+";font-family:var(--mono);font-weight:400;font-size:18px;color:var(--accent);flex:none}
+.faq-item summary::after{content:"+";font-family:var(--mono);font-weight:400;font-size:18px;color:var(--accent-ink);flex:none}
 .faq-item[open] summary::after{content:"\2013"}
 .faq-a{padding:0 0 22px;max-width:64ch}
 .faq-a p{color:var(--soft);font-weight:300;line-height:1.6;font-size:14.5px}
-.faq-a a{color:var(--accent)}
+.faq-a a{color:var(--accent-ink)}
 </style></head>
 <body>
 
@@ -472,14 +505,14 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
         <h3 data-i18n="roles.coach.title">Coach</h3>
         <p data-i18n="roles.coach.text">Planifiez les séances, suivez vos athlètes et analysez leurs données réelles. L'assistant IA synthétise chaque séance et oriente la suite du plan.</p>
         <a href="./sillance-app.html" data-i18n="roles.coach.link">Voir l'espace coach</a>
-        <a href="./sillance-app.html?login=1&role=coach" style="margin-top:2px;opacity:.7;font-size:12px" data-i18n="roles.loginCta">Déjà client ? Se connecter</a>
+        <a href="./sillance-app.html?login=1&role=coach" style="margin-top:2px;font-size:12px;color:var(--muted)" data-i18n="roles.loginCta">Déjà client ? Se connecter</a>
       </div>
       <div class="role">
         <span class="rk" data-i18n="roles.club.kicker">Clubs &amp; box</span>
         <h3 data-i18n="roles.club.title">Club</h3>
         <p data-i18n="roles.club.text">Créneaux, adhérents, présences et facturation réunis au même endroit. Trois formules, de la séance à la carte au suivi premium. Conçu pour les structures et les box Hyrox.</p>
         <a href="./logiciel-club-triathlon/" data-i18n="roles.club.link">Voir l'espace club</a>
-        <a href="./sillance-app.html?login=1&role=club" style="margin-top:2px;opacity:.7;font-size:12px" data-i18n="roles.loginCta">Déjà client ? Se connecter</a>
+        <a href="./sillance-app.html?login=1&role=club" style="margin-top:2px;font-size:12px;color:var(--muted)" data-i18n="roles.loginCta">Déjà client ? Se connecter</a>
       </div>
       <div class="role">
         <span class="rk" data-i18n="roles.athlete.kicker">Athlètes</span>
@@ -488,6 +521,12 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
         <a href="./sillance-app.html" data-i18n="roles.athlete.link">Voir l'espace athlète</a>
       </div>
     </div>
+    <p class="seo-links">Selon ta structure :
+      <a href="./logiciel-club-triathlon/">club de triathlon</a> ·
+      <a href="./logiciel-run-club/">run club</a> ·
+      <a href="./logiciel-coach-triathlon/">coach indépendant</a> ·
+      <a href="./logiciel-club-natation/">club de natation</a>.
+      Et pour tes athlètes : <a href="./outils/">calculateurs gratuits</a> et <a href="./guides/">guides d'entraînement</a>.</p>
   </div></section>
 
   <!-- COMMENT ÇA MARCHE -->
