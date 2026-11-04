@@ -1,0 +1,40 @@
+name: Publier les articles programmés
+
+# Chaque matin : publie le prochain guide dont la date est arrivée
+# (guides/calendrier.json), met à jour la page Guides, le sitemap, les liens
+# « À lire aussi » et le flux RSS, puis prévient les moteurs via IndexNow.
+on:
+  schedule:
+    - cron: '30 5 * * *'   # 6 h 30 (hiver) / 7 h 30 (été), heure de Paris
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Publier l'article du jour
+        run: node tools/publier-articles.mjs
+      - name: Enregistrer
+        run: |
+          if git diff --quiet; then echo "Rien de nouveau"; exit 0; fi
+          git config user.name "Sillance"
+          git config user.email "contact@sillance.app"
+          git add -A guides sitemap.xml index.html
+          git commit -m "Publication programmée des guides ($(date +%F))"
+          git push
+      - name: Prévenir les moteurs (IndexNow)
+        if: hashFiles('.publies.txt') != ''
+        run: |
+          URLS=$(grep -v '^$' .publies.txt | sed 's/.*/"&"/' | paste -sd, -)
+          [ -z "$URLS" ] && exit 0
+          sleep 90   # laisse GitHub Pages déployer
+          curl -s -o /dev/null -w "IndexNow %{http_code}\n" -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d "{\"host\":\"sillance.app\",\"key\":\"2d3f4b3bdf3cf6be053387644d018b44\",\"keyLocation\":\"https://sillance.app/2d3f4b3bdf3cf6be053387644d018b44.txt\",\"urlList\":[$URLS,\"https://sillance.app/guides/\"]}"

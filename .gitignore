@@ -27,3 +27,4 @@ prd_outputs/
 .agents/
 *.local.js
 *.local.png
+.publies.txt
