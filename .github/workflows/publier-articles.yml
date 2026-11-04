@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 jobs:
   publier:
@@ -29,6 +30,12 @@ jobs:
           git add -A guides sitemap.xml index.html
           git commit -m "Publication programmée des guides ($(date +%F))"
           git push
+          echo "publie=1" >> "$GITHUB_ENV"
+      - name: Reconstruire le site (GitHub Pages)
+        if: env.publie == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || true
       - name: Prévenir les moteurs (IndexNow)
         if: hashFiles('.publies.txt') != ''
         run: |
