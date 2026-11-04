@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Calcul CSS natation : vitesse critique et allures au 100 m | Sillance</title>
+<meta name="description" content="Calcule ta CSS (vitesse critique de nage) à partir de tes temps sur 400 m et 200 m, et obtiens tes allures d'entraînement au 100 m pour chaque zone. Gratuit.">
+<link rel="canonical" href="https://sillance.app/outils/calcul-css-natation/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Sillance">
+<meta property="og:title" content="Calcul CSS natation : vitesse critique et allures au 100 m | Sillance"><meta property="og:description" content="Calcule ta CSS (vitesse critique de nage) à partir de tes temps sur 400 m et 200 m, et obtiens tes allures d'entraînement au 100 m pour chaque zone. Gratuit.">
+<meta property="og:image" content="https://sillance.app/og-image.png"><meta property="og:url" content="https://sillance.app/outils/calcul-css-natation/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/seo.css?v=20261104b">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Sillance", "item": "https://sillance.app/"}, {"@type": "ListItem", "position": 2, "name": "Outils", "item": "https://sillance.app/outils/"}, {"@type": "ListItem", "position": 3, "name": "Calcul de la CSS natation", "item": "https://sillance.app/outils/calcul-css-natation/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Calcul de la CSS natation · Sillance", "url": "https://sillance.app/outils/calcul-css-natation/", "applicationCategory": "SportsApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Quelle différence entre la CSS et la VMA ?", "acceptedAnswer": {"@type": "Answer", "text": "La CSS est une vitesse de natation, la VMA une vitesse de course à pied. Les deux servent de référence pour régler l'intensité des séances dans leur sport, mais la CSS est plus proche d'un seuil que d'une vitesse maximale."}}, {"@type": "Question", "name": "Le test doit-il se faire en bassin de 25 m ou de 50 m ?", "acceptedAnswer": {"@type": "Answer", "text": "Dans le bassin où tu t'entraînes habituellement. Les virages font gagner du temps en 25 m : tes allures sont donc légèrement plus rapides qu'en 50 m. L'important est de refaire le test dans les mêmes conditions."}}, {"@type": "Question", "name": "Quelle nage utiliser pour le test ?", "acceptedAnswer": {"@type": "Answer", "text": "Le crawl, c'est la référence. Pour une autre nage, fais un test dédié : les allures ne se transposent pas d'une nage à l'autre."}}, {"@type": "Question", "name": "Tous les combien de temps refaire le test ?", "acceptedAnswer": {"@type": "Answer", "text": "Toutes les 6 à 8 semaines, ou après un bloc d'entraînement important. Une CSS qui progresse se voit tout de suite dans tes temps au 100 m."}}]}</script>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links"><a href="../">Tous les outils</a><a href="../../logiciel-coach-triathlon/">Coachs</a><a href="../../logiciel-club-triathlon/">Clubs</a></div>
+  <a class="btn primary" href="../../sillance-app.html">Découvrir Sillance</a>
+</div></nav>
+<main>
+  <div class="wrap crumb"><a href="../../">Sillance</a> › <a href="../">Outils</a> › Calcul de la CSS natation</div>
+  <section class="hero" style="padding-bottom:40px"><div class="wrap">
+    <span class="kicker">Outil gratuit · natation</span>
+    <h1>Calcul de la <em>CSS</em> en natation</h1>
+    <p class="lead">Entre tes temps sur 400 m et 200 m nagés à fond : tu obtiens ta vitesse critique de nage et tes temps au 100 m pour chaque zone d'entraînement.</p>
+    <div class="tool"><form data-tool="css" data-out="cssOut" novalidate>
+  <label>Temps sur 400 m <small>ex. 6:20</small><input name="t400" inputmode="numeric" placeholder="6:20" autocomplete="off"></label>
+  <label>Temps sur 200 m <small>ex. 2:58</small><input name="t200" inputmode="numeric" placeholder="2:58" autocomplete="off"></label>
+  <button class="btn primary" type="submit">Calculer ma CSS</button>
+</form><div id="cssOut" aria-live="polite"></div></div>
+  </div></section>
+  <section class="block prose"><div class="wrap"><span class="kicker">Comprendre</span>
+<h2>Qu'est-ce que la <em>CSS</em> ?</h2>
+<p>La CSS (<i>Critical Swim Speed</i>, vitesse critique de nage) est l'allure que tu peux tenir longtemps sans t'effondrer, de l'ordre d'une trentaine de minutes. Elle se situe près de ton seuil : c'est la référence la plus pratique pour régler l'intensité d'une séance de natation, comme la VMA en course à pied ou la FTP à vélo.</p>
+<p>Elle se calcule avec une formule simple : <b>CSS = (400 − 200) / (temps du 400 m − temps du 200 m)</b>. Le calculateur l'exprime en temps au 100 m, l'unité que tu utilises au bord du bassin.</p>
+<span class="kicker">Le test</span>
+<h2>Comment faire le <em>test CSS</em></h2>
+<ul>
+<li>Échauffe-toi 400 à 600 m, avec quelques accélérations.</li>
+<li>Nage un <b>400 m</b> le plus vite possible, en crawl, départ dans l'eau.</li>
+<li>Récupère 5 à 10 minutes en nageant souplement.</li>
+<li>Nage un <b>200 m</b> le plus vite possible, dans les mêmes conditions.</li>
+<li>Fais le test dans ton bassin habituel, et refais-le toutes les 6 à 8 semaines pour suivre ta progression.</li>
+</ul>
+<span class="kicker">S'entraîner</span>
+<h2>Utiliser tes <em>zones</em></h2>
+<p><b>Récupération et aérobie</b> pour les échauffements, les éducatifs et le volume. <b>Seuil (CSS)</b> pour les séries de 100 à 400 m avec 10 à 20 secondes de récupération : c'est le cœur de la progression. <b>VO2max et vitesse</b> pour les séries courtes et rapides, avec plus de récupération.</p>
+<p>Dans Sillance, les séances de natation s'écrivent directement en % de CSS : « 6x200m seuil crawl départ 3'20 » donne à chaque nageur ses propres temps au 100 m. Voir le <a href="../../logiciel-club-natation/">logiciel pour club de natation</a>.</p></div></section>
+  <section class="block faq"><div class="wrap"><span class="kicker">Questions fréquentes</span><h2>Bon à <em>savoir</em></h2><details><summary>Quelle différence entre la CSS et la VMA ?</summary><p>La CSS est une vitesse de natation, la VMA une vitesse de course à pied. Les deux servent de référence pour régler l'intensité des séances dans leur sport, mais la CSS est plus proche d'un seuil que d'une vitesse maximale.</p></details><details><summary>Le test doit-il se faire en bassin de 25 m ou de 50 m ?</summary><p>Dans le bassin où tu t'entraînes habituellement. Les virages font gagner du temps en 25 m : tes allures sont donc légèrement plus rapides qu'en 50 m. L'important est de refaire le test dans les mêmes conditions.</p></details><details><summary>Quelle nage utiliser pour le test ?</summary><p>Le crawl, c'est la référence. Pour une autre nage, fais un test dédié : les allures ne se transposent pas d'une nage à l'autre.</p></details><details><summary>Tous les combien de temps refaire le test ?</summary><p>Toutes les 6 à 8 semaines, ou après un bloc d'entraînement important. Une CSS qui progresse se voit tout de suite dans tes temps au 100 m.</p></details></div></section>
+  <section class="final"><div class="wrap"><span class="kicker">Avec Sillance</span><h2>Tes séances de natation <em>en % de CSS</em></h2><p class="lead" style="margin:0 auto">Dans Sillance, chaque nageur reçoit ses temps au 100 m calculés à partir de sa propre CSS, et le rappel du matin avec le matériel.</p><div class="ctas"><a class="btn primary" href="../../logiciel-club-natation/">Sillance pour les clubs de natation</a><a class="btn ghost" href="../../sillance-app.html">Explorer la démo</a></div></div></section>
+</main>
+<footer><div class="wrap">
+  <a href="../../">Sillance</a>
+  <a href="../">Outils</a>
+  <a href="../calcul-css-natation/">Calcul CSS natation</a>
+  <a href="../allures-vma/">Allures VMA</a>
+  <a href="../zones-puissance-ftp/">Zones de puissance FTP</a>
+  <a href="../../logiciel-coach-triathlon/">Coach triathlon</a>
+  <a href="../../logiciel-club-triathlon/">Club de triathlon</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../../assets/outils.js?v=20261104a"></script>
+<script src="../../sillance-cookies.js?v=20261104a"></script>
+<script src="../../sillance-analytics.js?v=20261028b"></script>
+</body></html>

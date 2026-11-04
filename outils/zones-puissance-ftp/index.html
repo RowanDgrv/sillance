@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Zones de puissance vélo : calcul à partir de la FTP | Sillance</title>
+<meta name="description" content="Calcule tes zones de puissance à vélo à partir de ta FTP (ou d'un test de 20 minutes) : watts pour chaque zone, du récupération à l'anaérobie, et ton rapport poids-puissance. Gratuit.">
+<link rel="canonical" href="https://sillance.app/outils/zones-puissance-ftp/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Sillance">
+<meta property="og:title" content="Zones de puissance vélo : calcul à partir de la FTP | Sillance"><meta property="og:description" content="Calcule tes zones de puissance à vélo à partir de ta FTP (ou d'un test de 20 minutes) : watts pour chaque zone, du récupération à l'anaérobie, et ton rapport poids-puissance. Gratuit.">
+<meta property="og:image" content="https://sillance.app/og-image.png"><meta property="og:url" content="https://sillance.app/outils/zones-puissance-ftp/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/seo.css?v=20261104b">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Sillance", "item": "https://sillance.app/"}, {"@type": "ListItem", "position": 2, "name": "Outils", "item": "https://sillance.app/outils/"}, {"@type": "ListItem", "position": 3, "name": "Zones de puissance FTP", "item": "https://sillance.app/outils/zones-puissance-ftp/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Zones de puissance FTP · Sillance", "url": "https://sillance.app/outils/zones-puissance-ftp/", "applicationCategory": "SportsApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Faut-il un capteur de puissance ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui pour mesurer ta FTP et rouler en watts : un capteur de puissance sur le vélo, ou un home-trainer connecté. Sans capteur, entraîne-toi à la fréquence cardiaque ou aux sensations (RPE)."}}, {"@type": "Question", "name": "Ma FTP est-elle la même en extérieur et sur home-trainer ?", "acceptedAnswer": {"@type": "Answer", "text": "Souvent non : beaucoup de cyclistes produisent un peu moins de puissance sur home-trainer. Utilise la FTP mesurée dans les conditions de la séance."}}, {"@type": "Question", "name": "Qu'est-ce qu'un bon rapport poids-puissance ?", "acceptedAnswer": {"@type": "Answer", "text": "Il dépend du niveau et de l'objectif. Il compte surtout en montée : à puissance égale, un cycliste plus léger va plus vite. Sur le plat, la puissance absolue et l'aérodynamisme comptent davantage."}}, {"@type": "Question", "name": "Pourquoi 95 % du test de 20 minutes ?", "acceptedAnswer": {"@type": "Answer", "text": "Parce qu'on tient environ 5 % de puissance de plus sur 20 minutes que sur une heure. Cette correction donne une estimation de la puissance tenable une heure."}}]}</script>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links"><a href="../">Tous les outils</a><a href="../../logiciel-coach-triathlon/">Coachs</a><a href="../../logiciel-club-triathlon/">Clubs</a></div>
+  <a class="btn primary" href="../../sillance-app.html">Découvrir Sillance</a>
+</div></nav>
+<main>
+  <div class="wrap crumb"><a href="../../">Sillance</a> › <a href="../">Outils</a> › Zones de puissance FTP</div>
+  <section class="hero" style="padding-bottom:40px"><div class="wrap">
+    <span class="kicker">Outil gratuit · vélo</span>
+    <h1>Calcul des <em>zones de puissance</em> à vélo</h1>
+    <p class="lead">Entre ta FTP, ou ta puissance moyenne sur un test de 20 minutes : tu obtiens tes zones de puissance en watts, et ton rapport poids-puissance.</p>
+    <div class="tool"><form data-tool="ftp" data-out="ftpOut" novalidate>
+  <label>Ta FTP <small>en watts, ex. 250</small><input name="ftp" inputmode="numeric" placeholder="250" autocomplete="off"></label>
+  <span class="or">ou</span>
+  <label>Test de 20 minutes <small>puissance moyenne, ex. 263</small><input name="p20" inputmode="numeric" placeholder="263" autocomplete="off"></label>
+  <label>Ton poids <small>en kg, facultatif</small><input name="kg" inputmode="decimal" placeholder="70" autocomplete="off"></label>
+  <button class="btn primary" type="submit">Calculer mes zones</button>
+</form><div id="ftpOut" aria-live="polite"></div></div>
+  </div></section>
+  <section class="block prose"><div class="wrap"><span class="kicker">Comprendre</span>
+<h2>Qu'est-ce que la <em>FTP</em> ?</h2>
+<p>La FTP (<i>Functional Threshold Power</i>) est la puissance que tu peux tenir environ une heure. C'est la référence de l'entraînement à la puissance : toutes les zones s'expriment en pourcentage de ta FTP, ce qui rend les séances comparables d'un cycliste à l'autre et d'une saison à l'autre.</p>
+<span class="kicker">Le test</span>
+<h2>Estimer ta FTP avec le <em>test de 20 minutes</em></h2>
+<ul>
+<li>Échauffe-toi 15 à 20 minutes, avec deux ou trois accélérations courtes.</li>
+<li>Roule <b>20 minutes</b> à la puissance moyenne la plus élevée possible, de façon régulière, idéalement sur home-trainer.</li>
+<li>Ta FTP estimée vaut <b>95 % de ta puissance moyenne</b> sur ces 20 minutes : 263 W donnent une FTP de 250 W.</li>
+<li>Refais le test toutes les 6 à 8 semaines, dans les mêmes conditions (même capteur, même position).</li>
+</ul>
+<span class="kicker">S'entraîner</span>
+<h2>Utiliser tes <em>zones</em></h2>
+<p><b>Récupération et endurance</b> pour les sorties longues et la base aérobie. <b>Tempo et seuil</b> pour les blocs de 8 à 20 minutes qui font monter ta FTP. <b>VO2max et anaérobie</b> pour les efforts courts et intenses, de 30 secondes à 5 minutes.</p>
+<p>Dans Sillance, une séance écrite « 3x10' seuil r5' » se cale sur la FTP de chaque athlète et part sur sa montre ou son compteur. Voir le <a href="../../logiciel-coach-triathlon/">logiciel pour coach de triathlon</a>.</p></div></section>
+  <section class="block faq"><div class="wrap"><span class="kicker">Questions fréquentes</span><h2>Bon à <em>savoir</em></h2><details><summary>Faut-il un capteur de puissance ?</summary><p>Oui pour mesurer ta FTP et rouler en watts : un capteur de puissance sur le vélo, ou un home-trainer connecté. Sans capteur, entraîne-toi à la fréquence cardiaque ou aux sensations (RPE).</p></details><details><summary>Ma FTP est-elle la même en extérieur et sur home-trainer ?</summary><p>Souvent non : beaucoup de cyclistes produisent un peu moins de puissance sur home-trainer. Utilise la FTP mesurée dans les conditions de la séance.</p></details><details><summary>Qu'est-ce qu'un bon rapport poids-puissance ?</summary><p>Il dépend du niveau et de l'objectif. Il compte surtout en montée : à puissance égale, un cycliste plus léger va plus vite. Sur le plat, la puissance absolue et l'aérodynamisme comptent davantage.</p></details><details><summary>Pourquoi 95 % du test de 20 minutes ?</summary><p>Parce qu'on tient environ 5 % de puissance de plus sur 20 minutes que sur une heure. Cette correction donne une estimation de la puissance tenable une heure.</p></details></div></section>
+  <section class="final"><div class="wrap"><span class="kicker">Avec Sillance</span><h2>Tes séances de vélo <em>en % de FTP</em></h2><p class="lead" style="margin:0 auto">Dans Sillance, chaque séance se cale sur la FTP de chaque athlète, part sur sa montre, et le capteur de puissance s'ajoute à son matériel du jour.</p><div class="ctas"><a class="btn primary" href="../../logiciel-coach-triathlon/">Sillance pour les coachs</a><a class="btn ghost" href="../../logiciel-club-triathlon/">Sillance pour les clubs</a></div></div></section>
+</main>
+<footer><div class="wrap">
+  <a href="../../">Sillance</a>
+  <a href="../">Outils</a>
+  <a href="../calcul-css-natation/">Calcul CSS natation</a>
+  <a href="../allures-vma/">Allures VMA</a>
+  <a href="../zones-puissance-ftp/">Zones de puissance FTP</a>
+  <a href="../../logiciel-coach-triathlon/">Coach triathlon</a>
+  <a href="../../logiciel-club-triathlon/">Club de triathlon</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../../assets/outils.js?v=20261104a"></script>
+<script src="../../sillance-cookies.js?v=20261104a"></script>
+<script src="../../sillance-analytics.js?v=20261028b"></script>
+</body></html>

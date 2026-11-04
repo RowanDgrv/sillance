@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Calcul des allures VMA : zones et temps de fractionné | Sillance</title>
+<meta name="description" content="Calcule tes allures de course à pied à partir de ta VMA (ou d'un test de 6 minutes) : vitesse et allure au kilomètre pour chaque zone, temps de passage au 200, 400 et 1 000 m. Gratuit.">
+<link rel="canonical" href="https://sillance.app/outils/allures-vma/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Sillance">
+<meta property="og:title" content="Calcul des allures VMA : zones et temps de fractionné | Sillance"><meta property="og:description" content="Calcule tes allures de course à pied à partir de ta VMA (ou d'un test de 6 minutes) : vitesse et allure au kilomètre pour chaque zone, temps de passage au 200, 400 et 1 000 m. Gratuit.">
+<meta property="og:image" content="https://sillance.app/og-image.png"><meta property="og:url" content="https://sillance.app/outils/allures-vma/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/seo.css?v=20261104b">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Sillance", "item": "https://sillance.app/"}, {"@type": "ListItem", "position": 2, "name": "Outils", "item": "https://sillance.app/outils/"}, {"@type": "ListItem", "position": 3, "name": "Calcul des allures VMA", "item": "https://sillance.app/outils/allures-vma/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Calcul des allures VMA · Sillance", "url": "https://sillance.app/outils/allures-vma/", "applicationCategory": "SportsApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "La VMA, c'est la même chose que le VO2max ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Le VO2max est une consommation d'oxygène (en ml/kg/min), la VMA est la vitesse de course à laquelle tu l'atteins. Deux coureurs avec le même VO2max peuvent avoir des VMA différentes selon leur économie de course."}}, {"@type": "Question", "name": "À quelle allure courir un footing ?", "acceptedAnswer": {"@type": "Answer", "text": "Entre 65 et 75 % de ta VMA environ : tu dois pouvoir parler en courant. La plupart des coureurs courent leurs footings trop vite."}}, {"@type": "Question", "name": "Pourquoi mes allures de seuil semblent difficiles ?", "acceptedAnswer": {"@type": "Answer", "text": "Le seuil se situe autour de 85 à 92 % de la VMA selon ton niveau et ta durée d'effort. Si une allure te paraît intenable, ta VMA a peut-être été surestimée : refais le test reposé."}}, {"@type": "Question", "name": "Le test de 6 minutes est-il fiable ?", "acceptedAnswer": {"@type": "Answer", "text": "C'est un bon compromis entre simplicité et précision, à condition de bien s'échauffer et de courir de façon régulière. Un test en laboratoire ou sur piste avec paliers reste plus précis."}}]}</script>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links"><a href="../">Tous les outils</a><a href="../../logiciel-coach-triathlon/">Coachs</a><a href="../../logiciel-club-triathlon/">Clubs</a></div>
+  <a class="btn primary" href="../../sillance-app.html">Découvrir Sillance</a>
+</div></nav>
+<main>
+  <div class="wrap crumb"><a href="../../">Sillance</a> › <a href="../">Outils</a> › Calcul des allures VMA</div>
+  <section class="hero" style="padding-bottom:40px"><div class="wrap">
+    <span class="kicker">Outil gratuit · course à pied</span>
+    <h1>Calcul des <em>allures VMA</em></h1>
+    <p class="lead">Entre ta VMA, ou la distance que tu as courue en 6 minutes : tu obtiens ta vitesse et ton allure au kilomètre pour chaque zone, et tes temps de fractionné.</p>
+    <div class="tool"><form data-tool="vma" data-out="vmaOut" novalidate>
+  <label>Ta VMA <small>en km/h, ex. 16,5</small><input name="vma" inputmode="decimal" placeholder="16,5" autocomplete="off"></label>
+  <span class="or">ou</span>
+  <label>Distance en 6 minutes <small>en mètres, ex. 1650</small><input name="d6" inputmode="numeric" placeholder="1650" autocomplete="off"></label>
+  <button class="btn primary" type="submit">Calculer mes allures</button>
+</form><div id="vmaOut" aria-live="polite"></div></div>
+  </div></section>
+  <section class="block prose"><div class="wrap"><span class="kicker">Comprendre</span>
+<h2>Qu'est-ce que la <em>VMA</em> ?</h2>
+<p>La VMA (vitesse maximale aérobie) est la vitesse de course à laquelle ta consommation d'oxygène atteint son maximum. On la tient environ 4 à 7 minutes. Elle sert de référence pour régler toutes les allures d'entraînement : un footing d'endurance se court autour de 65 à 75 % de VMA, un fractionné court autour de 95 à 105 %.</p>
+<span class="kicker">Le test</span>
+<h2>Mesurer ta VMA avec le <em>test de 6 minutes</em></h2>
+<ul>
+<li>Échauffe-toi 15 à 20 minutes avec quelques accélérations progressives.</li>
+<li>Sur une piste ou un parcours plat et mesuré, cours <b>6 minutes</b> à l'allure la plus élevée possible, la plus régulière possible.</li>
+<li>Note la distance parcourue : <b>VMA (km/h) = distance en mètres / 100</b>. 1 650 m donnent une VMA de 16,5 km/h.</li>
+<li>Refais le test toutes les 8 à 12 semaines, ou au début de chaque préparation.</li>
+</ul>
+<span class="kicker">S'entraîner</span>
+<h2>Utiliser tes <em>zones</em></h2>
+<p><b>Récupération et endurance</b> pour la majorité de ton volume : c'est là que se construit la base. <b>Tempo et seuil</b> pour les blocs longs (3 × 10 minutes, 2 × 5 km) qui préparent le 10 km et le semi. <b>VO2max et vitesse</b> pour le fractionné court : 10 × 400 m, 30/30.</p>
+<p>Dans Sillance, une séance écrite « 10x400m vma r1'30 » calcule automatiquement les allures de chaque coureur à partir de sa propre VMA, puis l'envoie sur sa montre. Voir le <a href="../../logiciel-run-club/">logiciel pour run club</a>.</p></div></section>
+  <section class="block faq"><div class="wrap"><span class="kicker">Questions fréquentes</span><h2>Bon à <em>savoir</em></h2><details><summary>La VMA, c'est la même chose que le VO2max ?</summary><p>Non. Le VO2max est une consommation d'oxygène (en ml/kg/min), la VMA est la vitesse de course à laquelle tu l'atteins. Deux coureurs avec le même VO2max peuvent avoir des VMA différentes selon leur économie de course.</p></details><details><summary>À quelle allure courir un footing ?</summary><p>Entre 65 et 75 % de ta VMA environ : tu dois pouvoir parler en courant. La plupart des coureurs courent leurs footings trop vite.</p></details><details><summary>Pourquoi mes allures de seuil semblent difficiles ?</summary><p>Le seuil se situe autour de 85 à 92 % de la VMA selon ton niveau et ta durée d'effort. Si une allure te paraît intenable, ta VMA a peut-être été surestimée : refais le test reposé.</p></details><details><summary>Le test de 6 minutes est-il fiable ?</summary><p>C'est un bon compromis entre simplicité et précision, à condition de bien s'échauffer et de courir de façon régulière. Un test en laboratoire ou sur piste avec paliers reste plus précis.</p></details></div></section>
+  <section class="final"><div class="wrap"><span class="kicker">Avec Sillance</span><h2>Tes séances de course <em>à ta VMA</em></h2><p class="lead" style="margin:0 auto">Dans Sillance, chaque séance de fractionné donne à chaque coureur ses propres allures, envoyées sur sa montre, avec la bonne paire de baskets.</p><div class="ctas"><a class="btn primary" href="../../logiciel-run-club/">Sillance pour les run clubs</a><a class="btn ghost" href="../../logiciel-coach-triathlon/">Sillance pour les coachs</a></div></div></section>
+</main>
+<footer><div class="wrap">
+  <a href="../../">Sillance</a>
+  <a href="../">Outils</a>
+  <a href="../calcul-css-natation/">Calcul CSS natation</a>
+  <a href="../allures-vma/">Allures VMA</a>
+  <a href="../zones-puissance-ftp/">Zones de puissance FTP</a>
+  <a href="../../logiciel-coach-triathlon/">Coach triathlon</a>
+  <a href="../../logiciel-club-triathlon/">Club de triathlon</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../../assets/outils.js?v=20261104a"></script>
+<script src="../../sillance-cookies.js?v=20261104a"></script>
+<script src="../../sillance-analytics.js?v=20261028b"></script>
+</body></html>
