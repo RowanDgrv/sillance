@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Logiciel pour club de triathlon : planning, groupes, présences | Sillance</title>
+<meta name="description" content="Le logiciel d'entraînement des clubs de triathlon : séances par groupe, envoi sur la montre, présences aux créneaux, suivi des jeunes, compétitions de la saison et rappels du matin avec le matériel. Entraîneurs illimités.">
+<link rel="canonical" href="https://sillance.app/logiciel-club-triathlon/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sillance">
+<meta property="og:title" content="Sillance · Le logiciel d'entraînement des clubs de triathlon">
+<meta property="og:description" content="Séances par groupe, envoi sur la montre, présences, suivi des jeunes, compétitions et rappels du matin. Entraîneurs illimités.">
+<meta property="og:image" content="https://sillance.app/og-image.png">
+<meta property="og:url" content="https://sillance.app/logiciel-club-triathlon/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"Sillance","item":"https://sillance.app/"},
+    {"@type":"ListItem","position":2,"name":"Logiciel pour club de triathlon","item":"https://sillance.app/logiciel-club-triathlon/"}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Sillance pour les clubs de triathlon",
+  "url": "https://sillance.app/logiciel-club-triathlon/",
+  "applicationCategory": "SportsApplication",
+  "operatingSystem": "Web",
+  "description": "Logiciel d'entraînement pour clubs de triathlon : séances par groupe, envoi sur la montre (COROS, Garmin), présences aux créneaux, suivi des jeunes, compétitions de la saison, rappels du matin avec le matériel, entraîneurs illimités.",
+  "offers": [
+    {"@type":"Offer","name":"Club (jusqu'à 50 athlètes)","price":"50","priceCurrency":"EUR"},
+    {"@type":"Offer","name":"Grand club (jusqu'à 150 athlètes)","price":"112.50","priceCurrency":"EUR"},
+    {"@type":"Offer","name":"Club illimité (jusqu'à 300 athlètes)","price":"150","priceCurrency":"EUR"}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"Combien d'entraîneurs du club peuvent utiliser Sillance ?","acceptedAnswer":{"@type":"Answer","text":"Autant que vous voulez : les entraîneurs sont illimités. Le tarif du club dépend uniquement du nombre d'athlètes suivis."}},
+    {"@type":"Question","name":"Nos athlètes ont des montres différentes, ou pas de montre du tout. Ça marche ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Les séances s'envoient directement sur les montres COROS, et en fichier .FIT pour les montres Garmin. Sans montre, l'athlète consulte sa séance dans l'application et peut importer ses fichiers .FIT, .TCX ou .GPX."}},
+    {"@type":"Question","name":"Comment gérer les jeunes et les athlètes mineurs ?","acceptedAnswer":{"@type":"Answer","text":"Le suivi jeunes garde les chronos de référence en natation et en course à pied sur toute la saison. Pour les compétitions, l'athlète, ou son parent s'il est mineur, confirme sa participation."}},
+    {"@type":"Question","name":"Combien de temps pour mettre le club en place ?","acceptedAnswer":{"@type":"Answer","text":"Nous créons l'espace de votre club avec vous. Vous partagez ensuite un lien d'invitation unique : chaque licencié crée son compte, et vous l'affectez au bon groupe."}},
+    {"@type":"Question","name":"Où sont hébergées les données des licenciés ?","acceptedAnswer":{"@type":"Answer","text":"En Europe, conformément au RGPD. Les données de santé ne sont traitées qu'avec le consentement explicite de l'athlète, qui peut retirer l'accès à tout moment."}},
+    {"@type":"Question","name":"Combien coûte Sillance pour un club ?","acceptedAnswer":{"@type":"Answer","text":"50 € par mois jusqu'à 50 athlètes, 112,50 € jusqu'à 150 athlètes, 150 € jusqu'à 300 athlètes. Les 10 premiers clubs de chaque palier bénéficient d'un tarif fondateur bloqué à vie (25 €, 56,25 € ou 75 € par mois)."}}
+  ]
+}
+</script>
+<style>
+  :root{ --paper:#0B1120; --panel:#111a2e; --panel2:#16213a; --text:#F3F6FC; --muted:#9AA6BF; --line:rgba(150,165,200,.16);
+    --accent:#46C2D8; --accent2:#FF9A3D; --display:'Oswald',sans-serif; --body:'Archivo',sans-serif; --mono:'JetBrains Mono',monospace; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(900px 600px at 10% -10%,rgba(70,194,216,.14),transparent 60%),radial-gradient(800px 600px at 100% 20%,rgba(255,154,61,.08),transparent 60%)}
+  a{color:var(--accent)}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+  /* nav */
+  .nav{position:sticky;top:0;z-index:20;background:rgba(11,17,32,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;gap:20px;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.06em;color:var(--text);text-decoration:none;text-transform:uppercase}
+  .nav-links{display:flex;gap:22px;margin-left:auto}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:15px}
+  .nav-links a:hover{color:var(--text)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:12px;font:600 15px var(--body);text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+  .btn.primary{background:var(--accent);color:#06222A}
+  .btn.ghost{border-color:var(--line);color:var(--text);background:rgba(255,255,255,.03)}
+  .nav .btn{height:40px;padding:0 16px}
+  /* contenu */
+  .crumb{font:500 13px var(--mono);color:var(--muted);padding-top:22px}
+  .crumb a{color:var(--muted);text-decoration:none}
+  .kicker{font:700 13px var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--accent2)}
+  h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.08;letter-spacing:.005em}
+  h1{font-size:clamp(36px,4.6vw,54px);text-transform:uppercase;margin:14px 0 18px}
+  h1 em,h2 em{font-style:normal;color:var(--accent)}
+  h2{font-size:clamp(30px,4vw,44px);margin:12px 0 14px}
+  h3{font-size:22px;margin-bottom:6px}
+  .lead{font-size:20px;color:#C9D3E6;max-width:640px}
+  .hero{padding:30px 0 70px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:48px;align-items:center}
+  .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+  .note{font-size:14px;color:var(--muted);margin-top:14px}
+  .shot{border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -20px rgba(0,0,0,.7),0 0 60px -20px rgba(70,194,216,.25);background:var(--panel)}
+  .shot img{display:block;width:100%;height:auto}
+  section.block{padding:70px 0;border-top:1px solid var(--line)}
+  .feat{display:grid;grid-template-columns:1fr 1.15fr;gap:52px;align-items:center}
+  .feat.rev .txt{order:2}
+  .feat p{color:#C9D3E6;margin-bottom:12px}
+  .feat ul{list-style:none;margin-top:8px}
+  .feat li{padding-left:26px;position:relative;margin:8px 0;color:#DCE3F1}
+  .feat li::before{content:"";position:absolute;left:0;top:10px;width:12px;height:2px;background:var(--accent2)}
+  .gains{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .card p{color:var(--muted);font-size:15.5px}
+  .mini{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
+  .mini .card h3{font-size:19px}
+  .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+  .price .amt{font:700 44px var(--display);margin:10px 0 2px}
+  .price .amt small{font:500 16px var(--body);color:var(--muted)}
+  .price .cap{color:var(--muted);font-size:14.5px}
+  .price .founder{margin-top:14px;padding:10px 12px;border-radius:10px;background:rgba(255,154,61,.1);border:1px solid rgba(255,154,61,.35);font-size:14.5px}
+  .faq details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:12px}
+  .faq summary{font:600 18px var(--body);cursor:pointer;list-style:none}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";float:right;color:var(--accent);font-weight:700}
+  .faq details[open] summary::after{content:"–"}
+  .faq p{color:#C9D3E6;margin-top:10px}
+  .final{text-align:center;padding:80px 0}
+  .final .ctas{justify-content:center}
+  footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+  footer a{color:var(--muted);text-decoration:none}
+  footer .sp{margin-left:auto}
+  @media (max-width:900px){
+    .hero-grid,.feat{grid-template-columns:1fr;gap:28px}
+    .feat.rev .txt{order:0}
+    .gains,.prices{grid-template-columns:1fr}
+    .mini{grid-template-columns:1fr 1fr}
+    .nav-links{display:none}
+  }
+  @media (max-width:520px){ .mini{grid-template-columns:1fr} .nav .btn.ghost{display:none} body{font-size:16px} }
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links">
+    <a href="#fonctionnalites">Fonctionnalités</a>
+    <a href="#tarifs">Tarifs</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a class="btn ghost" href="../sillance-app.html">Explorer la démo</a>
+  <a class="btn primary" href="../contact.html">Demander une démo</a>
+</div></nav>
+
+<main>
+  <div class="wrap crumb"><a href="../">Sillance</a> › Logiciel pour club de triathlon</div>
+
+  <section class="hero"><div class="wrap hero-grid">
+    <div>
+      <span class="kicker">Clubs de triathlon</span>
+      <h1>Le logiciel d'entraînement des <em>clubs de triathlon</em></h1>
+      <p class="lead">Programmez les séances de chaque groupe en quelques minutes, envoyez-les sur la montre de vos licenciés, suivez les présences, les jeunes et les compétitions de la saison. Vos entraîneurs passent moins de temps sur l'organisation, et plus sur le bord du bassin.</p>
+      <div class="ctas">
+        <a class="btn primary" href="../contact.html">Demander une démo pour mon club</a>
+        <a class="btn ghost" href="../sillance-app.html">Explorer la démo</a>
+      </div>
+      <p class="note">Entraîneurs illimités · Natation, vélo, course à pied · Données hébergées en Europe</p>
+    </div>
+    <div class="shot"><img src="../img/club-triathlon/seance-groupe.webp" width="1440" height="1152" alt="Sillance : attribuer une séance de natation à un groupe du club de triathlon (Adultes Triathlon M, Jeunes Compétition…)" fetchpriority="high"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap">
+    <span class="kicker">Pourquoi un logiciel dédié</span>
+    <h2>Un club de triathlon, c'est <em>trois sports</em> et des dizaines de profils</h2>
+    <p class="lead">Jeunes et adultes, débutants et compétiteurs, distance S ou Ironman : chaque groupe a son plan, ses créneaux et ses objectifs. Les tableurs et les groupes WhatsApp ne suivent plus.</p>
+    <div class="gains">
+      <div class="card"><h3>Moins d'organisation</h3><p>Une séance écrite une fois part à tout un groupe, avec des allures adaptées au niveau de chacun.</p></div>
+      <div class="card"><h3>Des licenciés mieux préparés</h3><p>Chaque matin, la séance du jour et le matériel à prévoir. Plus d'oubli de maillot ou de plaquettes.</p></div>
+      <div class="card"><h3>Un suivi enfin visible</h3><p>Présences, progression des jeunes, athlètes blessés ou fatigués : tout le club d'un coup d'œil.</p></div>
+    </div>
+  </div></section>
+
+  <section class="block" id="fonctionnalites"><div class="wrap feat">
+    <div class="txt">
+      <span class="kicker">Planification par groupe</span>
+      <h2>Programmer une séance pour <em>tout un groupe</em></h2>
+      <p>Organisez vos licenciés en groupes : jeunes loisir, jeunes compétition, distance M, half, Ironman… Une séance créée par un entraîneur part en un clic à tout le groupe.</p>
+      <ul>
+        <li>Les cibles en % de VMA, de FTP ou de CSS s'adaptent aux références de chaque athlète.</li>
+        <li>Séances récurrentes (la piste du mardi) et cycles de plusieurs semaines.</li>
+        <li>Plusieurs entraîneurs sur le même club, sans surcoût.</li>
+      </ul>
+    </div>
+    <div class="shot"><img src="../img/club-triathlon/groupes.webp" width="1600" height="1036" alt="Groupes d'un club de triathlon dans Sillance : jeunes loisir, jeunes compétition, distance M, half, Ironman" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap feat rev">
+    <div class="txt">
+      <span class="kicker">Natation · vélo · course</span>
+      <h2>Écrire une séance <em>comme sur un carnet</em></h2>
+      <p>Tapez « 8x100m seuil crawl départ 1'50 » ou « 6x1000m seuil r2' » : Sillance construit la séance complète, avec l'échauffement, les répétitions, les récupérations et le profil d'intensité.</p>
+      <ul>
+        <li>Envoi direct sur les montres COROS, fichier .FIT pour les montres Garmin.</li>
+        <li>Matériel demandé par la séance : pull-buoy, plaquettes, palmes, home-trainer…</li>
+        <li>Durée et charge d'entraînement calculées automatiquement.</li>
+      </ul>
+    </div>
+    <div class="shot"><img src="../img/club-triathlon/creation-seance.webp" width="1600" height="842" alt="Création d'une séance dans Sillance avec la notation rapide et le profil de la séance" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap feat">
+    <div class="txt">
+      <span class="kicker">Créneaux et présences</span>
+      <h2>Les présences de <em>chaque créneau</em>, sans feuille papier</h2>
+      <p>Créez les créneaux du club (bassin, piste, sortie vélo), avec leur capacité et leurs groupes, et suivez qui est présent à chaque séance collective.</p>
+      <ul>
+        <li>Taux de remplissage des créneaux sur le tableau de bord.</li>
+        <li>Une séance-type peut être attachée à un créneau.</li>
+      </ul>
+    </div>
+    <div class="shot"><img src="../img/club-triathlon/presences.webp" width="1600" height="1036" alt="Liste de présence des créneaux d'un club de triathlon dans Sillance" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap feat rev">
+    <div class="txt">
+      <span class="kicker">École de triathlon</span>
+      <h2>Suivre la <em>progression des jeunes</em> sur la saison</h2>
+      <p>Les chronos de référence en natation et en course à pied de chaque jeune, d'un test à l'autre : le meilleur temps, l'écart avec le test précédent et le gain depuis le début de la saison.</p>
+    </div>
+    <div class="shot"><img src="../img/club-triathlon/suivi-jeunes.webp" width="1600" height="1036" alt="Suivi des chronos de référence des jeunes d'un club de triathlon dans Sillance" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap feat">
+    <div class="txt">
+      <span class="kicker">Compétitions</span>
+      <h2>Préparer les <em>compétitions de la saison</em></h2>
+      <p>Créez les courses objectifs du club, départementales, régionales ou nationales, et suivez les participations : l'athlète, ou son parent s'il est mineur, confirme sa présence.</p>
+    </div>
+    <div class="shot"><img src="../img/club-triathlon/competitions.webp" width="1600" height="1036" alt="Compétitions objectifs de la saison d'un club de triathlon dans Sillance, avec confirmations des athlètes" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap feat rev">
+    <div class="txt">
+      <span class="kicker">Le matin de la séance</span>
+      <h2>La séance du jour <em>et le matériel</em> à prévoir</h2>
+      <p>Chaque matin, l'athlète reçoit le rappel de sa séance avec la liste du matériel : tenue, baskets, vélo, capteur de puissance, maillot, bonnet, plaquettes… Il arrive au bassin avec tout ce qu'il faut.</p>
+    </div>
+    <div class="shot" style="max-width:520px;justify-self:center"><img src="../img/club-triathlon/rappel-materiel.webp" width="840" height="720" alt="Rappel du matin Sillance : séance du jour et matériel à prévoir pour un triathlète" loading="lazy"></div>
+  </div></section>
+
+  <section class="block"><div class="wrap">
+    <span class="kicker">Et aussi</span>
+    <h2>Tout ce dont le club a besoin, <em>au même endroit</em></h2>
+    <div class="mini">
+      <div class="card"><h3>Qui a besoin de vous</h3><p>Blessures, fatigue, séances manquées : les athlètes à suivre remontent d'eux-mêmes.</p></div>
+      <div class="card"><h3>Un lien d'invitation</h3><p>Un seul lien pour tout le club : chaque licencié crée son compte.</p></div>
+      <div class="card"><h3>Fil du club</h3><p>Publiez le programme de la semaine pour tout le club ou un groupe.</p></div>
+      <div class="card"><h3>Aux couleurs du club</h3><p>Logo et couleurs du club dans l'application de vos licenciés.</p></div>
+    </div>
+  </div></section>
+
+  <section class="block" id="tarifs"><div class="wrap">
+    <span class="kicker">Tarifs club</span>
+    <h2>Un prix au nombre d'athlètes, <em>entraîneurs illimités</em></h2>
+    <div class="prices">
+      <div class="card price"><h3>Club</h3><div class="amt">50 € <small>/ mois</small></div><div class="cap">jusqu'à 50 athlètes</div><div class="founder"><b>Fondateurs : 25 €/mois à vie</b> · 10 premiers clubs</div></div>
+      <div class="card price"><h3>Grand club</h3><div class="amt">112,50 € <small>/ mois</small></div><div class="cap">jusqu'à 150 athlètes</div><div class="founder"><b>Fondateurs : 56,25 €/mois à vie</b> · 10 premiers clubs</div></div>
+      <div class="card price"><h3>Club illimité</h3><div class="amt">150 € <small>/ mois</small></div><div class="cap">jusqu'à 300 athlètes</div><div class="founder"><b>Fondateurs : 75 €/mois à vie</b> · 10 premiers clubs</div></div>
+    </div>
+    <p class="note">Le détail des offres est sur la <a href="../#pricing">page tarifs</a>.</p>
+  </div></section>
+
+  <section class="block faq" id="faq"><div class="wrap">
+    <span class="kicker">Questions fréquentes</span>
+    <h2>Les questions des <em>clubs de triathlon</em></h2>
+    <details><summary>Combien d'entraîneurs du club peuvent utiliser Sillance ?</summary><p>Autant que vous voulez : les entraîneurs sont illimités. Le tarif du club dépend uniquement du nombre d'athlètes suivis.</p></details>
+    <details><summary>Nos athlètes ont des montres différentes, ou pas de montre du tout. Ça marche ?</summary><p>Oui. Les séances s'envoient directement sur les montres COROS, et en fichier .FIT pour les montres Garmin. Sans montre, l'athlète consulte sa séance dans l'application et peut importer ses fichiers .FIT, .TCX ou .GPX.</p></details>
+    <details><summary>Comment gérer les jeunes et les athlètes mineurs ?</summary><p>Le suivi jeunes garde les chronos de référence en natation et en course à pied sur toute la saison. Pour les compétitions, l'athlète, ou son parent s'il est mineur, confirme sa participation.</p></details>
+    <details><summary>Combien de temps pour mettre le club en place ?</summary><p>Nous créons l'espace de votre club avec vous. Vous partagez ensuite un lien d'invitation unique : chaque licencié crée son compte, et vous l'affectez au bon groupe.</p></details>
+    <details><summary>Où sont hébergées les données des licenciés ?</summary><p>En Europe, conformément au RGPD. Les données de santé ne sont traitées qu'avec le consentement explicite de l'athlète, qui peut retirer l'accès à tout moment. Le détail est dans la <a href="../legal.html#confidentialite">politique de confidentialité</a>.</p></details>
+    <details><summary>Combien coûte Sillance pour un club ?</summary><p>50 € par mois jusqu'à 50 athlètes, 112,50 € jusqu'à 150 athlètes, 150 € jusqu'à 300 athlètes. Les 10 premiers clubs de chaque palier bénéficient d'un tarif fondateur bloqué à vie (25 €, 56,25 € ou 75 € par mois).</p></details>
+  </div></section>
+
+  <section class="final"><div class="wrap">
+    <span class="kicker">Votre club</span>
+    <h2>On vous montre Sillance <em>sur votre club</em> ?</h2>
+    <p class="lead" style="margin:0 auto">Une démonstration de 20 minutes avec vos groupes et vos créneaux, aux couleurs de votre club.</p>
+    <div class="ctas">
+      <a class="btn primary" href="../contact.html">Demander une démo</a>
+      <a class="btn ghost" href="../sillance-app.html">Explorer la démo seul</a>
+    </div>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  <a href="../">Sillance</a>
+  <a href="../sillance-aide.html">Aide &amp; guide</a>
+  <a href="../contact.html">Contact</a>
+  <a href="../legal.html#mentions">Mentions légales</a>
+  <a href="../legal.html#confidentialite">Confidentialité</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../sillance-cookies.js?v=20261104a"></script>
+<script src="../sillance-analytics.js?v=20261028b"></script>
+</body></html>

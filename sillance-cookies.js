@@ -126,7 +126,7 @@
 
   function legalHref(){
     // reste sur la même page si on est déjà sur legal.html (ancre confidentialité/cookies)
-    return /legal\.html/.test(location.pathname) ? '#confidentialite' : 'legal.html#confidentialite';
+    return /legal\.html/.test(location.pathname) ? '#confidentialite' : '/legal.html#confidentialite';
   }
 
   function build(){
