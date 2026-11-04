@@ -1024,6 +1024,27 @@ export const PF = {
     if (error) { console.warn("[PF] lecture club membre échouée :", error.message); return null; }
     return (data ?? []).map((r) => r.clubs).find(Boolean) ?? null;
   },
+  // Vue « Mon club » de l'athlète MEMBRE (05/11/2026) : son club, ses
+  // créneaux, ses inscriptions, les compétitions et SES réponses.
+  // RLS : club_members self reads, creneaux/club_competitions member reads,
+  // creneau_attendees member self manages own, responses athlete manages own.
+  async myClubOverview() {
+    if (!this.user) return null;
+    const { data: m, error } = await sb.from("club_members")
+      .select("id, club_id, group_id, clubs(id, name)").eq("athlete_id", this.user.id).limit(1).maybeSingle();
+    if (error || !m || !m.clubs) { if (error) console.warn("[PF] myClubOverview :", error.message); return null; }
+    const today = new Date().toISOString().slice(0, 10);
+    const [cr, cp, att, resp] = await Promise.all([
+      sb.from("creneaux").select("*").eq("club_id", m.club_id).order("day"),
+      sb.from("club_competitions").select("id, name, date, level, target_group_id").eq("club_id", m.club_id).gte("date", today).order("date"),
+      sb.from("creneau_attendees").select("creneau_id").eq("athlete_id", m.id),
+      sb.from("club_competition_responses").select("competition_id, status").eq("athlete_id", this.user.id),
+    ]);
+    return { club: m.clubs, memberId: m.id, groupId: m.group_id,
+      creneaux: cr.data ?? [], competitions: cp.data ?? [],
+      attending: (att.data ?? []).map((r) => r.creneau_id),
+      responses: resp.data ?? [] };
+  },
   async getClubMembers(clubId) {
     // profiles(full_name,email) : un membre rejoint via accept-club-invite n'a
     // pas toujours de display_name posé (fix 0057/accept-club-invite côté

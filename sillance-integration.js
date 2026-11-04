@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261103c";
+import { PF } from "./sillance-client.js?v=20261105a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -497,6 +497,17 @@ async function hydrate() {
         renderClubSwitcher(clubs, null);
         // Athlète membre d'un club : il voit l'app aux couleurs de son club.
         applyClubTheme(await PF.myMemberClub().catch(() => null));
+        // « Mon club » côté athlète membre : sorties + compétitions (05/11/2026)
+        try {
+          const ov = PF.myClubOverview ? await PF.myClubOverview() : null;
+          if (ov && app.setMyClub) {
+            const resp = {}; ov.responses.forEach((r) => { resp[r.competition_id] = r.status; });
+            app.setMyClub({ name: esc(ov.club.name), memberId: ov.memberId, group: ov.groupId,
+              creneaux: ov.creneaux.map(mapCreneau),
+              comps: ov.competitions.map((c) => ({ id: c.id, name: esc(c.name), date: c.date, level: c.level, targetGroupId: c.target_group_id })),
+              resp, mine: new Set(ov.attending) });
+          }
+        } catch (e) { console.warn("[PF] Mon club :", e); }
         return;
       }
       const savedId = localStorage.getItem("sil_active_club");

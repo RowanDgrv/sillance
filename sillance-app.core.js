@@ -1424,6 +1424,7 @@ function renderSidebar(){
     })();
     buildMorningPreview();
     renderStravaCard();
+    renderMyClubCard();
     const cv = document.getElementById('checkinValidate');
     if(cv) cv.addEventListener('click', ()=> submitCheckin());
     const rs = document.getElementById('refsSave');
@@ -5485,7 +5486,8 @@ let TEST_TIMES = [
    ============================================================ */
 let COMPETITIONS = [
   {id:'cp1', name:'Sélectif départemental CAP', date:'2026-10-18', level:'departemental', targetGroupId:'g1'},
-  {id:'cp2', name:'Championnat régional triathlon jeunes', date:'2026-11-22', level:'regional', targetGroupId:'g2'}
+  {id:'cp2', name:'Championnat régional triathlon jeunes', date:'2026-11-22', level:'regional', targetGroupId:'g2'},
+  {id:'cp3', name:'Duathlon de Muret', date:'2026-12-06', level:'departemental', targetGroupId:'g3'}
 ];
 /* clé "compId:athleteId" -> {status:'pending'|'confirmed'|'declined'} */
 let COMPETITION_RESPONSES = {
@@ -5806,6 +5808,99 @@ let crMemberView=false;
    s'il est ponctuel (recur==='once'), sinon le prochain jour de semaine
    correspondant (aujourd'hui inclus). Sert à matérialiser sa séance-type
    sur un calendrier (F/E) sans que le coach ait à choisir une date. */
+/* ============================================================
+   MON CLUB — vue de l'athlète MEMBRE d'un club (05/11/2026)
+   ------------------------------------------------------------
+   Avant : l'adhérent n'avait aucun accès aux créneaux de son club
+   (la vue « adhérent » n'existait que dans l'espace club, réservé
+   au gérant) ni aux compétitions (seul le coach simulait la réponse).
+   Carte dans l'espace athlète : sorties de son groupe avec « Je viens »
+   (copie la séance du créneau sur son calendrier, comme côté club) et
+   compétitions du club avec « Je participe / Pas cette fois ».
+   Réel : MY_CLUB posé par l'intégration (PF.myClubOverview). Démo :
+   le club de démonstration vu par « moi » (ME_CLUB_ID).
+   ============================================================ */
+let MY_CLUB = null;
+function setMyClub(ov){ MY_CLUB = ov; renderMyClubCard(); }
+function myClubData(){
+  if(MY_CLUB) return MY_CLUB;
+  if(window.PF?.user) return null;
+  const me = CLUB_ATHLETES.find(a=>a.id===ME_CLUB_ID);
+  const resp = {}; COMPETITIONS.forEach(c=>{ const r=COMPETITION_RESPONSES[compResponseKey(c.id, ME_CLUB_ID)]; if(r) resp[c.id]=r.status; });
+  return { demo:true, name: document.getElementById('clubName')?.textContent || tr('myClub.title'), memberId: ME_CLUB_ID,
+    group: me?.group || null, creneaux: CRENEAUX, comps: COMPETITIONS, resp,
+    mine: new Set(CRENEAUX.filter(c=>(c.attendees||[]).includes(ME_CLUB_ID)).map(c=>c.id)) };
+}
+function renderMyClubCard(){
+  const box=document.getElementById('myClubCard'); if(!box) return;
+  const d = (mode==='athlete') ? myClubData() : null;
+  if(!d){ box.hidden=true; box.innerHTML=''; return; }
+  box.hidden=false;
+  const todayIso = iso(new Date());
+  const fmt = (isoD)=> new Date(isoD+'T00:00:00').toLocaleDateString(localeStr(), {weekday:'short', day:'numeric', month:'short'});
+  const sorties = d.creneaux
+    .filter(c=> !(c.groups&&c.groups.length) || (d.group && c.groups.includes(d.group)))
+    .map(c=>({c, date: nextCreneauDate(c)}))
+    .filter(x=> x.date >= todayIso)
+    .sort((a,b)=> (a.date+a.c.time).localeCompare(b.date+b.c.time)).slice(0,5);
+  const comps = d.comps
+    .filter(c=> c.date >= todayIso && (!c.targetGroupId || !d.group || c.targetGroupId===d.group))
+    .sort((a,b)=> a.date.localeCompare(b.date)).slice(0,4);
+  box.innerHTML = `
+    <div class="rec-head"><h3><i class="ic ic-users"></i> ${tr('myClub.title')} · ${d.name}</h3></div>
+    <div class="mc-sub">${tr('myClub.sorties')}</div>
+    ${sorties.length ? sorties.map(({c,date})=>{ const D=DISC[c.disc]; const inIt=d.mine.has(c.id); return `
+      <div class="mc-row" data-cr="${c.id}">
+        <span class="mc-ic" style="color:${D?D.color:'var(--accent)'}">${D?discIcon(D):''}</span>
+        <div class="mc-b"><b>${c.title}</b><span>${fmt(date)} · ${c.time||''}${c.place?' · '+c.place:''}</span></div>
+        <button class="mc-btn ${inIt?'on':''}" data-act="join" type="button">${inIt?`<i class="ic ic-check"></i> ${tr('myClub.going')}`:(c.price>0?tr('myClub.joinPrice',{price:c.price}):tr('myClub.join'))}</button>
+      </div>`; }).join('') : `<p class="mc-empty">${tr('myClub.noSorties')}</p>`}
+    <div class="mc-sub">${tr('myClub.comps')}</div>
+    ${comps.length ? comps.map(c=>{ const st=d.resp[c.id]||'pending'; return `
+      <div class="mc-row" data-cp="${c.id}">
+        <span class="mc-ic"><i class="ic ic-flag"></i></span>
+        <div class="mc-b"><b>${c.name}</b><span>${fmt(c.date)}</span></div>
+        <div class="mc-duo">
+          <button class="mc-btn ${st==='confirmed'?'on':''}" data-st="confirmed" type="button">${tr('myClub.yes')}</button>
+          <button class="mc-btn ghost ${st==='declined'?'off':''}" data-st="declined" type="button">${tr('myClub.no')}</button>
+        </div>
+      </div>`; }).join('') : `<p class="mc-empty">${tr('myClub.noComps')}</p>`}`;
+  box.querySelectorAll('[data-cr]').forEach(row=>{
+    const c = d.creneaux.find(x=>x.id===row.dataset.cr);
+    row.querySelector('[data-act="join"]').onclick = ()=>{
+      const date = nextCreneauDate(c);
+      if(d.mine.has(c.id)){
+        d.mine.delete(c.id);
+        if(d.demo){ const i=(c.attendees||[]).indexOf(d.memberId); if(i>-1) c.attendees.splice(i,1); }
+        else {
+          PF.leaveCreneau(c.id, d.memberId).catch(e=>{ console.warn('[PF] leaveCreneau :', e); toast(tr('myClub.saveFailed'),'error'); });
+          if(c.sessionTemplate) PF.unscheduleFromCreneau(PF.user.id, c.id, date).catch(e=>console.warn('[PF] unscheduleFromCreneau :', e));
+        }
+        toast(tr('toast.inscriptionAnnulee'));
+      } else {
+        if(d.demo && c.cap && (c.attendees||[]).length>=c.cap){ toast(tr('toast.creneauComplet')); return; }
+        d.mine.add(c.id);
+        if(d.demo){ (c.attendees ||= []).push(d.memberId); }
+        else {
+          PF.joinCreneau(c.id, d.memberId).catch(e=>{ console.warn('[PF] joinCreneau :', e); d.mine.delete(c.id); renderMyClubCard(); toast(tr('myClub.saveFailed'),'error'); });
+          if(c.sessionTemplate) PF.scheduleSessionFromCreneau(PF.user.id, date, c.sessionTemplate, c.id).catch(e=>console.warn('[PF] scheduleSessionFromCreneau :', e));
+        }
+        toast(c.price>0 ? tr('creneau.registeredPricePay', {price:c.price}) : (c.sessionTemplate ? tr('myClub.joinedWithSession') : tr('creneau.registeredToSlot')));
+      }
+      renderMyClubCard();
+    };
+  });
+  box.querySelectorAll('[data-cp]').forEach(row=>{
+    row.querySelectorAll('[data-st]').forEach(b=> b.onclick = ()=>{
+      const st=b.dataset.st, id=row.dataset.cp, prev=d.resp[id];
+      d.resp[id]=st;
+      if(d.demo) COMPETITION_RESPONSES[compResponseKey(id, d.memberId)] = {status:st};
+      else PF.respondToClubCompetition(id, st).catch(e=>{ console.warn('[PF] respondToClubCompetition :', e); d.resp[id]=prev; renderMyClubCard(); toast(tr('myClub.saveFailed'),'error'); });
+      toast(st==='confirmed' ? tr('myClub.confirmedToast') : tr('myClub.declinedToast'));
+      renderMyClubCard();
+    });
+  });
+}
 function nextCreneauDate(c){
   if(c.recur==='once' && c.date) return c.date;
   const today = new Date();
@@ -7998,6 +8093,7 @@ window.__pf_app = {
   setCoachAthletes,
   // Résout "moi" dans CLUB_ATHLETES (club_members.id) une fois hydraté.
   setMeClubId(id){ if(id) ME_CLUB_ID = id; },
+  setMyClub,
   getCurrentAthleteId(){ return currentAthleteId; },
   // Masque l'analyse/records de démo pour un compte confirmé sans activité réelle.
   setActivityState,
