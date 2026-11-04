@@ -1,10 +1,10 @@
 /* Sillance — dictionnaire i18n de la landing (index.html) */
 (function(){
   var fr = {
-    "meta.title": `Sillance, logiciel de coaching triathlon & Hyrox`,
-    "meta.description": `Sillance, la plateforme de coaching qui met ton entraînement dans le sillage de ton coach : data, planning et facturation pour le triathlon, le Hyrox et la course à pied.`,
-    "meta.ogTitle": `Sillance, entre dans le sillage`,
-    "meta.ogDescription": `La plateforme qui fait progresser coach et athlète, dans le sillage l'un de l'autre. Triathlon, Hyrox, course à pied.`,
+    "meta.title": `Logiciel de coaching triathlon et course à pied pour coachs et clubs | Sillance`,
+    "meta.description": `Planifie tes séances, envoie-les sur la montre, suis tes athlètes et rappelle-leur chaque matin la séance et le matériel. Pour coachs et clubs. Essai gratuit 14 jours.`,
+    "meta.ogTitle": `Sillance · Le logiciel d'entraînement des coachs et des clubs`,
+    "meta.ogDescription": `Séances envoyées sur la montre, suivi des athlètes, rappels du matin avec le matériel du jour, app aux couleurs du club. Triathlon, course à pied, natation.`,
 
     "nav.beta": `Bêta`,
     "nav.links.roles": `Pour qui`,
@@ -31,8 +31,8 @@
     "faq.a4": `Les données restent celles de l'athlète : il autorise leur accès et peut les retirer, et chaque athlète ne voit que sa propre progression. Le coach voit celles de ses athlètes suivis, pour les analyser. Hébergement en Europe, conformité RGPD, données de santé traitées uniquement sur consentement explicite. Le détail est dans la <a href="./legal.html#confidentialite">politique de confidentialité</a>.`,
     "faq.q5": `Coach indépendant ou Club, lequel choisir ?`,
     "faq.a5": `Coach indépendant : tu factures tes athlètes dans l'app, le palier suit ton nombre d'athlètes coachés (19, 29 ou 49 € par mois). Club : licence à la saison pour une structure ou une box, au nombre d'athlètes réellement suivis, avec créneaux, adhérents et présences. Entraîneurs illimités dans les deux cas.`,
-    "faq.q6": `Le paiement en ligne, c'est pour quand ?`,
-    "faq.a6": `Sillance est en bêta. Tu peux déjà tout utiliser et tester la démo sans inscription. L'encaissement en ligne des abonnements sera activé prochainement ; d'ici là, l'accès n'est pas facturé.`,
+    "faq.q6": `Comment se passe le paiement ?`,
+    "faq.a6": `Paiement en ligne sécurisé par Stripe, par carte bancaire, au mois ou à l'année. Tu commences par 14 jours d'essai gratuit, sans carte bancaire, et tu gères ton abonnement à tout moment depuis « Gérer mon abonnement ». La démo reste accessible sans inscription.`,
     "faq.q7": `Combien de temps pour mettre en place et faire venir mes athlètes ?`,
     "faq.a7": `Créer ton espace et poser un premier plan prend quelques minutes. Chaque athlète reçoit une invitation, crée son accès et connecte sa montre en une fois. Essai gratuit de 14 jours pour te faire ton avis avant de t'engager.`,
     "faq.q8": `Sillance gère le Hyrox, pas seulement l'endurance ?`,
@@ -105,7 +105,7 @@
     "pricing.kicker": `Tarifs`,
     "pricing.title": `Des prix pensés pour durer`,
     "pricing.sub1": `Le coach indépendant facture ses athlètes dans l'app. Les clubs prennent une licence à la saison, au nombre d'athlètes réellement suivis. <b style="color:var(--text);font-weight:600">Entraîneurs illimités à tous les paliers.</b>`,
-    "pricing.sub2": `Sillance est en bêta. Essai gratuit de 14 jours, sans carte bancaire.`,
+    "pricing.sub2": `Essai gratuit de 14 jours, sans carte bancaire.`,
     "pricing.coachKicker": `Coach indépendant`,
     "pricing.coachText": `Planifie, analyse la donnée réelle de tes athlètes, et fais-toi payer par eux directement dans l'app. Le palier suit ton nombre d'athlètes coachés, pas ton chiffre d'affaires.`,
     "pricing.coachTier": `Coach solo`,
@@ -156,10 +156,10 @@
   };
 
   var en = {
-    "meta.title": `Sillance, Triathlon & Hyrox Coaching Software`,
-    "meta.description": `Sillance is the coaching platform that puts your training in your coach's wake: data, planning and billing for triathlon, Hyrox and running.`,
-    "meta.ogTitle": `Sillance, enter the wake`,
-    "meta.ogDescription": `The platform that helps coach and athlete progress together, each in the other's wake. Triathlon, Hyrox, running.`,
+    "meta.title": `Triathlon & running coaching software for coaches and clubs | Sillance`,
+    "meta.description": `Plan sessions, send them to the watch, follow your athletes and remind them every morning of the session and the gear. For coaches and clubs. 14-day free trial.`,
+    "meta.ogTitle": `Sillance · Training software for coaches and clubs`,
+    "meta.ogDescription": `Sessions sent to the watch, athlete follow-up, morning reminders with the day's gear, an app in your club's colours. Triathlon, running, swimming.`,
 
     "nav.beta": `Beta`,
     "nav.links.roles": `Who it's for`,
@@ -186,8 +186,8 @@
     "faq.a4": `The data stays the athlete's: they grant access and can withdraw it, and each athlete only sees their own progress. The coach sees the data of the athletes they coach, in order to analyse it. Hosting in Europe, GDPR compliance, health data processed only with explicit consent. Details are in the <a href="./legal.html#confidentialite">privacy policy</a>.`,
     "faq.q5": `Independent coach or Club — which one?`,
     "faq.a5": `Independent coach: you bill your athletes in the app, the tier follows how many athletes you coach (19, 29 or 49 € per month). Club: a seasonal licence for a club or box, priced on the number of athletes actually coached, with time slots, members and attendance. Unlimited coaches on both.`,
-    "faq.q6": `When will online payment be available?`,
-    "faq.a6": `Sillance is in beta. You can already use everything and try the demo without signing up. Online subscription payments will be switched on soon; until then, access is free.`,
+    "faq.q6": `How does payment work?`,
+    "faq.a6": `Secure online payment with Stripe, by card, monthly or yearly. You start with a 14-day free trial, no card required, and you manage your subscription anytime from “Manage my subscription”. The demo stays open without signing up.`,
     "faq.q7": `How long does it take to set up and bring my athletes on board?`,
     "faq.a7": `Setting up your space and laying out a first plan takes a few minutes. Each athlete gets an invitation, creates their account and connects their watch in one go. 14-day free trial to make up your mind before committing.`,
     "faq.q8": `Does Sillance handle Hyrox, not just endurance?`,
@@ -260,7 +260,7 @@
     "pricing.kicker": `Pricing`,
     "pricing.title": `Pricing built to last`,
     "pricing.sub1": `Independent coaches bill their athletes right in the app. Clubs take a season license, based on the number of athletes actually coached. <b style="color:var(--text);font-weight:600">Unlimited coaches at every tier.</b>`,
-    "pricing.sub2": `Sillance is in beta. 14-day free trial, no card required.`,
+    "pricing.sub2": `14-day free trial, no card required.`,
     "pricing.perYear": `/ year`,
     "pricing.billMonthly": `Monthly`,
     "pricing.billYearly": `Yearly`,
@@ -311,10 +311,10 @@
   };
 
   var es = {
-    "meta.title": `Sillance, software de coaching de triatlón y Hyrox`,
-    "meta.description": `Sillance, la plataforma de coaching que pone tu entrenamiento en la estela de tu entrenador: datos, planificación y facturación para el triatlón, el Hyrox y el running.`,
-    "meta.ogTitle": `Sillance, entra en la estela`,
-    "meta.ogDescription": `La plataforma que hace progresar a entrenador y atleta, cada uno en la estela del otro. Triatlón, Hyrox, running.`,
+    "meta.title": `Software de coaching de triatlón y running para entrenadores y clubes | Sillance`,
+    "meta.description": `Planifica las sesiones, envíalas al reloj, sigue a tus atletas y recuérdales cada mañana la sesión y el material. Para entrenadores y clubes. Prueba gratuita de 14 días.`,
+    "meta.ogTitle": `Sillance · El software de entrenamiento de entrenadores y clubes`,
+    "meta.ogDescription": `Sesiones enviadas al reloj, seguimiento de atletas, recordatorios matinales con el material del día, app con los colores del club. Triatlón, running, natación.`,
 
     "nav.beta": `Beta`,
     "nav.links.roles": `Para quién`,
@@ -341,8 +341,8 @@
     "faq.a4": `Los datos siguen siendo del atleta: él concede el acceso y puede retirarlo, y cada atleta solo ve su propia progresión. El entrenador ve los de los atletas que entrena, para analizarlos. Alojamiento en Europa, cumplimiento del RGPD, datos de salud tratados únicamente con consentimiento explícito. El detalle está en la <a href="./legal.html#confidentialite">política de privacidad</a>.`,
     "faq.q5": `¿Entrenador independiente o Club? ¿Cuál elegir?`,
     "faq.a5": `Entrenador independiente: facturas a tus atletas en la app, el nivel depende del número de atletas que entrenas (19, 29 o 49 € al mes). Club: licencia por temporada para un club o box, según el número de atletas realmente seguidos, con franjas horarias, socios y asistencia. Entrenadores ilimitados en ambos casos.`,
-    "faq.q6": `¿Para cuándo el pago en línea?`,
-    "faq.a6": `Sillance está en beta. Ya puedes usarlo todo y probar la demo sin registrarte. El cobro en línea de las suscripciones se activará próximamente; hasta entonces, el acceso no se factura.`,
+    "faq.q6": `¿Cómo funciona el pago?`,
+    "faq.a6": `Pago en línea seguro con Stripe, con tarjeta, mensual o anual. Empiezas con 14 días de prueba gratuita, sin tarjeta, y gestionas tu suscripción en cualquier momento desde «Gestionar mi suscripción». La demo sigue disponible sin registro.`,
     "faq.q7": `¿Cuánto se tarda en configurarlo y traer a mis atletas?`,
     "faq.a7": `Crear tu espacio y montar un primer plan lleva unos minutos. Cada atleta recibe una invitación, crea su acceso y conecta su reloj de una vez. Prueba gratuita de 14 días para decidir antes de comprometerte.`,
     "faq.q8": `¿Sillance sirve para Hyrox, no solo para resistencia?`,
@@ -415,7 +415,7 @@
     "pricing.kicker": `Precios`,
     "pricing.title": `Precios pensados para durar`,
     "pricing.sub1": `El entrenador independiente factura a sus atletas dentro de la app. Los clubes contratan una licencia por temporada, según el número de atletas realmente seguidos. <b style="color:var(--text);font-weight:600">Entrenadores ilimitados en todos los niveles.</b>`,
-    "pricing.sub2": `Sillance está en beta. Prueba gratuita de 14 días, sin tarjeta.`,
+    "pricing.sub2": `Prueba gratuita de 14 días, sin tarjeta.`,
     "pricing.perYear": `/ año`,
     "pricing.billMonthly": `Mensual`,
     "pricing.billYearly": `Anual`,

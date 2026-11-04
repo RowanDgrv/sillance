@@ -9,4 +9,7 @@ Disallow: /sillance-review.html
 Disallow: /sillance-club.html
 Disallow: /sillance-demo.html
 
+# Pages de travail, admin, statistiques : exclues par <meta name="robots" content="noindex">
+# (pas de Disallow ici, sinon Google ne lit pas la balise et ne les retire pas)
+
 Sitemap: https://sillance.app/sitemap.xml
