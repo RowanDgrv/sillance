@@ -5907,6 +5907,20 @@ function openBuilder(dateKey, existing){
       targetDate: dateKey||null
     };
   }
+  // Séances créées hors de l'éditeur (connecteur assistant, imports) : leurs
+  // lignes n'ont ni lid ni bid. renderBlocks retrouve chaque ligne par son lid
+  // → sans lui, modifier une récup (30" → 60") ne trouvait aucune ligne et
+  // rien ne bougeait (signalé 05/11/2026). On complète aussi les champs
+  // manquants avec ceux d'une ligne par défaut du même type.
+  (builderState.blocks||[]).forEach(b=>{
+    if(!b.bid) b.bid='b'+(builderUid++);
+    if(!(b.series>0)) b.series=1;
+    b.lines=(b.lines||[]).map(l=>{
+      if(l.lid && l.dur) return l;
+      const d=defaultLine(l.type||'exo', builderState.disc);
+      return Object.assign(d, l, {lid: l.lid || d.lid, dur: l.dur || d.dur});
+    });
+  });
   // objectif de séance (pour l'analyse IA) — normalisé en chaîne "type|zone"
   if(builderState.objectif && typeof builderState.objectif==='object'){ builderState.objectif = builderState.objectif.type ? builderState.objectif.type+'|'+builderState.objectif.zone : ''; }
   if(builderState.objectif==null) builderState.objectif = (existing&&existing.objectif&&existing.objectif.type) ? existing.objectif.type+'|'+existing.objectif.zone : '';
