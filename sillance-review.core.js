@@ -5756,7 +5756,7 @@ function parseSwimShorthand(text){
     if(p.unparsed){ unparsed.push(p.unparsed); return; }
     const work = defaultLine(p.type, 'swim');
     work.metric='dist'; work.dist=p.dist;
-    work.pct=p.pct; work.rpe=rpeFromPct(p.pct);
+    work.pct=p.pct; work.rpe=rpeFromPct(p.pct, work.model);
     if(p.nage) work.nage=p.nage;
     if(p.sendoff) work.sendoff=p.sendoff;
     // Un repos court ("20 passif") ne peut PAS être représenté par le champ
@@ -5836,7 +5836,13 @@ function exactKinds(disc){
 function defaultBlockNew(disc){
   return {bid:'b'+(builderUid++), series:1, title:'', lines:[defaultLine('exo',disc)]};
 }
-function rpeFromPct(p){ return Math.max(1,Math.min(10, Math.round(p/12))); }
+// model : pour un modèle INVERSÉ (% CSS, % allure seuil), 112 % = plus lent,
+// donc plus facile. Sans conversion, un échauffement nagé à 112 % CSS sortait
+// à RPE 9 (constaté 05/11/2026 en préparant la vidéo bloc-notes).
+function rpeFromPct(p, model){
+  const eq = model ? invertedEquivPct(model, p) : null;
+  return Math.max(1,Math.min(10, Math.round((eq || p)/12)));
+}
 
 /* unité de la tolérance selon le type de cible */
 function tolUnit(kind){
@@ -6048,7 +6054,7 @@ function renderRefs(){
       builderState.blocks.forEach(blk=>blk.lines.forEach(ln=>{
         if(ln.type==='station') return;
         ln.mode='exact';
-        ln.exact={kind:'rpe', rpe: ln.exact&&ln.exact.kind==='rpe'?(ln.exact.rpe||ln.rpe||6):(ln.rpe||rpeFromPct(ln.pct||70)), tol:0};
+        ln.exact={kind:'rpe', rpe: ln.exact&&ln.exact.kind==='rpe'?(ln.exact.rpe||ln.rpe||6):(ln.rpe||rpeFromPct(ln.pct||70, ln.model)), tol:0};
       }));
       toast(tr('toast.seanceEnRpeUniquementParfaite'));
     } else {
@@ -6404,12 +6410,12 @@ function wireBlocks(){
           else if(f==='pct'){
             // maj EN PLACE pendant le drag — re-render seulement au relâchement,
             // sinon le slider est détruit sous le doigt et le réglage fin est impossible
-            ln.pct=+inp.value; ln.rpe=rpeFromPct(ln.pct);
+            ln.pct=+inp.value; ln.rpe=rpeFromPct(ln.pct, ln.model);
             const nn=lnEl.querySelector('[data-f="pctn"]'); if(nn && document.activeElement!==nn) nn.value=ln.pct;
             updateBuilderSummary();
           }
           else if(f==='pctn'){
-            ln.pct=Math.max(40,Math.min(130,+inp.value||40)); ln.rpe=rpeFromPct(ln.pct);
+            ln.pct=Math.max(40,Math.min(130,+inp.value||40)); ln.rpe=rpeFromPct(ln.pct, ln.model);
             const rg=lnEl.querySelector('[data-f="pct"]'); if(rg) rg.value=ln.pct;
             updateBuilderSummary();
           }
@@ -6422,10 +6428,10 @@ function wireBlocks(){
             const v=inp.value;
             if(v && v[0]==='c'){   // zone perso : change la référence + place le %
               const cz=customZones()[+v.slice(1)];
-              if(cz){ ln.model=cz.ref; const mid=Math.round((cz.lo+cz.hi)/2); ln.pct=Math.max(40,Math.min(130,mid)); ln.rpe=rpeFromPct(ln.pct); renderBlocks(); }
+              if(cz){ ln.model=cz.ref; const mid=Math.round((cz.lo+cz.hi)/2); ln.pct=Math.max(40,Math.min(130,mid)); ln.rpe=rpeFromPct(ln.pct, ln.model); renderBlocks(); }
             } else {
               const zList=zonesFor(ln.model); const z=zList[+v];
-              if(z){ const mid=Math.round((z[1]+z[2])/2); ln.pct=Math.max(40,Math.min(130,mid)); ln.rpe=rpeFromPct(ln.pct); renderBlocks(); }
+              if(z){ const mid=Math.round((z[1]+z[2])/2); ln.pct=Math.max(40,Math.min(130,mid)); ln.rpe=rpeFromPct(ln.pct, ln.model); renderBlocks(); }
             }
           }
         });

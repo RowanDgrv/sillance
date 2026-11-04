@@ -2509,6 +2509,8 @@ body[data-athview] .planner > .library{display:none}
   font-family:var(--font-data);font-size:var(--fs-md);font-weight:700;text-align:center;padding:6px var(--space-1)}
 .ex-n2{width:42px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);
   font-family:var(--font-data);font-size:var(--fs-md);font-weight:700;text-align:center;padding:6px 3px}
+/* départ natation (1'40) : 32 px utiles moins 18 px de padding masquaient la valeur (05/11/2026) */
+.ln-sendoff .ex-n2{width:56px;min-width:56px;padding:4px 6px;text-align:center}
 .ex-chip{font-family:var(--font-data);font-size:var(--fs-base);font-weight:700;color:var(--good);
   background:rgba(57,230,163,.12);border:1px solid rgba(57,230,163,.3);border-radius:6px;padding:3px 9px;white-space:nowrap}
 .ex-tol{display:flex;align-items:center;gap:3px;font-family:var(--font-data);font-size:var(--fs-base);color:var(--muted);font-weight:700}
@@ -4270,7 +4272,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-exercises.js?v=20261030d"></script>
 <script src="./sillance-equipment.js?v=20261103c"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
-<script src="./sillance-app.core.js?v=20261105a"></script>
+<script src="./sillance-app.core.js?v=20261105b"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
