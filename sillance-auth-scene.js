@@ -37,6 +37,7 @@ const CSS = `
 #pf-auth-overlay.pf-3d.open{display:grid;grid-template-columns:minmax(360px,480px) 1fr}
 .pf3-side{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:safe center;min-height:100vh;
   padding:32px clamp(24px,4vw,56px);background:linear-gradient(90deg,var(--p3-bg) 72%,transparent)}
+.pf3-side > *{flex-shrink:0}
 .pf3-brand{display:flex;align-items:center;gap:10px;font:700 22px 'Oswald',sans-serif;color:#F3F6FC;margin-bottom:clamp(20px,5vh,56px)}
 .pf3-brand svg{width:30px;height:30px}
 .pf3-kicker{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--p3-accent);margin:0 0 12px}
@@ -87,10 +88,23 @@ const CSS = `
 .pf3-cap{position:absolute;right:clamp(24px,4vw,56px);bottom:36px;text-align:right;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8A93A8}
 .pf3-cap b{display:block;font:600 20px 'Oswald',sans-serif;letter-spacing:.04em;color:#F3F6FC;margin-bottom:4px}
 @media (max-width:860px){
-  #pf-auth-overlay.pf-3d.open{grid-template-columns:1fr;grid-template-rows:38vh auto}
-  .pf3-stage{grid-row:1;position:relative;height:38vh}
-  .pf3-side{grid-row:2;min-height:0;padding:4px 16px 40px;background:var(--p3-bg)}
+  #pf-auth-overlay.pf-3d.open{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start}
+  .pf3-stage{grid-row:1;position:relative;height:min(30vh,260px)}
+  .pf3-side{grid-row:2;position:static;min-height:0;padding:0 16px 40px;background:var(--p3-bg)}
+  .pf3-brand{position:absolute;top:18px;left:16px;z-index:4;margin:0;font-size:19px}
+  .pf3-brand svg{width:26px;height:26px}
+  .pf3-motion{top:16px;right:16px;padding:7px 10px;font-size:11px}
+  .pf3-kicker{margin-bottom:8px}
+  .pf3-title{font-size:clamp(28px,8.4vw,36px);margin-bottom:8px}
+  .pf3-lede{font-size:14px;min-height:0;margin-bottom:16px}
+  .pf3-roles{margin-bottom:12px}
+  .pf3-role{padding:10px 4px 9px;font-size:13px}
+  .pf3-demo{margin-bottom:14px;font-size:13px;padding:10px 12px}
   .pf3-cap{display:none}
+}
+@media (max-width:360px){
+  .pf3-motion span{display:none}
+  .pf3-demo{flex-direction:column;align-items:flex-start;gap:4px}
 }
 @media (prefers-reduced-motion:reduce){.pf3-title .ch{transition:none}}
 `;
