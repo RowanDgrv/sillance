@@ -117,3 +117,5 @@
 .author .av{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font:700 20px var(--display);color:#06222A;flex:none}
 .author p{margin:0;font-size:15px;color:var(--muted)}
 .author b{color:var(--text)}
+.res-links{list-style:none;padding:0;margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}
+.res-links a{display:inline-block;padding:10px 16px;border-radius:99px;border:1px solid rgba(70,194,216,.45);background:rgba(70,194,216,.08);color:var(--text);font-weight:600}
