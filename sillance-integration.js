@@ -1077,8 +1077,17 @@ let hardGate = false;
 function openAuth(hard = false) {
   hardGate = hard;
   injectAuthOverlay();
-  document.getElementById("pf-auth-overlay").classList.add("open");
+  const ov = document.getElementById("pf-auth-overlay");
+  ov.classList.add("open");
   if (hard) document.body.style.overflow = "hidden";
+  // Mur de connexion venu de la landing : écran « 3 rôles » avec objet 3D
+  // (sillance-auth-scene.js). Le formulaire est déjà affiché ; l'habillage
+  // arrive par-dessus, et s'il échoue le mur classique reste utilisable.
+  if (hard && gateMode && !joinGate) {
+    import("./sillance-auth-scene.js?v=20261106g")
+      .then((m) => m.mountAuthScene(ov, { initialRole: pickedRole }))
+      .catch((e) => console.warn("[PF] écran de connexion 3D :", e?.message || e));
+  }
 }
 function closeAuth(force = false) {
   if (hardGate && !force) return;   // mur bloquant : pas de fermeture sans connexion
@@ -1722,6 +1731,13 @@ function showPaymentReturnModal(success, message) {
       openAuth(true);                // "Connexion" landing → mur bloquant, pas de démo visible
     } else {
       setCloudBadge(false);         // sinon démo intacte + bouton de connexion
+      // Lien « Démo coach / athlète / club » de l'écran de connexion : la démo
+      // s'ouvre directement dans le rôle choisi, sans l'écran d'accueil.
+      const demoRole = { coach: "modeCoach", athlete: "modeAthlete", club: "modeClub" }[gateParams.get("demo")];
+      if (demoRole) {
+        const w = document.getElementById("welcomeOverlay"); if (w) w.style.display = "none";
+        document.getElementById(demoRole)?.click();
+      }
     }
   } catch (e) {
     console.warn("[PF] backend indisponible/non configuré → mode démo.", e?.message || e);
