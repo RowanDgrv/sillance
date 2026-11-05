@@ -35,9 +35,11 @@ const calPath = 'guides/calendrier.json';
 const cal = JSON.parse(read(calPath));
 const published = [];
 
-// 1) publication du premier article arrivé à échéance
-const due = cal.filter((a) => !a.publie && a.date <= today).sort((a, b) => a.date.localeCompare(b.date))[0];
-if (due) {
+// 1) publication : tous les articles de la date la plus ancienne arrivée à
+// échéance (3 au maximum). Après un retard, on n'avance que d'une date par jour.
+const pending = cal.filter((a) => !a.publie && a.date <= today).sort((a, b) => a.date.localeCompare(b.date));
+const batch = pending.filter((a) => a.date === (pending[0] && pending[0].date)).slice(0, 3);
+for (const due of batch) {
   const p = `guides/${due.slug}/index.html`;
   let s = read(p);
   s = s.replace(/\n?<meta name="robots" content="noindex, follow" data-auto="file-attente">/, '');
@@ -60,9 +62,8 @@ if (due) {
   published.push(loc);
   write(calPath, JSON.stringify(cal, null, 1) + '\n');
   console.log(`Publié : ${due.slug} (${today})`);
-} else {
-  console.log(`Rien à publier le ${today}.`);
 }
+if (!batch.length) console.log(`Rien à publier le ${today}.`);
 
 // 2) « À lire aussi » : 3 articles publiés, même thème d'abord, puis les plus récents
 const live = cal.filter((a) => a.publie);
