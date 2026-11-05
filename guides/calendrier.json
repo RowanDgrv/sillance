@@ -1,7 +1,7 @@
 [
  {
   "slug": "entrainement-polarise-80-20",
-  "date": "2026-11-06",
+  "date": "2026-11-08",
   "theme": "Endurance",
   "titre": "Entraînement polarisé 80/20",
   "resume": "Seiler, Stöggl et Sperlich, méta-analyse 2024 : ce que la science dit de la répartition de l&#x27;intensité en endurance, chiffres à l&#x27;appui, et comment l&#x27;appliquer.",
@@ -9,7 +9,7 @@
  },
  {
   "slug": "affutage-avant-competition",
-  "date": "2026-11-06",
+  "date": "2026-11-08",
   "theme": "Compétition",
   "titre": "Affûtage avant une compétition",
   "resume": "Combien de jours, quelle baisse de volume, faut-il garder l&#x27;intensité ? Les chiffres de la méta-analyse de Bosquet (2007) et des travaux de Mujika, expliqués simplement.",
@@ -17,7 +17,7 @@
  },
  {
   "slug": "renforcement-musculaire-course-a-pied",
-  "date": "2026-11-06",
+  "date": "2026-11-08",
   "theme": "Renforcement",
   "titre": "Renforcement musculaire et course",
   "resume": "Støren 2008 et méta-analyse de 2016 : la musculation lourde améliore l&#x27;économie de course sans faire prendre de poids. Les chiffres et les protocoles testés.",
@@ -25,7 +25,7 @@
  },
  {
   "slug": "desentrainement-perte-de-forme",
-  "date": "2026-11-07",
+  "date": "2026-11-09",
   "theme": "Endurance",
   "titre": "Désentraînement et perte de forme",
   "resume": "Blessure, vacances, surcharge de travail : ce que perd un athlète d&#x27;endurance en 3, 8 ou 12 semaines d&#x27;arrêt, et le minimum pour garder sa forme, d&#x27;après Coyle et Hickson.",
@@ -33,7 +33,7 @@
  },
  {
   "slug": "charge-entrainement-et-blessures",
-  "date": "2026-11-07",
+  "date": "2026-11-09",
   "theme": "Prévention",
   "titre": "Charge d'entraînement et blessures",
   "resume": "Règle des 10 %, ratio aigu/chronique (ACWR) : ce que montrent les études de Nielsen et Gabbett, pourquoi l&#x27;ACWR est contesté, et ce qu&#x27;un coach peut en tirer.",
@@ -41,7 +41,7 @@
  },
  {
   "slug": "css-natation-ce-que-mesure-le-test",
-  "date": "2026-11-07",
+  "date": "2026-11-09",
   "theme": "Natation",
   "titre": "Ce que mesure la CSS",
   "resume": "Wakayoshi (1992) a montré le lien entre CSS et seuil lactique ; Dekerle (2005) a montré ses limites. Comment calculer et bien utiliser la CSS avec ses nageurs.",
