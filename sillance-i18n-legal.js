@@ -10,7 +10,7 @@
     "legal.nav.cgu": `CGU / CGV`,
     "legal.nav.confidentialite": `Confidentialité`,
     "legal.h1": `Informations légales`,
-    "legal.updated": `Version provisoire. Sillance est en phase de pré-lancement.`,
+    "legal.updated": `Dernière mise à jour : 6 novembre 2026.`,
     "legal.langNote": `En cas de divergence entre les versions, la version française fait foi.`,
     "legal.provisional": `<b>Service en phase de pré-lancement.</b> Aucun paiement réel n'est encore encaissé à ce stade ; le médiateur de la consommation sera désigné à l'ouverture officielle du service.`,
 
@@ -36,9 +36,7 @@ planification et d'analyse de l'entraînement destinée aux coachs sportifs, à 
     "legal.cgu.p2a": `Le Service propose trois types de comptes : <strong>coach</strong>, <strong>athlète</strong> et <strong>club</strong>.
 Vous vous engagez à fournir des informations exactes lors de l'inscription, à maintenir la confidentialité de vos
 identifiants et à ne pas partager votre compte. Vous êtes responsable de l'activité réalisée depuis votre compte.`,
-    "legal.cgu.p2b": `L'inscription est ouverte aux personnes majeures. Un mineur de plus de 15 ans peut utiliser le Service en tant
-qu'athlète ou membre de club avec l'accord de son représentant légal ; le consentement parental est recueilli
-dans l'application pour les membres mineurs des clubs.`,
+    "legal.cgu.p2b": `L'inscription en libre-service (comptes coach et club) est réservée aux personnes majeures. Un mineur peut utiliser le Service en tant qu'athlète ou membre de club, uniquement sur invitation de son coach ou de son club : à partir de 15 ans, il consent seul au traitement de ses données ; avant 15 ans, son inscription requiert en plus le consentement du ou des titulaires de l'autorité parentale (voir l'article 3.6). Un mineur ne peut souscrire aucun abonnement payant.`,
     "legal.cgu.t3": `2.3 Offres et tarifs`,
     "legal.cgu.th1": `Offre`,
     "legal.cgu.th2": `Prix`,
@@ -95,9 +93,7 @@ Consultez un médecin avant de débuter ou d'intensifier une pratique sportive. 
 symptôme inhabituel, cessez l'effort et consultez un professionnel de santé. Les recommandations d'un coach via
 la plateforme relèvent de la seule responsabilité de ce coach.`,
     "legal.cgu.t9": `2.9 Assistant IA`,
-    "legal.cgu.p9": `L'add-on « Assistant IA » génère des résumés et recommandations d'entraînement à partir des données chiffrées de
-vos séances, au moyen d'un modèle de langage fourni par Groq (Anthropic en secours). Ces contenus sont générés automatiquement et
-peuvent comporter des imprécisions : ils doivent être relus et validés par le coach avant toute décision d'entraînement.`,
+    "legal.cgu.p9": `L'add-on « Assistant IA » génère des résumés et recommandations d'entraînement à partir des données chiffrées de vos séances, au moyen d'un modèle de langage fourni par Groq (Anthropic en secours). Ces contenus sont générés automatiquement, signalés comme tels dans l'application, et peuvent comporter des imprécisions : ils doivent être relus et validés par le coach avant toute décision d'entraînement. Le détail des données utilisées et vos choix figurent à l'article 3.9.`,
     "legal.cgu.t10": `2.10 Propriété intellectuelle`,
     "legal.cgu.p10": `Le Service, sa marque, son interface, ses contenus (dont la bibliothèque d'exercices vidéo) sont la propriété
 exclusive de l'éditeur. Vous conservez la propriété des données et contenus que vous créez (plans d'entraînement,
@@ -165,7 +161,7 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.ret5": `Documents de facturation : 10 ans (obligation comptable, art. L123-22 du Code de commerce).`,
     "legal.priv.ret6": `Jetons de connexion aux services tiers (Garmin, Coros, Strava) : supprimés dès la déconnexion du service.`,
     "legal.priv.ret7": `Sauvegardes techniques de la base de données : rétention glissante de 30 jours maximum, à seule fin de continuité de service.`,
-    "legal.priv.ret8": `Mesure d'audience (si acceptée) : 13 mois, en agrégat, sans identifiant permettant de relier plusieurs visites à une même personne.`,
+    "legal.priv.ret8": `Choix de consentement aux cookies : 12 mois, puis nouvelle demande.`,
     "legal.priv.ret9": `Journal des échecs de l'Assistant IA : 90 jours, puis suppression automatique.`,
     "legal.priv.ret10": `Statistiques de fréquentation anonymes : 25 mois maximum, puis suppression automatique.`,
     "legal.priv.sub6.c": `États-Unis (Data Privacy Framework et clauses contractuelles types)`,
@@ -182,14 +178,9 @@ l'analyse individuelle, réservée aux entraîneurs.`,
     "legal.priv.d6.b": `Savoir quels canaux font connaître Sillance`,
     "legal.priv.d6.a": `Provenance : « Où nous as-tu connus ? » (réponse facultative)`,
     "legal.priv.t5": `3.5 Vos droits`,
-    "legal.priv.p5": `Vous disposez des droits d'accès, de rectification, d'effacement, de portabilité, de limitation et d'opposition,
-ainsi que du droit de retirer votre consentement à tout moment (notamment pour les données de santé : le retrait
-désactive les fonctionnalités concernées, check-ins et analyse cardiaque). Pour les exercer :
-<a href="mailto:contact@sillance.app">contact@sillance.app</a>. Réponse sous 30 jours. Vous pouvez introduire une
-réclamation auprès de la CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
+    "legal.priv.p5": `Vous disposez des droits d'accès, de rectification, d'effacement, de portabilité, de limitation et d'opposition (articles 15 à 21 du RGPD), du droit de retirer votre consentement à tout moment (notamment pour les données de santé : le retrait désactive les fonctionnalités concernées, check-ins et analyse cardiaque) et du droit de définir des directives sur le sort de vos données après votre décès (article 85 de la loi Informatique et Libertés).<br><strong>Supprimer votre compte :</strong> écrivez à <a href="mailto:contact@sillance.app?subject=Suppression%20de%20compte">contact@sillance.app</a> depuis l'adresse e-mail du compte, avec l'objet « Suppression de compte ». Le compte et toutes les données associées (entraînement, santé, activités importées, résumés de l'Assistant IA, jetons de connexion aux montres) sont supprimés sous 30 jours, sauf les documents de facturation que la loi impose de conserver (article 3.4). Vous pouvez aussi déconnecter à tout moment Garmin, COROS ou Strava depuis l'application.<br><strong>Portabilité :</strong> sur simple demande, vos données vous sont transmises dans un format structuré et lisible par machine (CSV ou JSON, et fichiers d'activité d'origine lorsqu'ils sont disponibles).<br>Réponse à toute demande sous un mois (article 12 du RGPD). Vous pouvez introduire une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Mineurs`,
-    "legal.priv.p6": `Le traitement des données d'un mineur de moins de 15 ans requiert le consentement conjoint du titulaire de
-l'autorité parentale, recueilli dans l'application lors de l'adhésion à un club.`,
+    "legal.priv.p6": `Conformément à l'article 8 du RGPD et à l'article 45 de la loi Informatique et Libertés, un mineur de 15 ans ou plus peut consentir seul au traitement de ses données ; en dessous de 15 ans, le consentement conjoint du mineur et du ou des titulaires de l'autorité parentale est requis. Pour un membre mineur d'un club, le club enregistre dans l'application le nom et l'e-mail du représentant légal et atteste avoir recueilli son accord écrit (par exemple le formulaire d'adhésion signé) ; la date de cet accord est conservée. Le représentant légal peut à tout moment retirer ce consentement et demander la suppression des données du mineur en écrivant à contact@sillance.app.`,
     "legal.priv.t7": `3.7 Cookies et gestion du consentement`,
     "legal.priv.p7": `Sillance dépose des éléments de stockage <strong>strictement nécessaires</strong> au fonctionnement du site (authentification,
 langue, thème, préférences d'affichage) : ils sont actifs par défaut et ne requièrent pas de consentement (art. 82 de la loi
@@ -225,6 +216,15 @@ rôle appliqué au niveau de la base de données (Row Level Security) ; paiement
 (certifié PCI-DSS). En cas de violation de données susceptible d'engendrer un risque pour vos droits, vous et la
 CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
     "legal.footer": `Sillance, micro-entreprise · <a href="index.html">Accueil</a> · <a href="sillance-aide.html">Aide</a> · <a href="contact.html">Contact</a>`,
+    "legal.cgu.t13": `2.13 Signalement de contenus illicites`,
+    "legal.cgu.p13": `Conformément au règlement (UE) 2022/2065 sur les services numériques (DSA), le point de contact unique, pour les autorités comme pour les utilisateurs, est <a href="mailto:contact@sillance.app">contact@sillance.app</a> (en français ou en anglais). Tout contenu publié par un autre utilisateur que vous estimez illicite (vidéo, message, nom, description) peut être signalé à cette adresse en indiquant son emplacement exact, les raisons du signalement et vos coordonnées. Nous accusons réception, examinons le signalement, puis vous informons de la décision prise et des voies de recours. Un contenu manifestement illicite est retiré et le compte en cause peut être suspendu (article 2.6).`,
+    "legal.priv.sub7.a": `Cloudflare (Turnstile)`,
+    "legal.priv.sub7.b": `Protection anti-robots des formulaires de connexion et d'inscription (traite l'adresse IP et des signaux techniques du navigateur, sans cookie publicitaire)`,
+    "legal.priv.sub7.c": `États-Unis (Data Privacy Framework et clauses contractuelles types)`,
+    "legal.priv.t9": `3.9 Intelligence artificielle : déclaration de transparence`,
+    "legal.priv.p9": `Sillance n'utilise l'intelligence artificielle que dans l'add-on <strong>Assistant IA</strong>, souscrit par le coach.<br><strong>Ce qui est fait :</strong> des modèles de langage (Groq en principal, Anthropic en secours) rédigent un résumé ou un rapport de séance et une synthèse de semaine à partir d'indicateurs calculés au préalable par Sillance : durées, allures, fréquence cardiaque, zones, ressenti et, pour le rapport complet, HRV, FC de repos, sommeil, fatigue, sexe, âge et cycle menstruel s'il est renseigné.<br><strong>Ce qui n'est pas fait :</strong> aucun nom, e-mail ni identifiant n'est transmis ; vos données ne servent à entraîner aucun modèle d'IA, ni chez Sillance ni chez ses prestataires ; aucune décision produisant des effets juridiques ou vous affectant de manière significative n'est prise automatiquement (article 22 du RGPD) : les contenus générés sont une aide à la décision, signalés comme tels dans l'application, et relus par le coach.<br><strong>Votre choix :</strong> vous pouvez vous opposer à l'analyse de vos données par l'Assistant IA, sans conséquence sur le reste du Service, en écrivant à contact@sillance.app.<br><strong>Données issues d'appareils Garmin :</strong> elles ne sont transmises à l'Assistant IA qu'avec votre consentement explicite, recueilli dans l'application avant toute analyse et retirable à tout moment.<br>Ces informations répondent aux obligations de transparence du règlement (UE) 2024/1689 sur l'intelligence artificielle (article 50).`,
+    "legal.priv.t10": `3.10 Textes de référence`,
+    "legal.priv.p10": `La présente politique est établie conformément au règlement (UE) 2016/679 relatif à la protection des données (RGPD), à la loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés, au règlement (UE) 2022/2065 sur les services numériques (DSA) et au règlement (UE) 2024/1689 sur l'intelligence artificielle. Autorité de contrôle compétente : Commission nationale de l'informatique et des libertés (CNIL), 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07.`,
   };
 
   var en = {
@@ -234,7 +234,7 @@ CNIL seront notifiés conformément aux articles 33 et 34 du RGPD.`,
     "legal.nav.cgu": `Terms of use`,
     "legal.nav.confidentialite": `Privacy`,
     "legal.h1": `Legal information`,
-    "legal.updated": `Provisional version. Sillance is in pre-launch.`,
+    "legal.updated": `Last updated: 6 November 2026.`,
     "legal.langNote": `In case of discrepancy between versions, the French version prevails.`,
     "legal.provisional": `<b>Service in pre-launch phase.</b> No real payments are collected at this stage; the consumer mediator will be designated when the service officially launches.`,
 
@@ -260,9 +260,7 @@ training planning and analysis intended for sports coaches, their athletes and c
     "legal.cgu.p2a": `The Service offers three types of accounts: <strong>coach</strong>, <strong>athlete</strong> and <strong>club</strong>.
 You agree to provide accurate information when registering, to keep your
 login credentials confidential, and not to share your account. You are responsible for activity carried out from your account.`,
-    "legal.cgu.p2b": `Registration is open to adults. A minor over 15 may use the Service as
-an athlete or club member with the consent of their legal guardian; parental consent is collected
-in the application for minor club members.`,
+    "legal.cgu.p2b": `Self-service sign-up (coach and club accounts) is reserved for adults. A minor may use the Service as an athlete or club member only when invited by their coach or club: from the age of 15 they may consent alone to the processing of their data; under 15, sign-up also requires the consent of the holder(s) of parental authority (see section 3.6). A minor may not take out any paid subscription.`,
     "legal.cgu.t3": `2.3 Plans and pricing`,
     "legal.cgu.th1": `Plan`,
     "legal.cgu.th2": `Price`,
@@ -319,9 +317,7 @@ Consult a doctor before starting or intensifying a sports activity. In case of f
 unusual symptom, stop exercising and consult a healthcare professional. Recommendations from a coach via
 the platform are the sole responsibility of that coach.`,
     "legal.cgu.t9": `2.9 AI Assistant`,
-    "legal.cgu.p9": `The "AI Assistant" add-on generates training summaries and recommendations from the numerical data of
-your sessions, using a language model provided by Groq (Anthropic as backup). This content is generated automatically and
-may contain inaccuracies: it must be reviewed and validated by the coach before any training decision.`,
+    "legal.cgu.p9": `The "AI Assistant" add-on generates training summaries and recommendations from the numerical data of your sessions, using a language model provided by Groq (Anthropic as fallback). This content is generated automatically, labelled as such in the app, and may contain inaccuracies: it must be reviewed and validated by the coach before any training decision. The data used and your choices are described in section 3.9.`,
     "legal.cgu.t10": `2.10 Intellectual property`,
     "legal.cgu.p10": `The Service, its brand, its interface, and its content (including the video exercise library) are the exclusive
 property of the publisher. You retain ownership of the data and content you create (training plans,
@@ -389,7 +385,7 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.ret5": `Billing documents: 10 years (accounting obligation, art. L123-22 of the French Commercial Code).`,
     "legal.priv.ret6": `Third-party service connection tokens (Garmin, Coros, Strava): deleted as soon as the service is disconnected.`,
     "legal.priv.ret7": `Technical database backups: rolling retention of 30 days maximum, solely for service continuity.`,
-    "legal.priv.ret8": `Audience measurement (if accepted): 13 months, in aggregate, with no identifier linking multiple visits to the same person.`,
+    "legal.priv.ret8": `Cookie consent choice: 12 months, then asked again.`,
     "legal.priv.ret9": `AI Assistant failure log: 90 days, then deleted automatically.`,
     "legal.priv.ret10": `Anonymous visit statistics: 25 months maximum, then deleted automatically.`,
     "legal.priv.sub6.c": `United States (Data Privacy Framework and standard contractual clauses)`,
@@ -406,14 +402,9 @@ individual analysis, which is reserved for coaches.`,
     "legal.priv.d6.b": `Knowing which channels bring people to Sillance`,
     "legal.priv.d6.a": `Referral source: "How did you hear about us?" (optional answer)`,
     "legal.priv.t5": `3.5 Your rights`,
-    "legal.priv.p5": `You have the right to access, rectify, erase, port, restrict and object to processing,
-as well as the right to withdraw your consent at any time (notably for health data: withdrawal
-disables the related features, check-ins, cardiac analysis). To exercise these rights:
-<a href="mailto:contact@sillance.app">contact@sillance.app</a>. Response within 30 days. You can file a
-complaint with the CNIL, the French data protection authority (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
+    "legal.priv.p5": `You have the rights of access, rectification, erasure, portability, restriction and objection (Articles 15 to 21 GDPR), the right to withdraw your consent at any time (in particular for health data: withdrawal disables the related features, check-ins and heart-rate analysis) and the right to set instructions on what happens to your data after your death (Article 85 of the French Data Protection Act).<br><strong>Deleting your account:</strong> write to <a href="mailto:contact@sillance.app?subject=Account%20deletion">contact@sillance.app</a> from the account's e-mail address, with the subject "Account deletion". The account and all associated data (training, health, imported activities, AI Assistant summaries, watch connection tokens) are deleted within 30 days, except for invoices that the law requires us to keep (section 3.4). You can also disconnect Garmin, COROS or Strava at any time from the app.<br><strong>Portability:</strong> on request, your data is sent to you in a structured, machine-readable format (CSV or JSON, plus original activity files where available).<br>Any request is answered within one month (Article 12 GDPR). You may lodge a complaint with the CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Minors`,
-    "legal.priv.p6": `Processing the data of a minor under 15 requires the joint consent of the holder of
-parental authority, collected in the application when joining a club.`,
+    "legal.priv.p6": `In accordance with Article 8 GDPR and Article 45 of the French Data Protection Act, a minor aged 15 or over may consent alone to the processing of their data; under 15, the joint consent of the minor and of the holder(s) of parental authority is required. For a minor club member, the club records the legal guardian's name and e-mail in the app and certifies that it has obtained their written consent (for example the signed membership form); the date of this consent is kept. The legal guardian may withdraw this consent at any time and request the deletion of the minor's data by writing to contact@sillance.app.`,
     "legal.priv.t7": `3.7 Cookies and consent management`,
     "legal.priv.p7": `Sillance stores <strong>strictly necessary</strong> items for the site to function (authentication, language, theme,
 display preferences): they are active by default and do not require consent (art. 82 of the French Data Protection Act).
@@ -448,6 +439,15 @@ role at the database level (Row Level Security); payments are processed exclusiv
 (PCI-DSS certified). In the event of a data breach likely to create a risk to your rights, you and the
 CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
     "legal.footer": `Sillance, sole proprietorship · <a href="index.html">Home</a> · <a href="sillance-aide.html">Help</a> · <a href="contact.html">Contact</a>`,
+    "legal.cgu.t13": `2.13 Reporting illegal content`,
+    "legal.cgu.p13": `In accordance with Regulation (EU) 2022/2065 on digital services (DSA), the single point of contact for authorities and users is <a href="mailto:contact@sillance.app">contact@sillance.app</a> (in French or English). Any content posted by another user that you consider illegal (video, message, name, description) can be reported to this address, stating its exact location, the reasons for the report and your contact details. We acknowledge receipt, review the report, then inform you of the decision and the available means of redress. Manifestly illegal content is removed and the account concerned may be suspended (section 2.6).`,
+    "legal.priv.sub7.a": `Cloudflare (Turnstile)`,
+    "legal.priv.sub7.b": `Bot protection on the sign-in and sign-up forms (processes the IP address and technical browser signals, no advertising cookie)`,
+    "legal.priv.sub7.c": `United States (Data Privacy Framework and standard contractual clauses)`,
+    "legal.priv.t9": `3.9 Artificial intelligence: transparency statement`,
+    "legal.priv.p9": `Sillance uses artificial intelligence only in the <strong>AI Assistant</strong> add-on, subscribed to by the coach.<br><strong>What is done:</strong> language models (Groq primarily, Anthropic as fallback) write a session summary or report and a weekly review from indicators computed beforehand by Sillance: durations, paces, heart rate, zones, perceived effort and, for the full report, HRV, resting heart rate, sleep, fatigue, sex, age and menstrual cycle if entered.<br><strong>What is not done:</strong> no name, e-mail or identifier is sent; your data is not used to train any AI model, neither by Sillance nor by its providers; no decision producing legal effects or similarly significantly affecting you is made automatically (Article 22 GDPR): generated content is decision support, labelled as such in the app, and reviewed by the coach.<br><strong>Your choice:</strong> you can object to the analysis of your data by the AI Assistant, without any effect on the rest of the Service, by writing to contact@sillance.app.<br><strong>Data from Garmin devices:</strong> it is sent to the AI Assistant only with your explicit consent, collected in the app before any analysis and withdrawable at any time.<br>This information meets the transparency obligations of Regulation (EU) 2024/1689 on artificial intelligence (Article 50).`,
+    "legal.priv.t10": `3.10 Applicable legislation`,
+    "legal.priv.p10": `This policy is established in accordance with Regulation (EU) 2016/679 on data protection (GDPR), French Act No. 78-17 of 6 January 1978 on information technology, files and freedoms, Regulation (EU) 2022/2065 on digital services (DSA) and Regulation (EU) 2024/1689 on artificial intelligence. Competent supervisory authority: Commission nationale de l'informatique et des libertés (CNIL), 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France.`,
   };
 
   var es = {
@@ -457,7 +457,7 @@ CNIL will be notified in accordance with articles 33 and 34 of the GDPR.`,
     "legal.nav.cgu": `Términos de uso`,
     "legal.nav.confidentialite": `Privacidad`,
     "legal.h1": `Información legal`,
-    "legal.updated": `Versión provisional. Sillance está en fase de prelanzamiento.`,
+    "legal.updated": `Última actualización: 6 de noviembre de 2026.`,
     "legal.langNote": `En caso de discrepancia entre las versiones, prevalece la versión francesa.`,
     "legal.provisional": `<b>Servicio en fase de prelanzamiento.</b> Todavía no se cobra ningún pago real en esta etapa; el mediador de consumo se designará en la apertura oficial del servicio.`,
 
@@ -483,9 +483,7 @@ planificación y análisis del entrenamiento destinada a entrenadores deportivos
     "legal.cgu.p2a": `El Servicio ofrece tres tipos de cuentas: <strong>entrenador</strong>, <strong>atleta</strong> y <strong>club</strong>.
 Te comprometes a proporcionar información exacta al registrarte, a mantener la confidencialidad de tus
 credenciales y a no compartir tu cuenta. Eres responsable de la actividad realizada desde tu cuenta.`,
-    "legal.cgu.p2b": `El registro está abierto a personas mayores de edad. Un menor de más de 15 años puede usar el Servicio como
-atleta o miembro de un club con el acuerdo de su representante legal; el consentimiento parental se recoge
-en la aplicación para los miembros menores de los clubes.`,
+    "legal.cgu.p2b": `El registro libre (cuentas de entrenador y de club) está reservado a personas mayores de edad. Un menor puede usar el Servicio como atleta o miembro de club solo por invitación de su entrenador o de su club: a partir de los 15 años puede consentir por sí solo al tratamiento de sus datos; por debajo de 15 años, el registro requiere además el consentimiento del titular o titulares de la patria potestad (véase el artículo 3.6). Un menor no puede contratar ninguna suscripción de pago.`,
     "legal.cgu.t3": `2.3 Planes y precios`,
     "legal.cgu.th1": `Plan`,
     "legal.cgu.th2": `Precio`,
@@ -542,9 +540,7 @@ Consulta a un médico antes de empezar o intensificar una práctica deportiva. E
 síntoma inusual, cesa el esfuerzo y consulta a un profesional de la salud. Las recomendaciones de un entrenador a través de
 la plataforma son responsabilidad exclusiva de dicho entrenador.`,
     "legal.cgu.t9": `2.9 Asistente de IA`,
-    "legal.cgu.p9": `El add-on «Asistente de IA» genera resúmenes y recomendaciones de entrenamiento a partir de los datos numéricos de
-tus sesiones, mediante un modelo de lenguaje proporcionado por Groq (Anthropic como respaldo). Este contenido se genera automáticamente y
-puede contener imprecisiones: debe ser revisado y validado por el entrenador antes de cualquier decisión de entrenamiento.`,
+    "legal.cgu.p9": `El add-on «Asistente IA» genera resúmenes y recomendaciones de entrenamiento a partir de los datos numéricos de tus sesiones, mediante un modelo de lenguaje proporcionado por Groq (Anthropic como respaldo). Estos contenidos se generan automáticamente, se señalan como tales en la aplicación y pueden contener imprecisiones: el entrenador debe revisarlos y validarlos antes de cualquier decisión de entrenamiento. Los datos utilizados y tus opciones se describen en el artículo 3.9.`,
     "legal.cgu.t10": `2.10 Propiedad intelectual`,
     "legal.cgu.p10": `El Servicio, su marca, su interfaz y sus contenidos (incluida la biblioteca de ejercicios en vídeo) son propiedad
 exclusiva del editor. Conservas la propiedad de los datos y contenidos que creas (planes de entrenamiento,
@@ -612,7 +608,7 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.ret5": `Documentos de facturación: 10 años (obligación contable, art. L123-22 del Código de Comercio francés).`,
     "legal.priv.ret6": `Tokens de conexión a servicios externos (Garmin, Coros, Strava): eliminados en cuanto se desconecta el servicio.`,
     "legal.priv.ret7": `Copias de seguridad técnicas de la base de datos: retención móvil de 30 días como máximo, solo para la continuidad del servicio.`,
-    "legal.priv.ret8": `Medición de audiencia (si se acepta): 13 meses, en conjunto agregado, sin identificador que vincule varias visitas a la misma persona.`,
+    "legal.priv.ret8": `Elección de consentimiento de cookies: 12 meses, después se vuelve a preguntar.`,
     "legal.priv.ret9": `Registro de fallos del Asistente IA: 90 días, después eliminación automática.`,
     "legal.priv.ret10": `Estadísticas de visitas anónimas: 25 meses como máximo, después eliminación automática.`,
     "legal.priv.sub6.c": `Estados Unidos (Data Privacy Framework y cláusulas contractuales tipo)`,
@@ -629,14 +625,9 @@ el análisis individual, reservado a los entrenadores.`,
     "legal.priv.d6.b": `Saber qué canales dan a conocer Sillance`,
     "legal.priv.d6.a": `Procedencia: «¿Cómo nos conociste?» (respuesta opcional)`,
     "legal.priv.t5": `3.5 Tus derechos`,
-    "legal.priv.p5": `Dispones de los derechos de acceso, rectificación, supresión, portabilidad, limitación y oposición,
-así como del derecho a retirar tu consentimiento en cualquier momento (en particular para los datos de salud: la retirada
-desactiva las funcionalidades correspondientes: check-ins, análisis cardíaco). Para ejercerlos:
-<a href="mailto:contact@sillance.app">contact@sillance.app</a>. Respuesta en un plazo de 30 días. Puedes presentar una
-reclamación ante la CNIL, la autoridad francesa de protección de datos (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
+    "legal.priv.p5": `Tienes derecho de acceso, rectificación, supresión, portabilidad, limitación y oposición (artículos 15 a 21 del RGPD), derecho a retirar tu consentimiento en cualquier momento (en particular para los datos de salud: la retirada desactiva las funciones correspondientes, check-ins y análisis cardíaco) y derecho a establecer directrices sobre el destino de tus datos tras tu fallecimiento (artículo 85 de la ley francesa Informatique et Libertés).<br><strong>Eliminar tu cuenta:</strong> escribe a <a href="mailto:contact@sillance.app?subject=Eliminaci%C3%B3n%20de%20cuenta">contact@sillance.app</a> desde el correo de la cuenta, con el asunto «Eliminación de cuenta». La cuenta y todos los datos asociados (entrenamiento, salud, actividades importadas, resúmenes del Asistente IA, tokens de conexión de relojes) se eliminan en un plazo de 30 días, salvo los documentos de facturación que la ley obliga a conservar (artículo 3.4). También puedes desconectar Garmin, COROS o Strava en cualquier momento desde la aplicación.<br><strong>Portabilidad:</strong> previa solicitud, te enviamos tus datos en un formato estructurado y legible por máquina (CSV o JSON, y archivos de actividad originales cuando estén disponibles).<br>Respondemos a cualquier solicitud en el plazo de un mes (artículo 12 del RGPD). Puedes presentar una reclamación ante la CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).`,
     "legal.priv.t6": `3.6 Menores`,
-    "legal.priv.p6": `El tratamiento de los datos de un menor de 15 años requiere el consentimiento conjunto del titular de
-la patria potestad, recogido en la aplicación al afiliarse a un club.`,
+    "legal.priv.p6": `De conformidad con el artículo 8 del RGPD y el artículo 45 de la ley francesa Informatique et Libertés, un menor de 15 años o más puede consentir por sí solo al tratamiento de sus datos; por debajo de 15 años se requiere el consentimiento conjunto del menor y del titular o titulares de la patria potestad. Para un miembro menor de un club, el club registra en la aplicación el nombre y el correo del representante legal y certifica haber obtenido su consentimiento por escrito (por ejemplo, el formulario de inscripción firmado); se conserva la fecha de dicho consentimiento. El representante legal puede retirar este consentimiento en cualquier momento y solicitar la supresión de los datos del menor escribiendo a contact@sillance.app.`,
     "legal.priv.t7": `3.7 Cookies y gestión del consentimiento`,
     "legal.priv.p7": `Sillance almacena elementos <strong>estrictamente necesarios</strong> para el funcionamiento del sitio (autenticación,
 idioma, tema, preferencias de visualización): están activos por defecto y no requieren consentimiento (art. 82 de la ley
@@ -672,6 +663,15 @@ rol aplicada a nivel de base de datos (Row Level Security); pagos procesados exc
 (certificado PCI-DSS). En caso de violación de datos que pueda suponer un riesgo para tus derechos, tú y la
 CNIL seréis notificados conforme a los artículos 33 y 34 del RGPD.`,
     "legal.footer": `Sillance, micro-empresa · <a href="index.html">Inicio</a> · <a href="sillance-aide.html">Ayuda</a> · <a href="contact.html">Contacto</a>`,
+    "legal.cgu.t13": `2.13 Notificación de contenidos ilícitos`,
+    "legal.cgu.p13": `De conformidad con el Reglamento (UE) 2022/2065 de servicios digitales (DSA), el punto de contacto único, tanto para las autoridades como para los usuarios, es <a href="mailto:contact@sillance.app">contact@sillance.app</a> (en francés o en inglés). Cualquier contenido publicado por otro usuario que consideres ilícito (vídeo, mensaje, nombre, descripción) puede notificarse a esta dirección indicando su ubicación exacta, los motivos y tus datos de contacto. Acusamos recibo, examinamos la notificación y te informamos de la decisión y de las vías de recurso. Un contenido manifiestamente ilícito se retira y la cuenta en cuestión puede suspenderse (artículo 2.6).`,
+    "legal.priv.sub7.a": `Cloudflare (Turnstile)`,
+    "legal.priv.sub7.b": `Protección anti-bots de los formularios de inicio de sesión y registro (trata la dirección IP y señales técnicas del navegador, sin cookie publicitaria)`,
+    "legal.priv.sub7.c": `Estados Unidos (Data Privacy Framework y cláusulas contractuales tipo)`,
+    "legal.priv.t9": `3.9 Inteligencia artificial: declaración de transparencia`,
+    "legal.priv.p9": `Sillance solo utiliza inteligencia artificial en el add-on <strong>Asistente IA</strong>, contratado por el entrenador.<br><strong>Qué se hace:</strong> modelos de lenguaje (Groq como principal, Anthropic como respaldo) redactan un resumen o informe de sesión y una síntesis semanal a partir de indicadores calculados previamente por Sillance: duraciones, ritmos, frecuencia cardíaca, zonas, percepción del esfuerzo y, para el informe completo, HRV, FC en reposo, sueño, fatiga, sexo, edad y ciclo menstrual si se ha indicado.<br><strong>Qué no se hace:</strong> no se transmite ningún nombre, correo ni identificador; tus datos no sirven para entrenar ningún modelo de IA, ni en Sillance ni en sus proveedores; no se toma automáticamente ninguna decisión que produzca efectos jurídicos o te afecte de forma significativa (artículo 22 del RGPD): los contenidos generados son una ayuda a la decisión, señalados como tales en la aplicación y revisados por el entrenador.<br><strong>Tu elección:</strong> puedes oponerte al análisis de tus datos por el Asistente IA, sin consecuencias para el resto del Servicio, escribiendo a contact@sillance.app.<br><strong>Datos procedentes de dispositivos Garmin:</strong> solo se transmiten al Asistente IA con tu consentimiento explícito, recogido en la aplicación antes de cualquier análisis y revocable en cualquier momento.<br>Esta información cumple las obligaciones de transparencia del Reglamento (UE) 2024/1689 de inteligencia artificial (artículo 50).`,
+    "legal.priv.t10": `3.10 Normativa de referencia`,
+    "legal.priv.p10": `La presente política se establece de conformidad con el Reglamento (UE) 2016/679 de protección de datos (RGPD), la ley francesa n.º 78-17 de 6 de enero de 1978 relativa a la informática, los ficheros y las libertades, el Reglamento (UE) 2022/2065 de servicios digitales (DSA) y el Reglamento (UE) 2024/1689 de inteligencia artificial. Autoridad de control competente: Commission nationale de l'informatique et des libertés (CNIL), 3 place de Fontenoy, TSA 80715, 75334 París Cedex 07, Francia.`,
   };
 
   window.SIL_I18N = window.SIL_I18N || { fr: {}, en: {}, es: {} };
