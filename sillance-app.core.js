@@ -3344,6 +3344,16 @@ function weekReviewPayload(mon){
     seances: items,
   };
 }
+// Clé de cache de la synthèse : semaine + EMPREINTE de son contenu (06/11/2026).
+// Avant : clé = semaine seule → une synthèse faite mercredi (2 sorties hors plan)
+// était resservie telle quelle après la séance de jeudi, jamais analysée.
+// Désormais toute séance ajoutée, réalisée, synchronisée ou modifiée change
+// l'empreinte → nouvelle synthèse ; un clic répété sur la même semaine reste gratuit.
+function weekAiKey(mon){
+  const txt=JSON.stringify(weekReviewSessions(mon));
+  let h=5381; for(let i=0;i<txt.length;i++) h=((h<<5)+h+txt.charCodeAt(i))|0;
+  return 'v3|'+iso(mon)+'|'+(h>>>0).toString(36);
+}
 function weekHasRealised(mon){ return weekReviewSessions(mon).some(x=>x.statut==='réalisée'||x.statut==='hors plan'); }
 function weekReviewMapped(r){
   return {headline:r.headline, tenu:r.verdict, bullets:(r.bullets||[]).map(x=>({s:x.status,t:x.text})), recos:r.recos||[]};
@@ -3360,7 +3370,7 @@ function renderWeekAiBtn(mon){
   const key = activeAthleteKey();
   if(!key || !weekHasRealised(mon)){ el.hidden=true; return; }
   el.hidden=false;
-  const wk = 'v2|'+iso(mon), ck = key+'|'+wk;
+  const wk = weekAiKey(mon), ck = key+'|'+wk;
   const cached = WEEK_REVIEW_CACHE[ck];
   if(cached){
     el.innerHTML = aiResultHtml(null, null, cached.mapped, cached.isDemo, ['ai.weekFootDemo','ai.weekFootReal'])
@@ -3389,9 +3399,9 @@ function renderWeekAiConfirm(mon){
 function runWeekAi(mon){
   const el = document.getElementById('weekAiAssist'); if(!el) return;
   injectAiCss();
-  // 'v2|' : nouveau format de données ; ignore les synthèses v1 en cache
-  // (faites sans le plan, avec des chiffres inventés).
-  const key = activeAthleteKey(), wk = 'v2|'+iso(mon), ck = key+'|'+wk;
+  // 'v3|' + empreinte du contenu (weekAiKey) : une semaine qui a changé
+  // depuis la dernière synthèse est réanalysée au lieu de resservir l'ancienne.
+  const key = activeAthleteKey(), wk = weekAiKey(mon), ck = key+'|'+wk;
   const sessions = weekReviewPayload(mon);
   if(!weekHasRealised(mon)){ el.innerHTML = `<p class="club-hint">${tr('weekAi.noSessions')}</p>`; return; }
   if(!aiUnlocked()){
