@@ -1,7 +1,7 @@
 [
  {
   "slug": "entrainement-polarise-80-20",
-  "date": "2026-11-10",
+  "date": "2026-12-01",
   "theme": "Endurance",
   "titre": "Entraînement polarisé 80/20",
   "resume": "Seiler, Stöggl et Sperlich, méta-analyse 2024 : ce que la science dit de la répartition de l&#x27;intensité en endurance, chiffres à l&#x27;appui, et comment l&#x27;appliquer.",
@@ -9,7 +9,7 @@
  },
  {
   "slug": "cafeine-et-performance-endurance",
-  "date": "2026-11-13",
+  "date": "2026-12-04",
   "theme": "Nutrition",
   "titre": "Caféine et performance",
   "resume": "3 à 6 mg par kilo, environ 60 minutes avant l&#x27;effort : ce que dit la position officielle de l&#x27;International Society of Sports Nutrition (2021) sur la caféine.",
@@ -17,7 +17,7 @@
  },
  {
   "slug": "cadence-de-course-et-blessures",
-  "date": "2026-11-15",
+  "date": "2026-12-06",
   "theme": "Course à pied",
   "titre": "Cadence de course et blessures",
   "resume": "Heiderscheit (2011) : augmenter la cadence de 5 à 10 % réduit l&#x27;énergie absorbée par le genou et la hanche. Les chiffres de l&#x27;étude et comment l&#x27;appliquer.",
@@ -25,7 +25,7 @@
  },
  {
   "slug": "css-natation-ce-que-mesure-le-test",
-  "date": "2026-11-17",
+  "date": "2026-12-08",
   "theme": "Natation",
   "titre": "Ce que mesure la CSS",
   "resume": "Wakayoshi (1992) a montré le lien entre CSS et seuil lactique ; Dekerle (2005) a montré ses limites. Comment calculer et bien utiliser la CSS avec ses nageurs.",
@@ -33,7 +33,7 @@
  },
  {
   "slug": "affutage-avant-competition",
-  "date": "2026-11-20",
+  "date": "2026-12-11",
   "theme": "Compétition",
   "titre": "Affûtage avant une compétition",
   "resume": "Combien de jours, quelle baisse de volume, faut-il garder l&#x27;intensité ? Les chiffres de la méta-analyse de Bosquet (2007) et des travaux de Mujika, expliqués simplement.",
@@ -41,7 +41,7 @@
  },
  {
   "slug": "intervalles-30-15-cyclisme",
-  "date": "2026-11-24",
+  "date": "2026-12-15",
   "theme": "Cyclisme",
   "titre": "Intervalles 30/15 en cyclisme",
   "resume": "Rønnestad (2015) : 3 × 13 répétitions de 30 s / 15 s contre 4 × 5 minutes, à effort perçu égal. +8,7 % de VO2max contre +2,6 %. Détails et application.",
@@ -49,7 +49,7 @@
  },
  {
   "slug": "sommeil-et-performance-sportive",
-  "date": "2026-11-27",
+  "date": "2026-12-18",
   "theme": "Récupération",
   "titre": "Sommeil et performance",
   "resume": "Mah (2011) : des basketteurs de Stanford dorment près de 2 h de plus pendant 5 à 7 semaines. Sprint plus rapide, adresse en hausse. Les chiffres.",
@@ -57,7 +57,7 @@
  },
  {
   "slug": "renforcement-musculaire-course-a-pied",
-  "date": "2026-11-29",
+  "date": "2026-12-20",
   "theme": "Renforcement",
   "titre": "Renforcement musculaire et course",
   "resume": "Støren 2008 et méta-analyse de 2016 : la musculation lourde améliore l&#x27;économie de course sans faire prendre de poids. Les chiffres et les protocoles testés.",
@@ -65,7 +65,7 @@
  },
  {
   "slug": "glucides-pendant-effort-endurance",
-  "date": "2026-12-01",
+  "date": "2026-12-22",
   "theme": "Nutrition",
   "titre": "Glucides pendant l'effort",
   "resume": "Les recommandations de Jeukendrup (2014) : 30 g/h jusqu&#x27;à 2 h, jusqu&#x27;à 60 g/h ensuite, jusqu&#x27;à 90 g/h au-delà de 2 h 30 avec des mélanges de sucres. Explications.",
@@ -73,7 +73,7 @@
  },
  {
   "slug": "fractionne-4x4-vo2max",
-  "date": "2026-12-04",
+  "date": "2026-12-25",
   "theme": "Course à pied",
   "titre": "Le 4 × 4 minutes et la VO2max",
   "resume": "L&#x27;étude de Helgerud (2007) a comparé footing, seuil, 15/15 et 4 × 4 minutes à dépense égale. Résultats, explications et façon de l&#x27;utiliser à l&#x27;entraînement.",
@@ -81,7 +81,7 @@
  },
  {
   "slug": "aspiration-natation-triathlon",
-  "date": "2026-12-08",
+  "date": "2026-12-29",
   "theme": "Triathlon",
   "titre": "Aspiration en natation",
   "resume": "Chatard et Wilson (2003) : nager dans les pieds d&#x27;un autre réduit la résistance de 20 à 21 %, et de 6 à 7 % sur le côté. Les bonnes distances.",
@@ -89,7 +89,7 @@
  },
  {
   "slug": "charge-entrainement-et-blessures",
-  "date": "2026-12-11",
+  "date": "2027-01-01",
   "theme": "Prévention",
   "titre": "Charge d'entraînement et blessures",
   "resume": "Règle des 10 %, ratio aigu/chronique (ACWR) : ce que montrent les études de Nielsen et Gabbett, pourquoi l&#x27;ACWR est contesté, et ce qu&#x27;un coach peut en tirer.",
@@ -97,7 +97,7 @@
  },
  {
   "slug": "chaussures-plaque-carbone",
-  "date": "2026-12-13",
+  "date": "2027-01-03",
   "theme": "Course à pied",
   "titre": "Chaussures à plaque carbone",
   "resume": "L&#x27;étude de Hoogkamer (2018) sur le prototype Vaporfly : 18 coureurs, 4 % d&#x27;énergie économisée en moyenne. Ce que ce chiffre veut dire, et ce qu&#x27;il ne veut pas dire.",
@@ -105,7 +105,7 @@
  },
  {
   "slug": "desentrainement-perte-de-forme",
-  "date": "2026-12-15",
+  "date": "2027-01-05",
   "theme": "Endurance",
   "titre": "Désentraînement et perte de forme",
   "resume": "Blessure, vacances, surcharge de travail : ce que perd un athlète d&#x27;endurance en 3, 8 ou 12 semaines d&#x27;arrêt, et le minimum pour garder sa forme, d&#x27;après Coyle et Hickson.",
@@ -113,7 +113,7 @@
  },
  {
   "slug": "hydratation-et-performance",
-  "date": "2026-12-18",
+  "date": "2027-01-08",
   "theme": "Nutrition",
   "titre": "Hydratation et performance",
   "resume": "Perdre plus de 2 % de son poids en eau dégrade la performance d&#x27;endurance (ACSM). Mesurer sa sudation, et pourquoi trop boire est aussi un risque.",
@@ -121,7 +121,7 @@
  },
  {
   "slug": "variabilite-frequence-cardiaque-vfc",
-  "date": "2026-12-22",
+  "date": "2027-01-12",
   "theme": "Récupération",
   "titre": "Variabilité de la fréquence cardiaque",
   "resume": "Kiviniemi (2007) : un entraînement guidé par la VFC du matin a fait plus progresser qu&#x27;un programme fixe. Ce que mesure la VFC et comment l&#x27;utiliser.",
@@ -129,7 +129,7 @@
  },
  {
   "slug": "pliometrie-course-a-pied",
-  "date": "2026-12-25",
+  "date": "2027-01-15",
   "theme": "Renforcement",
   "titre": "Pliométrie et course à pied",
   "resume": "Paavolainen (1999) : remplacer 32 % de l&#x27;entraînement par du travail explosif a amélioré le 5 km et l&#x27;économie de course. Détails et mise en pratique.",
@@ -137,7 +137,7 @@
  },
  {
   "slug": "entrainement-en-altitude",
-  "date": "2026-12-27",
+  "date": "2027-01-17",
   "theme": "Endurance",
   "titre": "Entraînement en altitude",
   "resume": "Levine et Stray-Gundersen (1997) : seul le groupe « vivre en haut, s&#x27;entraîner en bas » a gagné 13 secondes sur 5 000 m. Explications et limites.",
@@ -145,7 +145,7 @@
  },
  {
   "slug": "bain-froid-recuperation",
-  "date": "2026-12-29",
+  "date": "2027-01-19",
   "theme": "Récupération",
   "titre": "Bain froid et récupération",
   "resume": "Roberts (2015) : 12 semaines de musculation, avec ou sans bain froid de 10 minutes à 10 °C. Le bain froid a réduit les gains de force et de masse musculaire.",
@@ -153,7 +153,7 @@
  },
  {
   "slug": "cycle-menstruel-et-performance",
-  "date": "2027-01-01",
+  "date": "2027-01-22",
   "theme": "Athlètes féminines",
   "titre": "Cycle menstruel et performance",
   "resume": "McNulty (2020) : 78 études analysées. La performance serait très légèrement réduite en début de phase folliculaire, mais l&#x27;effet est faible et très individuel.",
@@ -161,7 +161,7 @@
  },
  {
   "slug": "echauffement-et-etirements",
-  "date": "2027-01-05",
+  "date": "2027-01-26",
   "theme": "Préparation",
   "titre": "Échauffement et étirements",
   "resume": "L&#x27;échauffement améliore la performance dans 79 % des cas étudiés ; les étirements statiques longs font perdre 5,4 % de force. Ce que disent les méta-analyses.",
@@ -169,7 +169,7 @@
  },
  {
   "slug": "regime-cetogene-et-endurance",
-  "date": "2027-01-08",
+  "date": "2027-01-29",
   "theme": "Nutrition",
   "titre": "Régime cétogène et endurance",
   "resume": "Burke (2017) : chez des marcheurs de niveau olympique, le régime cétogène a annulé le bénéfice de 3 semaines d&#x27;entraînement intensif. Les chiffres.",
@@ -177,7 +177,7 @@
  },
  {
   "slug": "vieillissement-athlete-master",
-  "date": "2027-01-10",
+  "date": "2027-01-31",
   "theme": "Athlètes masters",
   "titre": "Vieillissement et performance",
   "resume": "Tanaka et Seals (2008) : performance stable jusqu&#x27;à 35 ans, puis en baisse. Ce qui décline avec l&#x27;âge, ce qui ne décline pas, et quoi en faire.",
@@ -185,7 +185,7 @@
  },
  {
   "slug": "proteines-et-renforcement-musculaire",
-  "date": "2027-01-12",
+  "date": "2027-02-02",
   "theme": "Renforcement",
   "titre": "Protéines et renforcement",
   "resume": "Méta-analyse de Morton (2018) : 49 études, 1 863 participants. Les protéines augmentent les gains de force et de muscle, avec un plateau autour de 1,6 g/kg/jour.",
@@ -193,7 +193,7 @@
  },
  {
   "slug": "rouleau-de-massage-foam-roller",
-  "date": "2027-01-15",
+  "date": "2027-02-05",
   "theme": "Récupération",
   "titre": "Rouleau de massage",
   "resume": "Wiewelhove (2019) : 21 études. Avant l&#x27;effort, +0,7 % en sprint et +4 % de souplesse ; après, moins de douleurs musculaires. Des effets réels mais modestes.",
