@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261108a";
+import { PF } from "./sillance-client.js?v=20261108b";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -828,6 +828,9 @@ function applyAthleteRefs(refs) {
   const R = A().data.ATHLETE_REF;
   ["ftp", "pma", "cpBike", "vma", "cv", "seuilRun", "css", "fcMax", "fcRepos", "hrvBase", "updatedAt"].forEach((k) => { R[k] = null; });
   if (refs) A().assignObj(R, mapRefs(refs));
+  // Consentement IA (0091) : null = pas d'avis, true / false = choix exprimé.
+  R.aiConsent = refs && typeof refs.ai_consent === "boolean" ? refs.ai_consent : null;
+  R.garminLinked = !!(window.__pf_providers || []).some?.((p) => p === "garmin" || p?.provider === "garmin");
 }
 
 // (Re)charge le planning ET le matériel d'un athlète donné (null = soi-même),

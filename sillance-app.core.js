@@ -1376,7 +1376,8 @@ function renderSidebar(){
         <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)"><span>${l} <em style="font-style:normal;opacity:.65">${u}</em></span>
           <input type="number" step="any" data-ref="${k}" value="${ATHLETE_REF[k]??''}" style="width:100%;box-sizing:border-box"></label>`).join('')}
       </div>
-      <button class="btn" id="refsSave" style="width:100%;margin-top:10px">${tr('refs.save')}</button>`;
+      <button class="btn" id="refsSave" style="width:100%;margin-top:10px">${tr('refs.save')}</button>
+      ${aiConsentCardHtml()}`;
     renderAthleteBelow();
     (checkinEl ? checkinEl.querySelectorAll('input[type=range]') : []).forEach(inp=>{
       inp.addEventListener('input', ()=>{
@@ -1429,6 +1430,7 @@ function renderSidebar(){
     if(cv) cv.addEventListener('click', ()=> submitCheckin());
     const rs = document.getElementById('refsSave');
     if(rs) rs.addEventListener('click', ()=> saveMyRefs());
+    wireAiConsentCard();
     const dab = document.getElementById('debriefAddBtn');
     if(dab) dab.addEventListener('click', ()=> openDebrief());
     wireCoTeamActions(document.getElementById('coTeamCard'));
@@ -1486,6 +1488,41 @@ function renderMorningCard(){
 /* Édition des références physiologiques de l'athlète.
    Met à jour ATHLETE_REF en place (les calculs de zones du builder s'en
    servent), persiste via Sillance cloud si connecté, puis re-render. */
+/* Consentement à l'analyse IA (07/11/2026, politique 3.9 + exigence Garmin).
+   Athlète connecté, sur SES données : interrupteur « Analyse IA de mes
+   séances ». null (pas d'avis) = autorisé, sauf montre Garmin connectée où
+   Garmin exige un « oui » explicite. Le serveur (session-summary,
+   session-report, week-review) applique le même choix en 403. */
+function aiConsentAllowed(){
+  const v=ATHLETE_REF.aiConsent;
+  return v===true || (v!==false && !ATHLETE_REF.garminLinked);
+}
+function aiConsentCardHtml(){
+  if(!window.PF?.user || mode!=='athlete') return '';
+  const on=aiConsentAllowed();
+  const needGarmin = ATHLETE_REF.garminLinked && ATHLETE_REF.aiConsent!==true && ATHLETE_REF.aiConsent!==false;
+  return `<div class="ai-consent" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+    <label style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+      <span style="font-weight:600"><i class="ic ic-brain"></i> ${tr('aiConsent.title')}</span>
+      <input type="checkbox" id="aiConsentToggle" ${on?'checked':''} style="width:auto;transform:scale(1.25)">
+    </label>
+    <p class="club-hint" style="margin:6px 0 0">${tr('aiConsent.text')} <a href="./legal.html#confidentialite" target="_blank" rel="noopener">${tr('aiConsent.more')}</a></p>
+    <p class="club-hint" id="aiConsentState" style="margin:6px 0 0;color:${on?'var(--good)':'var(--muted)'}">${needGarmin?tr('aiConsent.garmin'):(on?tr('aiConsent.on'):tr('aiConsent.off'))}</p>
+  </div>`;
+}
+function wireAiConsentCard(){
+  const t=document.getElementById('aiConsentToggle'); if(!t) return;
+  t.onchange=()=>{
+    const want=t.checked; t.disabled=true;
+    PF.setAiConsent(want).then(()=>{
+      ATHLETE_REF.aiConsent=want;
+      const st=document.getElementById('aiConsentState');
+      if(st){ st.textContent=want?tr('aiConsent.on'):tr('aiConsent.off'); st.style.color=want?'var(--good)':'var(--muted)'; }
+      toast(tr('aiConsent.saved'));
+    }).catch(e=>{ console.warn('[PF] ai consent:', e); t.checked=!want; toast(tr('aiConsent.error'), 'error'); })
+      .finally(()=>{ t.disabled=false; });
+  };
+}
 function saveMyRefs(){
   document.querySelectorAll('#refsBlock input[data-ref]').forEach(inp=>{
     const v = inp.value.trim();
@@ -2184,10 +2221,10 @@ function renderPremiumUpsell(){
          <div class="pf-premium-sec">${T('premium.trialNote','Essai 14 jours · résiliable à tout moment')}</div>`}
   </div>`;
   const cta=document.getElementById('premiumCta');
-  if(cta) cta.onclick=()=>{
+  if(cta) cta.onclick=()=> aiTermsGate(()=>{
     cta.disabled=true; cta.textContent=T('premium.redirecting','Redirection…');
     PF.subscribeAiAddon().catch(e=>{ console.warn('[PF] subscribeAiAddon:',e); cta.disabled=false; cta.textContent=T('premium.cta','Activer l’option'); toast(T('premium.error','Impossible d’ouvrir le paiement'),'error'); });
-  };
+  });
 }
 
 function buildTemplates(container){
@@ -2828,7 +2865,7 @@ function renderSettings(){
   if(pro) pro.onclick=()=>toast(tr('toast.coachProBientotDisponible'));
   const st=document.getElementById('setAiStart');
   if(st) st.onclick=()=>{
-    if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(()=>toast(tr('toast.stripeIndisponible'), 'error')); return; }
+    if(window.PF?.user && PF.subscribeAiAddon){ aiTermsGate(()=>PF.subscribeAiAddon().catch(()=>toast(tr('toast.stripeIndisponible'), 'error'))); return; }
     window.__pf_aiDemo=true; window.__pf_aiDemoStart=Date.now();
     renderSettings(); if(mode==='coach') renderSidebar();
     toast(tr('toast.assistantIaActiveEssai14'));
@@ -3408,7 +3445,7 @@ function runWeekAi(mon){
     el.innerHTML = aiPaywallHtml();
     const btn=document.getElementById('aiActivate');
     if(btn) btn.onclick=()=>{
-      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>console.warn('[PF] ai-addon:',e)); return; }
+      if(window.PF?.user && PF.subscribeAiAddon){ aiTermsGate(()=>PF.subscribeAiAddon().catch(e=>console.warn('[PF] ai-addon:',e))); return; }
       window.__pf_aiDemo=true; renderWeekAiBtn(mon);
     };
     return;
@@ -11309,6 +11346,34 @@ function injectAiCss(){
   .ai-confirm-row .btn{flex:none}`;
   document.head.appendChild(st);
 }
+// Engagements du coach (07/11/2026) : fenêtre obligatoire avant toute
+// activation réelle de l'Assistant IA (4 boutons : paywall séance, paywall
+// semaine, réglages, carte premium). Acceptation horodatée en base (0091).
+function aiTermsGate(go){
+  if(!window.PF?.user){ go(); return; }            // démo : rien n'est souscrit
+  document.getElementById('aiTermsModal')?.remove();
+  const m=document.createElement('div'); m.id='aiTermsModal';
+  m.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(5,8,14,.72);display:grid;place-items:center;padding:16px';
+  m.innerHTML=`<div role="dialog" aria-modal="true" aria-labelledby="aiTermsT" style="max-width:460px;width:100%;background:var(--panel,#121A2B);color:var(--text,#F3F6FC);border:1px solid var(--line-strong,rgba(150,165,200,.28));border-radius:14px;padding:20px 20px 16px;font-size:14px;line-height:1.5">
+    <h3 id="aiTermsT" style="margin:0 0 10px;font-size:16px"><i class="ic ic-brain"></i> ${tr('aiTerms.title')}</h3>
+    <ul style="margin:0 0 12px 18px;padding:0"><li>${tr('aiTerms.l1')}</li><li>${tr('aiTerms.l2')}</li><li>${tr('aiTerms.l3')}</li></ul>
+    <label style="display:flex;gap:8px;align-items:center;cursor:pointer;margin-bottom:14px"><input type="checkbox" id="aiTermsOk" style="width:auto"> ${tr('aiTerms.accept')}</label>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn cy-ghost" id="aiTermsNo">${tr('common.no')}</button>
+      <button class="btn" id="aiTermsYes">${tr('settings.start14dTrial')}</button>
+    </div></div>`;
+  document.body.appendChild(m);
+  const close=()=>m.remove();
+  m.addEventListener('click',e=>{ if(e.target===m) close(); });
+  m.querySelector('#aiTermsNo').onclick=close;
+  m.querySelector('#aiTermsYes').onclick=()=>{
+    const ok=m.querySelector('#aiTermsOk');
+    if(!ok.checked){ toast(tr('aiTerms.required'), 'error'); ok.focus(); return; }
+    close();
+    Promise.resolve(PF.acceptAiTerms?.()).catch(e=>console.warn('[PF] ai terms:',e)).finally(go);
+  };
+  m.querySelector('#aiTermsOk').focus();
+}
 function aiPaywallHtml(){
   return `<div class="ai-pay">
     <h5><i class="ic ic-brain"></i> ${tr('ai.paywallTitle')}</h5>
@@ -11423,7 +11488,7 @@ function renderAi(s, data){
     const btn=document.getElementById('aiActivate');
     if(btn) btn.onclick=()=>{
       // En prod (connecté) : vrai checkout Stripe de l'add-on. En démo : déverrouillage immédiat.
-      if(window.PF?.user && PF.subscribeAiAddon){ PF.subscribeAiAddon().catch(e=>console.warn('[PF] ai-addon:',e)); return; }
+      if(window.PF?.user && PF.subscribeAiAddon){ aiTermsGate(()=>PF.subscribeAiAddon().catch(e=>console.warn('[PF] ai-addon:',e))); return; }
       window.__pf_aiDemo=true; renderAi(s, data); toast(tr('toast.assistantIaActiveDemo'));
     };
     return;
@@ -11441,7 +11506,7 @@ function renderAi(s, data){
     PF.summarizeSession({
       session_key: sessionKey,
       bilan: b,
-      athlete_id: s.athleteId || null,
+      athlete_id: s.athleteId || (mode==='coach' && rosterIsReal ? currentAthleteId : null),
       discipline: s.disc,
       objective: (s.objectif&&s.objectif.type) || b.type,
     }).then(r=>{

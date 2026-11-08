@@ -36,6 +36,9 @@
       'aip.err.add_on_required': 'L\'assistant IA n\'est pas actif sur ton compte.',
       'aip.err.network': 'Connexion impossible. Vérifie ton réseau et réessaie.',
       'aip.err.unknown': 'Erreur inattendue. Réessaie, et préviens-nous si ça continue.',
+      'aip.err.athlete_ai_refused': 'Cet athlète a désactivé l\'analyse IA de ses séances. Tu gardes ses séances, graphiques et données, sans analyse IA.',
+      'aip.err.athlete_ai_consent_needed': 'Cet athlète a connecté une montre Garmin : Garmin exige son accord explicite avant toute analyse IA. Il peut l\'activer dans ses réglages (Analyse IA de mes séances).',
+      'aip.consentTitle': 'Analyse IA désactivée',
       'aip.code': 'Code',
       'aip.open': 'Voir l\'analyse en grand',
       'aip.weekOf': 'Semaine du {d}'
@@ -59,6 +62,9 @@
       'aip.err.add_on_required': 'The AI assistant isn\'t active on your account.',
       'aip.err.network': 'Can\'t connect. Check your network and try again.',
       'aip.err.unknown': 'Unexpected error. Try again, and let us know if it keeps happening.',
+      'aip.err.athlete_ai_refused': 'This athlete has turned off AI analysis of their sessions. You keep their sessions, charts and data, without AI analysis.',
+      'aip.err.athlete_ai_consent_needed': 'This athlete has connected a Garmin watch: Garmin requires their explicit consent before any AI analysis. They can turn it on in their settings (AI analysis of my sessions).',
+      'aip.consentTitle': 'AI analysis turned off',
       'aip.code': 'Code',
       'aip.open': 'Open full analysis',
       'aip.weekOf': 'Week of {d}'
@@ -82,6 +88,9 @@
       'aip.err.add_on_required': 'El asistente IA no está activo en tu cuenta.',
       'aip.err.network': 'No se puede conectar. Revisa tu red e inténtalo de nuevo.',
       'aip.err.unknown': 'Error inesperado. Inténtalo de nuevo y avísanos si continúa.',
+      'aip.err.athlete_ai_refused': 'Este atleta ha desactivado el análisis IA de sus sesiones. Conservas sus sesiones, gráficos y datos, sin análisis IA.',
+      'aip.err.athlete_ai_consent_needed': 'Este atleta ha conectado un reloj Garmin: Garmin exige su consentimiento explícito antes de cualquier análisis IA. Puede activarlo en sus ajustes (Análisis IA de mis sesiones).',
+      'aip.consentTitle': 'Análisis IA desactivado',
       'aip.code': 'Código',
       'aip.open': 'Ver el análisis completo',
       'aip.weekOf': 'Semana del {d}'
@@ -195,6 +204,7 @@
     var d = String(detail || 'unknown').split('+')[0];
     if(d === 'timeout') return 'aip.err.overloaded';
     if(/_credit$/.test(d)) return 'aip.err.anthropic_credit';
+    if(d === 'athlete_ai_refused' || d === 'athlete_ai_consent_needed') return 'aip.err.' + d;
     if(d === 'anthropic_credit' || d === 'missing_key' || d === 'bad_output' || d === 'add_on_required') return 'aip.err.' + d;
     if(/^network/.test(d)) return 'aip.err.network';
     if(/^(anthropic|groq)_(401|403)|authentication|permission|invalid_api_key/.test(d)) return 'aip.err.auth';
@@ -209,6 +219,11 @@
     if(/^network/.test(detail) && window.PF && window.PF.user && window.PF.reportAiFailure){
       window.PF.reportAiFailure({ fn: o.kind === 'week' ? 'week-review' : o.kind === 'report' ? 'session-report' : 'session-summary', detail: detail,
         context: { page: location.pathname, online: String(navigator.onLine) } });
+    }
+    // Refus de l'athlète : ce n'est pas une panne, pas de message « équipe prévenue ».
+    if(/^athlete_ai_/.test(detail)){
+      open('<h3 id="silAiPopupT">' + esc(t('aip.consentTitle')) + '</h3>' + '<div class="aip-err">' + esc(t(errKey(detail))) + '</div>');
+      return;
     }
     open(
       '<h3 id="silAiPopupT">' + esc(t('aip.errTitle')) + '</h3>'

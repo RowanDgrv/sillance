@@ -418,6 +418,22 @@ export const PF = {
     if (error) throw error; return data;
   },
 
+  // Consentement à l'analyse par l'Assistant IA du coach (0091, politique 3.9).
+  // true = oui explicite, false = refus (le serveur bloque alors toute analyse).
+  async setAiConsent(allowed) {
+    const { error } = await sb.from("athlete_profiles").upsert({
+      user_id: this.user.id, ai_consent: !!allowed, ai_consent_at: new Date().toISOString(),
+    });
+    if (error) throw error;
+    return true;
+  },
+  // Engagements du coach acceptés avant d'activer l'Assistant IA (0091).
+  async acceptAiTerms() {
+    const { error } = await sb.from("profiles").update({ ai_terms_accepted_at: new Date().toISOString() }).eq("id", this.user.id);
+    if (error) throw error;
+    return true;
+  },
+
   // -------- ZONES DE TRAVAIL PERSONNALISÉES (coach définit, athlète lit) --------
   // zones = { modelKey: [[nom, borneBasse, borneHaute], ...] } (migration 0020)
   async getAthleteZones(athleteId = this.user.id) {
