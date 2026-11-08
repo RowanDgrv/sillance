@@ -1267,9 +1267,12 @@ export const PF = {
   // (no_coros, polar_unsupported, past_date…), relu via _invokeSoft et levé
   // en Error.code ; avant, invoke() masquait la raison et l'app téléchargeait
   // un .tcx à la place.
-  async pushSessionToWatch(scheduledSessionId, dateIso) {
-    const r = await this._invokeSoft("push-session-to-watch", { scheduled_session_id: scheduledSessionId, date: dateIso });
-    if (r && r.error) throw Object.assign(new Error(r.detail || r.error), { code: r.error, detail: r.detail || "", disc: r.disc });
+  // Anti-doublon (08/11/2026) : une séance déjà envoyée lève le code
+  // already_sent (+ pushedAt, changed = modifiée depuis l'envoi) ;
+  // { force: true } renvoie quand même.
+  async pushSessionToWatch(scheduledSessionId, dateIso, { force = false } = {}) {
+    const r = await this._invokeSoft("push-session-to-watch", { scheduled_session_id: scheduledSessionId, date: dateIso, force });
+    if (r && r.error) throw Object.assign(new Error(r.detail || r.error), { code: r.error, detail: r.detail || "", disc: r.disc, pushedAt: r.pushed_at, changed: !!r.changed });
     return r;
   },
   // Activités importées, normalisées (disc/name/start_time/duration_s/distance_m…).

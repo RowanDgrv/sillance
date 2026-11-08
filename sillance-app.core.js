@@ -3692,13 +3692,24 @@ function watchErrMsg(e){
   if(known.includes(c)) return tr('watch.err.'+c, {detail: String(e.detail||'').slice(0,120)});
   return tr('watch.sendFailed', {reason: String(e?.message||e).slice(0,120)});
 }
-function pushSingleSessionToWatch(s, dateKey){
+function watchSentDate(e){
+  try{ return fmtDayFull.format(new Date(e.pushedAt)); }catch(_){ return ''; }
+}
+/* Anti-doublon (08/11/2026) : COROS crée une nouvelle séance à chaque envoi.
+   Déjà envoyée → on demande avant de renvoyer ; si elle a été modifiée
+   depuis, on prévient que l'ancienne version reste sur la montre. */
+function pushSingleSessionToWatch(s, dateKey, force=false){
   if(!window.PF?.user){ toast(tr('watch.needAccount')); return; }
   if(!s.id){ toast(tr('watch.needSavedFirst')); return; }
   toast(tr('watch.sending'));
-  PF.pushSessionToWatch(s.id, dateKey).then(()=>{
+  PF.pushSessionToWatch(s.id, dateKey, {force}).then(()=>{
     toast(tr('watch.sent'));
   }).catch(e=>{
+    if(e?.code==='already_sent' && !force){
+      const msg = tr(e.changed ? 'watch.resendChangedConfirm' : 'watch.resendConfirm', {date: watchSentDate(e)});
+      if(confirm(msg)) pushSingleSessionToWatch(s, dateKey, true);
+      return;
+    }
     console.warn('[PF] pushSessionToWatch', e);
     toast(watchErrMsg(e), 'error');
   });
@@ -4415,21 +4426,32 @@ async function pushWeekToWatch(){
   }
   if(!targets.length){ toast(tr('watch.weekNothingToSend')); return; }
   toast(tr('watch.sendingWeek', {n:targets.length}));
-  let sent=0, failed=0, firstErr=null;
-  for(const {s,key} of targets){
-    // séances passées : COROS les refuse, on ne les tente même pas
-    if(key < iso(new Date())){ continue; }
-    try{ await PF.pushSessionToWatch(s.id, key); sent++; }
+  let sent=0, failed=0, skipped=0, firstErr=null;
+  const changed=[];
+  const pushOne = async ({s,key}, force)=>{
+    try{ await PF.pushSessionToWatch(s.id, key, {force}); sent++; return true; }
     catch(e){
+      // déjà sur la montre (anti-doublon 08/11/2026) : intacte → on saute ;
+      // modifiée depuis → on demandera une fois à la fin
+      if(e?.code==='already_sent' && !force){ if(e.changed) changed.push({s,key}); else skipped++; return true; }
       failed++; firstErr = firstErr || e; console.warn('[PF] pushSessionToWatch (semaine)', s.id, e);
       // pas de COROS / Polar / connexion expirée : inutile d'insister
-      if(['no_coros','polar_unsupported','coros_auth'].includes(e?.code)) break;
+      return !['no_coros','polar_unsupported','coros_auth'].includes(e?.code);
     }
+  };
+  for(const t of targets){
+    // séances passées : COROS les refuse, on ne les tente même pas
+    if(t.key < iso(new Date())){ continue; }
+    if(!(await pushOne(t, false))) break;
   }
-  if(!sent && !failed){ toast(tr('watch.weekNothingToSend')); return; }
+  if(changed.length && confirm(tr('watch.weekResendChangedConfirm', {n: changed.length}))){
+    for(const t of changed){ if(!(await pushOne(t, true))) break; }
+  } else skipped += changed.length;
+  if(!sent && !failed){ toast(skipped ? tr('watch.weekAlreadySent') : tr('watch.weekNothingToSend')); return; }
+  const skipTxt = skipped ? ' · ' + tr('watch.weekSkipped', {n: skipped}) : '';
   toast(failed
-    ? tr('watch.weekSentWithFailures', {sent, failed}) + ' · ' + watchErrMsg(firstErr)
-    : tr(sent>1?'watch.weekSentPlural':'watch.weekSentSingular', {n:sent}), failed?'error':undefined);
+    ? tr('watch.weekSentWithFailures', {sent, failed}) + skipTxt + ' · ' + watchErrMsg(firstErr)
+    : tr(sent>1?'watch.weekSentPlural':'watch.weekSentSingular', {n:sent}) + skipTxt, failed?'error':undefined);
 }
 sendWeekWatchBtn?.addEventListener('click', pushWeekToWatch);
 /* Navigation du calendrier club (onglet Calendrier), indépendante du
