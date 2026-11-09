@@ -50,7 +50,7 @@
 
     "hero.kicker": `Triathlon · Hyrox · Course à pied`,
     "hero.title": `Sillance,<br>ton <span class="alt2">sillage</span>`,
-    "hero.lede": `Dans l'eau, dans une roue, le sillage porte l'effort à ta place. Ton coach fait de même avec ton entraînement&nbsp;: il calcule la charge, gère la récupération, ajuste la suite, et il ne te reste qu'à suivre le plan.`,
+    "hero.lede": `Dans l'eau comme à vélo, le sillage t'aide à avancer. Ton coach fait pareil&nbsp;: il prépare tes séances, surveille ta fatigue et adapte la suite. Toi, tu suis le plan.`,
     "hero.cta1": `Découvrir la démo`,
     "hero.cta2": `En savoir plus`,
     "hero.scroll": `Défiler`,
@@ -205,7 +205,7 @@
 
     "hero.kicker": `Triathlon · Hyrox · Running`,
     "hero.title": `Sillance,<br>your <span class="alt2">wake</span>`,
-    "hero.lede": `In the water, on a wheel, a wake carries the effort for you. Your coach does the same with your training&nbsp;: they calculate the load, manage recovery, adjust what's next, and all you have to do is follow the plan.`,
+    "hero.lede": `In the water or on the bike, a wake helps you move forward. Your coach does the same: they plan your sessions, watch your fatigue and adjust what comes next. You just follow the plan.`,
     "hero.cta1": `Try the demo`,
     "hero.cta2": `Learn more`,
     "hero.scroll": `Scroll`,
@@ -360,7 +360,7 @@
 
     "hero.kicker": `Triatlón · Hyrox · Running`,
     "hero.title": `Sillance,<br>tu <span class="alt2">estela</span>`,
-    "hero.lede": `En el agua, en la rueda, la estela lleva el esfuerzo por ti. Tu entrenador hace lo mismo con tu entrenamiento&nbsp;: calcula la carga, gestiona la recuperación, ajusta lo que sigue, y a ti solo te queda seguir el plan.`,
+    "hero.lede": `En el agua o en la bici, la estela te ayuda a avanzar. Tu entrenador hace lo mismo: prepara tus sesiones, vigila tu fatiga y ajusta lo que sigue. Tú solo sigues el plan.`,
     "hero.cta1": `Ver la demo`,
     "hero.cta2": `Saber más`,
     "hero.scroll": `Desplázate`,
