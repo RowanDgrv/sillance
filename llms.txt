@@ -1,27 +1,50 @@
 # Sillance
 
-> Plateforme web de coaching pour le duo coach-athlète : planification des entraînements, analyse de la donnée réelle (Garmin, Coros, import de fichiers .FIT) et facturation coach-athlète intégrée. Pour le triathlon, le Hyrox et les sports d'endurance. Éditée par Rowan Degraeve (micro-entreprise, SIRET 108 626 847 00017, France). En bêta, en ligne sur https://sillance.app.
+> Logiciel web de coaching pour les coachs et les clubs de triathlon, de course à pied et de natation : planification des séances, suivi des athlètes, analyse des séances réalisées et facturation intégrée. Édité en France par Rowan Degraeve (micro-entreprise, SIRET 108 626 847 00017). En ligne sur https://sillance.app.
 
 ## Comment ça marche
 
-Le coach planifie les séances (à la semaine ou par cycle), chaque athlète a son plan. L'athlète exécute : sa montre Garmin ou Coros, ou un fichier .FIT, fait remonter la séance réalisée. Sillance rend la donnée lisible (charge d'entraînement, fraîcheur, respect du plan) et un assistant IA en fait la synthèse. Le coach ajuste la suite sur du concret ; les athlètes le paient dans l'app. Trois rôles sur la même plateforme : coach indépendant, club ou box, athlète.
+Le coach planifie les séances, à la semaine ou par cycle complet, et chaque athlète reçoit son plan. L'athlète s'entraîne : sa montre COROS ou un fichier .FIT fait remonter la séance réalisée. Sillance rend la donnée lisible (charge d'entraînement, fraîcheur, respect du plan) et le coach ajuste la suite. Trois rôles sur la même plateforme : coach indépendant, club, athlète.
 
-## Pages
+## Pour qui
 
-- [Accueil](https://sillance.app/) : présentation, pour qui, fonctionnement, plateforme (charge d'entraînement multi-sports, multi-capteurs, assistant IA, découplage cardiaque), tarifs, FAQ
-- [Guide d'utilisation](https://sillance.app/sillance-aide.html) : 25 fiches pratiques (créer une séance, planifier dans le calendrier, attribuer un cycle à plusieurs athlètes, suivre l'adhérence, créer un groupe, gérer un créneau, faire son check-in, signaler une blessure, connecter une montre, importer un .FIT, éditer ses références physio, débrief de course, co-coaching, fiche de progression partageable)
-- [Contact et support](https://sillance.app/contact.html) : formulaire, e-mail contact@sillance.app, réponse sous 2 à 3 jours ouvrés
-- [Informations légales](https://sillance.app/legal.html) : mentions légales, CGU / CGV, politique de confidentialité (RGPD, données de santé sur consentement explicite, sous-traitants, cookies), hébergement en Europe
+- [Logiciel pour club de triathlon](https://sillance.app/logiciel-club-triathlon/) : créneaux, groupes de niveau, présences, séances envoyées sur la montre, facturation des adhérents, espace aux couleurs du club
+- [Logiciel pour run club](https://sillance.app/logiciel-run-club/) : sorties avec réponses de présence, groupes d'allure, séances envoyées sur la montre, espace aux couleurs du club
+- [Logiciel pour coach de triathlon indépendant](https://sillance.app/logiciel-coach-triathlon/) : séances envoyées sur la montre, check-in du matin, athlètes à suivre en priorité, dès 19 €/mois
+- [Logiciel pour club de natation](https://sillance.app/logiciel-club-natation/) : séances écrites comme au bord du bassin, temps calculés sur la CSS de chaque nageur, groupes et présences
+- [Comparatif Sillance, TrainingPeaks et Nolio](https://sillance.app/comparatif-logiciel-coaching/) : fonctions et prix officiels comparés
+
+## Calculateurs gratuits
+
+- [Tous les outils](https://sillance.app/outils/)
+- [Calcul de la CSS en natation](https://sillance.app/outils/calcul-css-natation/)
+- [Allures à partir de la VMA](https://sillance.app/outils/allures-vma/)
+- [Zones de puissance vélo à partir de la FTP](https://sillance.app/outils/zones-puissance-ftp/)
+- [Prédiction de temps sur 10 km, semi et marathon](https://sillance.app/outils/prediction-temps-course/)
+- [Zones de fréquence cardiaque (méthode de Karvonen)](https://sillance.app/outils/zones-frequence-cardiaque/)
+- [Convertisseur allure et vitesse](https://sillance.app/outils/convertisseur-allure-vitesse/)
+
+## Guides
+
+- [Tous les guides](https://sillance.app/guides/) : méthodes de terrain et études sur l'entraînement expliquées simplement
+- [Organiser les groupes d'entraînement d'un club de triathlon](https://sillance.app/guides/groupes-entrainement-club-triathlon/)
+- [Tests CSS, VMA et FTP : quand retester ses athlètes](https://sillance.app/guides/tests-css-vma-ftp-quand-retester/)
+- [Fractionné collectif en run club, tous niveaux](https://sillance.app/guides/fractionne-collectif-run-club/)
 
 ## Tarifs
 
-- Coach indépendant : 19 €/mois pour 1 à 10 athlètes coachés, 29 €/mois pour 11 à 30, 49 €/mois pour 31 et plus. Essai gratuit de 14 jours. Options facultatives : Assistant IA 12 €/mois, Vidéos 3 €/mois par athlète activé. Frais de service de 2 % si les athlètes règlent leur suivi dans l'app.
-- Club ou box : 50 €/mois jusqu'à 50 athlètes activés, 112,50 €/mois jusqu'à 150, 150 €/mois jusqu'à 300. Entraîneurs illimités à tous les paliers. Engagement minimum de 3 mois. Tarif « clubs fondateurs » réservé aux 10 premiers de chaque palier.
-- Un « athlète activé » est un athlète placé dans un groupe d'entraînement qui reçoit son planning ; les licenciés non suivis ne comptent pas.
+- Coach indépendant : 19 €/mois de 1 à 10 athlètes coachés, 29 €/mois de 11 à 30, 49 €/mois au-delà de 30. Essai gratuit de 14 jours. Options : Assistant IA 12 €/mois, Vidéos 3 €/mois par athlète activé. Frais de service de 2 % si les athlètes règlent leur suivi dans l'app.
+- Club : 50 €/mois jusqu'à 50 athlètes activés, 112,50 €/mois jusqu'à 150, 150 €/mois jusqu'à 300. Entraîneurs illimités. Essai gratuit de 14 jours, engagement minimum de 3 mois. Tarif « clubs fondateurs » à moitié prix pour les 10 premiers clubs de chaque palier, acquis tant que le club reste abonné.
+- Un « athlète activé » est un athlète placé dans un groupe d'entraînement qui reçoit son planning. Les licenciés non suivis ne comptent pas.
 
 ## Bon à savoir
 
-- Sillance est en bêta : l'accès n'est pas facturé pour l'instant, l'encaissement en ligne des abonnements sera activé prochainement.
-- Synchronisation des montres : Garmin et Coros via OAuth (autorisation de l'athlète, révocable), ou import manuel de fichiers .FIT. Intégration Strava disponible.
-- L'analyse de charge est commune à la course à pied, au vélo, à la natation et au Hyrox.
+- Montres : COROS par connexion autorisée par l'athlète (révocable), ou import de fichiers .FIT depuis n'importe quelle montre.
+- L'analyse de charge est commune à la course à pied, au vélo et à la natation.
 - Langues : français, anglais, espagnol.
+
+## Autres pages
+
+- [Guide d'utilisation](https://sillance.app/sillance-aide.html) : fiches pratiques pour les coachs, les clubs et les athlètes
+- [Contact et support](https://sillance.app/contact.html) : contact@sillance.app
+- [Informations légales](https://sillance.app/legal.html) : mentions légales, CGU, CGV, politique de confidentialité (RGPD)
