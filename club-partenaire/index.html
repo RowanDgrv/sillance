@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co; base-uri 'self'; object-src 'none'; form-action 'self'">
+<title>Kit club partenaire | Sillance</title>
+<meta name="description" content="Le badge et le texte à ajouter sur le site de votre club pour indiquer que vos entraînements sont gérés avec Sillance.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://sillance.app/club-partenaire/">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/seo.css?v=20261105b">
+<style>
+.kit{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+@media (max-width:760px){.kit{grid-template-columns:1fr}}
+.preview{display:flex;align-items:center;justify-content:center;border-radius:12px;padding:26px 16px;margin:14px 0}
+.preview.sombre{background:#0B1120;border:1px solid var(--line)}
+.preview.clair{background:#fff}
+.kit textarea{width:100%;min-height:118px;resize:vertical;background:var(--paper);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:13px/1.5 var(--mono)}
+.kit label{display:block;font-size:14px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../"><svg width="24" height="24" viewBox="0 0 96 96" fill="none" aria-hidden="true"><defs><linearGradient id="vesN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs><circle cx="34.5" cy="48" r="27" stroke="#46C2D8" stroke-width="2.6" opacity=".6"/><circle cx="61.5" cy="48" r="27" stroke="#FF9A3D" stroke-width="2.6" opacity=".6"/><path d="M 48 24.617 A 27 27 0 0 1 48 71.383 A 27 27 0 0 1 48 24.617 Z" fill="url(#vesN)"/></svg>Sillance</a>
+  <div class="nav-links"><a href="../logiciel-coach-triathlon/">Coachs</a><a href="../logiciel-club-triathlon/">Clubs</a></div>
+  <a class="btn primary" href="../sillance-app.html">Découvrir Sillance</a>
+</div></nav>
+<main>
+  <div class="wrap crumb"><a href="../">Sillance</a> › Kit club partenaire</div>
+  <section class="hero"><div class="wrap">
+    <span class="kicker">Clubs partenaires</span>
+    <h1>Montrez que vos entraînements sont <em>gérés avec Sillance</em></h1>
+    <p class="lead">Ajoutez ce badge sur le site de votre club, dans la page partenaires ou en bas de page. Copiez le code de la version qui va le mieux avec vos couleurs et collez-le dans votre site.</p>
+    <div class="kit">
+      <div class="card">
+        <span class="kicker">Fond sombre</span>
+        <div class="preview sombre"><img src="badge-sombre.svg" alt="Entraînements gérés avec Sillance" width="232" height="56"></div>
+        <label for="code-sombre">Code à copier</label>
+        <textarea id="code-sombre" readonly>&lt;a href=&quot;https://sillance.app/&quot; title=&quot;Sillance, logiciel d&#x27;entraînement pour les clubs&quot;&gt;&lt;img src=&quot;https://sillance.app/club-partenaire/badge-sombre.svg&quot; alt=&quot;Entraînements gérés avec Sillance&quot; width=&quot;232&quot; height=&quot;56&quot;&gt;&lt;/a&gt;</textarea>
+      </div>
+      <div class="card">
+        <span class="kicker">Fond clair</span>
+        <div class="preview clair"><img src="badge-clair.svg" alt="Entraînements gérés avec Sillance" width="232" height="56"></div>
+        <label for="code-clair">Code à copier</label>
+        <textarea id="code-clair" readonly>&lt;a href=&quot;https://sillance.app/&quot; title=&quot;Sillance, logiciel d&#x27;entraînement pour les clubs&quot;&gt;&lt;img src=&quot;https://sillance.app/club-partenaire/badge-clair.svg&quot; alt=&quot;Entraînements gérés avec Sillance&quot; width=&quot;232&quot; height=&quot;56&quot;&gt;&lt;/a&gt;</textarea>
+      </div>
+    </div>
+  </div></section>
+  <section class="block"><div class="wrap">
+    <span class="kicker">Sans badge</span>
+    <h2>Une simple phrase <em>suffit aussi</em></h2>
+    <p class="lead">Pour une page partenaires, une newsletter ou un post sur les réseaux du club :</p>
+    <div class="kit" style="grid-template-columns:1fr"><div class="card"><label for="code-texte">Texte à copier</label><textarea id="code-texte" readonly style="min-height:70px;font-family:var(--body);font-size:15px">Nos séances sont préparées avec Sillance (https://sillance.app), le logiciel d&#x27;entraînement des clubs de triathlon, de course à pied et de natation.</textarea></div></div>
+    <p class="lead" style="margin-top:18px">Votre site est sur Wix, WordPress ou une autre plateforme et vous ne savez pas où coller le code ? Écrivez à <a href="mailto:contact@sillance.app">contact@sillance.app</a>, on vous guide.</p>
+  </div></section>
+</main>
+<footer><div class="wrap">
+  <a href="../">Sillance</a><a href="../logiciel-club-triathlon/">Club de triathlon</a><a href="../logiciel-run-club/">Run club</a><a href="../logiciel-club-natation/">Club de natation</a><a href="../logiciel-coach-triathlon/">Coach indépendant</a><a href="../contact.html">Contact</a>
+  <span class="sp">© 2026 Sillance</span>
+</div></footer>
+<script src="../sillance-cookies.js?v=20261104a"></script>
+<script src="../sillance-analytics.js?v=20261028b"></script>
+</body></html>
