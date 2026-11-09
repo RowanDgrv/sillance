@@ -27,7 +27,7 @@ jobs:
           if git diff --quiet; then echo "Rien de nouveau"; exit 0; fi
           git config user.name "Sillance"
           git config user.email "contact@sillance.app"
-          git add -A guides sitemap.xml index.html outils
+          git add -A guides sitemap.xml index.html outils llms.txt
           git commit -m "Publication programmée des guides ($(date +%F))"
           git push
           echo "publie=1" >> "$GITHUB_ENV"

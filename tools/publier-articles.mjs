@@ -126,4 +126,24 @@ ${items}
 `;
 write('guides/feed.xml', rss);
 
+// 4) llms.txt (lu par ChatGPT, Perplexity, Claude…) : la section « Guides »
+// liste les articles publiés, les plus récents d'abord (09/11/2026). Les
+// lignes écrites à la main (hors calendrier) sont gardées en fin de liste.
+{
+  const unesc = (t) => String(t).replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  const llms = read('llms.txt');
+  const m = llms.match(/(## Guides\n\n)([\s\S]*?)(\n\n## )/);
+  if (m) {
+    const lines = m[2].split('\n');
+    const head = lines.filter((l) => l.includes(`${SITE}/guides/)`));
+    const known = new Set(cal.map((a) => `${SITE}/guides/${a.slug}/`));
+    const manual = lines.filter((l) => !head.includes(l) && ![...known].some((u) => l.includes(`(${u})`)));
+    const auto = [...live].sort((a, b) => b.publie.localeCompare(a.publie))
+      .map((a) => `- [${unesc(a.titre)}](${SITE}/guides/${a.slug}/) : ${unesc(a.resume)}`);
+    const body = [...head, ...auto, ...manual].join('\n');
+    const next = llms.replace(m[0], `${m[1]}${body}${m[3]}`);
+    if (next !== llms) write('llms.txt', next);
+  }
+}
+
 if (!DRY) fs.writeFileSync(path.join(ROOT, '.publies.txt'), published.join('\n'));
