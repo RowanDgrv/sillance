@@ -56,6 +56,22 @@
   "publie": null
  },
  {
+  "slug": "semi-de-paris-preparation-run-club",
+  "date": "2026-12-02",
+  "theme": "Run clubs",
+  "titre": "Préparer le Semi de Paris en run club",
+  "resume": "10 semaines pour amener tout un run club au Semi de Paris : trois groupes d&#x27;allure, une séance collective par semaine, une sortie longue, puis une semaine test pour fixer l&#x27;objectif.",
+  "publie": null
+ },
+ {
+  "slug": "marathon-de-paris-preparation-club",
+  "date": "2026-12-03",
+  "theme": "Run clubs",
+  "titre": "Préparer le Marathon de Paris en club",
+  "resume": "16 semaines pour préparer le Marathon de Paris en club avec des coureurs de niveaux différents : les quatre phases, les sorties longues au temps et l&#x27;affûtage.",
+  "publie": null
+ },
+ {
   "slug": "cadence-de-course-et-blessures",
   "date": "2026-12-04",
   "theme": "Course à pied",
@@ -197,6 +213,22 @@
   "theme": "Récupération",
   "titre": "Rouleau de massage",
   "resume": "Wiewelhove (2019) : 21 études. Avant l&#x27;effort, +0,7 % en sprint et +4 % de souplesse ; après, moins de douleurs musculaires. Des effets réels mais modestes.",
+  "publie": null
+ },
+ {
+  "slug": "nutrition-semi-marathon-marathon-course",
+  "date": "2027-01-22",
+  "theme": "Nutrition",
+  "titre": "Semi et marathon : que manger avant et pendant la course",
+  "resume": "Les recommandations de l&#x27;ACSM (2016) et de Burke (2011) : charge en glucides, repas d&#x27;avant course, glucides par heure et hydratation, avec un exemple chiffré pour un coureur de 70 kg.",
+  "publie": null
+ },
+ {
+  "slug": "allure-semi-marathon-marathon-jour-j",
+  "date": "2027-01-29",
+  "theme": "Compétition",
+  "titre": "Gérer son allure le jour du semi ou du marathon",
+  "resume": "Partir trop vite coûte cher : ce que montrent l&#x27;étude de 190 228 marathoniens de New York (2014) et l&#x27;analyse des records du monde (2018), avec des temps de passage pour 1 h 50 et 3 h 45.",
   "publie": null
  }
 ]
