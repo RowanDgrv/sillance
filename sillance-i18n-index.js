@@ -1,7 +1,7 @@
 /* Sillance — dictionnaire i18n de la landing (index.html) */
 (function(){
   var fr = {
-    "meta.title": `Logiciel de coaching triathlon et course à pied pour coachs et clubs | Sillance`,
+    "meta.title": `Logiciel de coaching triathlon et course à pied | Sillance`,
     "meta.description": `Planifie tes séances, envoie-les sur la montre, suis tes athlètes et rappelle-leur chaque matin la séance et le matériel. Pour coachs et clubs. Essai gratuit 14 jours.`,
     "meta.ogTitle": `Sillance · Le logiciel d'entraînement des coachs et des clubs`,
     "meta.ogDescription": `Séances envoyées sur la montre, suivi des athlètes, rappels du matin avec le matériel du jour, app aux couleurs du club. Triathlon, course à pied, natation.`,
@@ -156,7 +156,7 @@
   };
 
   var en = {
-    "meta.title": `Triathlon & running coaching software for coaches and clubs | Sillance`,
+    "meta.title": `Triathlon and running coaching software | Sillance`,
     "meta.description": `Plan sessions, send them to the watch, follow your athletes and remind them every morning of the session and the gear. For coaches and clubs. 14-day free trial.`,
     "meta.ogTitle": `Sillance · Training software for coaches and clubs`,
     "meta.ogDescription": `Sessions sent to the watch, athlete follow-up, morning reminders with the day's gear, an app in your club's colours. Triathlon, running, swimming.`,
@@ -311,7 +311,7 @@
   };
 
   var es = {
-    "meta.title": `Software de coaching de triatlón y running para entrenadores y clubes | Sillance`,
+    "meta.title": `Software de coaching de triatlón y running | Sillance`,
     "meta.description": `Planifica las sesiones, envíalas al reloj, sigue a tus atletas y recuérdales cada mañana la sesión y el material. Para entrenadores y clubes. Prueba gratuita de 14 días.`,
     "meta.ogTitle": `Sillance · El software de entrenamiento de entrenadores y clubes`,
     "meta.ogDescription": `Sesiones enviadas al reloj, seguimiento de atletas, recordatorios matinales con el material del día, app con los colores del club. Triatlón, running, natación.`,
