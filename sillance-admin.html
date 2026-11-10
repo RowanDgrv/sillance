@@ -154,6 +154,7 @@
     <span class="stat-chip">Athlètes <b id="statAthlete">—</b></span>
     <span class="stat-chip">Abonnés actifs <b id="statActive">—</b></span>
     <span class="stat-chip">⭐ Fondateurs <b id="statFounder">—</b></span>
+    <span class="stat-chip" id="shoeChip" title="Catalogue des chaussures (sillance-shoes.js). À mettre à jour chaque mois.">Chaussures <b id="shoeStat">—</b></span>
     <button class="btn" id="refreshBtn">↻ Actualiser</button>
   </div>
 
@@ -230,6 +231,19 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="./sillance-shoes.js?v=20261110b"></script>
+<script>
+/* Fraîcheur du catalogue chaussures (10/11/2026) : la pastille passe en
+   alerte si la dernière mise à jour date de plus de 45 jours. */
+(function(){
+  var el=document.getElementById('shoeStat'), chip=document.getElementById('shoeChip'); if(!el) return;
+  var S=window.SIL_SHOES; if(!S||!S.list){ el.textContent='catalogue introuvable'; chip.style.color='#ff6b6b'; return; }
+  var days=Math.floor((Date.now()-new Date(S.updated+'T12:00:00').getTime())/86400000);
+  var age=days<=0?"aujourd'hui":days===1?'hier':'il y a '+days+' jours';
+  if(days>45){ el.textContent=S.list.length+' modèles · pas mis à jour depuis '+days+' jours'; chip.style.color='#ff6b6b'; chip.style.borderColor='#ff6b6b'; }
+  else el.textContent=S.list.length+' modèles · mis à jour '+age;
+})();
+</script>
 <script type="module">
 import { PF } from "./sillance-client.js";
 

@@ -30,7 +30,7 @@ const PRECACHE_URLS = [
   // Découpage modulaire (03/08/2026) : la logique applicative n'est plus
   // inline dans les .html ci-dessus — sans ces entrées, une install qui
   // passe hors-ligne avant toute navigation aurait une coquille vide.
-  './sillance-app.core.js', './sillance-calendrier.core.js', './sillance-review.core.js',
+  './sillance-shoes.js', './sillance-app.core.js', './sillance-calendrier.core.js', './sillance-review.core.js',
   './sillance-framebuster.js', './sillance-fonts-async.js',
   './favicon.svg', './icon-192.png', './icon-512.png', './manifest.webmanifest',
 ];
