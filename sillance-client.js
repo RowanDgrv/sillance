@@ -520,16 +520,24 @@ export const PF = {
   // undefined = colonnes absentes (base pas encore migrée) → le bloc météo ne
   // s'affiche pas ; {} = pas de ligne ou pas de position.
   async getWeatherPos() {
-    const { data, error } = await sb.from("notification_prefs")
-      .select("weather_lat, weather_lon, weather_pos_at").maybeSingle();
-    if (error) return undefined;
+    let { data, error } = await sb.from("notification_prefs")
+      .select("weather_lat, weather_lon, weather_pos_at, weather_city, weather_manual").maybeSingle();
+    if (error) {   // colonnes ville (0094) pas encore là : on relit sans elles
+      ({ data, error } = await sb.from("notification_prefs")
+        .select("weather_lat, weather_lon, weather_pos_at").maybeSingle());
+      if (error) return undefined;
+      if (data) data.noCity = true;
+    }
     return data ?? {};
   },
   // lat/lon déjà arrondis à 0,1° par l'appelant. consent=true à l'activation
   // (date d'accord), false pour un simple rafraîchissement.
-  async saveWeatherPos(lat, lon, consent) {
+  // place : { city, manual } quand le lieu est choisi à la main (0094) ; sans
+  // place, c'est la position de l'appareil (ville vide, manual faux).
+  async saveWeatherPos(lat, lon, consent, place) {
     const now = new Date().toISOString();
-    const patch = { weather_lat: lat, weather_lon: lon, weather_pos_at: now };
+    const patch = { weather_lat: lat, weather_lon: lon, weather_pos_at: now,
+                    weather_city: place?.city ?? null, weather_manual: !!place?.manual };
     if (consent) patch.weather_consent_at = now;
     const { data, error } = await sb.from("notification_prefs").update(patch)
       .eq("user_id", this.user.id).select("user_id");
@@ -544,7 +552,7 @@ export const PF = {
   },
   async clearWeatherPos() {
     const { error } = await sb.from("notification_prefs")
-      .update({ weather_lat: null, weather_lon: null, weather_pos_at: null, weather_consent_at: null })
+      .update({ weather_lat: null, weather_lon: null, weather_pos_at: null, weather_consent_at: null, weather_city: null, weather_manual: false })
       .eq("user_id", this.user.id);
     if (error) throw error; return true;
   },

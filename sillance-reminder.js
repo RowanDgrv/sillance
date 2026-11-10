@@ -80,6 +80,11 @@
       'wx.saved': 'Météo activée', 'wx.cleared': 'Météo désactivée, position effacée',
       'wx.denied': 'Position refusée : la météo reste désactivée. Tu peux l\'autoriser dans les réglages de ton navigateur.',
       'wx.error': 'Position introuvable pour le moment, réessaie plus tard',
+      'wx.cityLabel': 'Ou choisis ta ville', 'wx.cityChange': 'Changer de lieu', 'wx.cityPh': 'Ex. Toulouse, Paris...',
+      'wx.search': 'Chercher', 'wx.noCity': 'Aucune ville trouvée', 'wx.cityErr': 'Recherche impossible pour le moment',
+      'wx.placeCity': 'Lieu : {c} (choisi à la main)', 'wx.placeDevice': 'Lieu : position de ton appareil',
+      'wx.useDevice': 'Utiliser ma position', 'wx.citySaved': 'Météo réglée sur {c}',
+      'wx.hintOnCity': 'Si la pluie est annoncée un jour de séance dehors, la veste s\'ajoute à ton rappel. Change de ville quand tu te déplaces.',
       'guide.close': 'Fermer'
     },
     en: {
@@ -139,6 +144,11 @@
       'wx.saved': 'Weather turned on', 'wx.cleared': 'Weather turned off, location deleted',
       'wx.denied': 'Location denied: weather stays off. You can allow it in your browser settings.',
       'wx.error': 'Location unavailable right now, try again later',
+      'wx.cityLabel': 'Or pick your city', 'wx.cityChange': 'Change location', 'wx.cityPh': 'E.g. Toulouse, Paris...',
+      'wx.search': 'Search', 'wx.noCity': 'No city found', 'wx.cityErr': 'Search unavailable right now',
+      'wx.placeCity': 'Location: {c} (set by hand)', 'wx.placeDevice': 'Location: your device position',
+      'wx.useDevice': 'Use my position', 'wx.citySaved': 'Weather set to {c}',
+      'wx.hintOnCity': 'If rain is forecast on an outdoor session day, the jacket is added to your reminder. Change city when you travel.',
       'guide.close': 'Close'
     },
     es: {
@@ -198,6 +208,11 @@
       'wx.saved': 'Tiempo activado', 'wx.cleared': 'Tiempo desactivado, ubicación borrada',
       'wx.denied': 'Ubicación denegada: el tiempo sigue desactivado. Puedes permitirla en los ajustes de tu navegador.',
       'wx.error': 'Ubicación no disponible por ahora, inténtalo más tarde',
+      'wx.cityLabel': 'O elige tu ciudad', 'wx.cityChange': 'Cambiar de lugar', 'wx.cityPh': 'Ej. Toulouse, París...',
+      'wx.search': 'Buscar', 'wx.noCity': 'Ninguna ciudad encontrada', 'wx.cityErr': 'Búsqueda no disponible por ahora',
+      'wx.placeCity': 'Lugar: {c} (elegido a mano)', 'wx.placeDevice': 'Lugar: posición de tu dispositivo',
+      'wx.useDevice': 'Usar mi posición', 'wx.citySaved': 'Tiempo ajustado a {c}',
+      'wx.hintOnCity': 'Si se anuncia lluvia un día de sesión al aire libre, la chaqueta se añade a tu recordatorio. Cambia de ciudad cuando viajes.',
       'guide.close': 'Cerrar'
     }
   };
@@ -251,7 +266,13 @@
     + '.rem-wx-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:var(--fs-sm,13px)}'
     + '.rem-wx-state{color:var(--muted)}.rem-wx-state.on{color:var(--accent)}'
     + '.rem-wx-hint{font-size:var(--fs-sm,13px);color:var(--muted);line-height:1.5;margin:6px 0 10px}'
-    + '.rem-wx-btn{width:100%}';
+    + '.rem-wx-btn{width:100%}'
+    + '.rem-wx-place{font-size:var(--fs-sm,13px);color:var(--text);margin:6px 0 0}'
+    + '.rem-wx-city{margin-top:12px}.rem-wx-city label{display:block;font-size:var(--fs-sm,13px);color:var(--muted);margin-bottom:6px}'
+    + '.rem-wx-row{display:flex;gap:8px}.rem-wx-row input{flex:1;min-width:0}.rem-wx-row .btn{width:auto;white-space:nowrap}'
+    + '.rem-wx-res{display:grid;gap:6px;margin-top:8px}.rem-wx-res button{text-align:left;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text);font:inherit;font-size:var(--fs-sm,13px);cursor:pointer}'
+    + '.rem-wx-res button:hover{border-color:var(--accent)}.rem-wx-res span{color:var(--muted);font-size:var(--fs-sm,13px)}'
+    + '.rem-wx-alt{margin-top:8px}';
 
   // Styles posés dès le chargement : le statut de la carte en dépend aussi,
   // pas seulement le guide.
@@ -385,12 +406,40 @@
      Sillance (déplacement, stage). « Désactiver » efface la position. */
   var wx, wxLoadedFor = null, wxBusy = false;
   function wxOn(){ return !!(wx && wx.weather_lat != null && wx.weather_lon != null); }
+  function esc(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  // Deux façons de donner le lieu (10/11/2026) : la position de l'appareil, ou
+  // une ville choisie à la main (athlète qui alterne entre deux villes). La
+  // ville est cherchée dans le géocodeur d'Open-Meteo : seul le texte tapé part,
+  // sans identifiant. Un lieu choisi à la main n'est plus remplacé par la
+  // position de l'appareil à l'ouverture. wx.noCity : colonnes 0094 absentes,
+  // on n'affiche alors que la position de l'appareil.
   function wxHtml(){
-    var on = wxOn();
-    return '<div class="rem-wx-head"><b>' + t('wx.title') + '</b><span class="rem-wx-state' + (on ? ' on' : '') + '">' + t(on ? 'wx.on' : 'wx.off') + '</span></div>'
-      + '<p class="rem-wx-hint">' + t(on ? 'wx.hintOn' : 'wx.hintOff') + '</p>'
-      + '<button type="button" class="btn btn-secondary rem-wx-btn" data-wx="' + (on ? 'off' : 'on') + '"' + (wxBusy ? ' disabled' : '') + '>'
-      + t(wxBusy ? 'wx.asking' : on ? 'wx.disable' : 'wx.enable') + '</button>';
+    var on = wxOn(), manual = on && wx.weather_manual && wx.weather_city, city = !wx.noCity;
+    var h = '<div class="rem-wx-head"><b>' + t('wx.title') + '</b><span class="rem-wx-state' + (on ? ' on' : '') + '">' + t(on ? 'wx.on' : 'wx.off') + '</span></div>';
+    if(on && city) h += '<p class="rem-wx-place">' + (manual ? t('wx.placeCity', { c: esc(wx.weather_city) }) : t('wx.placeDevice')) + '</p>';
+    h += '<p class="rem-wx-hint">' + t(!on ? 'wx.hintOff' : manual ? 'wx.hintOnCity' : 'wx.hintOn') + '</p>';
+    if(!on) h += '<button type="button" class="btn btn-secondary rem-wx-btn" data-wx="on"' + (wxBusy ? ' disabled' : '') + '>' + t(wxBusy ? 'wx.asking' : 'wx.enable') + '</button>';
+    if(city) h += '<div class="rem-wx-city"><label for="remWxCity">' + t(on ? 'wx.cityChange' : 'wx.cityLabel') + '</label>'
+      + '<div class="rem-wx-row"><input type="text" id="remWxCity" maxlength="60" autocomplete="off" placeholder="' + t('wx.cityPh') + '">'
+      + '<button type="button" class="btn btn-secondary" data-wx="search">' + t('wx.search') + '</button></div>'
+      + '<div class="rem-wx-res" id="remWxRes"></div></div>';
+    if(manual) h += '<button type="button" class="btn btn-secondary rem-wx-btn rem-wx-alt" data-wx="on"' + (wxBusy ? ' disabled' : '') + '>' + t(wxBusy ? 'wx.asking' : 'wx.useDevice') + '</button>';
+    if(on) h += '<button type="button" class="btn btn-secondary rem-wx-btn rem-wx-alt" data-wx="off"' + (wxBusy ? ' disabled' : '') + '>' + t('wx.disable') + '</button>';
+    return h;
+  }
+  var wxHits = [];
+  function wxSearch(){
+    var inp = document.getElementById('remWxCity'), res = document.getElementById('remWxRes'); if(!inp || !res) return;
+    var q = inp.value.trim(); if(q.length < 2){ res.innerHTML = ''; return; }
+    var lang = (window.SilI18n && window.SilI18n.getLang()) || 'fr';
+    fetch('https://geocoding-api.open-meteo.com/v1/search?count=5&format=json&language=' + lang + '&name=' + encodeURIComponent(q))
+      .then(function(r){ return r.json(); }).then(function(j){
+        wxHits = (j && j.results) || [];
+        res.innerHTML = wxHits.length ? wxHits.map(function(c, i){
+          var sub = [c.admin1, c.country].filter(Boolean).join(', ');
+          return '<button type="button" data-wx-city="' + i + '">' + esc(c.name) + (sub ? ' <span>' + esc(sub) + '</span>' : '') + '</button>';
+        }).join('') : '<span>' + t('wx.noCity') + '</span>';
+      }).catch(function(){ res.innerHTML = '<span>' + t('wx.cityErr') + '</span>'; });
   }
   function paintWx(force){
     var btn = document.getElementById('morningBtn'); if(!btn) return;
@@ -407,7 +456,7 @@
     { enableHighAccuracy: false, timeout: 10000, maximumAge: 3600000 });
   }
   function wxRefreshDaily(){
-    if(!wxOn() || !navigator.permissions || !navigator.permissions.query) return;
+    if(!wxOn() || wx.weather_manual || !navigator.permissions || !navigator.permissions.query) return;
     var day = new Date().toISOString().slice(0, 10), key = 'sil-wx-refresh';
     try{ if(localStorage.getItem(key) === day) return; }catch(_){ return; }
     navigator.permissions.query({ name: 'geolocation' }).then(function(st){
@@ -431,13 +480,31 @@
     }).catch(function(){});
   }
   setInterval(function(){ loadWx(); paintWx(); }, 1000);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && e.target && e.target.id === 'remWxCity'){ e.preventDefault(); wxSearch(); }
+  });
   document.addEventListener('click', function(e){
-    var b = e.target.closest('.rem-wx-btn'); if(!b || wxBusy || !window.PF || !window.PF.user) return;
+    if(!window.PF || !window.PF.user || wxBusy) return;
+    var say = function(k, kind, vars){ if(typeof window.toast === 'function') window.toast(t(k, vars), kind); };
+    if(e.target.closest('[data-wx="search"]')){ e.preventDefault(); wxSearch(); return; }
+    var pick = e.target.closest('[data-wx-city]');
+    if(pick){
+      e.preventDefault();
+      var c = wxHits[+pick.dataset.wxCity]; if(!c) return;
+      var lat = Math.round(c.latitude * 10) / 10, lon = Math.round(c.longitude * 10) / 10;
+      var label = c.name + (c.admin1 && c.admin1 !== c.name ? ', ' + c.admin1 : '');
+      wxBusy = true;
+      window.PF.saveWeatherPos(lat, lon, !wxOn(), { city: label, manual: true }).then(function(){
+        wx = { weather_lat: lat, weather_lon: lon, weather_city: label, weather_manual: true }; wxBusy = false; paintWx(true);
+        say('wx.citySaved', undefined, { c: label });
+      }).catch(function(){ wxBusy = false; paintWx(true); say('rem.saveErr', 'error'); });
+      return;
+    }
+    var b = e.target.closest('.rem-wx-btn'); if(!b) return;
     e.preventDefault();
-    var say = function(k, kind){ if(typeof window.toast === 'function') window.toast(t(k), kind); };
     if(b.dataset.wx === 'off'){
       wxBusy = true;
-      window.PF.clearWeatherPos().then(function(){ wx = {}; wxBusy = false; paintWx(true); say('wx.cleared'); })
+      window.PF.clearWeatherPos().then(function(){ wx = { noCity: wx && wx.noCity }; wxBusy = false; paintWx(true); say('wx.cleared'); })
         .catch(function(){ wxBusy = false; paintWx(true); say('rem.saveErr', 'error'); });
       return;
     }
@@ -445,7 +512,7 @@
     wxLocate(function(pos, why){
       if(!pos){ wxBusy = false; paintWx(true); say(why === 'denied' ? 'wx.denied' : 'wx.error', 'error'); return; }
       window.PF.saveWeatherPos(pos[0], pos[1], true).then(function(){
-        wx = { weather_lat: pos[0], weather_lon: pos[1] }; wxBusy = false; paintWx(true); say('wx.saved');
+        wx = { weather_lat: pos[0], weather_lon: pos[1], noCity: wx && wx.noCity }; wxBusy = false; paintWx(true); say('wx.saved');
         try{ localStorage.setItem('sil-wx-refresh', new Date().toISOString().slice(0, 10)); }catch(_){}
       }).catch(function(){ wxBusy = false; paintWx(true); say('rem.saveErr', 'error'); });
     });

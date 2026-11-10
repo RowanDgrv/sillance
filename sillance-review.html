@@ -14,7 +14,7 @@
 <!-- CSP : app (polices Google + module supabase-js via esm.sh + API supabase + iframe Calendly).
      unsafe-inline requis (gros scripts/styles inline, site statique sans nonce).
      frame-ancestors/X-Frame-Options non applicables via <meta> (en-tête HTTP requis). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co wss://onbsgohvqejccowfnrbs.supabase.co https://esm.sh; frame-src https://calendly.com; base-uri 'self'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://onbsgohvqejccowfnrbs.supabase.co https://geocoding-api.open-meteo.com wss://onbsgohvqejccowfnrbs.supabase.co https://esm.sh; frame-src https://calendly.com; base-uri 'self'; object-src 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
@@ -3462,7 +3462,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 
 <script src="./sillance-i18n.js"></script>
 <script src="./sillance-i18n-app.js?v=20261105c"></script>
-<script src="./sillance-reminder.js?v=20261110b"></script>
+<script src="./sillance-reminder.js?v=20261110c"></script>
 <script src="./sillance-ai-popup.js?v=20261028c"></script>
 <script src="./sillance-fit.js?v=20260924f"></script>
 <script src="./sillance-workout-export.js?v=20261009a"></script>
@@ -3479,7 +3479,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
      défini, l'analyse Strava réelle et toute fonctionnalité cloud restaient
      inaccessibles ici même pour un compte connecté.) -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261110a"></script>
+<script type="module" src="./sillance-integration.js?v=20261110b"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>
