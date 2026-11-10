@@ -71,6 +71,15 @@
       'guide.coachStep': 'Reviens dans ton espace coach, bloc « Rappel de planification », choisis <b>Notification</b> puis touche <b>Autoriser</b>.',
       'guide.coachEmail': 'Le rappel par email est déjà actif par défaut, sans rien installer. Tu peux changer le canal, le jour limite ou le couper dans « Rappel de planification ».',
       'guide.ok': 'J\'ai compris',
+      'wx.title': 'Météo du jour',
+      'wx.on': 'activée', 'wx.off': 'désactivée',
+      'wx.hintOff': 'Avec ton accord, Sillance utilise ta position approximative (à 10 km près) pour regarder la pluie du jour et ajouter la veste à ton rappel. Sans position, pas de météo.',
+      'wx.hintOn': 'Si la pluie est annoncée un jour de séance dehors, la veste s\'ajoute à ton rappel. Position approximative (à 10 km près), mise à jour quand tu ouvres Sillance.',
+      'wx.enable': 'Activer la météo', 'wx.disable': 'Désactiver et effacer ma position',
+      'wx.asking': 'Demande de position...',
+      'wx.saved': 'Météo activée', 'wx.cleared': 'Météo désactivée, position effacée',
+      'wx.denied': 'Position refusée : la météo reste désactivée. Tu peux l\'autoriser dans les réglages de ton navigateur.',
+      'wx.error': 'Position introuvable pour le moment, réessaie plus tard',
       'guide.close': 'Fermer'
     },
     en: {
@@ -121,6 +130,15 @@
       'guide.coachStep': 'Go back to your coach space, "Planning reminder" block, pick <b>Notification</b> then tap <b>Allow</b>.',
       'guide.coachEmail': 'The email reminder is already on by default, nothing to install. Change the channel, the deadline or turn it off in "Planning reminder".',
       'guide.ok': 'Got it',
+      'wx.title': 'Today\'s weather',
+      'wx.on': 'on', 'wx.off': 'off',
+      'wx.hintOff': 'With your consent, Sillance uses your approximate location (within 10 km) to check today\'s rain and add the jacket to your reminder. No location, no weather.',
+      'wx.hintOn': 'If rain is forecast on an outdoor session day, the jacket is added to your reminder. Approximate location (within 10 km), refreshed when you open Sillance.',
+      'wx.enable': 'Turn on weather', 'wx.disable': 'Turn off and delete my location',
+      'wx.asking': 'Requesting location...',
+      'wx.saved': 'Weather turned on', 'wx.cleared': 'Weather turned off, location deleted',
+      'wx.denied': 'Location denied: weather stays off. You can allow it in your browser settings.',
+      'wx.error': 'Location unavailable right now, try again later',
       'guide.close': 'Close'
     },
     es: {
@@ -171,6 +189,15 @@
       'guide.coachStep': 'Vuelve a tu espacio de entrenador, bloque «Recordatorio de planificación», elige <b>Notificación</b> y toca <b>Permitir</b>.',
       'guide.coachEmail': 'El recordatorio por email ya está activo por defecto, sin instalar nada. Cambia el canal, el día límite o desactívalo en «Recordatorio de planificación».',
       'guide.ok': 'Entendido',
+      'wx.title': 'Tiempo del día',
+      'wx.on': 'activado', 'wx.off': 'desactivado',
+      'wx.hintOff': 'Con tu permiso, Sillance usa tu ubicación aproximada (con 10 km de margen) para mirar la lluvia del día y añadir la chaqueta a tu recordatorio. Sin ubicación, no hay tiempo.',
+      'wx.hintOn': 'Si se anuncia lluvia un día de sesión al aire libre, la chaqueta se añade a tu recordatorio. Ubicación aproximada (con 10 km de margen), actualizada cuando abres Sillance.',
+      'wx.enable': 'Activar el tiempo', 'wx.disable': 'Desactivar y borrar mi ubicación',
+      'wx.asking': 'Solicitando ubicación...',
+      'wx.saved': 'Tiempo activado', 'wx.cleared': 'Tiempo desactivado, ubicación borrada',
+      'wx.denied': 'Ubicación denegada: el tiempo sigue desactivado. Puedes permitirla en los ajustes de tu navegador.',
+      'wx.error': 'Ubicación no disponible por ahora, inténtalo más tarde',
       'guide.close': 'Cerrar'
     }
   };
@@ -219,7 +246,12 @@
     + '.sg-mail{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}'
     + '.sg-mail b{display:block;margin-bottom:2px;color:var(--text)}'
     + '.rem-status{display:block;text-align:center;font-size:var(--fs-sm,13px);color:var(--muted);margin:-2px 0 8px}'
-    + '.rem-status.on{color:var(--accent)}';
+    + '.rem-status.on{color:var(--accent)}'
+    + '.rem-wx{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}'
+    + '.rem-wx-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:var(--fs-sm,13px)}'
+    + '.rem-wx-state{color:var(--muted)}.rem-wx-state.on{color:var(--accent)}'
+    + '.rem-wx-hint{font-size:var(--fs-sm,13px);color:var(--muted);line-height:1.5;margin:6px 0 10px}'
+    + '.rem-wx-btn{width:100%}';
 
   // Styles posés dès le chargement : le statut de la carte en dépend aussi,
   // pas seulement le guide.
@@ -342,6 +374,82 @@
     var sel = document.getElementById('morningChannel');
     if(sel && !sel.dataset.remSeen){ sel.dataset.remSeen = '1'; paintCard(); }
   }).observe(document.documentElement, { childList: true, subtree: true });
+
+  /* ---------- météo du jour : position avec accord de l'athlète (10/11/2026) ----------
+     Remplace la position tirée de la dernière sortie Strava (les athlètes
+     sur COROS ou Garmin n'en avaient pas). L'athlète active la météo ici :
+     le navigateur demande sa position, on n'en garde qu'un arrondi à 0,1°
+     (~10 km) dans notification_prefs (migration 0093). Refus = pas de météo.
+     Tant qu'elle est activée et que le navigateur a gardé l'autorisation, la
+     position est rafraîchie au plus une fois par jour à l'ouverture de
+     Sillance (déplacement, stage). « Désactiver » efface la position. */
+  var wx, wxLoadedFor = null, wxBusy = false;
+  function wxOn(){ return !!(wx && wx.weather_lat != null && wx.weather_lon != null); }
+  function wxHtml(){
+    var on = wxOn();
+    return '<div class="rem-wx-head"><b>' + t('wx.title') + '</b><span class="rem-wx-state' + (on ? ' on' : '') + '">' + t(on ? 'wx.on' : 'wx.off') + '</span></div>'
+      + '<p class="rem-wx-hint">' + t(on ? 'wx.hintOn' : 'wx.hintOff') + '</p>'
+      + '<button type="button" class="btn btn-secondary rem-wx-btn" data-wx="' + (on ? 'off' : 'on') + '"' + (wxBusy ? ' disabled' : '') + '>'
+      + t(wxBusy ? 'wx.asking' : on ? 'wx.disable' : 'wx.enable') + '</button>';
+  }
+  function paintWx(force){
+    var btn = document.getElementById('morningBtn'); if(!btn) return;
+    var box = btn.parentNode.querySelector('.rem-wx');
+    if(wx === undefined){ if(box) box.remove(); return; }   // pas connecté, ou base pas encore migrée
+    if(!box){ box = document.createElement('div'); box.className = 'rem-wx'; btn.parentNode.appendChild(box); force = true; }
+    if(force) box.innerHTML = wxHtml();
+  }
+  function wxLocate(cb){
+    if(!navigator.geolocation){ cb(null, 'error'); return; }
+    navigator.geolocation.getCurrentPosition(function(p){
+      cb([Math.round(p.coords.latitude * 10) / 10, Math.round(p.coords.longitude * 10) / 10]);
+    }, function(err){ cb(null, err && err.code === 1 ? 'denied' : 'error'); },
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 3600000 });
+  }
+  function wxRefreshDaily(){
+    if(!wxOn() || !navigator.permissions || !navigator.permissions.query) return;
+    var day = new Date().toISOString().slice(0, 10), key = 'sil-wx-refresh';
+    try{ if(localStorage.getItem(key) === day) return; }catch(_){ return; }
+    navigator.permissions.query({ name: 'geolocation' }).then(function(st){
+      if(st.state !== 'granted') return;
+      wxLocate(function(pos){
+        if(!pos) return;
+        try{ localStorage.setItem(key, day); }catch(_){}
+        if(pos[0] === +wx.weather_lat && pos[1] === +wx.weather_lon) return;
+        window.PF.saveWeatherPos(pos[0], pos[1]).then(function(){ wx.weather_lat = pos[0]; wx.weather_lon = pos[1]; }).catch(function(){});
+      });
+    }).catch(function(){});
+  }
+  function loadWx(){
+    var uid = window.PF && window.PF.user ? window.PF.user.id : null;
+    if(uid === wxLoadedFor) return;
+    wxLoadedFor = uid; wx = undefined; paintWx();
+    if(!uid || !window.PF.getWeatherPos) return;
+    window.PF.getWeatherPos().then(function(r){
+      if(wxLoadedFor !== uid) return;
+      wx = r; paintWx(true); wxRefreshDaily();
+    }).catch(function(){});
+  }
+  setInterval(function(){ loadWx(); paintWx(); }, 1000);
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('.rem-wx-btn'); if(!b || wxBusy || !window.PF || !window.PF.user) return;
+    e.preventDefault();
+    var say = function(k, kind){ if(typeof window.toast === 'function') window.toast(t(k), kind); };
+    if(b.dataset.wx === 'off'){
+      wxBusy = true;
+      window.PF.clearWeatherPos().then(function(){ wx = {}; wxBusy = false; paintWx(true); say('wx.cleared'); })
+        .catch(function(){ wxBusy = false; paintWx(true); say('rem.saveErr', 'error'); });
+      return;
+    }
+    wxBusy = true; paintWx(true);
+    wxLocate(function(pos, why){
+      if(!pos){ wxBusy = false; paintWx(true); say(why === 'denied' ? 'wx.denied' : 'wx.error', 'error'); return; }
+      window.PF.saveWeatherPos(pos[0], pos[1], true).then(function(){
+        wx = { weather_lat: pos[0], weather_lon: pos[1] }; wxBusy = false; paintWx(true); say('wx.saved');
+        try{ localStorage.setItem('sil-wx-refresh', new Date().toISOString().slice(0, 10)); }catch(_){}
+      }).catch(function(){ wxBusy = false; paintWx(true); say('rem.saveErr', 'error'); });
+    });
+  });
 
   /* ---------- interceptions (phase de capture : avant le handler du *.core.js) ---------- */
   document.addEventListener('click', function(e){

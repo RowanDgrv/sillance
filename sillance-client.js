@@ -516,6 +516,38 @@ export const PF = {
               { onConflict: "user_id" });
     if (error) throw error; return true;
   },
+  // ---- Météo du rappel du matin : position approximative, avec accord (0093) ----
+  // undefined = colonnes absentes (base pas encore migrée) → le bloc météo ne
+  // s'affiche pas ; {} = pas de ligne ou pas de position.
+  async getWeatherPos() {
+    const { data, error } = await sb.from("notification_prefs")
+      .select("weather_lat, weather_lon, weather_pos_at").maybeSingle();
+    if (error) return undefined;
+    return data ?? {};
+  },
+  // lat/lon déjà arrondis à 0,1° par l'appelant. consent=true à l'activation
+  // (date d'accord), false pour un simple rafraîchissement.
+  async saveWeatherPos(lat, lon, consent) {
+    const now = new Date().toISOString();
+    const patch = { weather_lat: lat, weather_lon: lon, weather_pos_at: now };
+    if (consent) patch.weather_consent_at = now;
+    const { data, error } = await sb.from("notification_prefs").update(patch)
+      .eq("user_id", this.user.id).select("user_id");
+    if (error) throw error;
+    if (!data?.length) {   // pas encore de préférences : mêmes valeurs par défaut que 0070
+      let tz = "Europe/Paris"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || tz; } catch (_) {}
+      const { error: e2 } = await sb.from("notification_prefs")
+        .insert({ user_id: this.user.id, send_hour: 7, send_minute: 0, tz, channel: "email", ...patch });
+      if (e2) throw e2;
+    }
+    return true;
+  },
+  async clearWeatherPos() {
+    const { error } = await sb.from("notification_prefs")
+      .update({ weather_lat: null, weather_lon: null, weather_pos_at: null, weather_consent_at: null })
+      .eq("user_id", this.user.id);
+    if (error) throw error; return true;
+  },
   // Abonnement Web Push du navigateur courant (un par appareil).
   async savePushSubscription(subJson) {
     const { error } = await sb.from("push_subscriptions")
