@@ -358,7 +358,7 @@ body.light .theme-toggle .tt-moon{display:none}
 .ta-btn .ic{margin-right:0;font-size:15px}
 .ta-btn svg{flex:none}
 .ta-btn.a11y-btn{display:inline-flex;font-size:var(--fs-sm)}
-.ta-dot{position:absolute;top:6px;left:24px;width:8px;height:8px;border-radius:50%;background:var(--run);box-shadow:0 0 0 2px var(--panel)}
+.ta-dot{position:absolute;top:-4px;left:14px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--run);color:#fff;font:700 10.5px/17px var(--font-data);text-align:center;box-shadow:0 0 0 2px var(--panel)}
 .ta-dot[hidden]{display:none}
 .top-tools{display:flex;align-items:center;gap:2px}
 .top-tools .icon-btn{width:30px;height:30px;border-color:transparent;background:transparent;color:var(--muted);font-size:14px}
@@ -4295,7 +4295,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261111a"></script>
+<script src="./sillance-i18n-app.js?v=20261111b"></script>
 <script src="./sillance-reminder.js?v=20261110c"></script>
 <script src="./sillance-ai-popup.js?v=20261107a"></script>
 <script src="./sillance-consigne.js?v=20261029a"></script>
@@ -4309,7 +4309,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-equipment.js?v=20261103c"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
-<script src="./sillance-app.core.js?v=20261111a"></script>
+<script src="./sillance-app.core.js?v=20261111b"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

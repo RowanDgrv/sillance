@@ -6573,8 +6573,7 @@ function showPanelView(view){
 async function refreshChatBadge(){
   if(!window.PF?.user) return;
   const list = await PF.listConversations().catch(()=>[]);
-  const unread = list.some(convUnread);
-  setChatBadges(unread);
+  setChatBadges(list.filter(convUnread).length);
 }
 
 async function loadConversationsList(){
@@ -6586,7 +6585,7 @@ async function loadConversationsList(){
   if(missing.length){ const names = await PF.getProfilesByIds(missing); Object.assign(CONV_NAMES, names); }
   if(mode==='athlete') await loadMyCoaches();
   renderChatList();
-  setChatBadges(CONVERSATIONS.some(convUnread));
+  setChatBadges(CONVERSATIONS.filter(convUnread).length);
 }
 /* L'athlète peut écrire le premier (11/11/2026). Avant, seul le coach pouvait ouvrir un fil :
    un athlète sans message reçu voyait « Aucune conversation » et rien d'autre. On lui propose
@@ -6732,7 +6731,15 @@ function openChat(athleteId){
 chatNewBtn.onclick = openNewPicker;
 chatBack.onclick = ()=>{ CURRENT_CONV=null; if(unsubThread){ unsubThread(); unsubThread=null; } showPanelView('list'); loadConversationsList(); };
 // Pastille non-lu : FAB (mobile) + bouton Conversations de la topbar.
-function setChatBadges(unread){ document.querySelectorAll('[data-chat-badge]').forEach(b=>{ b.hidden = !unread; }); }
+// Pastille chiffrée (11/11/2026) : nombre de conversations avec un message non lu, à côté du
+// bouton Conversations et sur la bulle. Avant : un simple point, et seulement après avoir
+// ouvert la messagerie une première fois.
+function setChatBadges(n){
+  n = +n || 0;
+  document.querySelectorAll('[data-chat-badge]').forEach(b=>{ b.hidden = !n; b.textContent = n ? (n>9 ? '9+' : n) : ''; });
+  const top = document.getElementById('chatTopBtn');
+  if(top) top.setAttribute('aria-label', n ? tr('messaging.unreadAria', {n}) : tr('topbar.conversations'));
+}
 const toggleChat = ()=>{ chatPanel.classList.contains('open')?chatPanel.classList.remove('open'):openChat(); };
 document.getElementById('chatFab').onclick = toggleChat;
 document.getElementById('chatTopBtn').onclick = toggleChat;
@@ -6751,7 +6758,28 @@ document.getElementById('chatTopBtn').onclick = toggleChat;
 document.getElementById('chatClose').onclick=()=> chatPanel.classList.remove('open');
 document.getElementById('chatSend').onclick=()=> sendChat(document.getElementById('chatText').value);
 document.getElementById('chatText').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(e.target.value); });
-if(window.PF?.user) refreshChatBadge();
+// La connexion arrive après ce script, et la messagerie ne s'abonnait aux nouveaux messages
+// qu'à l'ouverture du panneau : un message reçu restait invisible tant qu'on ne cliquait pas.
+// On surveille donc la connexion (simple comparaison d'identifiant), puis : compte des non lus,
+// abonnement temps réel, et un recomptage par minute en filet de sécurité.
+let chatWatchUid = null, chatLastPoll = 0;
+setInterval(()=>{
+  const uid = window.PF?.user?.id || null;
+  if(uid !== chatWatchUid){
+    chatWatchUid = uid;
+    if(unsubInbox){ unsubInbox(); unsubInbox = null; }
+    if(!uid){ setChatBadges(0); return; }
+    refreshChatBadge(); chatLastPoll = Date.now();
+    if(PF.subscribeToMyConversations) unsubInbox = PF.subscribeToMyConversations((msg)=>{
+      const open = chatPanel.classList.contains('open');
+      if(open && CURRENT_CONV && msg && CURRENT_CONV.id===msg.conversation_id) return;   // fil déjà à l'écran : lu
+      if(open && CURRENT_CONV==null) loadConversationsList(); else refreshChatBadge();
+      if(msg && msg.sender_id!==uid) toast(tr('messaging.newMessageToast'));
+    });
+    return;
+  }
+  if(uid && !document.hidden && Date.now()-chatLastPoll > 60000){ chatLastPoll = Date.now(); if(!(chatPanel.classList.contains('open') && CURRENT_CONV)) refreshChatBadge(); }
+}, 2000);
 
 /* ============================================================
    ACCESSIBILITÉ — daltonisme, motifs, contraste (en 1 clic)
