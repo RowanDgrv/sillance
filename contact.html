@@ -140,8 +140,10 @@
       <label for="cf-message" data-i18n="contact.form.message">Ton message</label>
       <textarea id="cf-message" name="message" required></textarea>
     </div>
-    <button type="submit" class="btn" data-i18n="contact.form.submit">Ouvrir mon e-mail</button>
-    <p class="form-note" data-i18n-html="contact.form.note">Le bouton ouvre ton logiciel de messagerie avec le message pré-rempli — tu n'as plus qu'à envoyer. Si rien ne s'ouvre, écris directement à <a href="mailto:contact@sillance.app">contact@sillance.app</a>.</p>
+    <!-- champ piège invisible : un humain ne le remplit pas, un robot oui -->
+    <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden"><label for="cf-site">Site</label><input type="text" id="cf-site" name="website" tabindex="-1" autocomplete="off"></div>
+    <button type="submit" class="btn" data-i18n="contact.form.submit">Envoyer</button>
+    <p class="form-note" data-i18n-html="contact.form.note">Ton message nous arrive directement, réponse sous 2 à 3 jours ouvrés. Tu peux aussi écrire à <a href="mailto:contact@sillance.app">contact@sillance.app</a>.</p>
   </form>
 </div>
 
@@ -205,8 +207,8 @@
 
 </div>
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-contact.js"></script>
-<script src="./sillance-contact.js"></script>
+<script src="./sillance-i18n-contact.js?v=20261112a"></script>
+<script src="./sillance-contact.js?v=20261112a"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>

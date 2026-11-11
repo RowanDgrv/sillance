@@ -1,8 +1,14 @@
-/* Sillance — page contact : le formulaire pré-remplit un e-mail vers le support.
-   Aucun backend : on construit un lien mailto: et on l'ouvre. Fonctionne
-   partout, respecte la CSP (script-src 'self'). */
+/* Sillance — page contact (12/11/2026) : le message est enregistré directement
+   (table support_requests, écriture seule pour le public) et le support est
+   prévenu par e-mail. Avant, le formulaire ne faisait qu'ouvrir le logiciel de
+   messagerie du visiteur : rien n'arrivait si celui-ci n'en avait pas, et aucune
+   trace n'était gardée. Si l'enregistrement échoue, on retombe sur cet ancien
+   comportement (lien mailto:) pour ne jamais perdre un message. */
 (function(){
   var SUPPORT = 'contact@sillance.app';
+  // Adresse et clé PUBLIQUES du projet (les mêmes que dans sillance-client.js).
+  var API = 'https://onbsgohvqejccowfnrbs.supabase.co/rest/v1/support_requests';
+  var KEY = 'sb_publishable_Tiz8pcjnik-Xj85Jvahivw_dfNqf_TT';
 
   function tr(key, fallback){
     try{
@@ -76,13 +82,36 @@
                  '?subject=' + encodeURIComponent(subject) +
                  '&body='    + encodeURIComponent(lines.join('\n'));
 
-      window.location.href = href;
-
-      status.hidden = false;
-      status.style.color = 'var(--accent)';
-      status.innerHTML = tr('contact.js.opened',
-        "Ton logiciel de messagerie devrait s'ouvrir. S'il ne s'ouvre pas, écris à ") +
-        '<a href="mailto:' + SUPPORT + '">' + SUPPORT + '</a>.';
+      var fallback = function(){
+        window.location.href = href;
+        status.hidden = false;
+        status.style.color = 'var(--accent)';
+        status.innerHTML = tr('contact.js.opened',
+          "Ton logiciel de messagerie devrait s'ouvrir. S'il ne s'ouvre pas, écris à ") +
+          '<a href="mailto:' + SUPPORT + '">' + SUPPORT + '</a>.';
+      };
+      // champ piège rempli = robot : on fait comme si c'était parti, sans rien enregistrer
+      var trap = (form.querySelector('#cf-site') || {}).value;
+      var btn = form.querySelector('button[type="submit"]');
+      var done = function(){
+        form.reset();
+        status.hidden = false;
+        status.style.color = 'var(--accent)';
+        status.textContent = tr('contact.js.sent', "Message bien reçu. On te répond sous 2 à 3 jours ouvrés, à l'adresse indiquée.");
+      };
+      if(trap){ done(); return; }
+      if(!window.fetch){ fallback(); return; }
+      if(btn) btn.disabled = true;
+      status.hidden = false; status.style.color = 'var(--accent)';
+      status.textContent = tr('contact.js.sending', 'Envoi en cours...');
+      var lang = (document.documentElement.getAttribute('lang') || '').slice(0, 8);
+      fetch(API, {
+        method: 'POST',
+        headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ name: name.slice(0, 120), email: email.slice(0, 200), role: roleText.slice(0, 80),
+                               subject: subjectText.slice(0, 160), message: message.slice(0, 4000), lang: lang })
+      }).then(function(r){ if(btn) btn.disabled = false; if(r.ok) done(); else fallback(); })
+        .catch(function(){ if(btn) btn.disabled = false; fallback(); });
     });
   }
 

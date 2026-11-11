@@ -25,8 +25,8 @@
     "contact.form.subjPartnership": `Partenariat`,
     "contact.form.subjOther": `Autre`,
     "contact.form.message": `Ton message`,
-    "contact.form.submit": `Ouvrir mon e-mail`,
-    "contact.form.note": `Le bouton ouvre ton logiciel de messagerie avec le message pré-rempli — tu n'as plus qu'à envoyer. Si rien ne s'ouvre, écris directement à <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
+    "contact.form.submit": `Envoyer`, "contact.js.sent": `Message bien reçu. On te répond sous 2 à 3 jours ouvrés, à l'adresse indiquée.`, "contact.js.sending": `Envoi en cours...`,
+    "contact.form.note": `Ton message nous arrive directement, réponse sous 2 à 3 jours ouvrés. Tu peux aussi écrire à <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
 
     "contact.direct.title": `Par e-mail, directement`,
     "contact.direct.delay": `<strong>Délai de réponse :</strong> sous 2 à 3 jours ouvrés en général. Les demandes relatives aux données personnelles sont traitées sous 30 jours (voir plus bas).`,
@@ -94,8 +94,8 @@
     "contact.form.subjPartnership": `Partnership`,
     "contact.form.subjOther": `Other`,
     "contact.form.message": `Your message`,
-    "contact.form.submit": `Open my email`,
-    "contact.form.note": `The button opens your email app with the message pre-filled — just hit send. If nothing opens, write directly to <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
+    "contact.form.submit": `Send`, "contact.js.sent": `Message received. We will reply within 2 to 3 working days, at the address you gave.`, "contact.js.sending": `Sending...`,
+    "contact.form.note": `Your message reaches us directly, reply within 2 to 3 working days. You can also write to <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
 
     "contact.direct.title": `By email, directly`,
     "contact.direct.delay": `<strong>Response time:</strong> within 2–3 business days as a rule. Requests about personal data are handled within 30 days (see below).`,
@@ -163,8 +163,8 @@
     "contact.form.subjPartnership": `Colaboración`,
     "contact.form.subjOther": `Otro`,
     "contact.form.message": `Tu mensaje`,
-    "contact.form.submit": `Abrir mi correo`,
-    "contact.form.note": `El botón abre tu aplicación de correo con el mensaje ya redactado — solo tienes que enviarlo. Si no se abre nada, escribe directamente a <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
+    "contact.form.submit": `Enviar`, "contact.js.sent": `Mensaje recibido. Te respondemos en 2 o 3 días laborables, a la dirección indicada.`, "contact.js.sending": `Enviando...`,
+    "contact.form.note": `Tu mensaje nos llega directamente, respuesta en 2 o 3 días laborables. También puedes escribir a <a href="mailto:contact@sillance.app">contact@sillance.app</a>.`,
 
     "contact.direct.title": `Por correo, directamente`,
     "contact.direct.delay": `<strong>Plazo de respuesta:</strong> en 2–3 días laborables por lo general. Las solicitudes sobre datos personales se tramitan en un plazo de 30 días (ver más abajo).`,
