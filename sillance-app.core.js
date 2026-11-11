@@ -8287,15 +8287,47 @@ async function loadConversationsList(){
   // club sans lien coach_athlete côté coach — cas des fils du fil du club).
   const missing = CONVERSATIONS.filter(c=>c.kind==='direct').map(convCounterpartId).filter(id=>id && !nameOf(id));
   if(missing.length){ const names = await PF.getProfilesByIds(missing); Object.assign(CONV_NAMES, names); }
+  if(mode==='athlete') await loadMyCoaches();
   renderChatList();
   setChatBadges(CONVERSATIONS.some(convUnread));
 }
+/* L'athlète peut écrire le premier (11/11/2026). Avant, seul le coach pouvait ouvrir un fil :
+   un athlète sans message reçu voyait « Aucune conversation » et rien d'autre. On lui propose
+   un bouton par coach relié avec qui il n'a pas encore de fil (start_coach_conversation, 0095). */
+let MY_COACHES = null, MY_COACHES_FOR = null;
+async function loadMyCoaches(){
+  const uid = window.PF?.user?.id; if(!uid || !PF.getCoTeam) return;
+  if(MY_COACHES && MY_COACHES_FOR===uid) return;
+  const team = await PF.getCoTeam(uid).catch(()=>[]);
+  MY_COACHES = team.map(r=>({ id:r.coach_id, name:(r.coach && (r.coach.full_name || (r.coach.email||'').split('@')[0])) || tr('crd.coach') }));
+  MY_COACHES_FOR = uid;
+  MY_COACHES.forEach(c=>{ if(!CONV_NAMES[c.id]) CONV_NAMES[c.id]=c.name; });
+}
+function chatStartHtml(){
+  if(mode!=='athlete' || !window.PF?.user || !PF.startCoachConversation) return '';
+  const have = new Set(CONVERSATIONS.filter(c=>c.kind==='direct' && !c.source_post_id).map(c=>c.coach_id));
+  return (MY_COACHES||[]).filter(c=>!have.has(c.id))
+    .map(c=>`<button class="chat-pick-row chat-start-coach" data-coach="${c.id}"><i class="ic ic-message-circle"></i> ${tr('messaging.writeTo', {name:dispoSafe(c.name)})}</button>`).join('');
+}
+function wireChatStart(){
+  chatList.querySelectorAll('.chat-start-coach').forEach(el=>{
+    el.onclick = async ()=>{
+      el.disabled = true;
+      try{ const id = await PF.startCoachConversation(el.dataset.coach); await loadConversationsList();
+        const conv = CONVERSATIONS.find(c=>c.id===id); if(conv) openConversation(conv); }
+      catch(e){ console.warn('[PF] startCoachConversation:', e); el.disabled = false; toast(tr('messaging.sendFailed')); }
+    };
+  });
+}
 function renderChatList(){
+  const start = chatStartHtml();
   if(!CONVERSATIONS.length){
-    chatList.innerHTML = `<div class="chat-list-empty">${mode!=='athlete' ? tr('messaging.emptyCoach') : tr('messaging.emptyAthlete')}</div>`;
+    const emptyKey = mode!=='athlete' ? 'messaging.emptyCoach' : start ? 'messaging.emptyAthleteStart' : (window.PF?.user && MY_COACHES && !MY_COACHES.length) ? 'messaging.noCoachYet' : 'messaging.emptyAthlete';
+    chatList.innerHTML = start + `<div class="chat-list-empty">${tr(emptyKey)}</div>`;
+    wireChatStart();
     return;
   }
-  chatList.innerHTML = CONVERSATIONS.map(c=>{
+  chatList.innerHTML = start + CONVERSATIONS.map(c=>{
     const unread = convUnread(c);
     const name = convName(c);
     const preview = c.kind==='group' ? tr('messaging.groupHint') : (c.source_post_id ? '↳ '+dispoSafe(c.title||'') : '');
@@ -8311,6 +8343,7 @@ function renderChatList(){
   chatList.querySelectorAll('.chat-row').forEach(el=>{
     el.onclick = ()=>{ const c=CONVERSATIONS.find(x=>x.id===el.dataset.id); if(c) openConversation(c); };
   });
+  wireChatStart();
 }
 
 async function openConversation(conv){
@@ -10328,8 +10361,9 @@ function computeImpact(s, data){
       : tr('impact.windDetailFavorable', {sec:Math.abs(windSecPerKm).toFixed(0)})});
 
   // — Dénivelé (D+) —
-  // coût ~ 6 s par mètre de D+ en course (réparti sur la distance)
-  const dplusSecTotal = isRun ? data.dplus*5.5 : data.dplus*3.2;
+  // Course : 3 s par mètre de D+ (décision Rowan 11/11/2026, proche de la règle « 100 m de D+ ≈ 1 km de plat » ;
+  // avant : 5,5 s/m, environ deux fois trop). La descente n'est pas créditée. Vélo : 3,2 s/m, inchangé.
+  const dplusSecTotal = isRun ? data.dplus*3 : data.dplus*3.2;
   const dplusSecPerKm = dplusSecTotal/distKm;
   items.push({key:tr('impact.elevation'), ico:'ic-mountain', color:'var(--bike)',
     cost: dplusSecPerKm, total: dplusSecTotal,
@@ -10340,7 +10374,7 @@ function computeImpact(s, data){
 
   const totalLost = items.reduce((a,i)=>a+Math.max(0,i.total),0);
   const totalGain = items.reduce((a,i)=>a+Math.min(0,i.total),0);
-  return {items, totalLost, totalGain, basePaceSec, distKm};
+  return {items, totalLost, totalGain, basePaceSec, distKm, measured};
 }
 function fmtMMSS(sec){ sec=Math.round(Math.abs(sec)); const m=Math.floor(sec/60),s=sec%60; return m>0?`${m}'${String(s).padStart(2,'0')}"`:`${s}s`; }
 
@@ -10364,7 +10398,7 @@ function renderImpact(s, data){
   const correctedPace = imp.basePaceSec - (imp.totalLost+imp.totalGain)/imp.distKm;
   const summary = `<div class="imp-summary">
     <div class="is-h"><i class="ic ic-chart"></i> ${tr('impact.correctedPace')}</div>
-    <div class="is-txt">${tr('impact.summaryText', {
+    <div class="is-txt">${tr(imp.measured ? 'impact.summaryText' : 'impact.summaryTextFlat', {
       corrected:paceFromSpeed(3600/correctedPace), actual:paceFromSpeed(data.avgSpeed),
       verb: imp.totalLost+imp.totalGain>=0?tr('impact.cost'):tr('impact.gained'),
       time: fmtMMSS(imp.totalLost+imp.totalGain)

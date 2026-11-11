@@ -1558,6 +1558,13 @@ export const PF = {
     const { error } = await sb.from("club_posts").delete().eq("id", id);
     if (error) throw error;
   },
+  // Athlète : ouvre (ou réutilise) le fil avec son coach (0095). coachId utile
+  // seulement s'il a plusieurs coachs. Renvoie l'id de la conversation.
+  async startCoachConversation(coachId) {
+    const { data, error } = await sb.rpc("start_coach_conversation", { p_coach_id: coachId ?? null });
+    if (error) throw error;
+    return data;
+  },
   // Ouvre (ou réutilise) le fil privé athlète <-> auteur d'une publication.
   async startPostDiscussion(postId) {
     const { data, error } = await sb.rpc("start_post_discussion", { p_post_id: postId });
