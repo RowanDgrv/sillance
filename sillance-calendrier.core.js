@@ -1647,7 +1647,7 @@ function ensureFitInput(){
 }
 function importActivityFile(file){
   if(typeof PFFit==='undefined'){ toast(tr('toast.moduleDImportIndisponible'), 'error'); return; }
-  const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
+  const ftp=lapFTPval();
   toast(tr('toast.lectureFichier'));
   PFFit.parseFile(file, {ftp}).then(res=>{
     if(!res.ok){ toast(tr('sync.importPrefix')+res.error); return; }
@@ -1672,7 +1672,7 @@ function openStravaAnalysis(act){
   toast(tr('toast.chargementDetail'));
   PF.getActivityStreams(act.id, act.src).then(({points, laps})=>{
     if(!points || !points.length){ toast(tr('toast.pasDetailSecondeParSeconde')); return; }
-    const ftp=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)||270;
+    const ftp=lapFTPval();
     const res = PFFit.buildFromRaw(points, act.disc, laps||[], {ftp});
     if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
     openAnalysis({id:act.id, disc:act.disc, title:act.name, dur:act.dur, zone:'Z2', _realData:res.data});
@@ -8486,6 +8486,10 @@ function computeImpact(s, data){
   const distKm = Math.max(data.dist, 0.1);
   const basePaceSec = 3600/Math.max(data.avgSpeed,1); // s/km de référence
   const items=[];
+  // Fichier réel (10/11/2026) : la montre ne donne ni température ni vent, le fichier
+  // arrivait avec des conditions « neutres » inventées (15 °C, 50 %, 0 km/h) affichées comme
+  // mesurées. On ne garde alors que le dénivelé, qui est réel.
+  const measured = !s._realData;
 
   // — Chaleur —
   let heatPctPerKm = 0;
@@ -8496,7 +8500,7 @@ function computeImpact(s, data){
   }
   const heatSecPerKm = basePaceSec * heatPctPerKm;
   const heatTotal = heatSecPerKm * distKm;
-  items.push({key:tr('impact.heat'), ico:'ic-thermometer', color:'var(--run)',
+  if(measured) items.push({key:tr('impact.heat'), ico:'ic-thermometer', color:'var(--run)',
     cost: heatSecPerKm, total: heatTotal,
     cond:tr('impact.heatCond', {temp:c.temp, hum:c.humidity}),
     detail: c.temp>15
@@ -8514,7 +8518,7 @@ function computeImpact(s, data){
     windSecPerKm = basePaceSec * windPct;
   }
   const windTotal = windSecPerKm * distKm;
-  items.push({key:tr('impact.wind'), ico:'ic-wind', color:'var(--swim)',
+  if(measured) items.push({key:tr('impact.wind'), ico:'ic-wind', color:'var(--swim)',
     cost: windSecPerKm, total: windTotal,
     cond:`${c.wind} km/h · ${c.windHead?tr('impact.headwind'):tr('impact.favorable')}`,
     detail: c.windHead
@@ -8864,6 +8868,9 @@ function drawCompareChart(series, disc, axis){
 }
 function renderCompareOverlay(s, data){
   const wrap=document.getElementById('anCompareWrap'); if(!wrap) return;
+  // Compte réel (10/11/2026) : la comparaison s'appuyait sur un historique de démo (SESSION_HISTORY).
+  // Tant qu'elle n'est pas branchée sur les vraies séances passées, on ne l'affiche pas.
+  if(window.PF?.user){ wrap.style.display='none'; return; }
   const disc=s.disc;
   if(disc==='hyrox'||disc==='strength'||disc==='swim'){ wrap.style.display='none'; return; }
   const type=sessionType(s);
@@ -9179,6 +9186,9 @@ function injectSimCss(){
 }
 function renderSimilar(disc, type, cur){
   const wrap=document.getElementById('anSimilarWrap'); if(!wrap) return;
+  // Compte réel (10/11/2026) : la comparaison s'appuyait sur un historique de démo (SESSION_HISTORY).
+  // Tant qu'elle n'est pas branchée sur les vraies séances passées, on ne l'affiche pas.
+  if(window.PF?.user){ wrap.style.display='none'; return; }
   if(disc==='swim'||!cur){ wrap.style.display='none'; return; }
   wrap.style.display=''; injectSimCss();
   const box=document.getElementById('anSimilar');
@@ -9304,6 +9314,9 @@ function drawDecouple(data, disc, dc){
 }
 function renderDecoupleTrend(disc, type, curPct){
   const box=document.getElementById('anDecoupleTrend'); if(!box) return;
+  // Compte réel (10/11/2026) : la comparaison s'appuyait sur un historique de démo (SESSION_HISTORY).
+  // Tant qu'elle n'est pas branchée sur les vraies séances passées, on ne l'affiche pas.
+  if(window.PF?.user){ box.style.display='none'; return; }
   const hist=SESSION_HISTORY.filter(h=>h.disc===disc&&h.type===type&&h.dec!=null).slice(0,3).reverse();
   const all=[...hist.map(h=>({date:h.date,dec:h.dec,cur:false})),{date:tr('simType.thisSession'),dec:curPct,cur:true}];
   if(all.length<2){ box.style.display='none'; return; }
@@ -9807,10 +9820,13 @@ function drawStepLen(data){
    vitesse, FC, watts, watts normalisés (NP), zone colorée, IF, W/kg, cadence,
    kJ, FC max, D+, température. Choix mémorisé (localStorage) par discipline. ---- */
 function fmtLapTime(min){ const s=Math.round(min*60), m=Math.floor(s/60), x=s%60; return `${m}'${String(x).padStart(2,'0')}"`; }
-function lapFTPval(){ return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp)?ATHLETE_REF.ftp:(STRAVA_DEMO.ftp?STRAVA_DEMO.ftp.at(-1):270); }
-function lapWeightVal(){ return STRAVA_DEMO.weightKg||70; }
+// Compte réel sans FTP renseignée → 0 (zones, IF et TSS vélo non calculés) au lieu de la FTP de démo (10/11/2026).
+function lapFTPval(){ if(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLETE_REF.ftp) return ATHLETE_REF.ftp; if(window.PF?.user) return 0; return STRAVA_DEMO.ftp?STRAVA_DEMO.ftp.at(-1):270; }
+// Compte réel : le poids n'est pas dans les références de l'athlète → pas de W/kg sur le poids de démo.
+function lapWeightVal(){ return window.PF?.user ? 0 : (STRAVA_DEMO.weightKg||70); }
 function lapZone(power){
-  const p=power/lapFTPval()*100;
+  const ftp=lapFTPval(); if(!ftp) return {z:'—',c:'#8B95AD'};
+  const p=power/ftp*100;
   const Z=[[55,'#39E6A3','Z1'],[75,'#2FD9FF','Z2'],[90,'#9D7BFF','Z3'],[105,'#FFB13D','Z4'],[150,'#FF5470','Z5']];
   for(const [lim,c,z] of Z) if(p<=lim) return {z,c};
   return {z:'Z6',c:'#FF5470'};
@@ -9824,12 +9840,12 @@ const LAP_COLS = [
   {key:'pw',   label:'Watts', def:1, app:'bike', v:l=>`<b style="color:var(--bike)">${l.avgPower}</b><small> W</small>`},
   {key:'np',   label:'NP', def:1, app:'bike', v:l=>`<b>${l.np}</b><small> W</small>`},
   {key:'zone', get label(){return tr('lapCol.zone')}, def:1, app:'bike', v:l=>{const z=lapZone(l.np);return `<span class="zbadge" style="background:${z.c}22;color:${z.c};border-color:${z.c}66">${z.z}</span>`;}},
-  {key:'if',   label:'IF', def:0, app:'bike', v:l=>l.if.toFixed(2)},
-  {key:'wkg',  label:'W/kg', def:0, app:'bike', v:l=>(l.avgPower/lapWeightVal()).toFixed(1)},
+  {key:'if',   label:'IF', def:0, app:'bike', v:l=>l.if?l.if.toFixed(2):'—'},
+  {key:'wkg',  label:'W/kg', def:0, app:'bike', v:l=>{const w=lapWeightVal(); return w?(l.avgPower/w).toFixed(1):'—';}},
   {key:'cad',  get label(){return tr('lapCol.cadence')}, def:0, app:'bike', v:l=>`${l.cad}<small> rpm</small>`},
   {key:'kj',   label:'kJ', def:0, app:'bike', v:l=>l.kj},
-  {key:'lbal', get label(){return tr('lapCol.lrBalance')}, def:0, app:'bike', v:l=>`${l.lbal}<small>/${100-l.lbal}</small>`},
-  {key:'tq',   get label(){return tr('lapCol.torque')}, def:0, app:'bike', v:l=>`${l.tq}<small> Nm</small>`},
+  {key:'lbal', get label(){return tr('lapCol.lrBalance')}, def:0, app:'bike', v:l=>l.lbal?`${l.lbal}<small>/${100-l.lbal}</small>`:'—'},
+  {key:'tq',   get label(){return tr('lapCol.torque')}, def:0, app:'bike', v:l=>l.tq?`${l.tq}<small> Nm</small>`:'—'},
   {key:'hrmax',get label(){return tr('refs.maxHr')}, def:0, app:'all', v:l=>`${l.maxHr}<small> bpm</small>`},
   {key:'vap',  label:'VAP', def:0, app:'!bike', v:(l,_,d)=>d==='swim'?paceFromSpeed2(l.avgGap)+'<small>/100m</small>':paceFromSpeed(l.avgGap)+'<small>/km</small>'},
   {key:'dplus',label:'D+', def:0, app:'!swim', v:l=>`${l.dplus}<small> m</small>`},
@@ -10882,8 +10898,11 @@ function renderLoadMix(){
   // codés en dur (STRAVA_DEMO.ctl/.atl), y compris pour un compte réel.
   const lastDaily = buildLoadDaily(new Date(), 364).at(-1);
   const ctl=Math.round(lastDaily.ctl), atl=Math.round(lastDaily.atl), tsb=Math.round(lastDaily.tsb);
-  const rows=LOAD_LOG.map(s=>{ const D=DISC[s.disc]||{ico:null,color:'var(--muted)'};
-    return `<div class="lm-row"><span class="lm-ic" style="color:${D.color}">${discIcon(D)}</span><span class="lm-n">${s.name}</span><span class="lm-m">${s.metric}</span><span class="lm-v">${sessionLoad(s)}</span></div>`; }).join('');
+  // Compte réel (10/11/2026) : les 6 dernières séances validées de l'athlète, plus la liste de démo (LOAD_LOG).
+  const realLog=[]; if(window.PF?.user){ const tk=iso(new Date()); Object.keys(planning).filter(k=>k<=tk).sort().reverse().forEach(k=>(planning[k]||[]).forEach(s=>{ if(s.done && s.tss && realLog.length<6) realLog.push(s); })); }
+  const rows=(window.PF?.user ? realLog.map(s=>({disc:s.disc, name:String(s.title||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])), metric:'TSS', load:Math.round(s.tss)})) : LOAD_LOG.map(s=>({disc:s.disc, name:s.name, metric:s.metric, load:sessionLoad(s)})))
+    .map(s=>{ const D=DISC[s.disc]||{ico:null,color:'var(--muted)'};
+    return `<div class="lm-row"><span class="lm-ic" style="color:${D.color}">${discIcon(D)}</span><span class="lm-n">${s.name}</span><span class="lm-m">${s.metric}</span><span class="lm-v">${s.load}</span></div>`; }).join('');
   box.innerHTML=`
     <div class="lm-kpis">
       <div><div class="v" style="color:var(--swim)">${Math.round(ctl)}</div><div class="k">${tr('chart.fitness')} · CTL</div></div>
@@ -11033,44 +11052,58 @@ renderRecords();
    ============================================================ */
 const READINESS = {
   // valeurs dérivées des données iDO réelles (S24 = très grosse charge)
-  acwr: 1.62,          // charge aiguë très supérieure au chronique → zone de risque
+  // Compte réel (10/11/2026) : ACWR et RPE calculés sur les séances VALIDÉES de l'athlète
+  // (readinessReal), plus aucun chiffre de démo. null / [] = pas assez de données → le
+  // facteur est ignoré et, s'il n'en reste aucun, le panneau le dit au lieu d'inventer.
+  get acwr(){ return window.PF?.user ? readinessReal().acwr : 1.62; },   // démo : charge aiguë très supérieure au chronique
   // TSB dérivé de STRAVA_DEMO (CTL - ATL de la dernière semaine) → fortement négatif
-  get tsb(){ return STRAVA_DEMO.ctl.at(-1) - STRAVA_DEMO.atl.at(-1); },
+  // compte réel : pas de TSB ici (l'historique chargé couvre 28 jours, trop court pour un CTL fiable)
+  get tsb(){ return window.PF?.user ? null : STRAVA_DEMO.ctl.at(-1) - STRAVA_DEMO.atl.at(-1); },
   // check-in subjectif : on réutilise l'objet `checkin` déjà présent
   get subjective(){ return checkin; },
-  rpeRecent: [9, 7, 9] // RPE des 3 dernières séances qualité (VO2max HT, Actif, VO2max piste)
+  get rpeRecent(){ return window.PF?.user ? readinessReal().rpes : [9, 7, 9]; } // démo : 3 dernières séances qualité
 };
+function readinessReal(){
+  const today=iso(new Date()), dAgo=n=>iso(addDays(new Date(),-n));
+  const d7=dAgo(7), d28=dAgo(28); let acute=0, chronic=0; const days=new Set(), rpes=[];
+  Object.keys(planning).filter(k=>k<=today).sort().reverse().forEach(k=>(planning[k]||[]).forEach(s=>{
+    if(!s.done) return;
+    if(k>d28){ chronic+=(s.tss||0); if(s.tss) days.add(k); if(k>d7) acute+=(s.tss||0); }
+    if(+s.rpe>0 && rpes.length<3) rpes.push(+s.rpe);
+  }));
+  // ACWR seulement avec un minimum d'historique : 8 jours d'entraînement validés sur 28
+  return { acwr: (chronic>0 && days.size>=8) ? acute/(chronic/4) : null, rpes };
+}
 
 function scoreReadiness(){
+  // Chaque facteur n'entre dans le score que s'il repose sur une vraie donnée
+  // (10/11/2026). En démo les quatre sont là, le résultat est inchangé.
+  const real = !!(window.PF && window.PF.user);
+  const parts=[];
   // 1. ACWR → score (1.0 idéal ; >1.5 ou <0.8 risqué)
   const a = READINESS.acwr;
-  let sAcwr;
-  if(a>=0.8 && a<=1.3) sAcwr = 100 - Math.abs(a-1.0)*60;        // zone optimale
-  else if(a>1.3)       sAcwr = Math.max(0, 100 - (a-1.3)*140);  // surcharge
-  else                 sAcwr = Math.max(0, 100 - (0.8-a)*120);  // sous-charge
-  sAcwr = Math.round(Math.max(0,Math.min(100,sAcwr)));
-
+  if(a!=null){
+    let sAcwr;
+    if(a>=0.8 && a<=1.3) sAcwr = 100 - Math.abs(a-1.0)*60;        // zone optimale
+    else if(a>1.3)       sAcwr = Math.max(0, 100 - (a-1.3)*140);  // surcharge
+    else                 sAcwr = Math.max(0, 100 - (0.8-a)*120);  // sous-charge
+    parts.push({key:tr('ready.acwr'), sub:`ratio ${a.toFixed(2)}`, score:Math.round(Math.max(0,Math.min(100,sAcwr))), w:0.32});
+  }
   // 2. TSB → score (très négatif = fatigue ; légèrement positif = frais)
   const t = READINESS.tsb;
-  let sTsb = Math.round(Math.max(0, Math.min(100, 50 + t*3.2))); // -15→~2, 0→50, +10→82
-
-  // 3. Subjectif → score (sommeil + (10-fatigue) + motivation)/30
+  if(t!=null) parts.push({key:tr('ready.tsb'), sub:`${t>=0?'+':''}${t}`, score:Math.round(Math.max(0, Math.min(100, 50 + t*3.2))), w:0.20});
+  // 3. Subjectif → score (sommeil + (10-fatigue) + motivation)/30 : check-in du jour réellement saisi
   const c = READINESS.subjective;
-  const sSubj = Math.round((c.sommeil + (10-c.fatigue) + c.motivation)/30*100);
-
+  if(!real || c._real){ const sSubj = Math.round((c.sommeil + (10-c.fatigue) + c.motivation)/30*100);
+    parts.push({key:tr('ready.subjective'), sub:`check-in ${sSubj}%`, score:sSubj, w:0.26}); }
   // 4. RPE récent → score (RPE bas = frais ; RPE élevé répété = alerte)
-  const meanRpe = READINESS.rpeRecent.reduce((x,y)=>x+y,0)/READINESS.rpeRecent.length;
-  const sRpe = Math.round(Math.max(0, Math.min(100, 100 - (meanRpe-3)*14)));
-
-  // pondération : risque blessure (ACWR) et ressenti pèsent le plus
-  const global = Math.round(sAcwr*0.32 + sTsb*0.20 + sSubj*0.26 + sRpe*0.22);
-
-  return {global, factors:[
-    {key:tr('ready.acwr'),  sub:`ratio ${a.toFixed(2)}`,                 score:sAcwr},
-    {key:tr('ready.tsb'),    sub:`${t>=0?'+':''}${t}`,                    score:sTsb},
-    {key:tr('ready.subjective'),       sub:`check-in ${sSubj}%`,                    score:sSubj},
-    {key:tr('ready.rpe'),     sub:`moy. ${meanRpe.toFixed(1)}/10`,         score:sRpe}
-  ]};
+  const rp = READINESS.rpeRecent;
+  if(rp.length){ const meanRpe = rp.reduce((x,y)=>x+y,0)/rp.length;
+    parts.push({key:tr('ready.rpe'), sub:`moy. ${meanRpe.toFixed(1)}/10`, score:Math.round(Math.max(0, Math.min(100, 100 - (meanRpe-3)*14))), w:0.22}); }
+  // pondération : risque blessure (ACWR) et ressenti pèsent le plus ; null = aucune donnée
+  const wsum = parts.reduce((x,p)=>x+p.w,0);
+  const global = wsum ? Math.round(parts.reduce((x,p)=>x+p.score*p.w,0)/wsum) : null;
+  return {global, factors:parts};
 }
 
 function readinessVerdict(g){
@@ -11101,6 +11134,7 @@ function scoreColor(s){
    ============================================================ */
 function computeRecoveryHours(){
   const t=READINESS.tsb, a=READINESS.acwr;
+  if(t==null) return null;   // compte réel : pas de TSB fiable → pas de délai inventé
   let hours = Math.max(0, -t*3.2);           // TSB très négatif → plus d'heures
   if(a>1.3) hours += (a-1.3)*60;             // surcharge (ACWR) → pénalité additionnelle
   return Math.min(168, Math.round(hours));
@@ -11117,8 +11151,9 @@ function renderReadiness(){
   const dw=dashWidgetPrefs();
   hub.style.display = dw.readyhub ? '' : 'none';
   if(!dw.readyhub) return;
-  const {global, factors} = scoreReadiness();
-  const v = readinessVerdict(global);
+  const sr = scoreReadiness(), factors = sr.factors;
+  const noData = sr.global==null, global = noData ? 0 : sr.global;
+  const v = noData ? {flag:tr('ready.noDataFlag'), color:'#8B95AD', advice:tr('ready.noDataAdvice')} : readinessVerdict(global);
   hub.style.setProperty('--vc', v.color);
 
   // jauge circulaire (rayon 76 → circonférence ≈ 477)
@@ -11127,7 +11162,7 @@ function renderReadiness(){
   fill.style.strokeDashoffset = C*(1-global/100);
   fill.style.stroke = v.color;
   const gs = document.getElementById('gScore');
-  gs.textContent = global; gs.style.color = v.color;
+  gs.textContent = noData ? '—' : global; gs.style.color = v.color;
 
   const flag = document.getElementById('rhFlag');
   flag.textContent = v.flag; flag.style.color = v.color;
@@ -11136,7 +11171,8 @@ function renderReadiness(){
 
   const recBox=document.getElementById('rhRecovery');
   if(recBox){
-    const h=computeRecoveryHours(), txt=fmtRecoveryHours(h);
+    const h=computeRecoveryHours(), txt=h==null?null:fmtRecoveryHours(h);
+    recBox.style.display = h==null ? 'none' : '';
     recBox.innerHTML = txt
       ? `<i class="ic ic-moon"></i> ${tr('ready.recoveryIn', {time:txt})}`
       : `<i class="ic ic-check"></i> ${tr('ready.recoveryReady')}`;
@@ -11275,13 +11311,14 @@ function renderToday(){
   const {global, factors} = scoreReadiness();
   const acwr = READINESS.acwr;
 
-  // 1. Fraîcheur = indice de forme global
+  // 1. Fraîcheur = indice de forme global (null : pas assez de données réelles)
   const fraicheur = global;
-  const frClass = fraicheur>=70?'ti-good':fraicheur>=50?'ti-warn':'ti-bad';
+  const frClass = fraicheur==null?'ti-info':fraicheur>=70?'ti-good':fraicheur>=50?'ti-warn':'ti-bad';
 
   // 2. Risque de blessure depuis l'ACWR (sweet spot 0.8–1.3)
   let risque, risqueLbl, rqClass, rqHint;
-  if(acwr>1.5){ risque='Élevé'; risqueLbl=tr('today.riskHigh'); rqClass='ti-bad'; rqHint=tr('today.riskHighHint'); }
+  if(acwr==null){ risque='Inconnu'; risqueLbl='—'; rqClass='ti-info'; rqHint=tr('today.needData'); }
+  else if(acwr>1.5){ risque='Élevé'; risqueLbl=tr('today.riskHigh'); rqClass='ti-bad'; rqHint=tr('today.riskHighHint'); }
   else if(acwr>1.3){ risque='Modéré'; risqueLbl=tr('today.riskModerate'); rqClass='ti-warn'; rqHint=tr('today.riskModerateHint'); }
   else if(acwr<0.8){ risque='Sous-charge'; risqueLbl=tr('today.riskUnderload'); rqClass='ti-info'; rqHint=tr('today.riskUnderloadHint'); }
   else { risque='Faible'; risqueLbl=tr('today.riskLow'); rqClass='ti-good'; rqHint=tr('today.riskLowHint'); }
@@ -11316,8 +11353,8 @@ function renderToday(){
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-battery"></i></div>
         <div class="ti-label">${tr('today.freshnessState')}</div>
-        <div class="ti-value ${frClass}">${fraicheur} %</div>
-        <div class="ti-hint">${fraicheur>=70?tr('today.freshnessGoodHint'):fraicheur>=50?tr('today.freshnessOkHint'):tr('today.freshnessBadHint')}</div>
+        <div class="ti-value ${frClass}">${fraicheur==null?'—':fraicheur+' %'}</div>
+        <div class="ti-hint">${fraicheur==null?tr('today.needData'):fraicheur>=70?tr('today.freshnessGoodHint'):fraicheur>=50?tr('today.freshnessOkHint'):tr('today.freshnessBadHint')}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-shield"></i></div>
@@ -11345,7 +11382,7 @@ function renderToday(){
 }
 function todayAdvice(fr, risque, s){
   if(risque==='Élevé') return tr('advice.highLoad');
-  if(fr<50) return tr('advice.lowRecovery');
+  if(fr!=null && fr<50) return tr('advice.lowRecovery');
   if(s && !s.done) return tr('advice.greenLight');
   if(s && s.done) return tr('advice.sessionDone');
   return tr('advice.restDay');

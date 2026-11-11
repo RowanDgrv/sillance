@@ -410,7 +410,8 @@
 
   /* ---------- Construction de `data` (shape genSessionData) ---------- */
   function buildData(raw, disc, lapsRaw, opts) {
-    const ftp = opts.ftp || 270;
+    // 0 = FTP inconnue : pas d'IF ni de seuil de puissance inventés (avant : 270 W par défaut, 10/11/2026)
+    const ftp = opts.ftp || 0;
     const t0 = firstTime(raw);
     let cumKm = 0, prev = null, dplus = 0;
     const pts = [];
@@ -505,7 +506,7 @@
       const avgSpeed = b.avgSpeedMs != null ? b.avgSpeedMs * 3.6 : avg(seg.map((p) => p.sp));
       const cad = b.avgCad != null ? b.avgCad : Math.round(avg(seg.map((p) => p.cad || 0)));
       // "hard" = série de qualité : forte FC (%FCmax) ou puissance > seuil
-      const hard = (avgHr && avgHr / fcMax > 0.85) || (avgPower && avgPower > ftp * 0.95);
+      const hard = (avgHr && avgHr / fcMax > 0.85) || (ftp && avgPower && avgPower > ftp * 0.95);
       return {
         n: i + 1, dist: distSeg, durMin,
         avgSpeed, avgGap: avg(seg.map((p) => p.gap)),

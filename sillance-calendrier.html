@@ -2539,6 +2539,15 @@ body[data-athview] .planner > .library{display:none}
 /* a11y/mobile (audit 03/08/2026) : bouton "+" par jour invisible sans hover,
    introuvable au tactile — toujours visible sur pointeur grossier. */
 @media(pointer:coarse){.day-add{opacity:1}}
+/* Écran tactile (11/11/2026) : le « + » toujours visible recouvrait le numéro du jour → on lui réserve sa place. */
+@media(pointer:coarse){.day-head{padding-right:40px}}
+/* Téléphone (11/11/2026) : la bulle de conversation et l'onglet cookies flottaient par-dessus
+   les fenêtres ouvertes et masquaient des champs ou des boutons en bas à droite et à gauche. */
+@media(max-width:720px){
+  body:has(.overlay.open) .chat-fab, body:has(.overlay.open) .scb-tab,
+  body:has(.welcome-overlay:not(.hidden)) .chat-fab{display:none !important}
+}
+
 
 /* ---------- Analytics ---------- */
 .analytics{margin-top:42px}
@@ -3896,22 +3905,22 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261105c"></script>
+<script src="./sillance-i18n-app.js?v=20261110d"></script>
 <script src="./sillance-reminder.js?v=20261110c"></script>
 <script src="./sillance-ai-popup.js?v=20261028c"></script>
-<script src="./sillance-fit.js?v=20260924f"></script>
+<script src="./sillance-fit.js?v=20261110d"></script>
 <script src="./sillance-workout-export.js?v=20261009a"></script>
 <script src="./sillance-club-feed.js?v=20261009b"></script>
 <script src="./sillance-tour.js"></script>
 <script src="./sillance-exercises.js?v=20261030d"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
-<script src="./sillance-calendrier.core.js?v=20261110c"></script>
+<script src="./sillance-calendrier.core.js?v=20261110d"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261110b"></script>
+<script type="module" src="./sillance-integration.js?v=20261110d"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>

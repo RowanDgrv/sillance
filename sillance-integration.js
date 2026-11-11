@@ -426,7 +426,8 @@ async function hydrate() {
     section("checkin", async () => {
       const c = await PF.todayCheckin();
       if (c) app.assignObj(app.data.checkin,
-        { sommeil: c.sommeil, fatigue: c.fatigue, motivation: c.motivation,
+        { _real: true,   // check-in du jour réellement saisi : seul cas où le ressenti entre dans l'indice de forme
+          sommeil: c.sommeil, fatigue: c.fatigue, motivation: c.motivation,
           // colonnes 0019 (poids/dispo) : absentes tant que la migration n'est pas déployée
           ...(c.poids != null ? { poids: c.poids } : {}),
           ...(c.hrv != null ? { hrv: c.hrv } : {}),
