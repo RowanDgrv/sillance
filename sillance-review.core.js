@@ -345,7 +345,7 @@ const INTENSITY_MODELS = {
   css:  {disc:'swim', label:'% CSS (vitesse critique nat)', unit:'pace100', ref:()=>ATHLETE_REF.css, invert:true,
          zones:[['Récup',115,108],['Aérobie',108,103],['Seuil (CSS)',103,98],['VO2max',98,92],['Vitesse',92,85]]},
   // UNIVERSEL — FC
-  fc:   {disc:'all', label:'% FC max', unit:'bpm', ref:()=>ATHLETE_REF.fcMax,
+  fc:   {disc:'all', get label(){ return fcRestOk()?'% FC de réserve':'% FC max'; }, unit:'bpm', ref:()=>ATHLETE_REF.fcMax,
          zones:[['Z1',0,60],['Z2',60,70],['Z3',70,80],['Z4',80,90],['Z5',90,100]]}
 };
 
@@ -365,6 +365,11 @@ function zoneAthleteId(){
   if(typeof mode!=='undefined' && mode==='coach' && typeof currentAthleteId!=='undefined' && currentAthleteId) return currentAthleteId;
   return (window.PF && PF.user && PF.user.id) || '_self';
 }
+/* FC de réserve (Karvonen, 13/11/2026) : si la FC de repos est connue, % → repos + % × (max − repos).
+   Même règle que le serveur (_shared/intensity.ts hrAt / pctOfHr). Sinon % de FC max. */
+function fcRestOk(max){ const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{}; const m=max||+R.fcMax||0, r=+R.fcRepos||0; return (m && r>=30 && r<m-40) ? r : 0; }
+function fcAt(pct, max){ const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{}; const m=max||+R.fcMax||0, r=fcRestOk(m); return r ? r+pct/100*(m-r) : m*pct/100; }
+function fcPctOf(bpm, max){ const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{}; const m=max||+R.fcMax||0, r=fcRestOk(m); if(!m) return 0; return r ? (bpm-r)/(m-r)*100 : bpm/m*100; }
 function zonesFor(modelKey, aid){
   aid = aid || zoneAthleteId();
   const c = CUSTOM_ZONES[aid] && CUSTOM_ZONES[aid][modelKey];
@@ -399,7 +404,7 @@ function computeTarget(modelKey, pct){
   if(!m) return '';
   const base = m.ref();
   if(m.unit==='W')   return Math.round(base*pct/100)+' W';
-  if(m.unit==='bpm') return Math.round(base*pct/100)+' bpm';
+  if(m.unit==='bpm') return Math.round(fcAt(pct))+' bpm';
   if(m.unit==='kmh'){ const v=base*pct/100; return v.toFixed(1)+' km/h · '+paceFromKmh(v); }
   if(m.unit==='pace'){ // base en s/km ; pct>100 = plus lent
     const s=Math.round(base*pct/100); return paceStr(s)+'/km'; }

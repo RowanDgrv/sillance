@@ -345,7 +345,7 @@ const INTENSITY_MODELS = {
   css:  {disc:'swim', label:'% CSS (vitesse critique nat)', unit:'pace100', ref:()=>ATHLETE_REF.css, invert:true,
          zones:[['Récup',115,108],['Aérobie',108,103],['Seuil (CSS)',103,98],['VO2max',98,92],['Vitesse',92,85]]},
   // UNIVERSEL — FC
-  fc:   {disc:'all', label:'% FC max', unit:'bpm', ref:()=>ATHLETE_REF.fcMax,
+  fc:   {disc:'all', get label(){ return fcRestOk()?'% FC de réserve':'% FC max'; }, unit:'bpm', ref:()=>ATHLETE_REF.fcMax,
          zones:[['Z1',0,60],['Z2',60,70],['Z3',70,80],['Z4',80,90],['Z5',90,100]]}
 };
 
@@ -365,6 +365,11 @@ function zoneAthleteId(){
   if(typeof mode!=='undefined' && mode==='coach' && typeof currentAthleteId!=='undefined' && currentAthleteId) return currentAthleteId;
   return (window.PF && PF.user && PF.user.id) || '_self';
 }
+/* FC de réserve (Karvonen, 13/11/2026) : si la FC de repos est connue, % → repos + % × (max − repos).
+   Même règle que le serveur (_shared/intensity.ts hrAt / pctOfHr). Sinon % de FC max. */
+function fcRestOk(max){ const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{}; const m=max||+R.fcMax||0, r=+R.fcRepos||0; return (m && r>=30 && r<m-40) ? r : 0; }
+function fcAt(pct, max){ const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{}; const m=max||+R.fcMax||0, r=fcRestOk(m); return r ? r+pct/100*(m-r) : m*pct/100; }
+function fcPctOf(bpm, max){ const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{}; const m=max||+R.fcMax||0, r=fcRestOk(m); if(!m) return 0; return r ? (bpm-r)/(m-r)*100 : bpm/m*100; }
 function zonesFor(modelKey, aid){
   aid = aid || zoneAthleteId();
   const c = CUSTOM_ZONES[aid] && CUSTOM_ZONES[aid][modelKey];
@@ -422,7 +427,7 @@ function computeTarget(modelKey, pct){
   if(!m) return '';
   const base = m.ref();
   if(m.unit==='W')   return Math.round(base*pct/100)+' W';
-  if(m.unit==='bpm') return Math.round(base*pct/100)+' bpm';
+  if(m.unit==='bpm') return Math.round(fcAt(pct))+' bpm';
   if(m.unit==='kmh'){ const v=base*pct/100; return v.toFixed(1)+' km/h · '+paceFromKmh(v); }
   if(m.unit==='pace'){ // base en s/km ; pct>100 = plus lent
     const s=Math.round(base*pct/100); return paceStr(s)+'/km'; }
@@ -442,7 +447,7 @@ function computeTargetRange(modelKey, pct, tol){
   const base = m.ref();
   const lo = Math.max(1, pct-tol), hi = pct+tol;
   if(m.unit==='W')   return `${Math.round(base*lo/100)}–${Math.round(base*hi/100)} W`;
-  if(m.unit==='bpm') return `${Math.round(base*lo/100)}–${Math.round(base*hi/100)} bpm`;
+  if(m.unit==='bpm') return `${Math.round(fcAt(lo))}–${Math.round(fcAt(hi))} bpm`;
   if(m.unit==='kmh'){
     const vLo=base*lo/100, vHi=base*hi/100;
     // l'allure est inversement proportionnelle à la vitesse : la borne basse
@@ -3551,7 +3556,7 @@ function profLinePct(ln){
     if(ex.kind==='pace'){ const sec=(ex.m||0)*60+(ex.s||0); const v=sec?3600/sec:0; return ATHLETE_REF.vma&&v ? v/ATHLETE_REF.vma*100 : 85; }
     if(ex.kind==='time100'){ const sec=(ex.m||0)*60+(ex.s||0); return ATHLETE_REF.css&&sec ? ATHLETE_REF.css/sec*100 : 85; }
     if(ex.kind==='rpe')     return (ex.rpe||6)*12;
-    if(ex.kind==='hr')      return ATHLETE_REF.fcMax ? ((ex.lo||0)+(ex.hi||0))/2/ATHLETE_REF.fcMax*100 : 75;
+    if(ex.kind==='hr')      return ATHLETE_REF.fcMax ? fcPctOf(((ex.lo||0)+(ex.hi||0))/2) : 75;
     return 85;
   }
   // Modèle INVERSÉ (% CSS natation : le % multiplie un TEMPS de référence,
@@ -4288,7 +4293,7 @@ function downloadGarminFit(s){
   const blocks=(s.blocksV2&&s.blocksV2.blocks)||[];
   if(!blocks.length){ toast(tr('fit.empty')); return; }
   const R=(typeof ATHLETE_REF!=='undefined' && ATHLETE_REF) || {};
-  const refs={ftp:R.ftp, pma:R.pma, cpBike:R.cpBike, vma:R.vma, cv:R.cv, seuilRun:R.seuilRun, fcMax:R.fcMax};
+  const refs={ftp:R.ftp, pma:R.pma, cpBike:R.cpBike, vma:R.vma, cv:R.cv, seuilRun:R.seuilRun, fcMax:R.fcMax, fcRepos:R.fcRepos};
   toast(tr('fit.preparing'));
   PF.fitWorkoutBlob({ title:s.title, disc:s.disc, blocks }, refs).then(blob=>{
     const name=(String(s.title||'seance').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9-_]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'seance')+'.fit';
@@ -9864,7 +9869,7 @@ function estimateLineTss(ln, disc){
     else if(ex.kind==='speed') pct = ATHLETE_REF.vma? (ex.kmh/ATHLETE_REF.vma*100):85;
     else if(ex.kind==='pace'){ const v=3600/((ex.m||0)*60+(ex.s||0)); pct = ATHLETE_REF.vma? (v/ATHLETE_REF.vma*100):85; }
     else if(ex.kind==='rpe') pct = (ex.rpe||6)*12;
-    else if(ex.kind==='hr') pct = ATHLETE_REF.fcMax ? ((ex.lo||0)+(ex.hi||0))/2/ATHLETE_REF.fcMax*100 : 75;
+    else if(ex.kind==='hr') pct = ATHLETE_REF.fcMax ? fcPctOf(((ex.lo||0)+(ex.hi||0))/2) : 75;
     else pct = 85;
   }
   const ir=Math.min(1.4, pct/100*(disc==='swim'?0.95:1));
@@ -11330,7 +11335,7 @@ function aiFcMax(){ return (typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF&&ATHLE
 // chez un athlète dont le coach a calé la Z2 jusqu'à 75 %.
 function aiHrZone(hr, fcMax){
   if(!fcMax || !hr) return null;
-  const p=hr/fcMax*100, zs=zonesFor('fc');
+  const p=fcPctOf(hr, fcMax), zs=zonesFor('fc');
   for(let i=0;i<zs.length;i++){ if(p<zs[i][2]) return 'Z'+Math.min(5,i+1); }
   return 'Z'+Math.min(5,Math.max(1,zs.length));
 }

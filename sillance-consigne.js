@@ -32,6 +32,10 @@
 (function(){
   'use strict';
 
+  // FC de réserve si la FC de repos est connue (13/11/2026), sinon % de FC max
+  function restOk(refs){ var m = +refs.fcMax || 0, r = +refs.fcRepos || 0; return (m && r >= 30 && r < m - 40) ? r : 0; }
+  function hrAt(pct, refs){ var r = restOk(refs), m = +refs.fcMax; return r ? r + pct / 100 * (m - r) : pct * m / 100; }
+  function pctOfHr(bpm, refs){ var r = restOk(refs), m = +refs.fcMax; return r ? (bpm - r) / (m - r) * 100 : bpm / m * 100; }
   var SHORT_SEC = 180, HR_LAG_SEC = 90, OK = 0.8, PARTIAL = 0.6;
   // 'recov' = clé réelle des lignes « Récup » du constructeur (LINE_TYPES) :
   // absente jusqu'au 29/10/2026, les récups étaient jugées comme des efforts.
@@ -75,7 +79,7 @@
       if(lo == null){ lo = pct - 5; hi = pct + 5; }
     }
     var zoneName = zoneNameOf(pct, zonesOf(model));
-    if(model === 'fc'){ if(!refs.fcMax) return { missing: 'FC max' }; return { metric: 'hr', lo: lo * refs.fcMax / 100, hi: hi * refs.fcMax / 100, src: 'zone', zone: zoneName, model: model }; }
+    if(model === 'fc'){ if(!refs.fcMax) return { missing: 'FC max' }; return { metric: 'hr', lo: hrAt(lo, refs), hi: hrAt(hi, refs), src: 'zone', zone: zoneName, model: model }; }
     if(model === 'vma' || model === 'cv'){
       var ref = refs[model]; if(!ref) return { missing: model === 'vma' ? 'VMA' : 'vitesse critique' };
       return { metric: 'speed', lo: lo * ref / 100, hi: hi * ref / 100, src: 'zone', zone: zoneName, model: model };
@@ -104,7 +108,7 @@
   }
   // Bloc court à cible FC → zone d'allure / de puissance de même numéro.
   function hrToEffortTarget(t, ln, refs, zonesOf, disc){
-    var pctMid = ln.mode === 'exact' && refs.fcMax ? ((+ln.exact.lo + +ln.exact.hi) / 2) / refs.fcMax * 100 : +ln.pct;
+    var pctMid = ln.mode === 'exact' && refs.fcMax ? pctOfHr((+ln.exact.lo + +ln.exact.hi) / 2, refs) : +ln.pct;
     if(!pctMid) return null;
     var k = zoneIndex(pctMid, zonesOf('fc'));
     if(disc === 'bike' && refs.ftp){ var zf = zonesOf('ftp') || []; if(zf[k]) return { metric: 'power', lo: zf[k][1] * refs.ftp / 100, hi: zf[k][2] * refs.ftp / 100, src: 'equivalence', zone: zf[k][0] }; }
