@@ -185,6 +185,33 @@ export const PF = {
   },
   // ---- Add-on « Assistant IA » du coach (option payante séparée) ----
   // Le coach a-t-il l'add-on IA actif ? (lecture directe de la table d'entitlement)
+  // ---- nutrition (12/11/2026) ----
+  // Proposition de l'assistant IA (Grok) pour une séance en cours d'édition ou enregistrée.
+  async nutritionAdvice(body) {
+    const { data, error } = await sb.functions.invoke("nutrition-advice", { body });
+    if (error) {
+      let j = null; try { j = await error.context?.json?.(); } catch (_) {}
+      return j || { error: "server_error" };
+    }
+    return data;
+  },
+  // Réglage du coach : montrer ou non la nutrition de ses séances à ses athlètes (0097).
+  async getShowNutrition() {
+    const { data, error } = await sb.from("profiles").select("show_nutrition").eq("id", this.user.id).maybeSingle();
+    if (error) return true;
+    return data?.show_nutrition !== false;
+  },
+  async setShowNutrition(on) {
+    const { error } = await sb.from("profiles").update({ show_nutrition: !!on }).eq("id", this.user.id);
+    if (error) throw error; return true;
+  },
+  // Coachs (créateurs de séances) qui ont masqué la nutrition à leurs athlètes.
+  async nutritionHiddenCreators(ids) {
+    const uniq = [...new Set((ids || []).filter(Boolean))]; if (!uniq.length) return new Set();
+    const { data, error } = await sb.from("profiles").select("id, show_nutrition").in("id", uniq);
+    if (error) return new Set();
+    return new Set((data ?? []).filter((p) => p.show_nutrition === false).map((p) => p.id));
+  },
   async hasAiAddon() {
     // plusieurs lignes possibles (historique d'abos) → on prend la plus récente
     const { data, error } = await sb.from("ai_addons")
@@ -600,11 +627,13 @@ export const PF = {
       ...(s.shoeId ? { shoe_id: s.shoeId } : {}),
       // matériel demandé (0088) : pull-buoy, plaquettes…
       ...(s.gear && s.gear.length ? { gear: s.gear } : {}),
+      // consignes nutrition du coach (0097) — avant cette date elles n'étaient jamais enregistrées
+      ...(s.nutrition ? { nutrition: { pre: s.nutrition.pre || "", during: s.nutrition.during || "", post: s.nutrition.post || "" } } : {}),
     };
     let { data, error } = await sb.from("scheduled_sessions").insert(row).select().single();
     // base pas encore migrée : la séance passe quand même, sans ces champs
-    if (error && /shoe_id|gear/.test(error.message || "")) {
-      delete row.shoe_id; delete row.gear;
+    if (error && /shoe_id|gear|nutrition/.test(error.message || "")) {
+      delete row.shoe_id; delete row.gear; delete row.nutrition;
       ({ data, error } = await sb.from("scheduled_sessions").insert(row).select().single());
     }
     if (error) throw error; return data;
@@ -649,10 +678,12 @@ export const PF = {
       // null = le coach est revenu à « Automatique »
       ...(s.shoeId !== undefined ? { shoe_id: s.shoeId } : {}),
       ...(s.gear !== undefined ? { gear: s.gear && s.gear.length ? s.gear : null } : {}),
+      // undefined = appel qui ne touche pas à la nutrition (déplacement…) ; null = consigne effacée
+      ...(s.nutrition !== undefined ? { nutrition: s.nutrition ? { pre: s.nutrition.pre || "", during: s.nutrition.during || "", post: s.nutrition.post || "" } : null } : {}),
     };
     let { data, error } = await sb.from("scheduled_sessions").update(patch).eq("id", id).select().single();
-    if (error && /shoe_id|gear/.test(error.message || "")) {
-      delete patch.shoe_id; delete patch.gear;
+    if (error && /shoe_id|gear|nutrition/.test(error.message || "")) {
+      delete patch.shoe_id; delete patch.gear; delete patch.nutrition;
       ({ data, error } = await sb.from("scheduled_sessions").update(patch).eq("id", id).select().single());
     }
     if (error) throw error; return data;

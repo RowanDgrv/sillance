@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261111a";
+import { PF } from "./sillance-client.js?v=20261113a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -101,6 +101,9 @@ const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s
   ...(s.strength_log ? { strengthLog: s.strength_log } : {}),
   ...(s.shoe_id ? { shoeId: s.shoe_id } : {}),
   ...(Array.isArray(s.gear) && s.gear.length ? { gear: s.gear } : {}),
+  // consignes nutrition enregistrées par le coach (0097), échappées comme le reste
+  ...(s.nutrition && (s.nutrition.pre || s.nutrition.during || s.nutrition.post) ? { nutrition: { pre: esc(s.nutrition.pre || ""), during: esc(s.nutrition.during || ""), post: esc(s.nutrition.post || "") } } : {}),
+  ...(s.created_by ? { createdBy: s.created_by } : {}),
   blocksV2: s.blocks && s.blocks.length ? { blocks: s.blocks } : undefined });
 // Nom du profil lié prioritaire SI un compte est rattaché (athlete_id) —
 // display_name n'est qu'un repère pour un membre SANS compte, et devient une
@@ -590,6 +593,7 @@ async function hydrate() {
       renderClubGate({ subscribed: ok, ownsClub, trialDaysLeft: clubTrialDaysLeft, locked: clubLocked });
     }),
 
+    section("showNutrition", async () => { window.__pf_showNutrition = await PF.getShowNutrition(); }),
     section("aiAddon", async () => {
       window.__pf_aiAddon = isAdminUser() || await PF.hasAiAddon();
     }),
@@ -852,8 +856,11 @@ async function loadPlanningFor(athleteId) {
   ]);
   applyAthleteRefs(refs);
   app.clearObj(app.data.planning);
+  // séances dont le coach créateur a masqué la nutrition (réglage, 0097) : rien côté athlète
+  const nutriHidden = await PF.nutritionHiddenCreators(rows.map((r) => r.created_by)).catch(() => new Set());
   for (const s of rows) {
-    (app.data.planning[s.date] ||= []).push(mapSession(s));
+    const ms = mapSession(s); if (s.created_by && nutriHidden.has(s.created_by)) ms._nutriHidden = true;
+    (app.data.planning[s.date] ||= []).push(ms);
   }
   // Activités réalisées (Strava/Coros/…) posées sur le jour où elles ont eu lieu.
   // Un compte peut tourner sur un core.js pas encore à jour (déploiement en

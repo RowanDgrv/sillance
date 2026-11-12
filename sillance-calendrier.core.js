@@ -147,8 +147,19 @@ function gearForSession(s){
    Repère le macronutriment clé (protéines / glucides) pour la
    notification post-synchro.
    ============================================================ */
+/* Nutrition d'une séance (12/11/2026) :
+   - le coach qui a créé la séance a masqué la nutrition (réglage) → rien chez l'athlète ;
+   - consignes écrites ou validées par le coach (enregistrées depuis 0097) → affichées telles quelles ;
+   - compte réel sans consigne → rien (plus de texte générique présenté comme une recommandation) ;
+   - démo → suggestions automatiques par type de séance, comme avant. */
 function nutritionForSession(s){
-  if(s.nutrition && (s.nutrition.pre||s.nutrition.post)) return s.nutrition; // surcharge coach
+  const NONE={pre:'',during:'',post:'',key:'',none:true};
+  if(s && s._nutriHidden && typeof mode!=='undefined' && mode==='athlete') return NONE;
+  if(s && s.nutrition && (s.nutrition.pre||s.nutrition.post||s.nutrition.during)) return {...s.nutrition, key:s.nutrition.key||nutritionAuto({...s,nutrition:null}).key};
+  if(window.PF?.user) return NONE;
+  return nutritionAuto(s);
+}
+function nutritionAuto(s){
   const t=(s.title||'').toLowerCase();
   const dur=s.dur||0;
   const hard = ['Z4','Z5'].includes(s.zone) || /vma|vo2|seuil|intervalle|fractionn|lt2|sv2/i.test(t);
@@ -1511,7 +1522,7 @@ function buildMorningPreview(){
       toast(tr('morning.activityReceived', {reminder}));
       if('Notification' in window){
         if(Notification.permission==='granted'){
-          new Notification(tr('morning.notifRecoveryTitle'), {body:tr('morning.notifRecoveryBody', {reminder})+' '+n.post});
+          new Notification(tr('morning.notifRecoveryTitle'), {body:tr('morning.notifRecoveryBody', {reminder})+(n.post?' '+n.post:'')});
         } else if(Notification.permission!=='denied'){
           Notification.requestPermission().then(p=>{ if(p==='granted') new Notification(tr('morning.notifRecoveryTitle'), {body:tr('morning.notifRecoveryBody', {reminder})}); });
         }
@@ -2383,6 +2394,9 @@ function settingsDashboardHtml(){
   const dw=dashWidgetPrefs();
   const rules=loadCustomAlerts();
   return `
+    ${window.PF?.user?`<div class="set-h">${tr('nutriSet.heading')}</div>
+    <label class="dash-widget-row"><input type="checkbox" id="setShowNutri" ${window.__pf_showNutrition!==false?'checked':''}><span>${tr('nutriSet.label')}</span></label>
+    <p class="club-hint" style="margin:6px 0 22px">${tr(window.__pf_aiAddon===true?'nutriSet.hintAi':'nutriSet.hintNoAi')}</p>`:''}
     <div class="set-h">${tr('dash.widgetsHeading')}</div>
     <div class="set-sub">${tr('dash.widgetsSub')}</div>
     <div class="dash-widget-list">
@@ -2412,6 +2426,8 @@ function renderSettings(){
   const body=document.getElementById('setBody');
   body.innerHTML = settingsTab==='structure' ? settingsStructureHtml() : settingsTab==='coach' ? settingsCoachHtml() : settingsTab==='dashboard' ? settingsDashboardHtml() : settingsAccountHtml();
   wireCoachTiers(body, renderSettings);
+  const showNutri=document.getElementById('setShowNutri');
+  if(showNutri) showNutri.onchange=async()=>{ try{ await PF.setShowNutrition(showNutri.checked); window.__pf_showNutrition=showNutri.checked; toast(tr(showNutri.checked?'nutriSet.on':'nutriSet.off')); }catch(e){ showNutri.checked=!showNutri.checked; toast(tr('rem.saveErr'),'error'); } };
   body.querySelectorAll('[data-dw]').forEach(cb=>cb.onchange=()=>{
     const p=dashWidgetPrefs(); p[cb.dataset.dw]=cb.checked; saveDashWidgetPrefs(p);
     if(mode==='coach') renderSidebar();
@@ -3662,14 +3678,14 @@ function openModal(s, dateKey){
     ${sessionCoachNoteHTML(s)}
     ${sessionWhyHTML(s)}
     ${sessionNotesHTML(s)}
-    ${(()=>{ const n=nutritionForSession(s); return `
+    ${(()=>{ const n=nutritionForSession(s); if(!n.pre&&!n.during) return ''; return `
       <div class="nutri-block nutri-pre">
         <div class="nutri-head"><i class="ic ic-utensils"></i> ${tr('modal.beforeSession')}</div>
         <div class="nutri-txt">${n.pre}</div>
         ${n.during?`<div class="nutri-during">⏱ ${tr('modal.during')} ${n.during}</div>`:''}
       </div>`; })()}
     ${s.done&&s.rpe?`<div class="fb-block"><div class="k">${tr('modal.athleteFeedback')}</div>${tr('modal.cardio')} <b style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}/10</b>${s.rpeMuscle?` · ${tr('modal.muscular')} <b style="color:${rpeColor(s.rpeMuscle)}">${s.rpeMuscle}/10</b>`:''}${s.note?` — «&nbsp;${s.note}&nbsp;»`:''}</div>`:''}
-    ${(()=>{ const n=nutritionForSession(s); return `
+    ${(()=>{ const n=nutritionForSession(s); if(!n.post) return ''; return `
       <div class="nutri-block nutri-post">
         <div class="nutri-head"><i class="ic ic-utensils"></i> ${tr('modal.afterSession')}</div>
         <div class="nutri-txt">${n.post}</div>
@@ -8201,7 +8217,7 @@ function builderToSession(){
     blocksV2: JSON.parse(JSON.stringify(builderState)),
     done:false, id:'s'+(uid++)
   };
-  if(pre||post||during){ s.nutrition = {pre, post, during, key: detectNutriKey(s)}; }
+  s.nutrition = (pre||post||during) ? {pre, post, during, key: detectNutriKey(s)} : null;   // null = consigne effacée (0097)
   if(builderState.disc==='run') s.shoeId = builderState.shoeId || null;
   if(builderState.gear && builderState.gear.length) s.gear = builderState.gear.slice();
   return s;
@@ -8212,7 +8228,7 @@ function detectNutriKey(s){
   if(/glucide|sucre|gel|barre/.test(txt)) return 'glucides';
   if(/prot[eé]ine/.test(txt)) return 'protéines';
   // sinon, on retombe sur l'auto
-  return nutritionForSession({...s, nutrition:null}).key;
+  return nutritionAuto({...s, nutrition:null}).key;
 }
 
 /* remplit les champs nutrition de l'éditeur (auto-suggestion) */
@@ -8222,7 +8238,9 @@ function initBuilderNutrition(existing){
   const fillAuto=()=>{
     // construit une séance provisoire pour calculer la suggestion
     const tmp={disc:builderState.disc, title:builderState.title, dur:builderTotals().min, zone:'Z3'};
-    const n=nutritionForSession(tmp);
+    const n=nutritionAuto(tmp);
+    if(window.PF?.user){ pre.placeholder=tr('builder.nutriPhPre'); post.placeholder=tr('builder.nutriPhPost'); if(typeof during!=='undefined'&&during) during.placeholder=tr('builder.nutriPhDuring');
+      auto.textContent=tr('builder.nutriNoAuto'); paintNutriAi(); return; }
     pre.placeholder=n.pre; during.placeholder=n.during; post.placeholder=n.post;
     auto.textContent=tr('builder.autoSuggestion', {key:n.key});
   };
@@ -8232,6 +8250,28 @@ function initBuilderNutrition(existing){
   document.getElementById('bNutriReset').onclick=()=>{ pre.value=''; during.value=''; post.value=''; fillAuto(); };
   // recalcul de la suggestion quand le sport change
   builderState._refreshNutri = fillAuto;
+}
+/* Bouton « Proposer avec l'assistant IA » (option Assistant IA, 12/11/2026) : Grok rédige avant / pendant /
+   après à partir de la séance en cours d'édition ; le coach relit et modifie avant d'enregistrer. */
+function paintNutriAi(){
+  const head=document.getElementById('bNutriAuto'); if(!head) return;
+  let b=document.getElementById('bNutriAi');
+  if(!window.PF?.user || mode!=='coach'){ if(b) b.remove(); return; }
+  if(!b){ b=document.createElement('button'); b.type='button'; b.id='bNutriAi'; b.className='b-nutri-reset'; head.parentNode.parentNode.insertBefore(b, head.parentNode.nextSibling); }
+  const ok=window.__pf_aiAddon===true;
+  b.innerHTML=ok?`<i class="ic ic-sparkles"></i> ${tr('builder.nutriAi')}`:`<i class="ic ic-lock"></i> ${tr('builder.nutriAiLocked')}`;
+  b.onclick=async()=>{
+    if(!ok){ toast(tr('builder.nutriAiLockedToast')); return; }
+    if(!PF.nutritionAdvice){ toast(tr('builder.nutriAiError')); return; }
+    b.disabled=true; const old=b.innerHTML; b.textContent=tr('builder.nutriAiLoading');
+    try{
+      const blocks=JSON.parse(JSON.stringify(builderState.blocks||[]));
+      const r=await PF.nutritionAdvice({ session:{ disc:builderState.disc, title:builderState.title||document.getElementById('bTitle').value, dur:builderTotals().min, zone:null, blocks }, athlete_id: (typeof currentAthleteId!=='undefined'?currentAthleteId:null) });
+      if(r.error){ toast(r.message||tr(r.error==='not_configured'?'builder.nutriAiNotConfigured':r.error==='athlete_refused'?'builder.nutriAiRefused':'builder.nutriAiError'),'error'); }
+      else { const set=(id,v)=>{ const e=document.getElementById(id); if(e&&v) e.value=v; }; set('bNutriPre',r.pre); set('bNutriDuring',r.during); set('bNutriPost',r.post); toast(tr('builder.nutriAiDone')); }
+    }catch(e){ toast(tr('builder.nutriAiError'),'error'); }
+    b.disabled=false; b.innerHTML=old;
+  };
 }
 
 // — branchements UI —
