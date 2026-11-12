@@ -212,8 +212,13 @@
     var pts = (data.pts || []).filter(function(p){ return p.t >= s.t0 && p.t < s.t1; });
     var isRec = !!REC_TYPES[s.type];
     var short = s.interval || s.dur < SHORT_SEC;
-    var tgt = targetOf(s.ln, refs, zonesOf, disc);
     var res = { seg: s, isRec: isRec, short: short, dur: (s.t1 - s.t0) * 60 };
+    // Récup libre (13/11/2026) : récup de 3 min ou moins sans allure/watts tapés par le coach → pas jugée.
+    // Une cible « Z1 » sur 1' de trot entre deux efforts est intenable (la FC ne redescend pas si vite).
+    if(isRec && s.ln && s.ln.mode !== 'exact' && (s.ln.metric === 'dist' ? (+s.ln.dist || 0) <= 400 : (s.dur || 0) <= SHORT_SEC)){
+      res.status = 'na'; res.free = true; res.note = 'récupération libre'; return res;
+    }
+    var tgt = targetOf(s.ln, refs, zonesOf, disc);
     if(!tgt){ res.status = 'na'; res.note = 'pas de cible chiffrée'; return res; }
     if(tgt.missing){ res.status = 'na'; res.note = 'référence manquante : ' + tgt.missing; return res; }
     // Piège des intervalles : jamais la FC sur un bloc court ou une récup.
@@ -288,7 +293,8 @@
           var w0 = evalW[0];
           var txt = label + ' : ' + okW + '/' + evalW.length + ' efforts dans la cible (' + fmtTarget(w0.target, disc) + (w0.equivalence ? ', équivalence de la zone de FC' : '') + ', jugés à ' + (w0.metric === 'pw' ? 'la puissance' : 'l\'allure') + ')';
           var badRec = recs.filter(function(r){ return r.status === 'above'; }).length;
-          txt += recs.length ? (badRec ? ' ; ' + badRec + ' récup(s) trop rapide(s)' : ' ; récupérations conformes (jugées à l\'allure, pas à la FC)') : '';
+          var freeRec = recs.length && recs.every(function(r){ return r.free; });
+          txt += recs.length ? (freeRec ? ' ; récupérations libres' : badRec ? ' ; ' + badRec + ' récup(s) trop rapide(s)' : ' ; récupérations conformes (jugées à l\'allure, pas à la FC)') : '';
           // Récups trop rapides = consigne non respectée aussi (pénalité
           // proportionnelle à leur part), pas seulement les efforts manqués.
           var recRatio = recs.length ? badRec / recs.length : 0;
