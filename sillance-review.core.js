@@ -336,7 +336,7 @@ const INTENSITY_MODELS = {
          zones:[['Sous-CP',0,95],['Autour CP',95,105],['Sur-CP',105,130]]},
   // COURSE — vitesse / allure
   vma:  {disc:'run', label:'% VMA', unit:'kmh', ref:()=>ATHLETE_REF.vma,
-         zones:[['Z1 Récup',0,65],['Z2 Endurance',65,75],['Z3 Tempo',75,85],['Z4 Seuil',85,92],['Z5 VO2max',92,100],['Z6 Vitesse',100,115]]},
+         zones:[['Z1 Récup',0,60],['Z2 Endurance',60,75],['Z3 Tempo',75,85],['Z4 Seuil',85,92],['Z5 VO2max',92,100],['Z6 Vitesse',100,115]]},
   cv:   {disc:'run', label:'% Vitesse critique', unit:'kmh', ref:()=>ATHLETE_REF.cv,
          zones:[['Sous-CV',0,95],['Autour CV',95,103],['Sur-CV',103,115]]},
   seuilRun:{disc:'run', label:'% allure seuil', unit:'pace', ref:()=>ATHLETE_REF.seuilRun, invert:true,
@@ -5914,7 +5914,9 @@ function defaultLine(type, disc){
   // seuil (référence ATHLETE_REF.css) est 1'38"/100m.
   const pct = disc==='swim'
     ? ({warmup:112, exo:98, contre:108, recov:112, cooldown:110}[type] ?? 105)
-    : ({warmup:60, exo:95, contre:50, recov:50, cooldown:55}[type] ?? 70);
+    // Échauffement, retour au calme et récup : Z2 par défaut (13/11/2026, Rowan). Le Z1 se choisit à la main.
+    : disc==='run' ? ({warmup:62, exo:95, contre:62, recov:60, cooldown:62}[type] ?? 70)   // % VMA : Z2 = 60-75 %
+    : ({warmup:65, exo:95, contre:60, recov:60, cooldown:62}[type] ?? 70);
   // métrique par défaut : la natation se planifie en distance, le renfo en
   // répétitions pour ses lignes de travail (exo/contre-effort — le vrai
   // fondamental d'une séance de muscu : séries × répétitions × charge),
