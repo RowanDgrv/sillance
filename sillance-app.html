@@ -2184,7 +2184,11 @@ body[data-athview="forme"] .pulse-strip,
 body[data-athview="calendrier"] .pulse-strip,
 body[data-athview="stats"] .pulse-strip,
 body[data-athview="outils"] .pulse-strip,
-body[data-athview="stats"] .lactest{display:none}
+body[data-athview="stats"] .lactest,
+/* Matériel (13/11/2026) : uniquement le matériel, plus le calendrier ni le bandeau de la semaine */
+body[data-athview="materiel"] .planner,
+body[data-athview="materiel"] #videolib,
+body[data-athview="materiel"] .pulse-strip{display:none}
 body[data-athview="home"] .stat-tech{display:none}
 /* Côté athlète, la sidebar (#sidebarContent) ne reçoit plus rien — check-in/
    records/références vivent maintenant dans leurs propres onglets — donc on
@@ -2627,7 +2631,13 @@ body[data-athview] .planner > .library{display:none}
 .needs-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
 .needs-tools button{border:1px solid var(--line-strong);background:var(--panel-2);color:var(--text);border-radius:8px;padding:7px 11px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 .need-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--panel-2)}
-.need-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;margin-bottom:6px}
+.need-top{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;cursor:pointer;list-style:none}
+.need-top::-webkit-details-marker{display:none}
+.need-top::after{content:'›';margin-left:auto;transition:transform .15s;color:var(--muted)}
+.need-card[open] .need-top{margin-bottom:6px}
+.need-card[open] .need-top::after{transform:rotate(90deg)}
+.need-top .need-dot{align-self:center}
+.need-count{color:var(--muted);font-size:.9em}
 .need-week{font-size:12px;color:var(--muted)}
 .need-row{display:flex;align-items:flex-start;gap:6px;padding:6px 0;border-top:1px solid var(--line)}
 .need-row:first-of-type{border-top:none}
@@ -4277,7 +4287,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261113a"></script>
+<script src="./sillance-i18n-app.js?v=20261113b"></script>
 <script src="./sillance-reminder.js?v=20261110c"></script>
 <script src="./sillance-ai-popup.js?v=20261107a"></script>
 <script src="./sillance-consigne.js?v=20261029a"></script>
@@ -4291,12 +4301,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-equipment.js?v=20261103c"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
-<script src="./sillance-app.core.js?v=20261113a"></script>
+<script src="./sillance-app.core.js?v=20261113b"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261113a"></script>
+<script type="module" src="./sillance-integration.js?v=20261113b"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>

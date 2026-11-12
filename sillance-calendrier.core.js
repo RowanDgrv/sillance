@@ -4574,7 +4574,8 @@ function saveAthleteProfile(){
   updatePlanAthleteVisibility();
   renderCoachBand();
 })();
-let athView = 'home';   // 'home' | 'stats'
+// Onglet d'arrivée côté athlète : « Forme & courses », pour qu'il remplisse son check-in du jour tout de suite (13/11/2026, demande Rowan).
+let athView = 'forme';
 function updateVideolibVisibility(){
   // mode club : panneau club via attribut body ; sinon onglets athlète
   document.body.removeAttribute('data-clubview');

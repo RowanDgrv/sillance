@@ -2021,7 +2021,11 @@ body[data-athview="forme"] .pulse-strip,
 body[data-athview="calendrier"] .pulse-strip,
 body[data-athview="stats"] .pulse-strip,
 body[data-athview="outils"] .pulse-strip,
-body[data-athview="stats"] .lactest{display:none}
+body[data-athview="stats"] .lactest,
+/* Matériel (13/11/2026) : uniquement le matériel, plus le calendrier ni le bandeau de la semaine */
+body[data-athview="materiel"] .planner,
+body[data-athview="materiel"] #videolib,
+body[data-athview="materiel"] .pulse-strip{display:none}
 body[data-athview="home"] .stat-tech{display:none}
 /* Côté athlète, la sidebar (#sidebarContent) ne reçoit plus rien — check-in/
    records/références vivent maintenant dans leurs propres onglets — donc on
@@ -3911,7 +3915,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261113a"></script>
+<script src="./sillance-i18n-app.js?v=20261113b"></script>
 <script src="./sillance-reminder.js?v=20261110c"></script>
 <script src="./sillance-ai-popup.js?v=20261028c"></script>
 <script src="./sillance-fit.js?v=20261110d"></script>
@@ -3921,12 +3925,12 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-exercises.js?v=20261030d"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
-<script src="./sillance-calendrier.core.js?v=20261113a"></script>
+<script src="./sillance-calendrier.core.js?v=20261113b"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261113a"></script>
+<script type="module" src="./sillance-integration.js?v=20261113b"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>

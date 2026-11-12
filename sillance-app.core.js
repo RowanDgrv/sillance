@@ -1202,14 +1202,18 @@ function renderNeedsOverlay(){
     .filter(a=>a.items.length)
     .sort((x,y)=>NEED_LVL[x.items[0].level]-NEED_LVL[y.items[0].level] || y.items.length-x.items.length);
   const ok=list.filter(a=>!a.items.some(i=>!i.done)).length;
+  // Une ligne par athlète, repliée (13/11/2026) : avec 20 athlètes, une carte dépliée par raison noyait l'essentiel.
+  // On clique sur le nom pour voir toutes les raisons ; l'état ouvert est gardé entre deux rafraîchissements.
+  window.__needsOpen = window.__needsOpen || new Set();
   body.innerHTML=head + running + (rows.length ? rows.map(a=>`
-    <div class="need-card">
-      <div class="need-top"><b>${dispoSafe(a.name)}</b>${a.week&&a.week.planned?`<span class="need-week">${tr('needs.week',{done:a.week.done, planned:a.week.planned})}</span>`:''}</div>
+    <details class="need-card" data-need-card="${a.aid}" ${window.__needsOpen.has(a.aid)?'open':''}>
+      <summary class="need-top"><span class="need-dot lvl-${a.items[0].level}"></span><b>${dispoSafe(a.name)}</b><span class="need-count">${tr(a.items.length>1?'needs.reasons':'needs.reason',{n:a.items.length})}</span>${a.week&&a.week.planned?`<span class="need-week">${tr('needs.week',{done:a.week.done, planned:a.week.planned})}</span>`:''}</summary>
       ${a.items.map(i=>`<div class="need-row${i.done?' is-done':''}"><span class="need-dot lvl-${i.level}"></span><span class="need-txt">${dispoSafe(i.text)}</span>
         <button type="button" class="need-done-btn" data-need-done="${dispoSafe(i.key)}" data-on="${i.done?'0':'1'}">${i.done?tr('needs.undo'):tr('needs.done')}</button></div>`).join('')}
       <button type="button" class="need-go" data-need-go="${a.aid}">${tr('needs.openPlanning')}</button>
-    </div>`).join('') : `<p class="club-hint">${tr('needs.allGood')}</p>`)
+    </details>`).join('') : `<p class="club-hint">${tr('needs.allGood')}</p>`)
     + (ok && rows.length ? `<p class="hint" style="margin-top:12px">${tr(ok>1?'needs.okPlural':'needs.ok',{n:ok})}</p>` : '');
+  body.querySelectorAll('[data-need-card]').forEach(d=>d.addEventListener('toggle',()=>{ d.open?window.__needsOpen.add(d.dataset.needCard):window.__needsOpen.delete(d.dataset.needCard); }));
 }
 function openNeeds(){
   ensureNeedsOverlay(); loadNeeds(); renderNeedsOverlay();
@@ -1310,9 +1314,10 @@ function renderSidebar(){
     var _adhOpen=document.getElementById('adhOpen'); if(_adhOpen) _adhOpen.onclick=openAdherence;
     var _cmpAthOpen=document.getElementById('compareAthOpen'); if(_cmpAthOpen) _cmpAthOpen.onclick=openCompareAthletes;
     var _needsOpen=document.getElementById('needsOpen'); if(_needsOpen) _needsOpen.onclick=(e)=>{ e.stopPropagation(); openNeeds(); };
+    // clic sur un athlète : la liste s'ouvre avec toutes ses raisons dépliées (13/11/2026)
     sidebarContent.querySelectorAll('[data-need-aid]').forEach(el=> el.onclick=()=>{
-      const idx = ROSTER.findIndex(x=>x.id===el.dataset.needAid);
-      if(idx>-1){ selectAthlete(idx); render(); }
+      window.__needsOpen = window.__needsOpen || new Set(); window.__needsOpen.add(el.dataset.needAid);
+      openNeeds();
     });
     sidebarContent.querySelectorAll('[data-wd]').forEach(el=> el.onclick=()=> setWeekDeadlineDay(el.dataset.wd));
     var _invAthOpen=document.getElementById('inviteAthOpen'); if(_invAthOpen) _invAthOpen.onclick=openInviteAthlete;
@@ -5475,7 +5480,8 @@ function saveAthleteProfile(){
   updatePlanAthleteVisibility();
   renderCoachBand();
 })();
-let athView = 'home';   // 'home' | 'stats'
+// Onglet d'arrivée côté athlète : « Forme & courses », pour qu'il remplisse son check-in du jour tout de suite (13/11/2026, demande Rowan).
+let athView = 'forme';
 function updateVideolibVisibility(){
   // mode club : panneau club via attribut body ; sinon onglets athlète
   document.body.removeAttribute('data-clubview');
