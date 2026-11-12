@@ -101,10 +101,10 @@
      mesuré que ce swap tardif (Oswald, condensée, remplace le fallback système)
      décalait le header + tout le contenu en dessous (CLS 0.81 sur desktop).
      Fallback <noscript>. -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=optional">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=optional" rel="stylesheet" id="asyncFonts" media="print">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&display=optional">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&display=optional" rel="stylesheet" id="asyncFonts" media="print">
 <script src="./sillance-fonts-async.js" defer></script>
-<noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=optional" rel="stylesheet"></noscript>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&display=optional" rel="stylesheet"></noscript>
 <style>
 :root{
   --cols:12; --gutter:24px; --margin:clamp(22px,5vw,72px); --maxw:1240px; --lh:24px;
@@ -113,8 +113,8 @@
   --line:rgba(150,165,200,.14); --line-strong:rgba(150,165,200,.28);
   --accent:#46C2D8; --accent-ink:var(--accent);
   --accent2:#FF9A3D;
-  --nav-bg:rgba(11,17,32,.55);
-  --display:'Oswald',sans-serif; --ui:'Archivo',sans-serif; --mono:'JetBrains Mono',monospace;
+  --nav-bg:#0B1120;
+  --display:'Oswald',sans-serif; --ui:'Archivo',sans-serif; --mono:'Archivo',sans-serif;   /* 12/11/2026 : deux polices seulement, l'ancienne police « code » est remplacée par Archivo */
 }
 /* Mode jour — ne change que la coque (nav, sections, footer) ; le hero garde
    son fond sombre volontairement (le shader WebGL n'est pas retheme-able
@@ -124,7 +124,7 @@
   --paper:#F5F7FA; --panel:#FFFFFF; --panel-2:#FFFFFF00;
   --text:#101828; --soft:#3C4656; --muted:#6B7585;
   --line:rgba(16,24,40,.10); --line-strong:rgba(16,24,40,.18);
-  --nav-bg:rgba(245,247,250,.75);
+  --nav-bg:#F5F7FA;
   /* Contraste (audit SEO/Lighthouse 05/11/2026) : le teal #46C2D8 et le gris
      #6B7585 tombaient sous 4,5:1 sur fond clair. Le hero, resté sombre,
      re-pin ses propres valeurs plus bas. */
@@ -150,7 +150,7 @@ body{transition:background-color .25s,color .25s}
 *{box-sizing:border-box;margin:0;padding:0}
 a{color:inherit;text-decoration:none}
 html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--text);font-family:var(--ui);font-size:16px;line-height:var(--lh);
+body{background:var(--paper);color:var(--text);font-family:var(--ui);font-size:16px;line-height:var(--lh);font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--margin)}
 
@@ -158,18 +158,15 @@ main,.nav,footer{position:relative;z-index:1}
 
 /* ---------- fond du hero : blob 3D généré en WebGL (sillage) ---------- */
 .hero-canvas{position:absolute;inset:0;z-index:0;width:100%;height:100%;display:block}
-.hero-fallback{position:absolute;inset:0;z-index:0;background:
-    radial-gradient(circle at 62% 46%, rgba(70,194,216,.22), transparent 55%),
-    radial-gradient(circle at 38% 62%, rgba(255,154,61,.14), transparent 60%),
-    var(--paper)}
-.hero-scrim{position:absolute;inset:0;z-index:0;pointer-events:none;background:
-  linear-gradient(90deg, rgba(11,17,32,.88) 0%, rgba(11,17,32,.62) 36%, rgba(11,17,32,.18) 62%, transparent 78%)}
+.hero-fallback{position:absolute;inset:0;z-index:0;background:var(--paper)}
+/* voile uni (plus de dégradé) : le haut de page reste sombre dans les deux thèmes, comme avant */
+.hero-scrim{position:absolute;inset:0;z-index:0;pointer-events:none;background:rgba(11,17,32,.7)}
 
 /* ---------- nav ---------- */
-.nav{position:sticky;top:0;z-index:20;background:var(--nav-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{position:sticky;top:0;z-index:20;background:var(--nav-bg);border-bottom:1px solid var(--line)}
 .nav .wrap{display:flex;align-items:center;height:66px;gap:18px}
 .brand{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:700;font-size:22px}
-.brand .orb{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.brand .orb{width:12px;height:12px;border-radius:50%;background:var(--accent)}
 .brand b{color:var(--accent-ink)}
 .beta-badge{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--accent2);
   border:1px solid var(--accent2);border-radius:99px;padding:2px 9px;margin-left:2px;vertical-align:middle;text-transform:uppercase}
@@ -206,7 +203,7 @@ main,.nav,footer{position:relative;z-index:1}
   background:var(--panel);cursor:pointer;flex:none;padding:0;transition:border-color .2s}
 .theme-toggle:hover{border-color:var(--accent)}
 .theme-toggle .tt-knob{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  background:var(--accent);
   transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center}
 :root[data-theme="light"] .theme-toggle .tt-knob{transform:translateX(24px)}
 .theme-toggle svg{width:13px;height:13px}
@@ -275,7 +272,7 @@ main,.nav,footer{position:relative;z-index:1}
 .cta-row{display:flex;gap:14px;flex-wrap:wrap}
 .scrollcue{position:absolute;bottom:30px;left:30px;font-family:var(--mono);font-size:11px;
   letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px}
-.scrollcue .ln{width:1px;height:34px;background:linear-gradient(var(--accent),transparent)}
+.scrollcue .ln{width:1px;height:34px;background:var(--accent)}
 @media(max-width:680px){.scrollcue{display:none}}
 
 /* ---------- CTA fixe mobile : apparaît une fois le hero dépassé, garde
@@ -286,7 +283,7 @@ main,.nav,footer{position:relative;z-index:1}
   .mobile-cta{
     display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;
     padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-    background:var(--nav-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:var(--nav-bg);
     border-top:1px solid var(--line-strong);
     transform:translateY(100%);transition:transform .22s ease;
   }
@@ -315,15 +312,10 @@ main,.nav,footer{position:relative;z-index:1}
 /* data — features numérotées en cartes 3D (tilt au survol, halo sous le curseur) */
 .feat{grid-column:span 6;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;
   padding:28px 26px;border:1px solid var(--line);border-radius:16px;position:relative;
-  background:linear-gradient(180deg,var(--panel),rgba(18,26,43,.35));
-  transform-style:preserve-3d;will-change:transform;--gx:50%;--gy:50%;
-  transition:transform .16s ease,border-color .2s,box-shadow .2s}
-.feat::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s;
-  background:radial-gradient(260px 200px at var(--gx) var(--gy), rgba(255,255,255,.08), transparent 62%)}
-.feat:hover{border-color:var(--line-strong);box-shadow:0 22px 48px rgba(0,0,0,.35)}
-.feat:hover::after{opacity:1}
-.feat .num{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--accent-ink);font-variant-numeric:tabular-nums;transform:translateZ(28px)}
-.feat h3{font-family:var(--display);font-weight:600;font-size:21px;text-transform:uppercase;margin-bottom:8px;transform:translateZ(18px)}
+  background:var(--panel);transition:border-color .2s}
+.feat:hover{border-color:var(--accent)}
+.feat .num{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.feat h3{font-family:var(--display);font-weight:600;font-size:21px;text-transform:uppercase;margin-bottom:8px}
 .feat p{color:var(--soft);font-size:14.5px;line-height:1.6;font-weight:300}
 @media(max-width:680px){.feat{grid-column:span 12}}
 
@@ -344,7 +336,7 @@ main,.nav,footer{position:relative;z-index:1}
 .race-points{list-style:none;display:flex;flex-direction:column;gap:12px;margin-top:24px}
 .race-points li{position:relative;padding-left:22px;color:var(--soft);font-size:14.5px;line-height:1.5;font-weight:300}
 .race-points li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
-.race-visual{background:linear-gradient(180deg,var(--panel),rgba(18,26,43,.35));border:1px solid var(--line);
+.race-visual{background:var(--panel);border:1px solid var(--line);
   border-radius:18px;padding:24px;font-family:var(--mono)}
 .rv-hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:16px}
 .rv-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin-bottom:6px}
@@ -368,8 +360,8 @@ main,.nav,footer{position:relative;z-index:1}
 
 /* tarifs */
 .price{grid-column:span 4;display:flex;flex-direction:column;gap:8px;padding:28px 24px;border-radius:16px;
-  border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),rgba(18,26,43,.35))}
-.price.feature{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset,0 24px 60px -30px rgba(70,194,216,.5)}
+  border:1px solid var(--line);background:var(--panel)}
+.price.feature{border:2px solid var(--accent)}
 .price .tier{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink)}
 .price.feature .tier{color:var(--accent-ink)}
 .price .amt{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;color:var(--text);margin-top:4px}
@@ -415,16 +407,11 @@ main,.nav,footer{position:relative;z-index:1}
 .reviews-empty{color:var(--muted);font-size:13px;text-align:center;padding:10px 0 4px}
 @media(max-width:880px){.reviews-grid{grid-template-columns:1fr}}
 
-/* cta — dégradé animé eau -> air (drift lent, coupé si reduced-motion) */
-.cta{padding:110px 0;border-top:1px solid var(--line);text-align:center;background:var(--paper);position:relative;overflow:hidden}
-.cta::before{content:"";position:absolute;inset:-45%;z-index:0;filter:blur(46px);
-  background:
-    radial-gradient(36% 44% at 30% 42%, rgba(70,194,216,.28), transparent 70%),
-    radial-gradient(40% 50% at 72% 58%, rgba(255,154,61,.20), transparent 70%),
-    radial-gradient(46% 56% at 52% 30%, rgba(37,99,235,.22), transparent 72%);
-  animation:ctaDrift 19s ease-in-out infinite alternate}
-@keyframes ctaDrift{from{transform:rotate(0deg) scale(1)}to{transform:rotate(16deg) scale(1.18)}}
-@media (prefers-reduced-motion: reduce){.cta::before{animation:none}}
+/* cta — aplat et deux traits : la mer (cyan) et la terre (orange), le sillage (12/11/2026) */
+.cta{padding:110px 0;border-top:1px solid var(--line);text-align:center;background:var(--panel);position:relative;overflow:hidden}
+.cta::before,.cta::after{content:"";position:absolute;left:50%;width:120px;height:3px;transform:translateX(-50%)}
+.cta::before{top:56px;margin-left:-64px;background:var(--accent)}
+.cta::after{top:56px;margin-left:64px;background:var(--accent2)}
 .cta .wrap{position:relative;z-index:1}
 .cta .h2{margin-bottom:16px}
 .cta p{color:var(--soft);font-weight:300;max-width:52ch;margin:0 auto 32px}
@@ -819,7 +806,7 @@ footer .fmono{font-family:var(--mono);letter-spacing:.04em}
 <script src="./sillance-flow.js?v=20261006a"></script>
 <script src="./sillance-reviews.js?v=20261017a"></script>
 <script src="./sillance-theme-nav.js?v=20261007b"></script>
-<script src="./sillance-index.js"></script>
+<script src="./sillance-index.js?v=20261112a"></script>
 <script src="./sillance-cookies.js?v=20261104a"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body></html>

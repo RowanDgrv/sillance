@@ -39,9 +39,9 @@
   io.observe(hero);
 })();
 
-/* Cartes data : tilt 3D + halo qui suit le curseur */
+/* Cartes data : l'inclinaison 3D et le halo qui suivaient le curseur sont retirés (12/11/2026, refonte sans effets). */
 (function(){
-  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  return;
   document.querySelectorAll('.feat').forEach(function(c){
     c.addEventListener('pointermove', function(e){
       var r = c.getBoundingClientRect();
