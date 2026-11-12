@@ -905,7 +905,7 @@ function injectStyles() {
      et le badge passait au-dessus des fenêtres ouvertes. */
   .top-right #pf-cloud-badge{position:static;z-index:auto;padding:8px 13px;box-shadow:none;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis}
   #pf-auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);
-    display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+    display:none;align-items:center;justify-content:center;}
   #pf-auth-overlay.open{display:flex}
   .pf-auth-card{width:340px;max-width:92vw;background:#11151a;border:1px solid #262c34;border-radius:16px;
     padding:26px 24px;color:#e7edf3;font-family:system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -958,7 +958,7 @@ function injectStyles() {
      (24/09/2026). Bloquante par choix explicite : pas de croix, pas de clic
      en dehors, pas d'Échap — voir openFeelingPrompt/closeFeelingOverlay. */
   #pf-feel-overlay{position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);
-    display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:20px;overflow-y:auto}
+    display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
   #pf-feel-overlay.open{display:flex}
   .pf-feel-card{width:420px;max-width:100%;background:#11151a;border:1px solid #262c34;border-radius:16px;
     padding:26px 24px;color:#e7edf3;font-family:system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -1285,7 +1285,7 @@ function injectGateStyles() {
     border-radius:99px;padding:5px 13px;font:700 12px 'Archivo',system-ui;cursor:pointer}
   #pf-trial-banner button:hover,.pf-trial-banner button:hover{filter:brightness(1.06)}
   #pf-lock-overlay,.pf-lock-overlay{position:fixed;inset:0;z-index:9995;background:rgba(6,8,11,.9);
-    display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:20px}
+    display:flex;align-items:center;justify-content:center;padding:20px}
   #pf-lock-overlay .card,.pf-lock-overlay .card{max-width:560px;width:100%;max-height:92vh;overflow-y:auto;background:#0f151b;border:1px solid #223;
     border-radius:16px;padding:30px 28px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.7)}
   #pf-lock-overlay h2,.pf-lock-overlay h2{font:800 22px/1.15 'Oswald','Archivo',system-ui;color:#eaf6f9;margin:0 0 8px;letter-spacing:.2px}
@@ -1583,7 +1583,7 @@ function askNameIfMissing() {
   const ov = document.createElement("div");
   ov.id = "pf-name-overlay";
   ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", "pf-name-h");
-  ov.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)";
+  ov.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(8,10,13,.82);display:flex;align-items:center;justify-content:center;";
   ov.innerHTML = `<div class="pf-auth-card">
       <h2 id="pf-name-h">${tr("auth.nameAskTitle")}</h2>
       <p class="sub">${tr("auth.nameAskText")}</p>

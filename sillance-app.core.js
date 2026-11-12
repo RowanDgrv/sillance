@@ -2187,7 +2187,7 @@ function injectPremiumCss(){
   const st=document.createElement('style'); st.id='pf-premium-css';
   st.textContent=`
   .pf-premium-card{margin:12px 0;padding:14px 15px;border:1px solid var(--line);border-radius:12px;
-    background:linear-gradient(180deg,rgba(70,194,216,.10),rgba(70,194,216,.02))}
+    background:rgba(70,194,216,.08)}
   .pf-premium-card h3{margin:0 0 4px;font:600 14px/1.2 var(--font-display,inherit);display:flex;align-items:center;gap:6px}
   .pf-premium-card p{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.5}
   .pf-premium-card button{width:100%;padding:9px 0;border:0;border-radius:9px;background:var(--accent,#46C2D8);
@@ -11430,7 +11430,7 @@ function injectAiCss(){
   if(document.getElementById('pf-ai-css')) return;
   const st=document.createElement('style'); st.id='pf-ai-css';
   st.textContent=`
-  .ai-pay{border:1px solid var(--line-strong);border-radius:var(--radius);padding:18px;background:linear-gradient(180deg,rgba(70,194,216,.07),transparent)}
+  .ai-pay{border:1px solid var(--line-strong);border-radius:var(--radius);padding:18px;background:rgba(70,194,216,.07)}
   .ai-pay h5{font-family:var(--font-display);font-size:16px;margin:0 0 3px}
   .ai-pay .ai-sub{color:var(--muted);font-size:12px;margin-bottom:12px}
   .ai-feat{display:flex;flex-direction:column;gap:8px;margin:12px 0;font-size:13px}
@@ -13019,7 +13019,7 @@ function injectLoadHxCss(){
   .hx-sub{font-size:11.5px;color:var(--muted);margin-bottom:8px}
   .hx-bars{display:flex;align-items:flex-end;gap:6px;height:84px;margin-bottom:12px}
   .hx-bar{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;gap:4px}
-  .hx-bar>i{width:100%;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--run),var(--bike))}
+  .hx-bar>i{width:100%;border-radius:5px 5px 0 0;background:var(--run)}
   .hx-bar>span{font-size:10px;color:var(--muted)}
   .hx-comp{font-size:11.5px;color:var(--soft);border-top:1px dashed var(--line);padding-top:10px}`;
   document.head.appendChild(st);

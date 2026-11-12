@@ -134,7 +134,7 @@
         '--ink:' + mix('#F4F6FB', th.accent, .035) + ';--panel-2:' + mix('#EDF1F8', th.accent, .05) + '}' +
       'html.club-th body.light ::selection{background:' + la + '30}' +
       // fond animé (halo « aurora ») et dégradé du haut : aux couleurs du club
-      'html.club-th body:not(.light){background-image:linear-gradient(180deg,' + mix(th.bg, '#000000', .3) + ' 0%,var(--ink) 38%)}' +
+      'html.club-th body:not(.light){background-color:var(--ink)}' +
       // bulle de discussion : posée sur --swim (couleur de données) → couleur du club
       'html.club-th .chat-fab{background:var(--accent)}' +
       // espace club : sa couleur « club » était le violet muscu (--strength,

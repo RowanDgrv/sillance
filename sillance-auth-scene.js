@@ -40,7 +40,7 @@ const CSS = `
 .pf3-side > *{flex-shrink:0}
 .pf3-brand{display:flex;align-items:center;gap:10px;font:700 22px 'Oswald',sans-serif;color:#F3F6FC;margin-bottom:clamp(20px,5vh,56px)}
 .pf3-brand svg{width:30px;height:30px}
-.pf3-kicker{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--p3-accent);margin:0 0 12px}
+.pf3-kicker{font:600 11px 'Archivo',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--p3-accent);margin:0 0 12px}
 .pf3-title{font:600 clamp(34px,6vh,54px)/1 var(--p3-title);text-transform:uppercase;color:#F3F6FC;margin:0 0 12px}
 .pf3-title,.pf3-title .ln,.pf3-title .ch{background:none;border:0;border-radius:0;box-shadow:none}
 .pf3-title .ln{display:block;overflow:hidden;padding:0 0 .06em;margin:0}
@@ -85,7 +85,7 @@ const CSS = `
 .pf3-flat[hidden]{display:none}
 .pf3-flat img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none}
 .pf3-flat img.on{display:block}
-.pf3-cap{position:absolute;right:clamp(24px,4vw,56px);bottom:36px;text-align:right;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8A93A8}
+.pf3-cap{position:absolute;right:clamp(24px,4vw,56px);bottom:36px;text-align:right;font:600 11px 'Archivo',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8A93A8}
 .pf3-cap b{display:block;font:600 20px 'Oswald',sans-serif;letter-spacing:.04em;color:#F3F6FC;margin-bottom:4px}
 @media (max-width:860px){
   #pf-auth-overlay.pf-3d.open{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start}
@@ -134,7 +134,7 @@ export function mountAuthScene(overlay, { initialRole = "coach" } = {}) {
   // Polices dessinées DANS les textures 3D : l'app les charge en différé
   // (display=optional, feuille en media=print) → on les déclare ici pour de bon,
   // sinon le canvas tombe sur une police de secours à empattements.
-  const fam = ["Oswald:wght@600;700", "Archivo:wght@500;600", "JetBrains+Mono:wght@500;600"]
+  const fam = ["Oswald:wght@600;700", "Archivo:wght@500;600"]
     .concat(club.font === "Anton" || club.initials ? ["Anton"] : []);
   const fl = document.createElement("link"); fl.rel = "stylesheet";
   fl.href = `https://fonts.googleapis.com/css2?${fam.map((f) => "family=" + f).join("&")}&display=swap`;
@@ -234,7 +234,7 @@ export function mountAuthScene(overlay, { initialRole = "coach" } = {}) {
   /* ---- 3D (ou version fixe « Animations allégées »), jamais bloquante ---- */
   const canvas = stage.querySelector("canvas"), flat = stage.querySelector(".pf3-flat");
   canvas.setAttribute("aria-hidden", "true"); flat.setAttribute("aria-hidden", "true");
-  const fonts = ["700 40px Oswald", "600 20px Archivo", "500 20px \"JetBrains Mono\""].concat(club.initials || club.font === "Anton" ? ["400 40px Anton"] : []);
+  const fonts = ["700 40px Oswald", "600 20px Archivo"].concat(club.initials || club.font === "Anton" ? ["400 40px Anton"] : []);
   const fontsReady = fontsCss.then(() => Promise.all(fonts.map((f) => document.fonts.load(f)))).catch(() => {});
   let flatBuilt = false, want3d = false;
   // Version figée : la même image que la 3D, rendue une fois (img/auth/*.webp),
