@@ -808,6 +808,13 @@ body.grid-on .cal-guides{opacity:1}
 
 /* Répartition des intensités de la semaine — prévu vs réalisé (vue coach) */
 .wk-int{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--line)}
+/* répartition 4 semaines vs modèle (12/11/2026) */
+.im{margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px dashed var(--line)}
+.im .wk-int-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.im-sel{margin-left:auto;font:inherit;font-size:12px;text-transform:none;letter-spacing:0;background:var(--panel-2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:4px 8px}
+.im-row{display:flex;align-items:center;gap:10px;margin:5px 0}
+.im-verdict{margin-top:8px;font-size:var(--fs-sm)}.im-ok{color:var(--good)}.im-warn{color:var(--bike)}
+
 .wk-int-head{font-size:var(--fs-sm);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
 .wk-int-head span{font-weight:400;letter-spacing:0;text-transform:none;margin-left:var(--space-2)}
 .wk-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
@@ -3905,7 +3912,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261111b"></script>
+<script src="./sillance-i18n-app.js?v=20261112a"></script>
 <script src="./sillance-reminder.js?v=20261110c"></script>
 <script src="./sillance-ai-popup.js?v=20261028c"></script>
 <script src="./sillance-fit.js?v=20261110d"></script>
@@ -3915,7 +3922,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-exercises.js?v=20261030d"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
-<script src="./sillance-calendrier.core.js?v=20261111b"></script>
+<script src="./sillance-calendrier.core.js?v=20261112a"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

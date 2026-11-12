@@ -2767,7 +2767,48 @@ function renderWeekIntensity(mon){
     <div class="wk-row"><span class="wk-lbl">${tr('weekInt.planned')}</span><div class="wk-bar">${bar(plan)}</div><span class="wk-tot">${fmtDur(Math.round(planMin))} · ${planTss} TSS</span></div>
     <div class="wk-row"><span class="wk-lbl">${tr('weekInt.done')}</span><div class="wk-bar">${realMin?bar(real):''}</div><span class="wk-tot">${realMin?`${fmtDur(Math.round(realMin))} · ${realTss} TSS (${planTss?Math.round(realTss/planTss*100):0}%)`:'—'}</span></div>
     <div class="wk-legend">${Z.map(z=>`<span><i style="background:${ZONE_COLORS[z]}"></i>${z}</span>`).join('')}</div>
-    ${alert}`;
+    ${alert}${intensityModelHTML(mon)}`;
+  wireIntensityModel(mon);
+}
+/* ============================================================
+   RÉPARTITION SUR 4 SEMAINES vs MODÈLE (12/11/2026, demande Rowan)
+   Temps passé en intensité basse (Z1-Z2), modérée (Z3) et haute (Z4-Z5) sur les
+   4 dernières semaines jusqu'à celle affichée, comparé au modèle choisi par le
+   coach : polarisé 80/20, pyramidal ou orienté seuil. Calculé ligne par ligne
+   (échauffements et récupérations comptent en basse intensité), sur le PRÉVU.
+   ============================================================ */
+const INT_MODELS={
+  polar:{ get l(){return tr('intModel.polar')}, t:[80,5,15] },
+  pyramid:{ get l(){return tr('intModel.pyramid')}, t:[75,17,8] },
+  threshold:{ get l(){return tr('intModel.threshold')}, t:[65,25,10] }
+};
+function intModelKey(){ let k='polar'; try{ k=localStorage.getItem('sil_int_model')||k; }catch(e){} return INT_MODELS[k]?k:'polar'; }
+function intensityModelHTML(mon){
+  const tot=[0,0,0]; let done=[0,0,0];
+  for(let i=-21;i<7;i++){
+    (planning[iso(addDays(mon,i))]||[]).forEach(s=>{
+      const zm=sessionZoneMinutes(s), v=[zm.Z1+zm.Z2, zm.Z3, zm.Z4+zm.Z5];
+      v.forEach((x,k)=>{ tot[k]+=x; if(s.done) done[k]+=x; });
+    });
+  }
+  const sum=tot[0]+tot[1]+tot[2]; if(sum<30) return '';
+  const pct=tot.map(x=>Math.round(x/sum*100)), key=intModelKey(), M=INT_MODELS[key], tgt=M.t;
+  const COL=['var(--good)','var(--bike)','var(--run)'], LAB=[tr('intModel.low'),tr('intModel.mid'),tr('intModel.high')];
+  // écart principal : plus de 7 points sur une famille
+  const gaps=pct.map((p,k)=>p-tgt[k]); let k=0; gaps.forEach((g,i)=>{ if(Math.abs(g)>Math.abs(gaps[k])) k=i; });
+  const verdict = Math.abs(gaps[k])<=7 ? `<span class="im-ok"><i class="ic ic-check"></i> ${tr('intModel.ok', {model:M.l})}</span>`
+    : `<span class="im-warn"><i class="ic ic-alert-triangle"></i> ${tr(gaps[k]>0?'intModel.tooMuch':'intModel.tooLittle', {zone:LAB[k], p:pct[k], t:tgt[k]})}${k===1&&gaps[k]>0&&key==='polar'?' '+tr('intModel.greyZone'):''}</span>`;
+  return `<div class="im">
+    <div class="wk-int-head">${tr('intModel.title')} <span>${tr('intModel.sub')}</span>
+      <select class="im-sel" aria-label="${tr('intModel.choose')}">${Object.entries(INT_MODELS).map(([k2,m])=>`<option value="${k2}"${k2===key?' selected':''}>${m.l}</option>`).join('')}</select></div>
+    <div class="im-row"><span class="wk-lbl">${tr('intModel.planned')}</span><div class="wk-bar">${pct.map((p,i)=>p?`<i style="width:${p}%;background:${COL[i]}" title="${LAB[i]} · ${p} %"></i>`:'').join('')}</div><span class="wk-tot">${pct.join(' / ')}</span></div>
+    <div class="im-row"><span class="wk-lbl">${tr('intModel.target')}</span><div class="wk-bar">${tgt.map((p,i)=>`<i style="width:${p}%;background:${COL[i]};opacity:.45" title="${LAB[i]} · ${p} %"></i>`).join('')}</div><span class="wk-tot">${tgt.join(' / ')}</span></div>
+    <div class="wk-legend">${LAB.map((l,i)=>`<span><i style="background:${COL[i]}"></i>${l}</span>`).join('')}</div>
+    <div class="im-verdict">${verdict}</div></div>`;
+}
+function wireIntensityModel(mon){
+  const sel=document.querySelector('#weekIntensity .im-sel'); if(!sel) return;
+  sel.onchange=()=>{ try{ localStorage.setItem('sil_int_model', sel.value); }catch(e){} renderWeekIntensity(mon); };
 }
 
 function sessionCard(s, dateKey){
@@ -9309,12 +9350,28 @@ let GEAR = [
    daily/tempo/race) pour le matériel jamais retaggé. want distingue
    maintenant fractionné (interval) du seuil/tempo (tempo), physiologiquement
    différents (VO2max/anaérobie court vs effort soutenu). */
+/* Intensité réelle d'une séance de course (12/11/2026) : la ligne d'effort la plus dure, en % de VMA
+   (allure exacte, % VMA, % allure seuil). Avant, seuls le titre et la zone comptaient : un 5 × 3' à 3:10
+   classé Z2 recevait une paire de footing. Même règle que le serveur (_shared/intensity.ts). */
+function runEffortPct(s){
+  const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{}, vma=+R.vma||0, seuil=+R.seuilRun||0;
+  const blocks=(s.blocksV2&&s.blocksV2.blocks)||s.blocks||[]; let max=null;
+  for(const b of blocks) for(const l of (b.lines||[])){
+    if(!['exo','contre'].includes(l.type)) continue; let p=null;
+    if(l.mode==='exact'&&l.exact&&l.exact.kind==='pace'){ const sec=(+l.exact.m||0)*60+(+l.exact.s||0); if(sec) p=vma?(3600/sec)/vma*100:seuil?(seuil/sec)*87:null; }
+    else if(l.mode==='zone'&&+l.pct>0){ p=l.model==='vma'?+l.pct:l.model==='seuilRun'?+l.pct*0.87:l.model==='cv'?+l.pct*0.93:null; }
+    if(p!=null&&(max==null||p>max)) max=p;
+  }
+  return max;
+}
 function recommendShoe(s){
   const shoes = GEAR.filter(g=>g.type==='shoe' && g.km < g.max);   // paires encore vivantes
   if(!shoes.length || !s || s.disc!=='run') return null;
   const title=(s.title||'').toLowerCase();
   let want;
+  const pv=runEffortPct(s);
   if(/comp[ée]t|course|marathon|semi|10k|5k|race/.test(title)) want='race';
+  else if(pv!=null) want = pv>=90?'interval':pv>=77?'tempo':'easy';
   else if(/vma|fractionn|interval|r[ée]p[ée]tition/.test(title) || s.zone==='Z5') want='interval';
   else if(/seuil|tempo|vo2|dynamique|allure/.test(title) || s.zone==='Z4') want='tempo';
   else want='easy';

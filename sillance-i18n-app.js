@@ -637,6 +637,7 @@
 
     "weekInt.alertHard": `RPE moyen {avg} · la semaine est plus éprouvante que prévu : pense à alléger les prochaines séances.`,
     "weekInt.alertEasy": `RPE moyen {avg} · la semaine passe mieux que prévu : la charge peut être maintenue, voire montée.`,
+    "intModel.title": `Répartition sur 4 semaines`, "intModel.sub": `temps par intensité, comparé à ton modèle`, "intModel.choose": `Modèle d'intensité`, "intModel.polar": `Polarisé 80/20`, "intModel.pyramid": `Pyramidal`, "intModel.threshold": `Orienté seuil`, "intModel.low": `Basse (Z1-Z2)`, "intModel.mid": `Modérée (Z3)`, "intModel.high": `Haute (Z4-Z5)`, "intModel.planned": `Prévu`, "intModel.target": `Modèle`, "intModel.ok": `Répartition conforme au modèle {model}.`, "intModel.tooMuch": `Trop de temps en {zone} : {p} % pour {t} % visés.`, "intModel.tooLittle": `Pas assez de temps en {zone} : {p} % pour {t} % visés.`, "intModel.greyZone": `C'est la « zone grise » : assez dure pour fatiguer, pas assez pour progresser autant qu'en Z4-Z5.`,
     "weekInt.title": `Intensités de la semaine`, "weekInt.subtitle": `prévu vs réalisé · pour adapter la charge`,
     "weekInt.planned": `Prévu`, "weekInt.done": `Réalisé`,
 
@@ -2338,6 +2339,7 @@
 
     "weekInt.alertHard": `Average RPE {avg} · the week is more taxing than planned: consider lightening upcoming sessions.`,
     "weekInt.alertEasy": `Average RPE {avg} · the week is going better than planned: load can be maintained, or even increased.`,
+    "intModel.title": `Distribution over 4 weeks`, "intModel.sub": `time per intensity, compared with your model`, "intModel.choose": `Intensity model`, "intModel.polar": `Polarised 80/20`, "intModel.pyramid": `Pyramidal`, "intModel.threshold": `Threshold-focused`, "intModel.low": `Low (Z1-Z2)`, "intModel.mid": `Moderate (Z3)`, "intModel.high": `High (Z4-Z5)`, "intModel.planned": `Planned`, "intModel.target": `Model`, "intModel.ok": `Distribution in line with the {model} model.`, "intModel.tooMuch": `Too much time in {zone}: {p} % for {t} % targeted.`, "intModel.tooLittle": `Not enough time in {zone}: {p} % for {t} % targeted.`, "intModel.greyZone": `This is the "grey zone": hard enough to tire, not enough to progress as much as Z4-Z5.`,
     "weekInt.title": `Week intensities`, "weekInt.subtitle": `planned vs done · to adjust load`,
     "weekInt.planned": `Planned`, "weekInt.done": `Done`,
 
@@ -3937,6 +3939,7 @@
 
     "weekInt.alertHard": `RPE medio {avg} · la semana está siendo más exigente de lo previsto: considera aligerar las próximas sesiones.`,
     "weekInt.alertEasy": `RPE medio {avg} · la semana va mejor de lo previsto: la carga puede mantenerse, o incluso subirse.`,
+    "intModel.title": `Distribución en 4 semanas`, "intModel.sub": `tiempo por intensidad, comparado con tu modelo`, "intModel.choose": `Modelo de intensidad`, "intModel.polar": `Polarizado 80/20`, "intModel.pyramid": `Piramidal`, "intModel.threshold": `Orientado al umbral`, "intModel.low": `Baja (Z1-Z2)`, "intModel.mid": `Moderada (Z3)`, "intModel.high": `Alta (Z4-Z5)`, "intModel.planned": `Previsto`, "intModel.target": `Modelo`, "intModel.ok": `Distribución conforme al modelo {model}.`, "intModel.tooMuch": `Demasiado tiempo en {zone}: {p} % para {t} % previstos.`, "intModel.tooLittle": `Poco tiempo en {zone}: {p} % para {t} % previstos.`, "intModel.greyZone": `Es la «zona gris»: lo bastante dura para cansar, no lo suficiente para progresar como en Z4-Z5.`,
     "weekInt.title": `Intensidades de la semana`, "weekInt.subtitle": `previsto vs realizado · para adaptar la carga`,
     "weekInt.planned": `Previsto`, "weekInt.done": `Realizado`,
 

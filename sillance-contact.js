@@ -29,6 +29,13 @@
     var form = document.getElementById('contactForm');
     if(!form) return;
 
+    // Lien venu de la page coach : ?sujet=coaching présélectionne le sujet.
+    try{
+      var wanted = (/[?&]sujet=([a-z]{1,20})/.exec(location.search) || [])[1];
+      var sel0 = form.querySelector('#cf-subject');
+      if(wanted && sel0 && sel0.querySelector('option[value="' + wanted + '"]')) sel0.value = wanted;
+    }catch(e){}
+
     var status = document.createElement('p');
     status.className = 'form-note';
     status.setAttribute('role', 'status');
