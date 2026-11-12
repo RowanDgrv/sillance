@@ -1035,6 +1035,7 @@ function renderSidebar(){
             <input type="number" min="30" max="150" step="0.1" value="${checkin.poids}" id="ckPoids" aria-label="${tr('checkin.weightAria')}">
             <span class="ck-wkg" id="ckWkg">${ATHLETE_REF.ftp?(ATHLETE_REF.ftp/checkin.poids).toFixed(2)+' W/kg':''}</span>
           </div>
+          <p class="ck-weight-note">${tr('checkin.weightNote')}</p>
         </div>
         <div class="row ck-hrv">
           <label><i class="ic ic-refresh"></i> ${tr('checkin.hrvMorning')} <span class="ck-hrv-opt">${tr('checkin.hrvOptional')}</span></label>

@@ -310,7 +310,7 @@
 
     "checkin.title": `Check-in du jour`, "checkin.hint": `30 secondes pour adapter ta séance à ta forme réelle.`,
     "checkin.sleep": `Sommeil`, "checkin.legFatigue": `Jambes lourdes`, "checkin.motivation": `Motivation`,
-    "checkin.weight": `Poids`, "checkin.weightAria": `Poids en kilogrammes`,
+    "checkin.weight": `Poids`, "checkin.weightAria": `Poids en kilogrammes`, "checkin.weightNote": `Facultatif. Si tu le renseignes, il sert à tes calculs (W/kg) et à doser les conseils nutrition de ton coach, y compris ceux proposés par l'assistant IA si l'analyse IA est activée. Tu peux le modifier ou l'effacer quand tu veux.`,
     "checkin.hrvMorning": `HRV du matin`, "checkin.hrvOptional": `Facultatif · depuis ta montre ou une appli dédiée.`, "checkin.hrvAria": `Variabilité de la fréquence cardiaque en millisecondes`,
     "checkin.availability": `Disponibilité`, "checkin.availabilityAria": `Disponibilité du jour`, "checkin.notePlaceholder": `Une précision ? (douleur, fatigue, contexte…)`,
     "checkin.cycleTitle": `Cycle menstruel`, "checkin.cycleStopTracking": `Arrêter le suivi de mon cycle`, "checkin.hide": `masquer`,
@@ -2014,7 +2014,7 @@
 
     "checkin.title": `Today's check-in`, "checkin.hint": `30 seconds to adapt your session to how you actually feel.`,
     "checkin.sleep": `Sleep`, "checkin.legFatigue": `Heavy legs`, "checkin.motivation": `Motivation`,
-    "checkin.weight": `Weight`, "checkin.weightAria": `Weight in kilograms`,
+    "checkin.weight": `Weight`, "checkin.weightAria": `Weight in kilograms`, "checkin.weightNote": `Optional. If you enter it, it is used for your calculations (W/kg) and to size your coach's nutrition advice, including suggestions from the AI assistant if AI analysis is on. You can change or remove it at any time.`,
     "checkin.hrvMorning": `Morning HRV`, "checkin.hrvOptional": `Optional · from your watch or a dedicated app.`, "checkin.hrvAria": `Heart rate variability in milliseconds`,
     "checkin.availability": `Availability`, "checkin.availabilityAria": `Today's availability`, "checkin.notePlaceholder": `Anything to add? (pain, fatigue, context…)`,
     "checkin.cycleTitle": `Menstrual cycle`, "checkin.cycleStopTracking": `Stop tracking my cycle`, "checkin.hide": `hide`,
@@ -3616,7 +3616,7 @@
 
     "checkin.title": `Check-in del día`, "checkin.hint": `30 segundos para adaptar tu sesión a tu forma real.`,
     "checkin.sleep": `Sueño`, "checkin.legFatigue": `Piernas cargadas`, "checkin.motivation": `Motivación`,
-    "checkin.weight": `Peso`, "checkin.weightAria": `Peso en kilogramos`,
+    "checkin.weight": `Peso`, "checkin.weightAria": `Peso en kilogramos`, "checkin.weightNote": `Opcional. Si lo indicas, se usa para tus cálculos (W/kg) y para ajustar los consejos de nutrición de tu entrenador, incluidas las propuestas del asistente IA si el análisis IA está activado. Puedes cambiarlo o borrarlo cuando quieras.`,
     "checkin.hrvMorning": `HRV de la mañana`, "checkin.hrvOptional": `Opcional · desde tu reloj o una app dedicada.`, "checkin.hrvAria": `Variabilidad de la frecuencia cardiaca en milisegundos`,
     "checkin.availability": `Disponibilidad`, "checkin.availabilityAria": `Disponibilidad del día`, "checkin.notePlaceholder": `¿Algo que precisar? (dolor, fatiga, contexto…)`,
     "checkin.cycleTitle": `Ciclo menstrual`, "checkin.cycleStopTracking": `Dejar de seguir mi ciclo`, "checkin.hide": `ocultar`,
