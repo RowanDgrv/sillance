@@ -22,7 +22,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
 <link rel="shortcut icon" href="./favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:wght@400;500;600&display=optional" rel="stylesheet">
 <style>
   :root{--paper:#0B1120;--panel:#121A2B;--panel-2:#18213A;--ink:#F3F6FC;--soft:#C2CBDD;--muted:#8A93A8;--accent:#46C2D8;--accent2:#FF9A3D;--line:rgba(150,165,200,.16);--line-strong:rgba(150,165,200,.30)}
   *{margin:0;padding:0;box-sizing:border-box}
@@ -31,7 +31,7 @@
   /* liens en plein texte (audit axe-core 04/08/2026, link-in-text-block) :
      distingués UNIQUEMENT par la couleur sinon, ce que la WCAG interdit. */
   .tip a, figcaption a{text-decoration:underline;text-underline-offset:2px}
-  .top{position:sticky;top:0;z-index:10;background:rgba(11,17,32,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-strong)}
+  .top{position:sticky;top:0;z-index:10;background:var(--paper,#0B1120);border-bottom:1px solid var(--line-strong)}
   .top .in{max-width:1080px;margin:0 auto;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
   .wm{font-family:'Oswald',sans-serif;font-weight:600;font-size:21px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
   .wm b{color:var(--accent)}
@@ -51,7 +51,7 @@
   }
   /* sommaire */
   .toc{position:sticky;top:96px;align-self:start;font-size:13.5px}
-  .toc .lbl{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
+  .toc .lbl{font-family:'Archivo',sans-serif;font-variant-numeric:tabular-nums;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
   .toc a{display:block;color:var(--soft);padding:5px 0;border-left:2px solid transparent;padding-left:12px;margin-left:-2px}
   .toc a:hover{color:var(--accent);border-color:var(--accent)}
   /* contenu */
@@ -62,12 +62,12 @@
   .role-h{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2);margin:52px 0 4px;padding-top:22px;border-top:1px solid var(--line-strong)}
   .tuto{margin-top:30px}
   .tuto h2{font-family:'Oswald',sans-serif;font-weight:600;font-size:23px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline;gap:12px}
-  .tuto h2 .no{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--accent);font-weight:600}
+  .tuto h2 .no{font-family:'Archivo',sans-serif;font-variant-numeric:tabular-nums;font-size:15px;color:var(--accent);font-weight:600}
   .tuto .lead{margin:8px 0 4px;color:var(--soft)}
   ol.steps{list-style:none;counter-reset:s;margin:18px 0 0}
   ol.steps>li{counter-increment:s;position:relative;padding:4px 0 18px 44px;border-left:1px solid var(--line);margin-left:15px}
   ol.steps>li:last-child{border-left:1px solid transparent}
-  ol.steps>li::before{content:counter(s);position:absolute;left:-15px;top:0;width:30px;height:30px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  ol.steps>li::before{content:counter(s);position:absolute;left:-15px;top:0;width:30px;height:30px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line-strong);color:var(--accent);font-family:'Archivo',sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
   ol.steps>li b{color:var(--ink)}
   .hlword{color:var(--accent2);font-weight:600;white-space:nowrap}
   figure{margin:20px 0 4px}
