@@ -71,6 +71,7 @@
       'guide.coachStep': 'Reviens dans ton espace coach, bloc « Rappel de planification », choisis <b>Notification</b> puis touche <b>Autoriser</b>.',
       'guide.coachEmail': 'Le rappel par email est déjà actif par défaut, sans rien installer. Tu peux changer le canal, le jour limite ou le couper dans « Rappel de planification ».',
       'guide.ok': 'J\'ai compris',
+      'eve.title': 'Rappel la veille', 'eve.on': 'activé', 'eve.off': 'désactivé', 'eve.label': "Recevoir l'alerte la veille à", 'eve.hint': "La veille au soir, un message « C'est prévu pour demain : … » avec la liste de ce qu'il faut mettre dans ton sac. Même canal que le rappel du matin.", 'eve.needMorning': "Active d'abord le rappel du matin ci-dessus : le rappel de la veille utilise le même canal.", 'eve.saved': 'Rappel de la veille enregistré', 'eve.err': 'Enregistrement impossible, réessaie.',
       'wx.title': 'Météo du jour',
       'wx.on': 'activée', 'wx.off': 'désactivée',
       'wx.hintOff': 'Avec ton accord, Sillance utilise ta position approximative (à 10 km près) pour regarder la pluie du jour et ajouter la veste à ton rappel. Sans position, pas de météo.',
@@ -135,6 +136,7 @@
       'guide.coachStep': 'Go back to your coach space, "Planning reminder" block, pick <b>Notification</b> then tap <b>Allow</b>.',
       'guide.coachEmail': 'The email reminder is already on by default, nothing to install. Change the channel, the deadline or turn it off in "Planning reminder".',
       'guide.ok': 'Got it',
+      'eve.title': 'Evening-before reminder', 'eve.on': 'on', 'eve.off': 'off', 'eve.label': 'Get the reminder the evening before at', 'eve.hint': 'The evening before, a message "Planned for tomorrow: …" with what to pack in your bag. Same channel as the morning reminder.', 'eve.needMorning': 'Turn on the morning reminder above first: the evening reminder uses the same channel.', 'eve.saved': 'Evening reminder saved', 'eve.err': 'Could not save, try again.',
       'wx.title': 'Today\'s weather',
       'wx.on': 'on', 'wx.off': 'off',
       'wx.hintOff': 'With your consent, Sillance uses your approximate location (within 10 km) to check today\'s rain and add the jacket to your reminder. No location, no weather.',
@@ -199,6 +201,7 @@
       'guide.coachStep': 'Vuelve a tu espacio de entrenador, bloque «Recordatorio de planificación», elige <b>Notificación</b> y toca <b>Permitir</b>.',
       'guide.coachEmail': 'El recordatorio por email ya está activo por defecto, sin instalar nada. Cambia el canal, el día límite o desactívalo en «Recordatorio de planificación».',
       'guide.ok': 'Entendido',
+      'eve.title': 'Recordatorio la víspera', 'eve.on': 'activado', 'eve.off': 'desactivado', 'eve.label': 'Recibir el aviso la víspera a las', 'eve.hint': 'La víspera por la noche, un mensaje «Previsto para mañana: …» con lo que debes meter en tu bolsa. Mismo canal que el recordatorio de la mañana.', 'eve.needMorning': 'Activa primero el recordatorio de la mañana: el de la víspera usa el mismo canal.', 'eve.saved': 'Recordatorio de la víspera guardado', 'eve.err': 'No se pudo guardar, inténtalo de nuevo.',
       'wx.title': 'Tiempo del día',
       'wx.on': 'activado', 'wx.off': 'desactivado',
       'wx.hintOff': 'Con tu permiso, Sillance usa tu ubicación aproximada (con 10 km de margen) para mirar la lluvia del día y añadir la chaqueta a tu recordatorio. Sin ubicación, no hay tiempo.',
@@ -707,6 +710,45 @@
     }
     saveCoach({ day: prev.day, channel: ch }, prev);
   });
+
+  /* ---------- rappel de la veille (13/11/2026, option) ---------- */
+  var eve, eveFor = null;
+  function eveHtml(){
+    var on = !!(eve && eve.eve_enabled), off = !eve || eve.channel === 'none';
+    var hh = eve ? pad(eve.eve_hour) + ':' + pad(eve.eve_minute || 0) : '21:00', opts = '';
+    for(var h = 17; h <= 23; h++) for(var m = 0; m < 60; m += 15){ var v = pad(h) + ':' + pad(m); opts += '<option' + (v === hh ? ' selected' : '') + '>' + v + '</option>'; }
+    return '<div class="rem-wx-head"><b>' + t('eve.title') + '</b><span class="rem-wx-state' + (on ? ' on' : '') + '">' + t(on ? 'eve.on' : 'eve.off') + '</span></div>'
+      + '<p class="rem-wx-hint">' + t(off ? 'eve.needMorning' : 'eve.hint') + '</p>'
+      + (off ? '' : '<label class="rem-eve-row" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px"><input type="checkbox" id="eveOn"' + (on ? ' checked' : '') + ' style="width:18px;height:18px"> <span>' + t('eve.label') + '</span> <select id="eveHour">' + opts + '</select></label>');
+  }
+  function paintEve(force){
+    var btn = document.getElementById('morningBtn'); if(!btn) return;
+    var box = btn.parentNode.querySelector('.rem-eve');
+    if(eve === undefined){ if(box) box.remove(); return; }
+    if(!box){ box = document.createElement('div'); box.className = 'rem-wx rem-eve'; btn.parentNode.appendChild(box); force = true; }
+    if(!force) return;
+    box.innerHTML = eveHtml();
+    var cb = box.querySelector('#eveOn'), sel = box.querySelector('#eveHour');
+    function save(){
+      var hv = sel.value.split(':').map(Number);
+      window.PF.saveEvePrefs({ enabled: cb.checked, hour: hv[0], minute: hv[1] }).then(function(){
+        eve.eve_enabled = cb.checked; eve.eve_hour = hv[0]; eve.eve_minute = hv[1];
+        if(window.toast) window.toast(t('eve.saved')); paintEve(true);
+      }).catch(function(){ if(window.toast) window.toast(t('eve.err'), 'error'); cb.checked = !!eve.eve_enabled; });
+    }
+    if(cb) cb.onchange = save; if(sel) sel.onchange = function(){ if(cb.checked) save(); };
+  }
+  setInterval(function(){
+    var uid = window.PF && window.PF.user ? window.PF.user.id : null;
+    if(uid !== eveFor){
+      eveFor = uid; eve = undefined; paintEve();
+      if(uid && window.PF.getEvePrefs) window.PF.getEvePrefs().then(function(r){ eve = r; paintEve(true); }).catch(function(){});
+    } else {
+      // le canal du matin a pu changer : on relit la ligne si elle était vide
+      var btn = document.getElementById('morningBtn');
+      if(btn && !btn.parentNode.querySelector('.rem-eve') && eve !== undefined) paintEve(true);
+    }
+  }, 1000);
 
   window.SilReminder = { openGuide: openGuide, needsInstall: needsInstall, paintSettings: paintSettings };
 })();

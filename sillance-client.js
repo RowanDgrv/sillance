@@ -543,6 +543,18 @@ export const PF = {
               { onConflict: "user_id" });
     if (error) throw error; return true;
   },
+  // ---- Rappel de la veille (0098) : undefined = colonnes absentes ; null = pas encore de rappel du matin ----
+  async getEvePrefs() {
+    const { data, error } = await sb.from("notification_prefs").select("channel, eve_enabled, eve_hour, eve_minute").maybeSingle();
+    if (error) return undefined;
+    return data ?? null;
+  },
+  async saveEvePrefs({ enabled, hour, minute }) {
+    const { error } = await sb.from("notification_prefs")
+      .update({ eve_enabled: !!enabled, eve_hour: hour, eve_minute: minute ?? 0, updated_at: new Date().toISOString() })
+      .eq("user_id", this.user.id);
+    if (error) throw error; return true;
+  },
   // ---- Météo du rappel du matin : position approximative, avec accord (0093) ----
   // undefined = colonnes absentes (base pas encore migrée) → le bloc météo ne
   // s'affiche pas ; {} = pas de ligne ou pas de position.

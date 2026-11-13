@@ -8291,15 +8291,19 @@ function openDayRecap(dateKey){
       <div class="adh-sub">${fmtDur(s.dur)} · ${s.tss} TSS · ${s.zone||''}</div>
       ${sessionBreakdownHTML(s)}
       <div class="sn-block"><div class="sn-head"><i class="ic ic-check"></i> À prévoir</div>
-        ${gear.map(g=>`<label class="dayrecap-g"><input type="checkbox"> <span>${dispoSafe(g)}</span></label>`).join('')}</div>
+        ${gear.map(g=>`<label class="dayrecap-g"><input type="checkbox" data-bag="${dispoSafe(dateKey+'|'+i+'|'+g)}"> <span>${dispoSafe(g)}</span></label>`).join('')}</div>
       ${s.coachNote?`<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> Le mot de ton coach</div><div class="sn-txt">${dispoSafe(s.coachNote)}</div></div>`:''}
       ${n&&!n.none&&(n.pre||n.during||n.post)?`<div class="sn-block"><div class="sn-head"><i class="ic ic-utensils"></i> Nutrition</div><div class="sn-txt">${[n.pre&&'Avant : '+dispoSafe(n.pre), n.during&&'Pendant : '+dispoSafe(n.during), n.post&&'Après : '+dispoSafe(n.post)].filter(Boolean).join('<br>')}</div></div>`:''}
       <button class="btn" data-recap-open="${i}" type="button" style="width:100%;margin-top:6px">Voir la séance complète</button>
     </div>`; }).join('') : `<p class="club-hint">Pas de séance prévue ce jour-là. Profite du repos.</p>`;
   el.innerHTML=`<div class="adh-modal dayrecap-modal" role="dialog" aria-label="Ta séance du jour" style="max-width:520px">
     <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
-    <span class="dayrecap-k">Ta séance du jour</span><h3 style="text-transform:capitalize">${dateTxt}</h3>${body}</div>`;
+    <span class="dayrecap-k">${dateKey===iso(addDays(new Date(),1))?'Ta séance de demain':'Ta séance du jour'}</span><h3 style="text-transform:capitalize">${dateTxt}</h3>${body}</div>`;
   document.body.appendChild(el);
+  // sac : ce qui est coché reste coché sur cet appareil (on prépare la veille, on vérifie le matin)
+  let bag={}; try{ bag=JSON.parse(localStorage.getItem('sil_bag')||'{}')||{}; }catch(e){}
+  el.querySelectorAll('[data-bag]').forEach(cb=>{ cb.checked=!!bag[cb.dataset.bag]; cb.onchange=()=>{ if(cb.checked) bag[cb.dataset.bag]=dateKey; else delete bag[cb.dataset.bag];
+    const keep=iso(addDays(new Date(),-2)); Object.keys(bag).forEach(k=>{ if(bag[k]<keep) delete bag[k]; }); try{ localStorage.setItem('sil_bag', JSON.stringify(bag)); }catch(e){} }; });
   requestAnimationFrame(()=>el.classList.add('open'));
   const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
   el.querySelector('.adh-close').onclick=close;
