@@ -71,7 +71,8 @@
       'guide.coachStep': 'Reviens dans ton espace coach, bloc « Rappel de planification », choisis <b>Notification</b> puis touche <b>Autoriser</b>.',
       'guide.coachEmail': 'Le rappel par email est déjà actif par défaut, sans rien installer. Tu peux changer le canal, le jour limite ou le couper dans « Rappel de planification ».',
       'guide.ok': 'J\'ai compris',
-      'eve.title': 'Rappel la veille', 'eve.on': 'activé', 'eve.off': 'désactivé', 'eve.label': "Recevoir l'alerte la veille à", 'eve.hint': "La veille au soir, un message « C'est prévu pour demain : … » avec la liste de ce qu'il faut mettre dans ton sac. Même canal que le rappel du matin.", 'eve.needMorning': "Active d'abord le rappel du matin ci-dessus : le rappel de la veille utilise le même canal.", 'eve.saved': 'Rappel de la veille enregistré', 'eve.err': 'Enregistrement impossible, réessaie.',
+      'eve.when': 'Quand recevoir ton rappel ?', 'eve.morning': 'Le matin même (à l\'heure ci-dessus)', 'eve.evening': 'La veille au soir, à', 'eve.hint2': 'Un seul rappel, au moment que tu préfères : le matin même, ou la veille au soir pour préparer ton sac.',
+      'eve.title': 'Rappel la veille', 'eve.on': 'activé', 'eve.off': 'désactivé', 'eve.label': "Recevoir l'alerte la veille à", 'eve.hint': "La veille au soir, un message « C'est prévu pour demain : … » avec la liste de ce qu'il faut mettre dans ton sac. Même canal que le rappel du matin.", 'eve.needMorning': "Active d'abord le rappel du matin ci-dessus : le rappel de la veille utilise le même canal.", 'eve.saved': 'Rappel enregistré', 'eve.err': 'Enregistrement impossible, réessaie.',
       'wx.title': 'Météo du jour',
       'wx.on': 'activée', 'wx.off': 'désactivée',
       'wx.hintOff': 'Avec ton accord, Sillance utilise ta position approximative (à 10 km près) pour regarder la pluie du jour et ajouter la veste à ton rappel. Sans position, pas de météo.',
@@ -136,6 +137,7 @@
       'guide.coachStep': 'Go back to your coach space, "Planning reminder" block, pick <b>Notification</b> then tap <b>Allow</b>.',
       'guide.coachEmail': 'The email reminder is already on by default, nothing to install. Change the channel, the deadline or turn it off in "Planning reminder".',
       'guide.ok': 'Got it',
+      'eve.when': 'When should you get your reminder?', 'eve.morning': 'The same morning (at the time above)', 'eve.evening': 'The evening before, at', 'eve.hint2': 'One reminder only, when you prefer: the same morning, or the evening before to pack your bag.',
       'eve.title': 'Evening-before reminder', 'eve.on': 'on', 'eve.off': 'off', 'eve.label': 'Get the reminder the evening before at', 'eve.hint': 'The evening before, a message "Planned for tomorrow: …" with what to pack in your bag. Same channel as the morning reminder.', 'eve.needMorning': 'Turn on the morning reminder above first: the evening reminder uses the same channel.', 'eve.saved': 'Evening reminder saved', 'eve.err': 'Could not save, try again.',
       'wx.title': 'Today\'s weather',
       'wx.on': 'on', 'wx.off': 'off',
@@ -201,6 +203,7 @@
       'guide.coachStep': 'Vuelve a tu espacio de entrenador, bloque «Recordatorio de planificación», elige <b>Notificación</b> y toca <b>Permitir</b>.',
       'guide.coachEmail': 'El recordatorio por email ya está activo por defecto, sin instalar nada. Cambia el canal, el día límite o desactívalo en «Recordatorio de planificación».',
       'guide.ok': 'Entendido',
+      'eve.when': '¿Cuándo recibir tu recordatorio?', 'eve.morning': 'La misma mañana (a la hora indicada arriba)', 'eve.evening': 'La víspera por la noche, a las', 'eve.hint2': 'Un solo recordatorio, cuando prefieras: la misma mañana o la víspera por la noche para preparar tu bolsa.',
       'eve.title': 'Recordatorio la víspera', 'eve.on': 'activado', 'eve.off': 'desactivado', 'eve.label': 'Recibir el aviso la víspera a las', 'eve.hint': 'La víspera por la noche, un mensaje «Previsto para mañana: …» con lo que debes meter en tu bolsa. Mismo canal que el recordatorio de la mañana.', 'eve.needMorning': 'Activa primero el recordatorio de la mañana: el de la víspera usa el mismo canal.', 'eve.saved': 'Recordatorio de la víspera guardado', 'eve.err': 'No se pudo guardar, inténtalo de nuevo.',
       'wx.title': 'Tiempo del día',
       'wx.on': 'activado', 'wx.off': 'desactivado',
@@ -717,9 +720,11 @@
     var on = !!(eve && eve.eve_enabled), off = !eve || eve.channel === 'none';
     var hh = eve ? pad(eve.eve_hour) + ':' + pad(eve.eve_minute || 0) : '21:00', opts = '';
     for(var h = 17; h <= 23; h++) for(var m = 0; m < 60; m += 15){ var v = pad(h) + ':' + pad(m); opts += '<option' + (v === hh ? ' selected' : '') + '>' + v + '</option>'; }
-    return '<div class="rem-wx-head"><b>' + t('eve.title') + '</b><span class="rem-wx-state' + (on ? ' on' : '') + '">' + t(on ? 'eve.on' : 'eve.off') + '</span></div>'
-      + '<p class="rem-wx-hint">' + t(off ? 'eve.needMorning' : 'eve.hint') + '</p>'
-      + (off ? '' : '<label class="rem-eve-row" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px"><input type="checkbox" id="eveOn"' + (on ? ' checked' : '') + ' style="width:18px;height:18px"> <span>' + t('eve.label') + '</span> <select id="eveHour">' + opts + '</select></label>');
+    // Un seul rappel au choix (13/11/2026) : le matin même (par défaut) OU la veille au soir, jamais les deux.
+    return '<div class="rem-wx-head"><b>' + t('eve.when') + '</b></div>'
+      + '<p class="rem-wx-hint">' + t(off ? 'eve.needMorning' : 'eve.hint2') + '</p>'
+      + (off ? '' : '<label style="display:flex;align-items:center;gap:10px;margin-top:8px"><input type="radio" name="eveWhen" value="morning"' + (on ? '' : ' checked') + ' style="width:18px;height:18px"> <span>' + t('eve.morning') + '</span></label>'
+        + '<label style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px"><input type="radio" name="eveWhen" value="eve"' + (on ? ' checked' : '') + ' style="width:18px;height:18px"> <span>' + t('eve.evening') + '</span> <select id="eveHour">' + opts + '</select></label>');
   }
   function paintEve(force){
     var btn = document.getElementById('morningBtn'); if(!btn) return;
@@ -728,15 +733,17 @@
     if(!box){ box = document.createElement('div'); box.className = 'rem-wx rem-eve'; btn.parentNode.appendChild(box); force = true; }
     if(!force) return;
     box.innerHTML = eveHtml();
-    var cb = box.querySelector('#eveOn'), sel = box.querySelector('#eveHour');
+    var sel = box.querySelector('#eveHour'), radios = box.querySelectorAll('input[name="eveWhen"]');
+    function isEve(){ var r = box.querySelector('input[name="eveWhen"]:checked'); return !!(r && r.value === 'eve'); }
     function save(){
-      var hv = sel.value.split(':').map(Number);
-      window.PF.saveEvePrefs({ enabled: cb.checked, hour: hv[0], minute: hv[1] }).then(function(){
-        eve.eve_enabled = cb.checked; eve.eve_hour = hv[0]; eve.eve_minute = hv[1];
+      var hv = sel.value.split(':').map(Number), en = isEve();
+      window.PF.saveEvePrefs({ enabled: en, hour: hv[0], minute: hv[1] }).then(function(){
+        eve.eve_enabled = en; eve.eve_hour = hv[0]; eve.eve_minute = hv[1];
         if(window.toast) window.toast(t('eve.saved')); paintEve(true);
-      }).catch(function(){ if(window.toast) window.toast(t('eve.err'), 'error'); cb.checked = !!eve.eve_enabled; });
+      }).catch(function(){ if(window.toast) window.toast(t('eve.err'), 'error'); paintEve(true); });
     }
-    if(cb) cb.onchange = save; if(sel) sel.onchange = function(){ if(cb.checked) save(); };
+    radios.forEach(function(r){ r.onchange = save; });
+    if(sel) sel.onchange = function(){ if(isEve()) save(); };
   }
   setInterval(function(){
     var uid = window.PF && window.PF.user ? window.PF.user.id : null;
