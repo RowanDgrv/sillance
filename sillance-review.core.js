@@ -520,7 +520,10 @@ const DISPO_META = {
   blesse: {get l(){return tr('dispo.blesse')},  c:'var(--run)',  ic:'ic-alert-triangle'}
 };
 function athDispo(a){ const d=a&&a.checkin&&a.checkin.dispo; return (d&&DISPO_META[d])?d:null; }
-function dispoSafe(t){ return String(t||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+/* Texte déjà échappé au chargement (sillance-integration.js esc) : on le décode avant de
+   ré-échapper, sinon « 3' » devenait « 3&amp;#39; » à l'écran (13/11/2026). */
+function plainText(t){ return String(t||'').replace(/&(amp|lt|gt|quot|#39);/g, (m,e)=>({amp:'&',lt:'<',gt:'>',quot:'"','#39':"'"}[e])); }
+function dispoSafe(t){ return plainText(t).replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
 
 /* ============================================================
    PHYSIO FÉMININE — suivi du cycle menstruel (opt-in, sensible)
@@ -5081,7 +5084,7 @@ function openCreneauDetail(c, tab){
   const ov=document.getElementById('crDetailOverlay');
   ov.querySelector('.modal').style.setProperty('--c', D.color);
   document.getElementById('crdBadge').innerHTML=`${discIcon(D)} ${D.label}`;
-  document.getElementById('crdTitle').textContent=c.title;
+  document.getElementById('crdTitle').textContent=plainText(c.title);
   renderCreneauDetail();
   ov.classList.add('open');
 }
@@ -5713,7 +5716,7 @@ function openVideo(v){
   const D=DISC[v.disc];
   document.getElementById('videoBadge').textContent=D.label;
   document.getElementById('videoBadge').style.background=D.color;
-  document.getElementById('videoTitle').textContent=v.title;
+  document.getElementById('videoTitle').textContent=plainText(v.title);
   document.getElementById('videoDesc').textContent=v.desc;
   const frame=document.getElementById('videoFrame');
   if(v.src){
@@ -5740,7 +5743,7 @@ function showVidPopover(e, v){
   const D=DISC[v.disc];
   vpop.style.setProperty('--vpc', D.color);
   document.getElementById('vpThumb').style.setProperty('--vpc', D.color);
-  document.getElementById('vpTitle').textContent=v.title;
+  document.getElementById('vpTitle').textContent=plainText(v.title);
   document.getElementById('vpHint').textContent=`${v.dur} · ${tr('video.clickToOpen')}`;
   vpop.classList.add('show'); vpop.setAttribute('aria-hidden','false');
   positionVidPopover(e);
@@ -6054,7 +6057,7 @@ function openBuilder(dateKey, existing){
   // objectif de séance (pour l'analyse IA) — normalisé en chaîne "type|zone"
   if(builderState.objectif && typeof builderState.objectif==='object'){ builderState.objectif = builderState.objectif.type ? builderState.objectif.type+'|'+builderState.objectif.zone : ''; }
   if(builderState.objectif==null) builderState.objectif = (existing&&existing.objectif&&existing.objectif.type) ? existing.objectif.type+'|'+existing.objectif.zone : '';
-  document.getElementById('bTitle').value = builderState.title||'';
+  document.getElementById('bTitle').value = plainText(builderState.title||'');
   document.getElementById('bObjectif').value = builderState.objectif||'';
   document.getElementById('builderBadge').textContent = existing ? tr('builder.editSession') : tr('builder.newSession');
   document.getElementById('bDiscPick').value = builderState.disc;
@@ -6628,25 +6631,38 @@ function estimateLineSpeed(ln){
   if(disc==='bike'){ return 36*Math.cbrt((ln.pct||70)/100); } // racine cubique (03/11/2026)
   return 12*(ln.pct/100);
 }
+/* Charge (TSS) d'une ligne, 13/11/2026 : intensité rapportée au SEUIL de l'athlète (allure seuil,
+   sinon 87 % de la VMA ; FTP ; FC de réserve), même calcul que le serveur (_shared/intensity.ts
+   lineIF / sessionLoad). Avant, le % de VMA ou de FC max était pris comme un % du seuil. */
+function lineIF(ln, disc){
+  const R=(typeof ATHLETE_REF!=='undefined'&&ATHLETE_REF)||{};
+  const vma=+R.vma||0, seuil=+R.seuilRun||0, ftp=+R.ftp||0, pma=+R.pma||0, fcmax=+R.fcMax||0;
+  const thr = seuil ? 3600/seuil : vma ? vma*0.87 : 0;
+  const hrIF = bpm => { if(!fcmax) return null; const p=fcPctOf(bpm, fcmax); return (fcRestOk(fcmax) ? p : (p-30)/0.7)/88; };
+  const DEF={warmup:0.65, cooldown:0.62, recov:0.6, contre:0.7, educatif:0.7, exo:0.85};
+  let v=null;
+  if(ln.metric==='reps') v=Math.min(1.4,(ln.rpe||7)*0.12);
+  else if(ln.mode==='exact' && ln.exact){
+    const e=ln.exact;
+    if(e.kind==='pace'){ const sec=(e.m||0)*60+(e.s||0); if(sec&&thr) v=(3600/sec)/thr; }
+    else if(e.kind==='speed'){ if(thr&&disc==='run') v=(+e.kmh)/thr; }
+    else if(e.kind==='power'){ if(ftp) v=(+e.w)/ftp; }
+    else if(e.kind==='hr') v=hrIF(((+e.lo||0)+(+e.hi||+e.lo||0))/2);
+    else if(e.kind==='rpe') v=0.2+(e.rpe||6)*0.1;
+  } else if(ln.mode==='zone' && +ln.pct>0){
+    const p=+ln.pct;
+    if(ln.model==='vma') v = vma&&thr ? (vma*p/100)/thr : p/87;
+    else if(ln.model==='seuilRun'||ln.model==='css') v=100/p;
+    else if(ln.model==='cv'||ln.model==='cpBike'||ln.model==='ftp') v=p/100;
+    else if(ln.model==='pma') v = ftp&&pma ? (p*pma/100)/ftp : p/75;
+    else if(ln.model==='fc') v = fcmax ? hrIF(fcAt(p, fcmax)) : p/90;
+  }
+  if(v==null||!isFinite(v)) v=DEF[ln.type]??0.75;
+  return Math.max(0.4, Math.min(1.4, v*(disc==='swim'?0.95:1)));
+}
 function estimateLineTss(ln, disc){
-  if(ln.metric==='reps'){
-    const pct = Math.min(130, (ln.rpe||7)*12);
-    const ir = Math.min(1.4, pct/100);
-    return lineMinutes(ln)/60*ir*ir*100;
-  }
-  let pct = ln.pct;
-  if(pct && INTENSITY_MODELS[ln.model]?.invert) pct = invertedEquivPct(ln.model, pct) ?? 10000/pct;   // % CSS / allure seuil inversés (cf. profLinePct)
-  if(ln.mode==='exact' && ln.exact){
-    // déduit une intensité relative approchée depuis la valeur absolue
-    const ex=ln.exact;
-    if(ex.kind==='power') pct = ATHLETE_REF.ftp? (ex.w/ATHLETE_REF.ftp*100):95;
-    else if(ex.kind==='speed') pct = ATHLETE_REF.vma? (ex.kmh/ATHLETE_REF.vma*100):85;
-    else if(ex.kind==='pace'){ const v=3600/((ex.m||0)*60+(ex.s||0)); pct = ATHLETE_REF.vma? (v/ATHLETE_REF.vma*100):85; }
-    else if(ex.kind==='rpe') pct = (ex.rpe||6)*12;
-    else pct = 85;
-  }
-  const ir=Math.min(1.4, pct/100*(disc==='swim'?0.95:1));
-  return lineMinutes(ln)/60*ir*ir*100;
+  const f=lineIF(ln, disc);
+  return lineMinutes(ln)/60*f*f*100;
 }
 function builderTotals(){
   let min=0, tss=0;
@@ -7164,7 +7180,7 @@ function openAnalysis(s){
   const D=DISC[s.disc];
   document.getElementById('anBadge').textContent=D.label;
   document.getElementById('anBadge').style.background=D.color;
-  document.getElementById('anTitle').textContent=s.title;
+  document.getElementById('anTitle').textContent=plainText(s.title);
 
   // ---- cas HYROX : stations + saisie manuelle ----
   if(s.disc==='hyrox'){ openHyroxAnalysis(s); analysisOverlay.classList.add('open'); return; }
@@ -7352,15 +7368,18 @@ function drawHr(data){
   const W=720,H=180,P={l:54,r:16,t:14,b:24};
   const pts=data.pts;
   const xs=i=>P.l+i/(pts.length-1)*(W-P.l-P.r);
-  const hrMax=Math.max(...pts.map(p=>p.hr))+6, hrMin=Math.min(...pts.map(p=>p.hr))-6;
+  // Axe gradué tous les 20 bpm (100, 120, 140…) au lieu de seulement le min et le max (13/11/2026)
+  const hv=pts.map(p=>p.hr).filter(v=>v>0);
+  const hrMin=Math.floor((Math.min(...hv)-4)/20)*20, hrMax=Math.ceil((Math.max(...hv)+4)/20)*20;
   const y=v=>H-P.b-(v-hrMin)/(hrMax-hrMin)*(H-P.t-P.b);
-  for(let g=0;g<=3;g++){ const yv=P.t+g/3*(H-P.t-P.b); svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${yv}" y2="${yv}" stroke="rgba(148,163,196,.1)"/>`); }
+  const ticks=[]; for(let v=hrMin; v<=hrMax; v+=20) ticks.push(v);
+  ticks.forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(148,163,196,.14)"/>`); });
   let path='',area='';
   pts.forEach((p,i)=>{ const x=xs(i),yy=y(p.hr); path+=(i?'L':'M')+x+' '+yy; });
   area=path+`L${xs(pts.length-1)} ${H-P.b}L${P.l} ${H-P.b}Z`;
   svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="var(--run)" opacity="0.1"/>`);
   svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--run)" stroke-width="2"/>`);
-  [hrMin,(hrMin+hrMax)/2,hrMax].forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--run)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${Math.round(v)}</text>`); });
+  ticks.forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--run)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${v}</text>`); });
   svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">bpm</text>`);
   AN_CHARTS.hr = {svg, pts, W, H, P, xs, y:(p)=>y(p.hr), color:'var(--run)', label:(p)=>`${Math.round(p.hr)} bpm`};
   attachCursor('hr');
