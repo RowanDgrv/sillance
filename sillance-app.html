@@ -2970,6 +2970,13 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 .my-club-card .mc-empty{font-size:13px;color:var(--muted);padding:6px 0}
 /* 11/11/2026 : sans largeur imposée, le texte se réduisait à une lettre au lieu de laisser passer les boutons à la ligne. */
 @media (max-width:640px){ .my-club-card .mc-b{flex:1 1 calc(100% - 52px)} .my-club-card .mc-row{flex-wrap:wrap} .my-club-card .mc-duo,.my-club-card .mc-row>.mc-btn{margin-left:40px} }
+.recap-k{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink,var(--accent));font-weight:700;margin-bottom:2px}
+.recap-s{border-left:3px solid var(--c);padding-left:12px;margin-top:14px}
+.recap-t{font-size:20px;font-weight:700;line-height:1.25}
+.recap-g{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:var(--fs-base);cursor:pointer}
+.recap-g:first-of-type{border-top:none}
+.recap-g input{width:18px;height:18px;accent-color:var(--good)}
+.recap-modal{max-height:88vh;overflow:auto}
 </style>
 </head>
 <body>
@@ -4302,7 +4309,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-equipment.js?v=20261103c"></script>
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
-<script src="./sillance-app.core.js?v=20261113f"></script>
+<script src="./sillance-app.core.js?v=20261113g"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->

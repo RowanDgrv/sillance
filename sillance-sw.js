@@ -85,7 +85,9 @@ self.addEventListener('push', (e) => {
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((ws) => {
-    for (const w of ws) { if ('focus' in w) return w.focus(); }
-    return self.clients.openWindow(e.notification.data?.url || './');
+    // ouvre la page visée par la notification (récap du jour), même si l'app est déjà ouverte (13/11/2026)
+    const url = new URL(e.notification.data?.url || './', self.registration.scope).href;
+    for (const w of ws) { if ('navigate' in w) return w.navigate(url).then((c) => (c || w).focus()); }
+    return self.clients.openWindow(url);
   }));
 });
