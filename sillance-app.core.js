@@ -8286,21 +8286,22 @@ function openDayRecap(dateKey){
   const body = list.length ? list.map((s,i)=>{
     const gear=gearForSession(s);
     const n=(typeof nutritionForSession==='function')?nutritionForSession(s):null;
-    return `<div class="recap-s" style="--c:${(DISC[s.disc]||{}).color||'var(--accent)'}">
-      <div class="recap-t">${dispoSafe(s.title||'')}</div>
+    return `<div class="dayrecap-s" style="--c:${(DISC[s.disc]||{}).color||'var(--accent)'}">
+      <div class="dayrecap-t">${dispoSafe(s.title||'')}</div>
       <div class="adh-sub">${fmtDur(s.dur)} · ${s.tss} TSS · ${s.zone||''}</div>
       ${sessionBreakdownHTML(s)}
       <div class="sn-block"><div class="sn-head"><i class="ic ic-check"></i> À prévoir</div>
-        ${gear.map(g=>`<label class="recap-g"><input type="checkbox"> <span>${dispoSafe(g)}</span></label>`).join('')}</div>
+        ${gear.map(g=>`<label class="dayrecap-g"><input type="checkbox"> <span>${dispoSafe(g)}</span></label>`).join('')}</div>
       ${s.coachNote?`<div class="sn-block"><div class="sn-head"><i class="ic ic-message-circle"></i> Le mot de ton coach</div><div class="sn-txt">${dispoSafe(s.coachNote)}</div></div>`:''}
       ${n&&!n.none&&(n.pre||n.during||n.post)?`<div class="sn-block"><div class="sn-head"><i class="ic ic-utensils"></i> Nutrition</div><div class="sn-txt">${[n.pre&&'Avant : '+dispoSafe(n.pre), n.during&&'Pendant : '+dispoSafe(n.during), n.post&&'Après : '+dispoSafe(n.post)].filter(Boolean).join('<br>')}</div></div>`:''}
       <button class="btn" data-recap-open="${i}" type="button" style="width:100%;margin-top:6px">Voir la séance complète</button>
     </div>`; }).join('') : `<p class="club-hint">Pas de séance prévue ce jour-là. Profite du repos.</p>`;
-  el.innerHTML=`<div class="adh-modal recap-modal" role="dialog" aria-label="Ta séance du jour" style="max-width:520px">
+  el.innerHTML=`<div class="adh-modal dayrecap-modal" role="dialog" aria-label="Ta séance du jour" style="max-width:520px">
     <button class="adh-close" aria-label="${tr('common.close')}"><i class="ic ic-x"></i></button>
-    <span class="recap-k">Ta séance du jour</span><h3 style="text-transform:capitalize">${dateTxt}</h3>${body}</div>`;
+    <span class="dayrecap-k">Ta séance du jour</span><h3 style="text-transform:capitalize">${dateTxt}</h3>${body}</div>`;
   document.body.appendChild(el);
-  const close=()=>el.remove();
+  requestAnimationFrame(()=>el.classList.add('open'));
+  const close=()=>{ el.classList.remove('open'); setTimeout(()=>el.remove(),180); };
   el.querySelector('.adh-close').onclick=close;
   el.addEventListener('click',e=>{ if(e.target===el) close(); const b=e.target.closest('[data-recap-open]'); if(b){ close(); openModal(list[+b.dataset.recapOpen], dateKey); } });
 }
