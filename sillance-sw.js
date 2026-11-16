@@ -21,7 +21,7 @@
    versions) — pas obligatoire à chaque déploiement grâce au
    network-first, seulement utile si un jour un bug de cache est
    suspecté. */
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = `sillance-${CACHE_VERSION}`;
 const PRECACHE_URLS = [
   './', './index.html', './sillance-app.html', './sillance-calendrier.html', './sillance-review.html',
@@ -30,7 +30,7 @@ const PRECACHE_URLS = [
   // Découpage modulaire (03/08/2026) : la logique applicative n'est plus
   // inline dans les .html ci-dessus — sans ces entrées, une install qui
   // passe hors-ligne avant toute navigation aurait une coquille vide.
-  './sillance-shoes.js', './sillance-app.core.js', './sillance-calendrier.core.js', './sillance-review.core.js',
+  './sillance-shoes.js', './sillance-chart-zoom.js', './sillance-app.core.js', './sillance-calendrier.core.js', './sillance-review.core.js',
   './sillance-framebuster.js', './sillance-fonts-async.js',
   './favicon.svg', './icon-192.png', './icon-512.png', './manifest.webmanifest',
 ];

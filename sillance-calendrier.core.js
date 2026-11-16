@@ -9286,6 +9286,7 @@ function renderHyroxStations(s){
 /* — courbe de vitesse/allure, unité selon le sport — */
 /* registre des graphes pour le curseur interactif partagé */
 const AN_CHARTS = {};
+window.__silCharts = AN_CHARTS;   // lu par sillance-chart-zoom.js (vue agrandie + segment A–B)
 
 function drawSpeed(data){
   const svg=document.getElementById('anSpeed'); svg.innerHTML='';
