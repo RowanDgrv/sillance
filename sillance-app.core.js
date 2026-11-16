@@ -912,11 +912,14 @@ function decideCoCoach(id, aid, decision){
 function readinessScore(){
   return Math.round((checkin.sommeil + (10-checkin.fatigue) + checkin.motivation)/30*100);
 }
-function readinessAdvice(s){
-  if(s>=75) return {c:'var(--good)', t:'Feu vert : la qualité passera bien aujourd\'hui'};
-  if(s>=55) return {c:'var(--bike)', t:'Correct : séance OK, garde une marge sur l\'intensité'};
-  return {c:'var(--run)', t:'Fatigue marquée : privilégie du Z1/Z2 ou du repos, préviens ton coach'};
+// Ressenti du check-in (16/11/2026) : une étiquette tirée des notes brutes, la même règle
+// que « Ton point du jour », au lieu d'un pourcentage qui laissait croire à une mesure.
+function feelOf(c){
+  if(c.fatigue>=7 || c.sommeil<=4) return {level:'bad', l:tr('today.feelBad'), c:'var(--run)', t:'Fatigue marquée : privilégie du Z1/Z2 ou du repos, préviens ton coach'};
+  if(c.fatigue>=5 || c.sommeil<=6 || c.motivation<=4) return {level:'mid', l:tr('today.feelMid'), c:'var(--bike)', t:'Séance OK, garde une marge sur l\'intensité'};
+  return {level:'good', l:tr('today.feelGood'), c:'var(--good)', t:'Feu vert : la qualité passera bien aujourd\'hui'};
 }
+function readinessAdvice(){ const f=feelOf(checkin); return {c:f.c, t:f.t}; }
 
 /* ---- sidebar dynamique selon le mode ---- */
 const AI_ADDON_PRICE = 12; // €/mois — add-on Assistant IA (voir plan financier)
@@ -1304,7 +1307,7 @@ function renderSidebar(){
       <div class="lib-note"><i class="ic ic-lightbulb"></i> <b>${tr('sidebar.coachTip')}</b> ${tr('sidebar.coachTipText')}</div>
       <div class="readiness" style="margin-top:14px">
         <div class="lbl">${tr('sidebar.athleteFreshness')}</div>
-        <div class="score" style="color:${readinessAdvice(readinessScore()).c}">${readinessScore()}%</div>
+        <div class="score" style="color:${feelOf(checkin).c}">${feelOf(checkin).l}</div>
       </div>
       <div class="lib-note" style="margin-top:14px"><i class="ic ic-credit-card"></i> ${tr('sidebar.accountMovedNote')}</div>`;
     buildTemplates(document.getElementById('tplList'));
@@ -1383,7 +1386,7 @@ function renderSidebar(){
         </div>`; })()}
         <div class="readiness">
           <div class="lbl">${tr('checkin.freshness')}</div>
-          <div class="score" id="readyScore" style="color:${adv.c}">${s}%</div>
+          <div class="score" id="readyScore" style="color:${adv.c}">${feelOf(checkin).l}</div>
           <div class="advice" id="readyAdvice" style="color:${adv.c}">${adv.t}</div>
         </div>
         <button class="btn checkin-validate" id="checkinValidate" style="width:100%;margin-top:10px">${tr('checkin.validate')}</button>
@@ -1410,7 +1413,7 @@ function renderSidebar(){
         document.getElementById('val-'+inp.dataset.k).textContent = inp.value+'/10';
         const sc = readinessScore(), a = readinessAdvice(sc);
         const el1 = document.getElementById('readyScore'), el2 = document.getElementById('readyAdvice');
-        el1.textContent = sc+'%'; el1.style.color = a.c;
+        el1.textContent = feelOf(checkin).l; el1.style.color = a.c;
         el2.textContent = a.t; el2.style.color = a.c;
         if(typeof renderReadiness==='function') renderReadiness();
       });
@@ -11657,7 +11660,7 @@ function reportLoad(){
     // (ex. 28/10/2026 : ratio 2,27 sur une CTL de 1 → fatigue « rouge » à tort).
     if(d.ctl < 15) return { note:"historique d'entraînement insuffisant dans Sillance pour évaluer la charge (charge chronique < 15)" };
     return { ctl_forme_chronique:Math.round(d.ctl), atl_fatigue_aigue:Math.round(d.atl), tsb_fraicheur:Math.round(d.tsb),
-      ratio_aigu_chronique:+(d.atl/d.ctl).toFixed(2), note:'ratio aigu/chronique à titre indicatif' }; }catch(e){ return null; }
+    }; }catch(e){ return null; }
 }
 function reportGoal(){ try{ const r=currentRace(); return r ? `${r.name}, dans ${r.days} jours` : null; }catch(e){ return null; } }
 // Contrôle de la consigne (28/10/2026, sillance-consigne.js) : règles de code
@@ -12724,7 +12727,7 @@ renderRunDynamics(); renderRunTiles(); renderRunSymmetry();
    commun qui lit tous les signaux d'un coup.
    ============================================================ */
 const LOAD_COLS={swim:'#46C2D8',bike:'#D9962F',run:'#DD5C72',strength:'#8E7FD0'};
-const loadStackShow={ charge:true, fatigue:false, risque:true, forme:true };
+const loadStackShow={ charge:true, fatigue:false, risque:false, forme:true };
 let loadStackPeriod='week'; // 'week' | 'month' | 'year' — regroupement choisi par le coach
 function weekMonday(d){ return addDays(d, -((d.getDay()+6)%7)); }
 
@@ -12892,7 +12895,7 @@ function drawLoadStack(){
       const periodLbl = loadStackPeriod==='week' ? tr('loadStack.week', {d:dd.getDate(), m:dd.getMonth()+1})
         : loadStackPeriod==='month' ? tr('loadStack.monthOf', {month:dd.toLocaleDateString(localeStr(),{month:'long',year:'numeric'})})
         : tr('loadStack.year', {y:dd.getFullYear()});
-      tipShow(e,`<b>${periodLbl}</b> · ${tr('modal.load')} <b>${w.total}</b> · <b>${w.hours.toFixed(1)} h</b><br>${tr('disc.swim')} ${w.load.swim} · ${tr('disc.bike')} ${w.load.bike} · ${tr('disc.run')} ${w.load.run} · ${tr('disc.strength')} ${w.load.strength}<br>${tr('chart.fatigue')} ${w.atl} · ${tr('loadStack.riskAcwr')} <b>${w.acwr.toFixed(2)}</b> (${risk}) · ${tr('loadStack.formLabel')} ${w.tsb>=0?'+':''}${w.tsb}`);
+      tipShow(e,`<b>${periodLbl}</b> · ${tr('modal.load')} <b>${w.total}</b> · <b>${w.hours.toFixed(1)} h</b><br>${tr('disc.swim')} ${w.load.swim} · ${tr('disc.bike')} ${w.load.bike} · ${tr('disc.run')} ${w.load.run} · ${tr('disc.strength')} ${w.load.strength}<br>${tr('chart.fatigue')} ${w.atl} · ${tr('loadStack.formLabel')} ${w.tsb>=0?'+':''}${w.tsb}`);
     });
     hit.addEventListener('mouseleave',()=>{ cursor.style.opacity=0; tipHide(); });
   });
@@ -12901,7 +12904,7 @@ function drawLoadStack(){
 /* barre de séries cochables + rendu initial (défile en fin d'année) */
 (function initLoadStack(){
   const box=document.getElementById('loadStackToggles'); if(!box) return;
-  const items=[['charge',tr('modal.load'),LOAD_COLS.bike],['fatigue',tr('bilan.fatigue'),'#FF5470'],['risque',tr('loadStack.riskAcwrLabel'),LOAD_COLS.bike],['forme',tr('bilan.form'),'#39E6A3']];
+  const items=[['charge',tr('modal.load'),LOAD_COLS.bike],['fatigue',tr('bilan.fatigue'),'#FF5470'],['forme',tr('bilan.form'),'#39E6A3']];
   box.innerHTML=items.map(([k,l,c])=>`<button class="ls-tog ${loadStackShow[k]?'on':''}" data-ls="${k}" style="--ls-c:${c}"><span class="sw"></span>${l}</button>`).join('');
   box.querySelectorAll('[data-ls]').forEach(b=> b.onclick=()=>{ const k=b.dataset.ls; loadStackShow[k]=!loadStackShow[k]; b.classList.toggle('on',loadStackShow[k]); drawLoadStack(); });
 
@@ -13337,8 +13340,8 @@ function scoreReadiness(){
   // (10/11/2026). En démo les quatre sont là, le résultat est inchangé.
   const real = !!(window.PF && window.PF.user);
   const parts=[];
-  // 1. ACWR → score (1.0 idéal ; >1.5 ou <0.8 risqué)
-  const a = READINESS.acwr;
+  // 1. ACWR retiré le 16/11/2026 : ne prédit pas la blessure (Impellizzeri 2020, Lolli 2019)
+  const a = null;
   if(a!=null){
     let sAcwr;
     if(a>=0.8 && a<=1.3) sAcwr = 100 - Math.abs(a-1.0)*60;        // zone optimale
@@ -13352,7 +13355,7 @@ function scoreReadiness(){
   // 3. Subjectif → score (sommeil + (10-fatigue) + motivation)/30 : check-in du jour réellement saisi
   const c = READINESS.subjective;
   if(!real || c._real){ const sSubj = Math.round((c.sommeil + (10-c.fatigue) + c.motivation)/30*100);
-    parts.push({key:tr('ready.subjective'), sub:`check-in ${sSubj}%`, score:sSubj, w:0.26}); }
+    parts.push({key:tr('ready.subjective'), sub:feelOf(c).l, score:sSubj, w:0.26}); }
   // 4. RPE récent → score (RPE bas = frais ; RPE élevé répété = alerte)
   const rp = READINESS.rpeRecent;
   if(rp.length){ const meanRpe = rp.reduce((x,y)=>x+y,0)/rp.length;
@@ -13393,7 +13396,6 @@ function computeRecoveryHours(){
   const t=READINESS.tsb, a=READINESS.acwr;
   if(t==null) return null;   // compte réel : pas de TSB fiable → pas de délai inventé
   let hours = Math.max(0, -t*3.2);           // TSB très négatif → plus d'heures
-  if(a>1.3) hours += (a-1.3)*60;             // surcharge (ACWR) → pénalité additionnelle
   return Math.min(168, Math.round(hours));
 }
 function fmtRecoveryHours(h){
