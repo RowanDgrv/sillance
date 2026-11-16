@@ -11531,20 +11531,19 @@ function todaySession(){
 }
 function renderToday(){
   const box=document.getElementById('todayPanel'); if(!box) return;
-  const {global, factors} = scoreReadiness();
-  const acwr = READINESS.acwr;
-
-  // 1. Fraîcheur = indice de forme global (null : pas assez de données réelles)
-  const fraicheur = global;
-  const frClass = fraicheur==null?'ti-info':fraicheur>=70?'ti-good':fraicheur>=50?'ti-warn':'ti-bad';
-
-  // 2. Risque de blessure depuis l'ACWR (sweet spot 0.8–1.3)
-  let risque, risqueLbl, rqClass, rqHint;
-  if(acwr==null){ risque='Inconnu'; risqueLbl='—'; rqClass='ti-info'; rqHint=tr('today.needData'); }
-  else if(acwr>1.5){ risque='Élevé'; risqueLbl=tr('today.riskHigh'); rqClass='ti-bad'; rqHint=tr('today.riskHighHint'); }
-  else if(acwr>1.3){ risque='Modéré'; risqueLbl=tr('today.riskModerate'); rqClass='ti-warn'; rqHint=tr('today.riskModerateHint'); }
-  else if(acwr<0.8){ risque='Sous-charge'; risqueLbl=tr('today.riskUnderload'); rqClass='ti-info'; rqHint=tr('today.riskUnderloadHint'); }
-  else { risque='Faible'; risqueLbl=tr('today.riskLow'); rqClass='ti-good'; rqHint=tr('today.riskLowHint'); }
+  // Refonte 16/11/2026 (« que des vrais chiffres, appuyés sur la littérature ») :
+  // - plus d'« état de fraîcheur » en % : c'était une moyenne pondérée de signaux
+  //   aux poids arbitraires. On affiche le ressenti du check-in tel quel ; le
+  //   ressenti déclaré suit la charge mieux que la plupart des mesures objectives
+  //   (Saw et al., Br J Sports Med 2016, revue systématique de 56 études).
+  // - plus de « risque de blessure » tiré de l'ACWR : ce ratio ne prédit pas
+  //   valablement la blessure (Impellizzeri et al., 2020 ; Lolli et al., 2019).
+  //   On compare simplement la charge des 7 derniers jours à la moyenne des
+  //   3 semaines d'avant (fenêtres séparées : pas de couplage mathématique).
+  //   Repère +30 % : au-delà, plus de blessures liées au volume chez les coureurs
+  //   débutants (Nielsen et al., JOSPT 2014). C'est un repère, pas une prédiction.
+  const feel = todayFeel();
+  const load = todayLoadTrend();
 
   // 3. Séance du jour
   const s = todaySession();
@@ -11575,15 +11574,15 @@ function renderToday(){
     <div class="today-grid">
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-battery"></i></div>
-        <div class="ti-label">${tr('today.freshnessState')}</div>
-        <div class="ti-value ${frClass}">${fraicheur==null?'—':fraicheur+' %'}</div>
-        <div class="ti-hint">${fraicheur==null?tr('today.needData'):fraicheur>=70?tr('today.freshnessGoodHint'):fraicheur>=50?tr('today.freshnessOkHint'):tr('today.freshnessBadHint')}</div>
+        <div class="ti-label">${tr('today.feelLabel')}</div>
+        <div class="ti-value ${feel.cls}">${feel.value}</div>
+        <div class="ti-hint">${feel.hint}</div>
       </div>
       <div class="today-item">
-        <div class="ti-icon"><i class="ic ic-shield"></i></div>
-        <div class="ti-label">${tr('today.injuryRisk')}</div>
-        <div class="ti-value ${rqClass}">${risqueLbl}</div>
-        <div class="ti-hint">${rqHint}</div>
+        <div class="ti-icon"><i class="ic ic-chart"></i></div>
+        <div class="ti-label">${tr('today.loadLabel')}</div>
+        <div class="ti-value ${load.cls}">${load.value}</div>
+        <div class="ti-hint">${load.hint}</div>
       </div>
       <div class="today-item">
         <div class="ti-icon"><i class="ic ic-target"></i></div>
@@ -11598,14 +11597,38 @@ function renderToday(){
         <div class="ti-value ti-info ti-text">${nutriDuring || tr('today.nutRestHint')}</div>
       </div>` : ''}
     </div>
-    <div class="today-foot"><i class="ic ic-lightbulb"></i> ${todayAdvice(fraicheur, risque, s)}</div>
+    <div class="today-foot"><i class="ic ic-lightbulb"></i> ${todayAdvice(feel, load, s)}</div>
   </div>`;
   const _cbBilanBtn = document.getElementById('cbBilanBtn');
   if(_cbBilanBtn) _cbBilanBtn.onclick = function(){ exportBilan(typeof ATHLETE_NAME!=='undefined'?ATHLETE_NAME:''); };
 }
-function todayAdvice(fr, risque, s){
-  if(risque==='Élevé') return tr('advice.highLoad');
-  if(fr!=null && fr<50) return tr('advice.lowRecovery');
+// Ressenti du jour : les notes du check-in telles quelles (0–10), sans score inventé.
+function todayFeel(){
+  const c = checkin, real = !!(window.PF && window.PF.user);
+  if(real && !c._real) return {value:'—', cls:'ti-info', level:null, hint:tr('today.feelNoCheckin')};
+  const detail = tr('today.feelDetail', {s:c.sommeil, f:c.fatigue, m:c.motivation});
+  if(c.fatigue>=7 || c.sommeil<=4) return {value:tr('today.feelBad'), cls:'ti-bad', level:'bad', hint:detail};
+  if(c.fatigue>=5 || c.sommeil<=6 || c.motivation<=4) return {value:tr('today.feelMid'), cls:'ti-warn', level:'mid', hint:detail};
+  return {value:tr('today.feelGood'), cls:'ti-good', level:'good', hint:detail};
+}
+// Charge des 7 derniers jours (séances validées) vs moyenne hebdo des 3 semaines d'avant.
+function todayLoadTrend(){
+  const today=iso(new Date()), dAgo=n=>iso(addDays(new Date(),-n));
+  const d7=dAgo(7), d28=dAgo(28); let week=0, before=0; const days=new Set();
+  Object.keys(planning).filter(k=>k<=today && k>d28).forEach(k=>(planning[k]||[]).forEach(s=>{
+    if(!s.done || !s.tss) return;
+    if(k>d7) week+=s.tss; else { before+=s.tss; days.add(k); }
+  }));
+  // au moins 6 jours d'entraînement validés sur les 3 semaines de référence
+  if(!before || days.size<6) return {value:'—', cls:'ti-info', pct:null, hint:tr('today.loadNeedData')};
+  const pct = Math.round((week/(before/3)-1)*100), sign = pct>0?'+':'';
+  if(pct>30)  return {value:`${sign}${pct} %`, cls:'ti-warn', pct, hint:tr('today.loadUpHint')};
+  if(pct<-30) return {value:`${pct} %`, cls:'ti-info', pct, hint:tr('today.loadDownHint')};
+  return {value:`${sign}${pct} %`, cls:'ti-good', pct, hint:tr('today.loadOkHint')};
+}
+function todayAdvice(feel, load, s){
+  if(feel.level==='bad') return tr('advice.lowRecovery');
+  if(load.pct!=null && load.pct>30) return tr('advice.loadJump');
   if(s && !s.done) return tr('advice.greenLight');
   if(s && s.done) return tr('advice.sessionDone');
   return tr('advice.restDay');

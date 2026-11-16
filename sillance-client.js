@@ -496,6 +496,15 @@ export const PF = {
     if (error) console.warn("[PF] lecture checkins échouée :", error.message);
     return data;
   },
+  // Dernier poids renseigné (16/11/2026) : sert à préremplir le check-in d'un nouveau jour,
+  // sinon le champ repartait d'une valeur par défaut et l'enregistrait si on n'y touchait pas.
+  async lastWeight() {
+    const { data, error } = await sb.from("checkins").select("poids")
+      .eq("athlete_id", this.user.id).not("poids", "is", null)
+      .order("date", { ascending: false }).limit(1).maybeSingle();
+    if (error) console.warn("[PF] lecture du dernier poids échouée :", error.message);
+    return data?.poids ?? null;
+  },
   async saveCheckin({ sommeil, fatigue, motivation, readiness, poids, dispo, dispoNote, hrv, cyclePhase, cycleDay }) {
     const today = new Date().toISOString().slice(0, 10);
     const base = { athlete_id: this.user.id, date: today, sommeil, fatigue, motivation, readiness };

@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261113i";
+import { PF } from "./sillance-client.js?v=20261116a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -436,6 +436,11 @@ async function hydrate() {
           ...(c.hrv != null ? { hrv: c.hrv } : {}),
           ...(c.cycle_phase ? { cyclePhase: c.cycle_phase, cycleDay: c.cycle_day } : {}),
           dispo: c.dispo || 'ok', dispoNote: c.dispo_note || '' });
+      // Pas de poids aujourd'hui : on reprend le dernier poids renseigné (16/11/2026)
+      if (!c || c.poids == null) {
+        const w = await PF.lastWeight();
+        if (w != null) app.assignObj(app.data.checkin, { poids: w });
+      }
     }),
 
     section("gear", async () => {
