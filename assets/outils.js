@@ -15,10 +15,16 @@
   };
   var COLORS = ['#2FD9FF','#39E6A3','#FFD43D','#FFB13D','#FF5470','#E0457A'];
 
-  function parseTime(v){                 // "5:42", "5'42", "342" (secondes) → secondes
-    v = String(v || '').trim().replace(/[''′]/g, ':').replace(/"|″/g, '').replace(/\s+/g, '');
+  function parseTime(v){                 // "5:42", "5'42", "5.42", "5,42", "1h05:30", "342" (secondes) → secondes
+    v = String(v || '').trim().toLowerCase().replace(/[''′’]/g, ':').replace(/"|″/g, '').replace(/\s+/g, '')
+      .replace(/^(\d+)h(\d{1,2})(?::|m)?(\d{1,2})?$/, function(_, h, m, sec){ return h + ':' + m + ':' + (sec || '0'); })
+      .replace(/^(\d+)m(\d{1,2})s?$/, '$1:$2').replace(/:$/, '');
     if(!v) return NaN;
-    if(/^\d+(\.\d+)?$/.test(v)) return parseFloat(v);
+    // 17/11/2026 : « 4.12 » ou « 4,12 » (clavier de téléphone) = 4 min 12, pas 4,12 secondes.
+    // Deux chiffres après le séparateur, inférieurs à 60 : minutes.secondes.
+    var ms = /^(\d+)[.,](\d{2})$/.exec(v);
+    if(ms && +ms[2] < 60) return +ms[1]*60 + +ms[2];
+    if(/^\d+([.,]\d+)?$/.test(v)) return parseFloat(v.replace(',', '.'));
     var p = v.split(':').map(Number);
     if(p.some(isNaN)) return NaN;
     return p.length === 3 ? p[0]*3600 + p[1]*60 + p[2] : p[0]*60 + (p[1] || 0);
@@ -40,6 +46,8 @@
     if(!(t400 > 0 && t200 > 0)) return out.innerHTML = '<p class="tool-err">Renseigne tes deux temps, par exemple 6:20 et 2:58.</p>';
     if(t400 <= t200 * 1.6 || t400 >= t200 * 2.6) return out.innerHTML = '<p class="tool-err">Ces deux temps ne sont pas cohérents : ton 400 m doit durer un peu plus du double de ton 200 m.</p>';
     var cssSec = (t400 - t200) / 2;      // temps au 100 m à la vitesse critique
+    // garde-fou : une CSS hors de 50" à 4'00" au 100 m vient presque toujours d'un temps mal saisi
+    if(!(cssSec >= 50 && cssSec <= 240)) return out.innerHTML = '<p class="tool-err">Ce résultat (' + fmt(cssSec) + ' au 100 m) n\'est pas réaliste : vérifie tes temps. Écris-les en minutes et secondes, par exemple 6:20 ou 6.20 pour 6 minutes 20.</p>';
     var rows = ZONES.css.map(function(z, i){
       return '<tr><td>' + dot(i) + esc(z[0]) + '</td><td>' + z[2] + ' – ' + z[1] + ' %</td><td><b>' + fmt(cssSec*z[2]/100) + ' – ' + fmt(cssSec*z[1]/100) + '</b> / 100 m</td></tr>';
     }).join('');
