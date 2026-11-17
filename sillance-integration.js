@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261117d";
+import { PF } from "./sillance-client.js?v=20261117f";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -1188,6 +1188,14 @@ function renderAuth() {
   if (src) {
     // Arrivé par un lien d'invitation de son coach : la provenance est connue.
     if (!src.value && PF.pendingInviteToken?.()) src.value = "club_coach";
+    // Arrivé par un lien suivi (?src=ig-…, li-…) : on PROPOSE le réseau correspondant,
+    // visible et modifiable (le champ reste facultatif, revue RGPD du 28/10/2026).
+    if (!src.value) {
+      let tag = ""; try { tag = (sessionStorage.getItem("sil_src") || "").toLowerCase(); } catch (_) {}
+      const guess = [["ig", "instagram"], ["insta", "instagram"], ["li", "linkedin"], ["tt", "tiktok"], ["yt", "youtube"],
+        ["fb", "facebook"], ["strava", "strava"], ["google", "google"]].find(([p]) => tag === p || tag.startsWith(p + "-"));
+      if (guess && [...src.options].some((o) => o.value === guess[1])) src.value = guess[1];
+    }
     const other = card.querySelector("#pf-source-other");
     const sync = () => { other.hidden = src.value !== "other"; };
     src.onchange = sync; sync();

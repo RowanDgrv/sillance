@@ -1104,7 +1104,7 @@ export const PF = {
   async resolveJoinRequest(requestId, { accept, clubId, athleteId, groupId }) {
     if (accept) {
       const { error: memErr } = await sb.from("club_members")
-        .insert({ club_id: clubId, athlete_id: athleteId, group_id: groupId || null, role: "member" });
+        .insert({ club_id: clubId, athlete_id: athleteId, group_id: groupId || null, role: "member", join_method: "lien" });
       // 23505 = déjà membre (index unique 0102, 17/11/2026 : une demande acceptée deux fois
       // créait un 2e adhérent) → on garde l'adhésion existante, on applique juste le groupe choisi.
       if (memErr && memErr.code === "23505") {
