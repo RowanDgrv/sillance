@@ -1479,7 +1479,13 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
   if (!document.getElementById("pf-trial-banner")) document.body.style.paddingTop = "";
   if (subscribed || !ownsClub) return;   // abonné ou pas gérant de club → rien
 
-  if (locked) {
+  // 17/11/2026 : plus d'essai sans carte. Gérant sans abonnement → écran de choix de
+  // formule ; pendant l'essai, Stripe démarre l'abonnement en période d'essai (carte
+  // demandée, aucun débit avant la fin, cf. stripe-checkout). Après l'essai → paiement.
+  const startTrial = !locked && trialDaysLeft != null && trialDaysLeft > 0;
+  if (locked || startTrial) {
+    const endDate = startTrial ? new Date(Date.now() + trialDaysLeft * 86400000)
+      .toLocaleDateString(document.documentElement.lang || "fr", { day: "numeric", month: "long" }) : "";
     const TIERS = [
       { n: 1, price: 50, cap: tr("gate.club.tier1.cap") },
       { n: 2, price: 112.5, cap: tr("gate.club.tier2.cap") },
@@ -1491,8 +1497,8 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
     o.dataset.interval = "month";
     o.innerHTML = `
       <div class="card">
-        <h2>${tr("gate.club.trialOverHeading")}</h2>
-        <p>${tr("gate.club.trialOverText2")}</p>
+        <h2>${startTrial ? tr("gate.club.startTrialHeading", { n: trialDaysLeft }) : tr("gate.club.trialOverHeading")}</h2>
+        <p>${startTrial ? tr("gate.club.startTrialText", { date: endDate }) : tr("gate.club.trialOverText2")}</p>
         ${billToggleHTML()}
         <div class="tier-lbl">${tr("gate.club.pickTier")}</div>
         <div class="tier-picks">
@@ -1528,18 +1534,6 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
     return;
   }
 
-  if (trialDaysLeft != null) {
-    const b = document.createElement("div");
-    b.id = "pf-club-trial-banner";
-    b.className = "pf-trial-banner";
-    const j = trialDaysLeft <= 1 ? tr("gate.lastDay") : tr("gate.daysLeft", { n: trialDaysLeft });
-    b.innerHTML = `🎁 ${tr("gate.club.freeTrial")} — <b>${j}</b>
-      <button id="pf-club-trial-go">${tr("gate.club.subscribePrice")}</button>`;
-    document.body.appendChild(b);
-    if (!document.getElementById("pf-trial-banner")) document.body.style.paddingTop = b.offsetHeight + "px";
-    b.querySelector("#pf-club-trial-go").onclick = () =>
-      PF.startCheckout("club", 1).catch((e) => console.warn("[PF] checkout:", e));
-  }
 }
 
 // Vidéos côté ATHLÈTE : masque la bibliothèque tant que le coach ne l'a pas
