@@ -27,6 +27,7 @@ Le coach planifie les séances, à la semaine ou par cycle complet, et chaque at
 ## Guides
 
 - [Tous les guides](https://sillance.app/guides/) : méthodes de terrain et études sur l'entraînement expliquées simplement
+- [Caféine et performance](https://sillance.app/guides/cafeine-et-performance-endurance/) : 2 à 3 % de gain en moyenne d'après 46 études, mais des écarts énormes d'un athlète à l'autre : génétique, habitude du café, effet placebo et sommeil. Ce que disent les études, et ce qui les contredit.
 - [Organiser les groupes d'entraînement d'un club de triathlon](https://sillance.app/guides/groupes-entrainement-club-triathlon/)
 - [Tests CSS, VMA et FTP : quand retester ses athlètes](https://sillance.app/guides/tests-css-vma-ftp-quand-retester/)
 - [Fractionné collectif en run club, tous niveaux](https://sillance.app/guides/fractionne-collectif-run-club/)

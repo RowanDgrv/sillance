@@ -27,7 +27,10 @@ const today = dateArg || new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Pa
 
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 const dateFr = (iso) => { const [y, m, d] = iso.split('-').map(Number); return `${d} ${MOIS[m - 1]} ${y}`; };
-const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Les titres et résumés de calendrier.json contiennent déjà des entités (&#x27;) : on les décode
+// avant d'échapper, sinon « d'après » s'affichait « d&#x27;après » (constaté le 17/11/2026).
+const plain = (s) => String(s).replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+const esc = (s) => plain(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 const write = (p, s) => { if (!DRY) fs.writeFileSync(path.join(ROOT, p), s); };
 
@@ -115,7 +118,7 @@ const items = [...live].sort((a, b) => b.publie.localeCompare(a.publie)).map((a)
 const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>Sillance · Guides d'entraînement</title>
+  <title>Sillance · Le blog</title>
   <link>${SITE}/guides/</link>
   <atom:link href="${SITE}/guides/feed.xml" rel="self" type="application/rss+xml"/>
   <description>La science de l'entraînement en endurance, expliquée simplement, par Rowan Degraeve.</description>
