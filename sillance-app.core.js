@@ -7852,8 +7852,8 @@ function renderJoinRequests(){
       <div class="join-req" data-id="${r.id}">
         <div class="join-av">${initials(r.name)}</div>
         <div class="join-i">
-          <div class="join-n">${r.name} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||tr('clubDisc.tri')}</span></div>
-          <div class="join-m">${r.msg||tr('join.wantsToJoin')}</div>
+          <div class="join-n">${dispoSafe(r.name)} <span class="club-ath-tag" style="margin-left:5px">${CLUB_DISC_LABEL[r.disc]||tr('clubDisc.tri')}</span></div>
+          <div class="join-m">${dispoSafe(r.msg)||tr('join.wantsToJoin')}</div>
         </div>
         <div class="join-acts">
           <button class="join-accept" data-act="accept">${tr('join.accept')}</button>
