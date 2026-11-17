@@ -17,7 +17,7 @@
   "use strict";
   var FR = {
     "feed.title": "Fil du club", "feed.openAria": "Ouvrir le fil du club",
-    "feed.placeholder": "Ex. Programme de la semaine en ligne — dites-moi si vous avez des questions.",
+    "feed.placeholder": "Ex. Samedi, sortie longue à 9 h au parc. Prévoyez une gourde.",
     "feed.publish": "Publier", "feed.wholeClub": "Tout le club",
     "feed.empty": "Aucune publication pour l'instant.",
     "feed.emptyStaff": "Aucune publication. Écris le premier message à ton club ci-dessus.",

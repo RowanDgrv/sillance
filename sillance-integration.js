@@ -1548,6 +1548,7 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
 // activée pour lui, et affiche un message d'invitation. Coach/club/démo intacts.
 async function onLoggedIn() {
   setCloudBadge(true);
+  try { window.__pf_app?.refreshAlerts?.(); } catch (_) {}   // pas d'alerte de démo sur un vrai compte
   // Compte admin : cet appareil sort de la mesure d'audience (équivaut à ?moi=1).
   if (isAdminUser()) { try { localStorage.setItem("sil_noTrack", "1"); } catch {} }
   // Lien d'équipe du coach (?coach=…, gardé en localStorage) : relie le compte

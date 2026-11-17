@@ -1242,9 +1242,10 @@ async function submitCheckin(){
        : urgent ? tr('checkin.sentPriorityAlert')
        : low ? tr('checkin.sentCoachNotified')
              : tr('checkin.sent'));
-  if(low){
+  // alerte locale : démo seulement (compte réel : le coach est prévenu par le serveur)
+  if(low && !window.PF?.user){
     const alert = {
-      id:'al'+Date.now(),
+      id:'al'+Date.now(), demo:true,
       athlete: ATHLETE_NAME,
       score,
       level: urgent ? 'urgent' : 'warn',
@@ -1272,7 +1273,13 @@ function notifyCoach(a){
 }
 
 /* — Cloche coach : badge + menu — */
+// 17/11/2026 : l'alerte de démo « Léa M. » s'affichait sur les vrais comptes ; retirée dès la connexion.
+function purgeDemoAlerts(){
+  if(!window.PF?.user) return;
+  for(let i=COACH_ALERTS.length-1;i>=0;i--) if(COACH_ALERTS[i].demo) COACH_ALERTS.splice(i,1);
+}
 function refreshAlertBadge(){
+  purgeDemoAlerts();
   const badge=document.getElementById('bellBadge');
   const bell=document.getElementById('bellBtn');
   const unseen=COACH_ALERTS.filter(a=>!a.seen).length;
@@ -1292,6 +1299,7 @@ function timeAgo(d){
   const h=Math.round(m/60); return `il y a ${h} h`;
 }
 function renderAlerts(){
+  purgeDemoAlerts();
   const list=document.getElementById('bellList');
   // tri : urgent d'abord, puis par score croissant
   COACH_ALERTS.sort((a,b)=> (a.level==='urgent'?0:1)-(b.level==='urgent'?0:1) || a.score-b.score);
@@ -1352,7 +1360,7 @@ document.addEventListener('click', e=>{ if(!bellMenu.contains(e.target)&&e.targe
 
 /* démo : une alerte déjà présente pour montrer le système au coach */
 (function seedDemoAlert(){
-  COACH_ALERTS.push({id:'al0', athlete:'Léa M.', score:41, level:'warn',
+  COACH_ALERTS.push({id:'al0', demo:true, athlete:'Léa M.', score:41, level:'warn',
     checkin:{sommeil:5,fatigue:7,motivation:4}, time:new Date(Date.now()-42*60000), seen:false});
   refreshAlertBadge();
 })();
@@ -5237,6 +5245,7 @@ window.__pf_app = {
   data: { RECORDS, checkin, planning, realised, ATHLETE_REF, CLUB_ATHLETES, CLUB_GROUPS, CRENEAUX, VIDEOS },
   render, renderSidebar, renderClub, updateVideolibVisibility,
   refreshDevices: refreshDeviceState,
+  refreshAlerts(){ refreshAlertBadge(); },
   getMode(){ return mode; },
   setMode(m){ mode = m; },
   replaceArray(arr, items){ arr.length = 0; for(const x of items) arr.push(x); },
