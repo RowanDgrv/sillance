@@ -1105,7 +1105,11 @@ export const PF = {
     if (accept) {
       const { error: memErr } = await sb.from("club_members")
         .insert({ club_id: clubId, athlete_id: athleteId, group_id: groupId || null, role: "member" });
-      if (memErr) throw memErr;
+      // 23505 = déjà membre (index unique 0102, 17/11/2026 : une demande acceptée deux fois
+      // créait un 2e adhérent) → on garde l'adhésion existante, on applique juste le groupe choisi.
+      if (memErr && memErr.code === "23505") {
+        if (groupId) await sb.from("club_members").update({ group_id: groupId }).eq("club_id", clubId).eq("athlete_id", athleteId);
+      } else if (memErr) throw memErr;
     }
     const { error } = await sb.from("club_join_requests")
       .update({ status: accept ? "accepted" : "rejected", resolved_at: new Date().toISOString() })
