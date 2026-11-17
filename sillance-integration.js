@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261116b";
+import { PF } from "./sillance-client.js?v=20261117c";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -95,6 +95,7 @@ const mapRefs = (p) => p ? {
   updatedAt: p.updated_at,
 } : {};
 const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s.dur,
+  athleteId: s.athlete_id || null, clubId: s.club_id || null, fromCreneau: !!s.source_creneau_id,
   dist: s.dist, tss: s.tss, zone: s.zone, done: s.done, rpe: s.rpe,
   ...(s.rpe_muscle != null ? { rpeMuscle: s.rpe_muscle } : {}), note: esc(s.note),
   coachNote: esc(s.coach_note),
@@ -120,7 +121,7 @@ const mapSession = (s) => ({ id: s.id, disc: s.disc, title: esc(s.title), dur: s
 // (scheduled_sessions, club_competition_responses) sont keyées sur le vrai
 // profil utilisateur, pas sur l'adhésion — calendrier club (0058) en a besoin
 // pour ouvrir/écrire le calendrier réel de l'adhérent.
-const mapMember  = (m) => ({ id: m.id, athleteUid: m.athlete_id || null,
+const mapMember  = (m) => ({ id: m.id, athleteUid: m.athlete_id || null, role: m.role || "member",
   name: (m.athlete_id && esc(m.profiles?.full_name)) || esc(m.display_name) || esc(m.profiles?.full_name) || "Athlète",
   email: esc(m.profiles?.email) || "", disc: m.disc || "tri", since: esc(m.since) || "", group: m.group_id });
 const mapGroup   = (g) => ({ id: g.id, name: esc(g.name), color: g.color, desc: esc(g.description) });
@@ -268,6 +269,7 @@ const answerFor = (row, next) => !row.for_date ? (row.status === "no" ? null : "
 
 async function loadClubData(club, app, uid) {
   window.__pf_clubId = club.id;   // exposé pour les écritures (création créneau)
+  window.__pf_clubOwner = club.owner_id || null;   // calendrier club : séances du staff vs séances perso
   applyClubTheme(club, uid);
   const [members, creneaux, attendance, competitions] = await Promise.all([
     PF.getClubMembers(club.id),

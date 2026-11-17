@@ -3037,7 +3037,7 @@ function buildWeekRow(mon){
   for(let i=0;i<7;i++){
     const date = addDays(mon,i);
     const key = iso(date);
-    const sessions = planning[key]||[];
+    const sessions = visibleSessions(planning[key]||[]);
     const acts = realised[key]||[];
     const dayTss = sessions.reduce((a,s)=>a+s.tss,0);
     totalTss += dayTss;
@@ -3164,9 +3164,24 @@ function openSessionAnalysis(s, dateKey){
   if(window.PF?.user){ toast(tr('aiv.noFile')); if(mode==='coach' && dateKey) openSessionActions(s, dateKey); return; }
   openAnalysis(s);   // démo : séance-type simulée, c'est le but de la démo
 }
+// Bandeau « calendrier CLUB de X » : rappelle dans quel système on programme + case séances perso.
+function renderPlanCtxBar(){
+  let bar = document.getElementById('planCtxBar');
+  const on = mode==='coach' && PLAN_CTX.kind==='club' && !!window.PF?.user;
+  if(!on){ if(bar) bar.remove(); return; }
+  const band = document.getElementById('coachBand'); if(!band) return;
+  if(!bar){ bar=document.createElement('div'); bar.id='planCtxBar'; band.parentNode.insertBefore(bar, band); }
+  const m = CLUB_ATHLETES.find(a=>a.athleteUid===PLAN_CTX.athleteId);
+  const shown = !!(m && clubPersoShown().has(m.id));
+  bar.innerHTML = `<span class="origin-tag o-club">${tr('origin.club')}</span>
+    <span class="pcb-t">${tr('planCtx.title',{name:dispoSafe(m?m.name:'')})}</span>
+    ${m?`<label class="pcb-chk"><input type="checkbox" ${shown?'checked':''}> ${tr('planCtx.showPerso')}</label>`:''}`;
+  const cb = bar.querySelector('input'); if(cb) cb.onchange=()=>{ const s=clubPersoShown(); cb.checked?s.add(m.id):s.delete(m.id); setClubPersoShown(s); render(); };
+}
 function render(){
   window.__pf_chartRefresh?.();
   linkRealisedToPlan();
+  renderPlanCtxBar();
   const mon = mondayOf(weekOffset);
   const nWeeks = calViewMode==='day' ? 1 : weeksShown;
   const sun = addDays(mon, nWeeks*7-1);
@@ -3725,28 +3740,66 @@ function wireIntensityModel(mon){
   sel.onchange=()=>{ try{ localStorage.setItem('sil_int_model', sel.value); }catch(e){} renderWeekIntensity(mon); };
 }
 
+/* ============================================================
+   DEUX SYSTÈMES DE SÉANCES : CLUB et COACH PERSO (17/11/2026)
+   ------------------------------------------------------------
+   Une séance est « du club » si elle a été programmée depuis le club
+   (club_id, 0101) ou vient d'un créneau ; « autonomie » si l'athlète se
+   l'est posée ; sinon « coach perso ». Chacun garde son système :
+   - le staff qui ouvre un adhérent DEPUIS le club (PLAN_CTX club) ne voit
+     que les séances du club, sauf athlètes cochés dans « Voir les séances
+     perso » — et celles-ci sont en lecture seule ;
+   - le coach perso voit les séances du club en lecture seule (étiquette Club).
+   La base applique la même règle (RLS 0101) : l'écran ne fait que suivre.
+   ============================================================ */
+let PLAN_CTX = { kind:'coach', clubId:null, athleteId:null };
+window.__pf_planCtx = ()=> PLAN_CTX;
+function sessionOrigin(s){
+  if(!s || !window.PF?.user) return null;
+  if(s.clubId || s.fromCreneau) return 'club';
+  if(s.createdBy && s.athleteId && s.createdBy===s.athleteId) return 'self';
+  return s.createdBy ? 'coach' : null;
+}
+function sessionForeign(s){
+  if(mode!=='coach') return false;
+  const o = sessionOrigin(s); if(!o) return false;
+  return PLAN_CTX.kind==='club' ? o!=='club' : o==='club';
+}
+function visibleSessions(list){
+  if(mode!=='coach' || PLAN_CTX.kind!=='club' || !window.PF?.user) return list;
+  const m = CLUB_ATHLETES.find(a=>a.athleteUid===PLAN_CTX.athleteId);
+  const showPerso = !!(m && clubPersoShown().has(m.id));
+  return list.filter(s=> sessionOrigin(s)!=='self' && sessionOrigin(s)!=='coach' || showPerso);
+}
+function originBadge(s){
+  const o = sessionOrigin(s); if(!o) return '';
+  const k = {club:'origin.club', coach:'origin.coach', self:'origin.self'}[o];
+  return `<span class="origin-tag o-${o}">${tr(k)}</span>`;
+}
 function sessionCard(s, dateKey){
   const D = DISC[s.disc];
+  const foreign = sessionForeign(s);
   const vid = (mode==='athlete') ? videoForSession(s) : null;
   const el = document.createElement('div');
-  el.className = 'session'+(s.done?' done':'')+(vid?' has-video':'');
+  el.className = 'session'+(s.done?' done':'')+(vid?' has-video':'')+(foreign?' foreign':'');
   el.dataset.disc = s.disc;
   if(vid) el.dataset.video = vid.id;
   el.style.setProperty('--c', D.color);
-  el.draggable = (mode==='coach');
+  el.draggable = (mode==='coach') && !foreign;
   el.innerHTML = `
+    ${originBadge(s)}
     <div class="t">${s.title}</div>
     <div class="m"><span>${fmtDur(s.dur)}</span>${s.dist?`<span>${s.dist} km</span>`:''}<span>${s.tss} TSS</span><span>${s.zone}</span>${s.done&&s.rpe?`<span class="rpe-chip" style="color:${rpeColor(s.rpe)}">RPE ${s.rpe}</span>`:''}${s.done&&s.rpeMuscle?`<span class="mus-chip" style="color:${rpeColor(s.rpeMuscle)}" title="${tr('session.muscleEffort')}"><i class="ic ic-dumbbell" style="width:10px;height:10px;vertical-align:-1px"></i>${s.rpeMuscle}</span>`:''}</div>
     ${sessionProfileHTML(s)}
     ${s.linkedAct?`<div class="real-tag"><i class="ic ic-check"></i> ${tr('week.realised')} · ${realisedSrcLabel(s.linkedAct.src)}${s.linkedAct.dur?' · '+fmtDur(s.linkedAct.dur):''}${s.linkedAct.avgHr?' · '+s.linkedAct.avgHr+' bpm':''}</div>`:''}
     ${vid?`<span class="video-chip">${vid.title}</span>`:''}
     ${s.done?'<span class="done-chip"><i class="ic ic-check"></i></span>':''}
-    ${mode==='coach'?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="${tr('session.noteForAthlete')}" title="${s.coachNote?dispoSafe(s.coachNote):tr('session.addNoteForAthlete')}"><i class="ic ic-message-circle"></i></button>`:''}
-    ${mode==='coach'?`<button class="del" aria-label="${tr('common.delete')}"><i class="ic ic-x"></i></button>`:''}
+    ${mode==='coach'&&!foreign?`<button class="note-btn ${s.coachNote?'has-note':''}" aria-label="${tr('session.noteForAthlete')}" title="${s.coachNote?dispoSafe(s.coachNote):tr('session.addNoteForAthlete')}"><i class="ic ic-message-circle"></i></button>`:''}
+    ${mode==='coach'&&!foreign?`<button class="del" aria-label="${tr('common.delete')}"><i class="ic ic-x"></i></button>`:''}
     ${mode==='athlete'?`<button class="check-btn">${s.done?'<i class="ic ic-check"></i> '+tr('session.done'):tr('session.markDone')}</button>`:''}
   `;
   el.addEventListener('dragstart', e=>{
-    if(mode!=='coach') return;
+    if(mode!=='coach' || foreign) return;
     el.classList.add('dragging');
     e.dataTransfer.setData('text/plain', JSON.stringify({type:'move', id:s.id, from:dateKey}));
   });
@@ -3783,7 +3836,8 @@ function sessionCard(s, dateKey){
     // supprimer) — cliquer une séance prévue ne faisait jusqu'ici RIEN de
     // ce que le coach en attend (retour Rowan 28/09/2026).
     // ATHLÈTE : garde la fiche séance (détails, nutrition, mark-done).
-    if(mode==='coach'){ if(s.done) openSessionAnalysis(s, dateKey); else openSessionActions(s, dateKey); }
+    // séance de l'AUTRE système (club ↔ coach perso) : consultation seulement, jamais d'actions
+    if(mode==='coach'){ if(s.done) openSessionAnalysis(s, dateKey); else if(foreign) openModal(s, dateKey); else openSessionActions(s, dateKey); }
     else openModal(s, dateKey);
   });
   return el;
@@ -4997,6 +5051,7 @@ function renderAthPicker(){
 }
 function selectAthlete(i){
   selectedAthleteIdx = i;
+  PLAN_CTX = { kind:'coach', clubId:null, athleteId:null };   // son effectif à lui = coach perso
   const a = ROSTER[i];
   document.getElementById('apMenu').hidden = true;
   document.getElementById('apBtn').setAttribute('aria-expanded','false');
@@ -5924,6 +5979,9 @@ const CLUB_HISTORY = {
 };
 function renderClubHistory(){
   const box=document.getElementById('clubHistory'); if(!box) return;
+  // 17/11/2026 : ces chiffres (23 séances, 31 h, 88 %) sont ceux de la DÉMO, en dur — ils
+  // s'affichaient aussi sur les vrais comptes. Pas de chiffre inventé : masqué hors démo.
+  if(window.PF?.user){ box.innerHTML=''; return; }
   const h=CLUB_HISTORY;
   const totalPaid=h.paid.reduce((a,p)=>a+p.amount,0);
   const paidHtml = h.paid.length? `
@@ -6301,6 +6359,7 @@ function openClubAthleteCalendar(a){
     const idx = Math.abs(String(a.id).split('').reduce((x,c)=>x+c.charCodeAt(0),0)) % COACH_ROSTER.length;
     selectedAthleteIdx = idx; applyDemoAthlete(idx); renderAthPicker();
   } else if(a.athleteUid){
+    PLAN_CTX = { kind:'club', clubId: window.__pf_clubId||null, athleteId: a.athleteUid };
     // Lien coach_athlete réel désormais posé (RLS 0058 club_coach_manages) :
     // on charge SON planning par id, qu'il soit ou non dans ROSTER (athlète
     // personnel du coach) — avant ce fix, un adhérent club hors ROSTER
@@ -6351,8 +6410,33 @@ function renderClubCalGroupFilter(){
    un créneau (déjà montrées via les cartes créneau, pas à dupliquer ici).
    Chargées une fois par fenêtre visible (clubIndivFetchKey), pas à chaque
    frappe — re-render déclenché quand la réponse arrive. */
+/* 17/11/2026 (demande Rowan) : une séance « perso » (posée par l'athlète lui-même ou par un
+   coach hors club) n'est PLUS affichée par défaut sur le calendrier club — seules les séances
+   posées par le staff du club (gérant, coachs, admins) pour un adhérent le sont. Le coach peut
+   afficher les séances perso d'un athlète précis via le filtre « Séances perso » (mémorisé). */
 let clubIndivSessions = {};
 let clubIndivFetchKey = '';
+function clubStaffUids(){
+  const s = new Set(); if(window.__pf_clubOwner) s.add(window.__pf_clubOwner);
+  CLUB_ATHLETES.forEach(a=>{ if(a.athleteUid && (a.role==='coach'||a.role==='admin')) s.add(a.athleteUid); });
+  return s;
+}
+let clubPersoOpen = false;
+const clubPersoKey = ()=> 'sil_clubcal_perso_'+(window.__pf_clubId||'demo');
+function clubPersoShown(){ try{ return new Set(JSON.parse(localStorage.getItem(clubPersoKey())||'[]')); }catch(_){ return new Set(); } }
+function setClubPersoShown(set){ try{ localStorage.setItem(clubPersoKey(), JSON.stringify([...set])); }catch(_){} }
+function renderClubCalPersoFilter(){
+  const el = document.getElementById('clubCalPersoFilter');
+  if(!el) return;
+  const withAccount = CLUB_ATHLETES.filter(a=>a.athleteUid);
+  if(!window.PF?.user || !withAccount.length){ el.innerHTML=''; return; }
+  const shown = clubPersoShown(), n = withAccount.filter(a=>shown.has(a.id)).length;
+  el.innerHTML = `<button type="button" class="asg-chip ccp-toggle ${clubPersoOpen?'on':''}" aria-expanded="${clubPersoOpen}">${tr('clubCal.persoLabel')}${n?` · ${n}`:''}</button>`
+    + (clubPersoOpen ? `<div class="ccp-panel"><p class="ccp-hint">${tr('clubCal.persoHint')}</p>`
+      + withAccount.map(a=>`<label class="ccp-row"><input type="checkbox" data-m="${a.id}" ${shown.has(a.id)?'checked':''}> ${dispoSafe(a.name)}</label>`).join('') + `</div>` : '');
+  el.querySelector('.ccp-toggle').onclick=()=>{ clubPersoOpen=!clubPersoOpen; renderClubCalPersoFilter(); };
+  el.querySelectorAll('[data-m]').forEach(cb=> cb.onchange=()=>{ const s=clubPersoShown(); cb.checked?s.add(cb.dataset.m):s.delete(cb.dataset.m); setClubPersoShown(s); renderClubCalendar(); });
+}
 function fetchClubIndividualSessions(fromIso, toIso){
   if(!(window.PF?.user && window.__pf_clubId)) return;
   const key = fromIso+'|'+toIso;
@@ -6361,10 +6445,13 @@ function fetchClubIndividualSessions(fromIso, toIso){
   const uids = CLUB_ATHLETES.map(a=>a.athleteUid).filter(Boolean);
   if(!uids.length) return;
   PF.getClubIndividualSchedule(uids, fromIso, toIso).then(rows=>{
-    const byDate = {};
+    const byDate = {}, staff = clubStaffUids();
     rows.forEach(r=>{
       const member = CLUB_ATHLETES.find(a=>a.athleteUid===r.athlete_id);
-      (byDate[r.date] ||= []).push({ id:r.id, memberId: member?member.id:null, memberName: member?member.name:'?', title:r.title, dur:r.dur });
+      // séance du club = posée par le staff POUR un autre que lui ; tout le reste est perso
+      const isClub = ('club_id' in r) ? !!r.club_id : !!(r.created_by && staff.has(r.created_by) && r.created_by!==r.athlete_id);
+      const origin = isClub ? 'club' : (r.created_by===r.athlete_id ? 'self' : 'coach');
+      (byDate[r.date] ||= []).push({ id:r.id, memberId: member?member.id:null, memberName: member?member.name:'?', title:r.title, dur:r.dur, perso: !isClub, origin });
     });
     clubIndivSessions = byDate;
     if(clubView==='calendrier') renderClubCalendar();
@@ -6374,6 +6461,8 @@ function renderClubCalendar(){
   const grid = document.getElementById('clubCalGrid');
   if(!grid) return;
   renderClubCalGroupFilter();
+  renderClubCalPersoFilter();
+  const persoShown = clubPersoShown();
   const label = document.getElementById('clubCalLabel');
   const mon0 = mondayOf(clubCalWeekOffset);
   const nWeeks = clubCalWeeksShown;
@@ -6399,7 +6488,7 @@ function renderClubCalendar(){
       const slots = CRENEAUX.filter(c=> (c.recur==='once' ? c.date===key : c.day===i) && matchesFilter(c.groups))
         .sort((a,b)=>(a.time||'').localeCompare(b.time||''));
       const comps = COMPETITIONS.filter(comp=>comp.date===key && (!clubCalGroupFilter || comp.targetGroupId===clubCalGroupFilter));
-      const indiv = clubCalGroupFilter ? [] : (clubIndivSessions[key]||[]);
+      const indiv = clubCalGroupFilter ? [] : (clubIndivSessions[key]||[]).filter(s=> !s.perso || persoShown.has(s.memberId));
       const day=document.createElement('div');
       day.className='day'+(key===todayIso?' today':'');
       day.innerHTML = `
@@ -6424,10 +6513,10 @@ function renderClubCalendar(){
               ${(c.disc==='run')?`<button class="ccs-mk" data-mk="${c.id}">${c.sessionTemplate?tr('creneau.editSession'):tr('creneau.createSession')}</button>`:''}
             </div>`;
           }).join('')}
-          ${indiv.map(s=>`<div class="club-cal-indiv" data-open-ath="${s.memberId||''}">
-            <span class="club-cal-badge type-indiv"><i class="ic ic-user"></i>${tr('clubCal.legendIndiv')}</span>
-            <div class="ccs-t">${s.title}</div>
-            <div class="ccs-m">${s.memberName} · ${fmtDur(s.dur)}</div>
+          ${indiv.map(s=>`<div class="club-cal-indiv${s.perso?' perso':''}" data-open-ath="${s.memberId||''}">
+            <span class="origin-tag o-${s.origin}">${tr('origin.'+s.origin)}</span>
+            <div class="ccs-t">${dispoSafe(s.title)}</div>
+            <div class="ccs-m">${dispoSafe(s.memberName)} · ${fmtDur(s.dur||0)}</div>
           </div>`).join('')}
         </div>`;
       row.appendChild(day);
@@ -10926,6 +11015,8 @@ function openAnalysis(s){
   document.getElementById('anBadge').textContent=D.label;
   document.getElementById('anBadge').style.background=D.color;
   document.getElementById('anTitle').textContent=plainText(s.title);
+  // « Partager mon activité » : seulement sur de vraies données de montre (jamais la démo simulée) ; le tracé GPS est facultatif
+  if(window.SilShare) SilShare.attach(s, s.disc==='hyrox' ? null : (s._realData||null), mode);
 
   // ---- cas HYROX : stations + saisie manuelle ----
   if(s.disc==='hyrox'){ openHyroxAnalysis(s); analysisOverlay.classList.add('open'); return; }

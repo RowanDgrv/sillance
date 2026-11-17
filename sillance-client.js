@@ -639,11 +639,20 @@ export const PF = {
     if (error) console.warn("[PF] lecture scheduled_sessions échouée :", error.message);
     return data ?? [];
   },
+  // Contexte de planification posé par l'app (window.__pf_planCtx) : { kind:'club', clubId, athleteId }
+  // quand le staff ouvre un adhérent DEPUIS le club. Seulement pour CET athlète (une copie vers un
+  // autre athlète reste une séance perso du coach).
+  _clubCtx(athleteId) {
+    try { const c = typeof window !== "undefined" && window.__pf_planCtx && window.__pf_planCtx();
+      return c && c.kind === "club" && c.clubId && c.athleteId === athleteId ? c.clubId : null; } catch { return null; }
+  },
   async scheduleSession(athleteId, dateIso, s) {
     const row = {
       athlete_id: athleteId, created_by: this.user.id, date: dateIso,
       disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,
       zone: s.zone, blocks: s.blocks ?? [], source_session_id: s.id ?? null,
+      // 0101 : séance « du club » si le staff programme depuis le club (contexte posé par l'app)
+      ...(this._clubCtx(athleteId) ? { club_id: this._clubCtx(athleteId) } : {}),
       // paire de baskets choisie par le coach (0086) — seulement si renseignée
       ...(s.shoeId ? { shoe_id: s.shoeId } : {}),
       // matériel demandé (0088) : pull-buoy, plaquettes…
@@ -653,8 +662,8 @@ export const PF = {
     };
     let { data, error } = await sb.from("scheduled_sessions").insert(row).select().single();
     // base pas encore migrée : la séance passe quand même, sans ces champs
-    if (error && /shoe_id|gear|nutrition/.test(error.message || "")) {
-      delete row.shoe_id; delete row.gear; delete row.nutrition;
+    if (error && /shoe_id|gear|nutrition|club_id/.test(error.message || "")) {
+      delete row.shoe_id; delete row.gear; delete row.nutrition; delete row.club_id;
       ({ data, error } = await sb.from("scheduled_sessions").insert(row).select().single());
     }
     if (error) throw error; return data;
@@ -682,6 +691,7 @@ export const PF = {
       athlete_id: athleteId, created_by: this.user.id, date: dateIso,
       disc: s.disc, title: s.title, dur: s.dur, dist: s.dist, tss: s.tss,
       zone: s.zone, blocks: s.blocks ?? [], source_creneau_id: creneauId,
+      ...(typeof window !== "undefined" && window.__pf_clubId ? { club_id: window.__pf_clubId } : {}),
     }).select().single();
     if (error) throw error; return data;
   },
@@ -1188,10 +1198,11 @@ export const PF = {
   // club_coach_manages (0058), un seul appel plutôt qu'un par adhérent.
   async getClubIndividualSchedule(athleteUids, fromIso, toIso) {
     if (!athleteUids.length) return [];
-    const { data, error } = await sb.from("scheduled_sessions")
-      .select("id, athlete_id, date, title, dur")
+    const q = (cols) => sb.from("scheduled_sessions").select(cols)
       .in("athlete_id", athleteUids).is("source_creneau_id", null)
       .gte("date", fromIso).lte("date", toIso);
+    let { data, error } = await q("id, athlete_id, date, title, dur, created_by, club_id");
+    if (error && /club_id/.test(error.message || "")) ({ data, error } = await q("id, athlete_id, date, title, dur, created_by"));   // avant 0101
     if (error) { console.warn("[PF] getClubIndividualSchedule :", error.message); return []; }
     return data ?? [];
   },

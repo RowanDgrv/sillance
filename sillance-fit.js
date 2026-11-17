@@ -458,7 +458,16 @@
     // false si c'est le repli auto au km/temps régulier de buildLaps() — sert
     // à savoir si ça a du sens d'étiqueter "Échauffement/Course/Retour au
     // calme" (un auto-split au km n'a pas cette structure).
-    return { pts, laps, dplus: Math.round(dplus), dist, avgHr, maxHr, avgSpeed, avgGap, disc, cond: NEUTRAL_COND, realLaps: !!(lapsRaw && lapsRaw.length) };
+    const out = { pts, laps, dplus: Math.round(dplus), dist, avgHr, maxHr, avgSpeed, avgGap, disc, cond: NEUTRAL_COND, realLaps: !!(lapsRaw && lapsRaw.length) };
+    // Tracé GPS (17/11/2026, « Partager ma séance ») : gardé en mémoire seulement. Propriété
+    // non énumérable → jamais sérialisée ni enregistrée en base avec le reste de l'analyse.
+    const track = [];
+    for (let i = 0; i < raw.length; i++) {
+      const la = raw[i].lat, lo = raw[i].lon;
+      if (la != null && lo != null && isFinite(la) && isFinite(lo) && !(la === 0 && lo === 0) && Math.abs(la) <= 90 && Math.abs(lo) <= 180) track.push([la, lo]);
+    }
+    if (track.length >= 2) Object.defineProperty(out, "track", { value: track, enumerable: false });
+    return out;
   }
 
   function buildLaps(pts, lapsRaw, disc, ftp, gAvgHr, gMaxHr) {
@@ -508,7 +517,7 @@
       // "hard" = série de qualité : forte FC (%FCmax) ou puissance > seuil
       const hard = (avgHr && avgHr / fcMax > 0.85) || (ftp && avgPower && avgPower > ftp * 0.95);
       return {
-        n: i + 1, dist: distSeg, durMin,
+        n: i + 1, dist: distSeg, durMin, t0: seg[0].t, t1: seg[seg.length - 1].t,   // bornes (min) : placer le lap sur une courbe
         avgSpeed, avgGap: avg(seg.map((p) => p.gap)),
         avgHr, maxHr, avgPower, np, cad,
         if: (np && ftp) ? +(np / ftp).toFixed(2) : 0,

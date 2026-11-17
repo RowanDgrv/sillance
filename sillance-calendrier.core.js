@@ -9120,6 +9120,8 @@ function openAnalysis(s){
   document.getElementById('anBadge').textContent=D.label;
   document.getElementById('anBadge').style.background=D.color;
   document.getElementById('anTitle').textContent=plainText(s.title);
+  // « Partager mon activité » : seulement sur de vraies données de montre (jamais la démo simulée) ; le tracé GPS est facultatif
+  if(window.SilShare) SilShare.attach(s, s.disc==='hyrox' ? null : (s._realData||null), mode);
 
   // ---- cas HYROX : stations + saisie manuelle ----
   if(s.disc==='hyrox'){ openHyroxAnalysis(s); analysisOverlay.classList.add('open'); return; }

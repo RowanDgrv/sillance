@@ -467,5 +467,5 @@
     else if(cached && cached.theme) apply(cached.theme, cached.name);
   } catch(_){}
 
-  window.SilClubTheme = { PRESETS: PRESETS, FONTS: FONTS, apply: apply, clear: clear, openEditor: openEditor, openPicker: openPicker, normalize: normalize, label: function(){ return t('open'); } };
+  window.SilClubTheme = { PRESETS: PRESETS, FONTS: FONTS, apply: apply, get: function(){ return current; }, clear: clear, openEditor: openEditor, openPicker: openPicker, normalize: normalize, label: function(){ return t('open'); } };
 })();
