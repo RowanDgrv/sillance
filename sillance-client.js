@@ -162,6 +162,14 @@ export const PF = {
   // plan ∈ 'coach' | 'athlete' | 'club'. tier (coach/club) ∈ 1|2|3 = paliers
   // (cf. stripe-checkout). interval ∈ 'month'|'year' (07/10/2026, mensuel/
   // annuel) — omis = mensuel, comportement inchangé pour les anciens appels.
+  // Couleurs des zones (0106, 18/11/2026) : gardées dans le profil pour tous les appareils.
+  async saveZoneColors(value) {
+    if (!this.user) return null;
+    const { error } = await sb.from("profiles").update({ zone_colors: value }).eq("id", this.user.id);
+    if (error) throw error;
+    if (this.profile) this.profile.zone_colors = value;
+    return true;
+  },
   async startCheckout(plan, tier, interval) {
     const body = { plan };
     if (tier) body.tier = tier;

@@ -30,7 +30,28 @@
     ZONES.forEach(function (z) { out[z] = hexOk(src[z]) ? src[z] : base[z]; });
     return out;
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} listeners.forEach(function (f) { try { f(colors()); } catch (e) { console.warn('[zones] ', e); } }); }
+  function notify() { listeners.forEach(function (f) { try { f(colors()); } catch (e) { console.warn('[zones] ', e); } }); }
+  // Compte connecté (18/11/2026) : le choix est aussi gardé dans le profil (profiles.zone_colors),
+  // pour le retrouver sur tous ses appareils. Envoi groupé (les sélecteurs de couleur bougent vite).
+  var syncT = null;
+  function syncAccount() {
+    clearTimeout(syncT);
+    syncT = setTimeout(function () {
+      var PF = window.PF; if (!PF || !PF.user || !PF.saveZoneColors) return;
+      PF.saveZoneColors({ preset: state.preset, custom: state.custom || null }).catch(function (e) { console.warn('[zones] sauvegarde compte :', e); });
+    }, 600);
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} notify(); syncAccount(); }
+  // Choix venu du compte (à la connexion) : appliqué ici, sans le renvoyer au compte.
+  function fromAccount(st) {
+    if (!st || typeof st !== 'object') return false;
+    var p = (PRESETS[st.preset] || st.preset === 'custom') ? st.preset : null; if (!p) return false;
+    var custom = null;
+    if (st.custom && typeof st.custom === 'object') { custom = {}; ZONES.forEach(function (z) { if (hexOk(st.custom[z])) custom[z] = st.custom[z]; }); }
+    state = { preset: p, custom: custom };
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    notify(); render(); return true;
+  }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 
   function css() {
@@ -96,6 +117,8 @@
     tabs.appendChild(b);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addSettingsButton); else addSettingsButton();
-  window.SilZoneColors = { colors: colors, presets: PRESETS, onChange: function (f) { listeners.push(f); }, open: open,
+  window.SilZoneColors = { colors: colors, presets: PRESETS, onChange: function (f) { listeners.push(f); }, open: open, fromAccount: fromAccount,
+    // à la connexion : compte sans choix enregistré mais choix fait sur cet appareil → on l'envoie au compte
+    pushLocalIfNeeded: function () { if (state.preset !== 'sillance' || state.custom) syncAccount(); },
     set: function (preset, custom) { state.preset = preset; if (custom) state.custom = custom; save(); } };
 })();

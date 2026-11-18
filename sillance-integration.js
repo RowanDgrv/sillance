@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261117f";
+import { PF } from "./sillance-client.js?v=20261118a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -1549,6 +1549,12 @@ function renderClubGate({ subscribed, ownsClub, trialDaysLeft, locked }) {
 async function onLoggedIn() {
   setCloudBadge(true);
   try { window.__pf_app?.refreshAlerts?.(); } catch (_) {}   // pas d'alerte de démo sur un vrai compte
+  // Couleurs des zones gardées sur le compte (0106) : le compte l'emporte ; sinon on y envoie le choix de cet appareil.
+  try {
+    const zc = PF.profile?.zone_colors;
+    if (zc && window.SilZoneColors?.fromAccount) window.SilZoneColors.fromAccount(zc);
+    else window.SilZoneColors?.pushLocalIfNeeded?.();
+  } catch (_) {}
   // Compte admin : cet appareil sort de la mesure d'audience (équivaut à ?moi=1).
   if (isAdminUser()) { try { localStorage.setItem("sil_noTrack", "1"); } catch {} }
   // Lien d'équipe du coach (?coach=…, gardé en localStorage) : relie le compte
