@@ -1102,7 +1102,7 @@ function openAuth(hard = false) {
   // (sillance-auth-scene.js). Le formulaire est déjà affiché ; l'habillage
   // arrive par-dessus, et s'il échoue le mur classique reste utilisable.
   if (hard && gateMode && !joinGate) {
-    import("./sillance-auth-scene.js?v=20261106i")
+    import("./sillance-auth-scene.js?v=20261118c")
       .then((m) => m.mountAuthScene(ov, { initialRole: pickedRole }))
       .catch((e) => console.warn("[PF] écran de connexion 3D :", e?.message || e));
   }

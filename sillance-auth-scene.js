@@ -109,10 +109,7 @@ const CSS = `
 @media (prefers-reduced-motion:reduce){.pf3-title .ch{transition:none}}
 `;
 
-const VESICA = `<svg viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="pf3v" x1="0" x2="1"><stop offset="0" stop-color="#46C2D8"/><stop offset="1" stop-color="#FF9A3D"/></linearGradient></defs>
-  <circle cx="34.5" cy="48" r="27" fill="none" stroke="#46C2D8" stroke-width="3" opacity=".6"/>
-  <circle cx="61.5" cy="48" r="27" fill="none" stroke="#FF9A3D" stroke-width="3" opacity=".6"/>
-  <path d="M48 24.6A27 27 0 0 1 48 71.4A27 27 0 0 1 48 24.6Z" fill="url(#pf3v)"/></svg>`;
+const VESICA = `<svg viewBox="0 0 96 96" aria-hidden="true"><defs><clipPath id="s172f1_k1"><circle cx="48" cy="24.62" r="13"/></clipPath><clipPath id="s172f1_k2"><circle cx="48" cy="71.38" r="13"/></clipPath><mask id="s172f1_c" maskUnits="userSpaceOnUse" x="0" y="0" width="96" height="96"><rect width="96" height="96" fill="#fff"/><circle cx="61.5" cy="48" r="27" fill="none" stroke="#000" stroke-width="14" clip-path="url(#s172f1_k1)"/></mask><mask id="s172f1_o" maskUnits="userSpaceOnUse" x="0" y="0" width="96" height="96"><rect width="96" height="96" fill="#fff"/><circle cx="34.5" cy="48" r="27" fill="none" stroke="#000" stroke-width="14" clip-path="url(#s172f1_k2)"/></mask></defs><circle cx="34.5" cy="48" r="27" fill="none" stroke="#46C2D8" stroke-width="7" mask="url(#s172f1_c)"/><circle cx="61.5" cy="48" r="27" fill="none" stroke="#FF9A3D" stroke-width="7" mask="url(#s172f1_o)"/></svg>`;
 const ICONS = {
   coach: `<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20M8 8h3M8 11h6"/></svg>`,
   athlete: `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg>`,
