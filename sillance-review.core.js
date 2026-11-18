@@ -380,7 +380,17 @@ function hasCustomZones(modelKey, aid){
   aid = aid || zoneAthleteId();
   return !!(CUSTOM_ZONES[aid] && CUSTOM_ZONES[aid][modelKey] && CUSTOM_ZONES[aid][modelKey].length);
 }
-const ZONE_RAMP = ['#2FD9FF','#39E6A3','#FFD43D','#FFB13D','#FF7A3D','#FF5470','#E0457A'];
+/* Couleurs des zones au choix de l'utilisateur (17/11/2026, sillance-zone-colors.js) :
+   une seule source pour toutes les couleurs de zones de l'app. Sans réglage : couleurs Sillance. */
+const ZONE_DEFAULT = {Z1:'#2FD9FF',Z2:'#39E6A3',Z3:'#FFD43D',Z4:'#FFB13D',Z5:'#FF5470',Z6:'#E36BFF'};
+const ZONE_RAMP_DEFAULT = ['#2FD9FF','#39E6A3','#FFD43D','#FFB13D','#FF7A3D','#FF5470','#E0457A'];
+function zonePal(){ try{ return (window.SilZoneColors && SilZoneColors.colors()) || ZONE_DEFAULT; }catch(e){ return ZONE_DEFAULT; } }
+function mixHex(a,b){ const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)); const x=p(a), y=p(b); return '#'+x.map((v,i)=>Math.round((v+y[i])/2).toString(16).padStart(2,'0')).join(''); }
+function zoneRampFrom(c){
+  if(['Z1','Z2','Z3','Z4','Z5','Z6'].every(z=>String(c[z]).toUpperCase()===ZONE_DEFAULT[z])) return ZONE_RAMP_DEFAULT.slice();
+  return [c.Z1,c.Z2,c.Z3,c.Z4,mixHex(c.Z4,c.Z5),c.Z5,c.Z6];
+}
+const ZONE_RAMP = zoneRampFrom(zonePal());
 function zoneColorAt(i, total){
   if(total<=1) return ZONE_RAMP[1];
   const idx = Math.round((i/(total-1))*(ZONE_RAMP.length-1));
@@ -1770,7 +1780,14 @@ const ZONE_CATS=[
   ['Z5','Z5 · '+tr('zoneCat.vo2max')], ['Z4','Z4 · '+tr('zoneCat.threshold')], ['Z3','Z3 · '+tr('zoneCat.tempo')],
   ['Z2','Z2 · '+tr('zoneCat.endurance')], ['Z1','Z1 · '+tr('zoneCat.recovery')], ['—',tr('zoneCat.strengthOther')]
 ];
-const ZONE_COLORS={Z1:'#2FD9FF',Z2:'#39E6A3',Z3:'#FFD43D',Z4:'#FFB13D',Z5:'#FF5470','—':'#8B93A7'};
+const ZONE_COLORS=(()=>{ const c=zonePal(); return {Z1:c.Z1,Z2:c.Z2,Z3:c.Z3,Z4:c.Z4,Z5:c.Z5,'—':'#8B93A7'}; })();
+// changement de couleurs dans les Paramètres : on met à jour les tables en place puis on redessine
+if(window.SilZoneColors) SilZoneColors.onChange(c=>{
+  zoneRampFrom(c).forEach((v,i)=>{ ZONE_RAMP[i]=v; });
+  ['Z1','Z2','Z3','Z4','Z5'].forEach(z=>{ ZONE_COLORS[z]=c[z]; });
+  try{ render(); }catch(e){}
+  try{ if(typeof renderSidebar==='function') renderSidebar(); }catch(e){}
+});
 let libSport='all', libZone='all';
 
 /* Bibliothèque officielle Sillance (offre Premium) — voir sillance-app.core.js */
@@ -2636,12 +2653,13 @@ function saveWeekPulseCoach(key, wk){
    estimé depuis la zone + le nombre de répétitions dans la description.
    ============================================================ */
 function intensityColor(p){
-  if(p<62)  return '#2FD9FF'; // récupération (Z1)
-  if(p<70)  return '#39E6A3'; // endurance
-  if(p<85)  return '#FFD43D'; // tempo
-  if(p<100) return '#FFB13D'; // seuil
-  if(p<112) return '#FF5470'; // VO2max
-  return '#E36BFF';           // anaérobie / sprint
+  const c=zonePal();
+  if(p<62)  return c.Z1; // récupération
+  if(p<70)  return c.Z2; // endurance
+  if(p<85)  return c.Z3; // tempo
+  if(p<100) return c.Z4; // seuil
+  if(p<112) return c.Z5; // VO2max
+  return c.Z6;           // anaérobie / sprint
 }
 function profLineMin(ln, disc){
   if(ln.type==='station') return 4; // ~4 min par station Hyrox
@@ -7998,9 +8016,10 @@ function lapWeightVal(){ return window.PF?.user ? 0 : (STRAVA_DEMO.weightKg||70)
 function lapZone(power){
   const ftp=lapFTPval(); if(!ftp) return {z:'—',c:'#8B95AD'};
   const p=power/ftp*100;
-  const Z=[[55,'#39E6A3','Z1'],[75,'#2FD9FF','Z2'],[90,'#9D7BFF','Z3'],[105,'#FFB13D','Z4'],[150,'#FF5470','Z5']];
+  // 17/11/2026 : mêmes couleurs que partout ailleurs (avant : Z1 vert / Z2 cyan, l'inverse du reste de l'app)
+  const k=zonePal(), Z=[[55,k.Z1,'Z1'],[75,k.Z2,'Z2'],[90,k.Z3,'Z3'],[105,k.Z4,'Z4'],[150,k.Z5,'Z5']];
   for(const [lim,c,z] of Z) if(p<=lim) return {z,c};
-  return {z:'Z6',c:'#FF5470'};
+  return {z:'Z6',c:k.Z6};
 }
 function colApplies(app,disc){ if(app==='all')return true; if(app[0]==='!')return disc!==app.slice(1); return app===disc; }
 const LAP_COLS = [
@@ -8266,11 +8285,11 @@ const STRAVA_DEMO = {
     {get k(){return tr('physio.vmaEst')},   v:'20.3', u:'km/h',      t:'▲ +0.4',          up:true, c:'var(--run)'},
     {get k(){return tr('physio.efficiency')}, v:'2.18', u:'W/bpm',   t:'▲ +0.09',         up:true, c:'var(--good)'}
   ],
-  hrZones:   [{get z(){return 'Z1 '+tr('physio.zRecup')}, pct:16, c:'#39E6A3'},
-              {get z(){return 'Z2 '+tr('zoneCat.endurance')}, pct:52, c:'#2FD9FF'},
-              {get z(){return 'Z3 '+tr('zoneCat.tempo')}, pct:14, c:'#9D7BFF'},
-              {get z(){return 'Z4 '+tr('zoneCat.threshold')}, pct:11, c:'#FFB13D'},
-              {get z(){return 'Z5 '+tr('zoneCat.vo2max')}, pct:7, c:'#FF5470'}],
+  hrZones:   [{get z(){return 'Z1 '+tr('physio.zRecup')}, pct:16, get c(){return zonePal().Z1}},
+              {get z(){return 'Z2 '+tr('zoneCat.endurance')}, pct:52, get c(){return zonePal().Z2}},
+              {get z(){return 'Z3 '+tr('zoneCat.tempo')}, pct:14, get c(){return zonePal().Z3}},
+              {get z(){return 'Z4 '+tr('zoneCat.threshold')}, pct:11, get c(){return zonePal().Z4}},
+              {get z(){return 'Z5 '+tr('zoneCat.vo2max')}, pct:7, get c(){return zonePal().Z5}}],
 
   /* ============================================================
      TESTS LACTATE — REMPLACE PAR TES VRAIS RÉSULTATS DE TEST
