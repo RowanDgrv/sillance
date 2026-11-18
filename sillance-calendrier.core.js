@@ -384,7 +384,11 @@ function hasCustomZones(modelKey, aid){
    une seule source pour toutes les couleurs de zones de l'app. Sans réglage : couleurs Sillance. */
 const ZONE_DEFAULT = {Z1:'#2FD9FF',Z2:'#39E6A3',Z3:'#FFD43D',Z4:'#FFB13D',Z5:'#FF5470',Z6:'#E36BFF'};
 const ZONE_RAMP_DEFAULT = ['#2FD9FF','#39E6A3','#FFD43D','#FFB13D','#FF7A3D','#FF5470','#E0457A'];
-function zonePal(){ try{ return (window.SilZoneColors && SilZoneColors.colors()) || ZONE_DEFAULT; }catch(e){ return ZONE_DEFAULT; } }
+// 18/11/2026 (retour Rowan) : le reste de l'app garde les couleurs Sillance (forme, semaine, planning…).
+// Les couleurs choisies dans Paramètres ne s'appliquent qu'aux graphiques d'une SÉANCE réalisée
+// (courbe cardio par zone, zones des tours) : ceux qu'on partage en Story.
+function zonePal(){ return ZONE_DEFAULT; }
+function sessionPal(){ try{ return (window.SilZoneColors && SilZoneColors.colors()) || ZONE_DEFAULT; }catch(e){ return ZONE_DEFAULT; } }
 function mixHex(a,b){ const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)); const x=p(a), y=p(b); return '#'+x.map((v,i)=>Math.round((v+y[i])/2).toString(16).padStart(2,'0')).join(''); }
 function zoneRampFrom(c){
   if(['Z1','Z2','Z3','Z4','Z5','Z6'].every(z=>String(c[z]).toUpperCase()===ZONE_DEFAULT[z])) return ZONE_RAMP_DEFAULT.slice();
@@ -1844,12 +1848,8 @@ const ZONE_CATS=[
 ];
 const ZONE_COLORS=(()=>{ const c=zonePal(); return {Z1:c.Z1,Z2:c.Z2,Z3:c.Z3,Z4:c.Z4,Z5:c.Z5,'—':'#8B93A7'}; })();
 // changement de couleurs dans les Paramètres : on met à jour les tables en place puis on redessine
-if(window.SilZoneColors) SilZoneColors.onChange(c=>{
-  zoneRampFrom(c).forEach((v,i)=>{ ZONE_RAMP[i]=v; });
-  ['Z1','Z2','Z3','Z4','Z5'].forEach(z=>{ ZONE_COLORS[z]=c[z]; });
-  try{ render(); }catch(e){}
-  try{ if(typeof renderSidebar==='function') renderSidebar(); }catch(e){}
-});
+// changement de couleurs dans les Paramètres : seule l'analyse de séance ouverte est redessinée
+if(window.SilZoneColors) SilZoneColors.onChange(()=>{ try{ if(window.__lastHrData) drawHr(window.__lastHrData); }catch(e){} });
 let libSport='all', libZone='all';
 
 /* ------------------------------------------------------------------
@@ -9351,11 +9351,41 @@ function drawHr(data){
   const y=v=>H-P.b-(v-hrMin)/(hrMax-hrMin)*(H-P.t-P.b);
   const ticks=[]; for(let v=hrMin; v<=hrMax; v+=20) ticks.push(v);
   ticks.forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<line x1="${P.l}" x2="${W-P.r}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(148,163,196,.14)"/>`); });
-  let path='',area='';
-  pts.forEach((p,i)=>{ const x=xs(i),yy=y(p.hr); path+=(i?'L':'M')+x+' '+yy; });
-  area=path+`L${xs(pts.length-1)} ${H-P.b}L${P.l} ${H-P.b}Z`;
-  svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="var(--run)" opacity="0.1"/>`);
-  svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--run)" stroke-width="2"/>`);
+  window.__lastHrData = data;
+  // Courbe colorée par zone cardio (18/11/2026) avec les couleurs choisies dans Paramètres.
+  // Sans FC max connue : courbe d'une seule couleur, comme avant (on n'invente pas de zones).
+  const fz = (typeof zonesFor==='function') ? zonesFor('fc') : [];
+  const canZone = !!(ATHLETE_REF && +ATHLETE_REF.fcMax > 0 && fz.length && typeof fcPctOf==='function');
+  const pal = sessionPal(), zcol = i=> pal['Z'+Math.min(6, i+1)] || pal.Z5;
+  const zoneIdx = hr=>{ const pc=fcPctOf(hr); for(let i=0;i<fz.length;i++){ const lo=Math.min(fz[i][1],fz[i][2]), hi=Math.max(fz[i][1],fz[i][2]); if(pc<=hi || i===fz.length-1) return pc<lo && i>0 ? i-1 : i; } return 0; };
+  if(canZone){
+    const secs = new Array(fz.length).fill(0);
+    let seg=null;
+    // fond sous la courbe d'un seul tenant (pas de bandes entre les zones), puis la ligne colorée par zone
+    let full=''; pts.forEach((p,i)=>{ if(p.hr>0) full+=(full?'L':'M')+xs(i)+' '+y(p.hr); });
+    if(full) svg.insertAdjacentHTML('beforeend',`<path d="${full}L${xs(pts.length-1)} ${H-P.b}L${P.l} ${H-P.b}Z" fill="${zcol(1)}" opacity="0.08"/>`);
+    const flush=()=>{ if(!seg || seg.n<2) return; const c=zcol(seg.z);
+      svg.insertAdjacentHTML('beforeend',`<path d="${seg.d}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`); };
+    pts.forEach((p,i)=>{
+      if(!(p.hr>0)) return;
+      const x=xs(i), yy=y(p.hr), z=zoneIdx(p.hr);
+      if(i>0 && pts[i-1].hr>0){ const dt=(p.t-pts[i-1].t)*60; if(dt>0) secs[z]+=dt; }
+      if(!seg || seg.z!==z){ const prev=seg; flush(); seg={z, d:(prev?`M${prev.lx} ${prev.ly}L`:'M')+x+' '+yy, fx:prev?prev.lx:x, lx:x, ly:yy, n:prev?2:1}; }
+      else { seg.d+='L'+x+' '+yy; seg.lx=x; seg.ly=yy; seg.n++; }
+    });
+    flush();
+    // légende : temps passé dans chaque zone
+    const tot=secs.reduce((a,b)=>a+b,0)||1; let lx=P.l;
+    fz.forEach((z,i)=>{ const pc=Math.round(secs[i]/tot*100); if(!pc) return;
+      svg.insertAdjacentHTML('beforeend',`<rect x="${lx}" y="3" width="9" height="9" rx="2" fill="${zcol(i)}"/><text x="${lx+13}" y="11" fill="var(--muted)" font-size="9.5" font-family="var(--font-data)">${String(z[0]).replace(/^(Z\d).*/,'$1')} ${pc}%</text>`);
+      lx+=70; });
+  } else {
+    let path='';
+    pts.forEach((p,i)=>{ const x=xs(i),yy=y(p.hr); path+=(i?'L':'M')+x+' '+yy; });
+    const area=path+`L${xs(pts.length-1)} ${H-P.b}L${P.l} ${H-P.b}Z`;
+    svg.insertAdjacentHTML('beforeend',`<path d="${area}" fill="var(--run)" opacity="0.1"/>`);
+    svg.insertAdjacentHTML('beforeend',`<path d="${path}" fill="none" stroke="var(--run)" stroke-width="2"/>`);
+  }
   ticks.forEach(v=>{ svg.insertAdjacentHTML('beforeend',`<text x="${P.l-7}" y="${y(v)+3}" fill="var(--run)" font-size="9.5" font-family="var(--font-data)" text-anchor="end">${v}</text>`); });
   svg.insertAdjacentHTML('beforeend',`<text x="${W-P.r}" y="11" fill="var(--muted)" font-size="9" font-family="var(--font-data)" text-anchor="end">bpm</text>`);
   AN_CHARTS.hr = {svg, pts, W, H, P, xs, y:(p)=>y(p.hr), color:'var(--run)', label:(p)=>`${Math.round(p.hr)} bpm`};
@@ -10084,7 +10114,7 @@ function lapZone(power){
   const ftp=lapFTPval(); if(!ftp) return {z:'—',c:'#8B95AD'};
   const p=power/ftp*100;
   // 17/11/2026 : mêmes couleurs que partout ailleurs (avant : Z1 vert / Z2 cyan, l'inverse du reste de l'app)
-  const k=zonePal(), Z=[[55,k.Z1,'Z1'],[75,k.Z2,'Z2'],[90,k.Z3,'Z3'],[105,k.Z4,'Z4'],[150,k.Z5,'Z5']];
+  const k=sessionPal(), Z=[[55,k.Z1,'Z1'],[75,k.Z2,'Z2'],[90,k.Z3,'Z3'],[105,k.Z4,'Z4'],[150,k.Z5,'Z5']];
   for(const [lim,c,z] of Z) if(p<=lim) return {z,c};
   return {z:'Z6',c:k.Z6};
 }

@@ -1,7 +1,7 @@
 /* Sillance — couleurs des zones d'entraînement au choix (17/11/2026)
    Chacun choisit les couleurs de ses zones Z1 à Z6 : une palette toute faite (Sillance,
-   Bordeaux, Classique, Daltonisme, Monochrome) ou ses propres couleurs. Les graphiques
-   de l'app (répartition des intensités, profils de séance, zones de l'analyse…) suivent.
+   Bordeaux, Classique, Daltonisme, Monochrome) ou ses propres couleurs. Depuis le 18/11/2026,
+   seuls les graphiques d'une séance réalisée les suivent (sessionPal() dans les cores).
    Chargé AVANT les *.core.js, qui lisent SilZoneColors.colors(). Choix gardé sur cet
    appareil (localStorage). Bouton dans les Paramètres + window.SilZoneColors.open(). */
 (function () {
@@ -11,7 +11,7 @@
   var NAMES = { Z1: 'Récupération', Z2: 'Endurance', Z3: 'Tempo', Z4: 'Seuil', Z5: 'VO2max', Z6: 'Anaérobie' };
   var PRESETS = {
     sillance:   { label: 'Sillance',    c: { Z1: '#2FD9FF', Z2: '#39E6A3', Z3: '#FFD43D', Z4: '#FFB13D', Z5: '#FF5470', Z6: '#E36BFF' } },
-    bordeaux:   { label: 'Bordeaux',    c: { Z1: '#F6D5C9', Z2: '#EFA48F', Z3: '#E2725F', Z4: '#C8414A', Z5: '#A3243B', Z6: '#7A1830' } },
+    bordeaux:   { label: 'Bordeaux',    c: { Z1: '#E4A99A', Z2: '#D9705F', Z3: '#C2403F', Z4: '#7E1A2E', Z5: '#4A1652', Z6: '#2E0E3A' } },
     classique:  { label: 'Classique',   c: { Z1: '#A0A7B4', Z2: '#3B82F6', Z3: '#22C55E', Z4: '#F59E0B', Z5: '#EF4444', Z6: '#A855F7' } },
     daltonisme: { label: 'Daltonisme',  c: { Z1: '#56B4E9', Z2: '#009E73', Z3: '#F0E442', Z4: '#E69F00', Z5: '#D55E00', Z6: '#CC79A7' } },
     mono:       { label: 'Monochrome',  c: { Z1: '#3E5A66', Z2: '#4F8597', Z3: '#5FB0C8', Z4: '#7FCFE3', Z5: '#B5E6F2', Z6: '#FFFFFF' } }
@@ -77,13 +77,13 @@
     var o = document.getElementById('szcOverlay'); if (!o) return;
     var cur = colors();
     var h = '<div class="szc-box" role="dialog" aria-modal="true" aria-label="Couleurs des zones"><div class="szc-head"><h3>Couleurs des zones</h3><button type="button" class="szc-x" data-x aria-label="Fermer">✕</button></div>' +
-      '<p class="szc-sub">Les graphiques de tes séances, de ta semaine et de tes analyses prennent ces couleurs.</p><div class="szc-presets">';
+      '<p class="szc-sub">Pour les graphiques de tes séances réalisées (courbe cardio par zone, zones des tours) : ceux que tu partages en Story. Le reste de l\'app garde les couleurs Sillance.</p><div class="szc-presets">';
     Object.keys(PRESETS).forEach(function (k) { h += '<button type="button" class="szc-p' + (state.preset === k ? ' on' : '') + '" data-p="' + k + '"><b>' + esc(PRESETS[k].label) + '</b><span class="szc-sw">' + swatches(PRESETS[k].c) + '</span></button>'; });
     h += '<button type="button" class="szc-p' + (state.preset === 'custom' ? ' on' : '') + '" data-p="custom"><b>Mes couleurs</b><span class="szc-sw">' + swatches(state.custom ? colors() : cur) + '</span></button></div>';
     if (state.preset === 'custom') {
       h += '<div class="szc-custom">' + ZONES.map(function (z) { return '<label class="szc-c"><input type="color" data-z="' + z + '" value="' + cur[z] + '" aria-label="Couleur ' + z + '"><span><b>' + z + '</b><br>' + NAMES[z] + '</span></label>'; }).join('') + '</div>';
     }
-    h += '<div class="szc-prev">' + swatches(cur) + '</div><p class="szc-note">Réglage gardé sur cet appareil. Les couleurs des sports (natation, vélo, course) ne changent pas.</p></div>';
+    h += '<div class="szc-prev">' + swatches(cur) + '</div><p class="szc-note">Réglage gardé sur ton compte. Les couleurs des sports (natation, vélo, course) ne changent pas.</p></div>';
     o.innerHTML = h;
   }
   function open() {
