@@ -1407,7 +1407,7 @@ export const PF = {
     return r;
   },
   // Activités importées, normalisées (disc/name/start_time/duration_s/distance_m…).
-  async getActivities(limit = 20, athleteId = null) {
+  async getActivities(limit = 20, athleteId = null, sinceIso = null) {
     // duplicate_of : exclut les doublons multi-plateformes déjà résolus
     // (0062) — la même séance importée par Strava ET par la montre ne doit
     // apparaître qu'une fois (la marque de la montre gagne).
@@ -1415,7 +1415,18 @@ export const PF = {
       .is("duplicate_of", null)
       .order("start_time", { ascending: false }).limit(limit);
     if (athleteId) q = q.eq("user_id", athleteId);
+    if (sinceIso) q = q.gte("start_time", sinceIso);
     const { data } = await q;
+    return data ?? [];
+  },
+  // Check-ins d'un athlète sur une période (écran Analyse, 19/11/2026) : sommeil,
+  // fatigue, motivation, HRV, poids. RLS : soi-même ou son coach.
+  async getCheckinsRange(athleteId, fromIso) {
+    const { data, error } = await sb.from("checkins")
+      .select("date, sommeil, fatigue, motivation, hrv, poids, dispo")
+      .eq("athlete_id", athleteId || this.user.id).gte("date", fromIso)
+      .order("date", { ascending: true });
+    if (error) console.warn("[PF] lecture checkins (période) échouée :", error.message);
     return data ?? [];
   },
   // Ressenti (RPE 1-10 effort + sensation 1-5 bien-être, distincts façon

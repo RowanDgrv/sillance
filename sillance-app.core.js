@@ -690,6 +690,11 @@ function setActivityState(hasActivity){
   if(!an || !anEmpty) return;
   an.hidden = !hasActivity;
   anEmpty.hidden = hasActivity;
+  // 19/11/2026 : ces 4 graphiques lisent STRAVA_DEMO (loadStravaData n'est jamais
+  // appelé) → sur un vrai compte ils montraient des chiffres de démo. Masqués ;
+  // la charge et la forme réelles sont dans l'écran Analyse (sillance-analyse.js).
+  if(window.PF?.user) ['ftpChart','hrChart','distChart','loadChart'].forEach(id=>{
+    const c=document.getElementById(id)?.closest('.chart-card'); if(c) c.hidden=true; });
 }
 
 /* ============================================================
@@ -3168,7 +3173,7 @@ function linkRealisedToPlan(){
     s.linkedAct=null;
   });
   for(const day in realised){
-    const acts=realised[day]||[]; acts.forEach(a=>{ a.linkedTo=null; });
+    const acts=realised[day]||[]; acts.forEach(a=>{ a.linkedTo=null; a._plan=null; });
     const pairs=[];
     (planning[day]||[]).forEach(s=> acts.forEach(a=>{
       if(discFamily(s.disc)===discFamily(a.disc)) pairs.push({s, a, gap:Math.abs((a.dur||0)-(s.dur||0))});
@@ -3176,7 +3181,7 @@ function linkRealisedToPlan(){
     pairs.sort((x,y)=>x.gap-y.gap);
     pairs.forEach(({s,a})=>{
       if(s.linkedAct || a.linkedTo) return;
-      s.linkedAct=a; a.linkedTo=s.id||true;
+      s.linkedAct=a; a.linkedTo=s.id||true; a._plan=s;
       if(!s.done){ s.done=true; s.autoDone=true; }
     });
   }
@@ -8373,6 +8378,8 @@ window.__pf_app = {
   setMeClubId(id){ if(id) ME_CLUB_ID = id; },
   setMyClub,
   getCurrentAthleteId(){ return currentAthleteId; },
+  // Écran Analyse (sillance-analyse.js) : série quotidienne de charge sur le réalisé.
+  loadDaily(end, days){ return buildLoadDaily(end, days); },
   // Masque l'analyse/records de démo pour un compte confirmé sans activité réelle.
   setActivityState,
   // Injecte les débriefs de course d'un athlète (chargés du cloud) — sert la
@@ -12931,17 +12938,72 @@ const CTL_ALPHA = 1 - Math.exp(-1/CTL_TAU), ATL_ALPHA = 1 - Math.exp(-1/ATL_TAU)
    du jour (somme des séances planning, 0 si repos) dès qu'au moins une
    donnée réelle existe dans la fenêtre ; sinon repli démo (profil lissé
    par semaine, réparti sur ses 7 jours — aucun athlète réel à représenter). */
+/* CHARGE D'UNE ACTIVITÉ RÉALISÉE (19/11/2026) — à partir du résumé de la
+   montre (pas des courbes, chargées seulement à l'ouverture de l'analyse).
+   Même formule que computeChargeCoggan : durée (h) × IF² × 100, IF tiré de
+   (1) la puissance (normalisée si la plateforme la donne, sinon moyenne) / FTP,
+   (2) l'allure moyenne / allure seuil (course), vitesse / CSS (natation),
+   (3) sinon le cardio : TRIMP de Banister ramené à 1 h au seuil = 100
+       (seuil estimé à 85 % de la FC de réserve faute de FC seuil saisie),
+   (4) sinon la charge prévue de la séance liée, (5) sinon IF 0,65 estimé.
+   Renvoie aussi la charge de Foster (durée min × RPE) quand le RPE est saisi. */
+function activityLoad(a){
+  const R=(typeof ATHLETE_REF!=='undefined')?ATHLETE_REF:{};
+  const durH=(a.dur||0)/60; if(!durH) return {tss:0, method:'none', estimated:true, foster:null};
+  const fam=discFamily(a.disc);
+  const tssOf=ifv=>Math.round(durH*Math.min(ifv,1.3)*Math.min(ifv,1.3)*100);
+  let tss=null, method=null;
+  const pw=a.np||a.avgPower;
+  if(fam==='bike' && pw && R.ftp){ tss=tssOf(pw/R.ftp); method='power'; }
+  else if(fam==='run' && a.spd && R.seuilRun){ tss=tssOf(a.spd/(1000/R.seuilRun)); method='pace'; }
+  else if(fam==='swim' && a.spd && R.css){ tss=tssOf(a.spd/(100/R.css)); method='pace'; }
+  if(tss==null && a.avgHr && R.fcMax && R.fcRepos && R.fcMax>R.fcRepos){
+    const trimp=(hrr,min)=>min*hrr*0.64*Math.exp(1.92*hrr);
+    const hrr=Math.max(0,Math.min(1,(a.avgHr-R.fcRepos)/(R.fcMax-R.fcRepos)));
+    tss=Math.round(trimp(hrr,durH*60)/trimp(0.85,60)*100); method='hr';
+  }
+  const linked=a.linkedTo && a._plan;
+  if(tss==null && linked && a._plan.tss){ tss=a._plan.tss; method='plan'; }
+  if(tss==null){ tss=tssOf(0.65); method='default'; }
+  return {tss, method, estimated:(method==='hr'||method==='plan'||method==='default'),
+    foster: a.rpe ? Math.round(durH*60*a.rpe) : null};
+}
+/* Compte connecté : jour passé = ce qui a été FAIT (activités de la montre +
+   séances cochées « faite » à la main sans activité), jour à venir = prévu.
+   Avant le 19/11/2026, la courbe additionnait le prévu même pour le passé :
+   une séance sautée comptait quand même. Démo : planning seedé, inchangé. */
 function buildLoadDaily(endDate, days){
   endDate = endDate || new Date();
   days = days || 364;
   const DISCS=['swim','bike','run','strength'];
-  const dayTotal={}, dayLoad={}, dayHours={};
-  for(const k in planning){
+  const dayTotal={}, dayLoad={}, dayHours={}, dayFoster={};
+  const connected0 = !!(window.PF && window.PF.user);
+  const todayKey = iso(new Date());
+  const discOf=d=>{ const f=discFamily(d); return DISCS.includes(f)?f:(d==='hyrox'?'strength':'bike'); };
+  if(connected0){
+    try{ linkRealisedToPlan(); }catch(e){}
+    const keys=new Set([...Object.keys(planning), ...Object.keys(realised)]);
+    keys.forEach(k=>{
+      const load={swim:0,bike:0,run:0,strength:0}; let hours=0, foster=0, fosterN=0, n=0;
+      if(k<=todayKey){
+        (realised[k]||[]).forEach(a=>{ const r=activityLoad(a); a._load=r; load[discOf(a.disc)]+=r.tss; hours+=(a.dur||0)/60; n++;
+          if(r.foster!=null){ foster+=r.foster; fosterN++; } });
+        (planning[k]||[]).forEach(s=>{ if(s.done && !s.linkedAct){ load[discOf(s.disc)]+=(s.tss||0); hours+=(s.dur||0)/60; n++;
+          if(s.rpe){ foster+=Math.round((s.dur||0)*s.rpe); fosterN++; } } });
+      } else {
+        (planning[k]||[]).forEach(s=>{ load[discOf(s.disc)]+=(s.tss||0); hours+=(s.dur||0)/60; });
+      }
+      dayLoad[k]=load; dayTotal[k]=load.swim+load.bike+load.run+load.strength; dayHours[k]=hours;
+      dayFoster[k]={v:foster, n:fosterN, of:n};
+    });
+  } else for(const k in planning){
     const d=new Date(k+'T00:00:00'); if(isNaN(d)) continue;
-    const load={swim:0,bike:0,run:0,strength:0};
+    const load={swim:0,bike:0,run:0,strength:0}; let foster=0, fosterN=0, n=0;
     (planning[k]||[]).forEach(s=>{ const disc=DISCS.includes(s.disc)?s.disc:'bike';
-      load[disc]+=(s.tss||0); dayHours[k]=(dayHours[k]||0)+(s.dur||0)/60; });
+      load[disc]+=(s.tss||0); dayHours[k]=(dayHours[k]||0)+(s.dur||0)/60;
+      if(s.done){ n++; if(s.rpe){ foster+=Math.round((s.dur||0)*s.rpe); fosterN++; } } });
     dayLoad[k]=load; dayTotal[k]=load.swim+load.bike+load.run+load.strength;
+    dayFoster[k]={v:foster, n:fosterN, of:n};
   }
   // planning ne couvre en général qu'une fenêtre autour d'aujourd'hui (démo
   // non connectée : ~2-3 semaines de séances-types de démonstration, PAS
@@ -12966,7 +13028,7 @@ function buildLoadDaily(endDate, days){
     const tsb = ctl-atl; // forme AVANT la charge du jour (convention TrainingPeaks)
     ctl += (total-ctl)*CTL_ALPHA;
     atl += (total-atl)*ATL_ALPHA;
-    daysArr.push({date:key, mon:d, total, load, hours, ctl, atl, tsb});
+    daysArr.push({date:key, mon:d, total, load, hours, ctl, atl, tsb, foster:dayFoster[key]||null, future:key>todayKey});
   }
   return daysArr;
 }

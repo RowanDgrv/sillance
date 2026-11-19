@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261118a";
+import { PF } from "./sillance-client.js?v=20261119a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -159,6 +159,11 @@ const mapActivity = (a) => ({
   avgPower: a.avg_power != null ? Math.round(a.avg_power) : null,
   elev: a.elevation_m != null ? Math.round(a.elevation_m) : null,
   src: a.provider || "strava",
+  // pour la charge sur le réalisé (activityLoad, 19/11/2026)
+  rpe: a.rpe != null ? Number(a.rpe) : null,
+  np: a.raw && Number(a.raw.weighted_average_watts) > 0 ? Math.round(a.raw.weighted_average_watts) : null,
+  spd: a.avg_speed != null ? Number(a.avg_speed) : null,
+  maxHr: a.max_hr != null ? Math.round(a.max_hr) : null,
 });
 // Jour local (YYYY-MM-DD) où placer l'activité sur le calendrier : on privilégie
 // l'horodatage local fourni par la plateforme (raw.start_date_local), sinon on
@@ -850,6 +855,7 @@ function applyAthleteRefs(refs) {
 async function loadPlanningFor(athleteId) {
   const app = A();
   const target = athleteId || PF.user.id;
+  window.__pf_viewTarget = target;   // athlète affiché (écran Analyse : ses check-ins)
   const today = new Date();
   const from = new Date(today); from.setDate(from.getDate() - 28);
   const to   = new Date(today); to.setDate(to.getDate() + 28);
@@ -858,7 +864,8 @@ async function loadPlanningFor(athleteId) {
     PF.getPlanning(target, iso(from), iso(to)),
     PF.getGear(target),
     PF.getAthleteZones(target).catch((e) => { console.warn("[PF] getAthleteZones :", e); return null; }),
-    PF.getActivities(200, target).catch((e) => { console.warn("[PF] getActivities :", e); return []; }),
+    // 13 mois d'activités : la forme (CTL) se calcule sur 42 jours et le graphique remonte à 1 an
+    PF.getActivities(1000, target, iso(new Date(today.getTime() - 400 * 864e5))).catch((e) => { console.warn("[PF] getActivities :", e); return []; }),
     PF.getAthleteRefs(target).catch((e) => { console.warn("[PF] getAthleteRefs :", e); return null; }),
   ]);
   applyAthleteRefs(refs);

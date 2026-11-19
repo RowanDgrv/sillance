@@ -3276,6 +3276,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     </label>
 
     <div class="chart-filter" id="chartFilter" aria-label="Choisir les graphiques à afficher" data-i18n-attr="aria-label:charts.chooseAria"></div>
+    <button type="button" class="san-open" id="sanOpenBtn" onclick="window.SilAnalyse&&window.SilAnalyse.open()" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:4px 0 14px;padding:14px 16px;border-radius:14px;border:1px solid var(--accent,#46C2D8);background:transparent;color:var(--text);font:inherit;cursor:pointer"><i class="ic ic-chart" style="color:var(--accent,#46C2D8)"></i><span style="flex:1"><b style="display:block;font-size:15px" data-i18n="stats.fullAnalysis">Analyse complète</b><small style="color:var(--muted)" data-i18n="stats.fullAnalysisSub">Forme, charge mesurée et ressentie, sommeil, HRV et poids sur le même axe des dates</small></span><span aria-hidden="true">→</span></button>
 
     <div class="charts stats-group" data-group="charge">
       <div class="chart-card c12">
@@ -4309,7 +4310,7 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261117h"></script>
+<script src="./sillance-i18n-app.js?v=20261119a"></script>
 <script src="./sillance-reminder.js?v=20261113j"></script>
 <script src="./sillance-ai-popup.js?v=20261107a"></script>
 <script src="./sillance-consigne.js?v=20261113e"></script>
@@ -4325,13 +4326,14 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
 <script src="./sillance-zone-colors.js?v=20261118b"></script>
-<script src="./sillance-app.core.js?v=20261118b"></script>
+<script src="./sillance-analyse.js?v=20261119a"></script>
+<script src="./sillance-app.core.js?v=20261119a"></script>
 <script src="./sillance-chart-zoom.js?v=20261117a"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261118c"></script>
+<script type="module" src="./sillance-integration.js?v=20261119a"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>
