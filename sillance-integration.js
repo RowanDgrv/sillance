@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261122a";
+import { PF } from "./sillance-client.js?v=20261122b";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -166,7 +166,7 @@ const mapActivity = (a) => ({
   maxHr: a.max_hr != null ? Math.round(a.max_hr) : null,
   // récap de l'analyse (22/11/2026) : calories de la montre, température si capteur (Strava average_temp)
   calories: a.calories != null ? Math.round(a.calories) : null,
-  temp: a.raw && a.raw.average_temp != null ? Math.round(a.raw.average_temp) : null,
+  temp: a.raw && (a.raw.average_temp ?? a.raw.avg_temp) != null ? Math.round(a.raw.average_temp ?? a.raw.avg_temp) : null,
 });
 // Jour local (YYYY-MM-DD) où placer l'activité sur le calendrier : on privilégie
 // l'horodatage local fourni par la plateforme (raw.start_date_local), sinon on

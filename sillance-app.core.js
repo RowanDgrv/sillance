@@ -2035,7 +2035,7 @@ function importActivityFile(file){
 function openStravaAnalysis(act, plan){
   if(!act || !act.id){ return; }
   toast(tr('toast.chargementDetail'));
-  PF.getActivityStreams(act.id, act.src).then(({points, laps})=>{
+  PF.getActivityStreams(act.id, act.src).then(({points, laps, avgTemp})=>{
     if(!points || !points.length){ toast(tr('toast.pasDetailSecondeParSeconde')); return; }
     const ftp=lapFTPval();
     // Vrais laps de la montre (bouton lap) si l'athlète en a posé, sinon []
@@ -2046,7 +2046,7 @@ function openStravaAnalysis(act, plan){
     const res = PFFit.buildFromRaw(points, act.disc, laps||[], {ftp});
     if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
     // Récap (22/11/2026) : calories et température viennent du résumé de l'activité (pas des points)
-    res.data.meta={calories:act.calories??null, temp:act.temp??null, durMin:act.dur||null};
+    res.data.meta={calories:act.calories??null, temp:act.temp??(avgTemp!=null?Math.round(avgTemp):null), durMin:act.dur||null};
     // plan : la séance prévue liée → l'IA juge contre SA consigne (titre,
     // objectif, durée prévue) et non contre le nom donné par la montre.
     // Un plantage de l'AFFICHAGE ne doit pas se faire passer pour un échec de
@@ -2120,7 +2120,7 @@ async function refreshDeviceState(){
         date: fmtActDate(a.start_time),
         src: a.provider,
         calories: a.calories!=null ? Math.round(a.calories) : null,
-        temp: a.raw && a.raw.average_temp!=null ? Math.round(a.raw.average_temp) : null
+        temp: a.raw && (a.raw.average_temp ?? a.raw.avg_temp)!=null ? Math.round(a.raw.average_temp ?? a.raw.avg_temp) : null
       }));
     } else { stravaActivities = []; }
     renderStravaCard();

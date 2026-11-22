@@ -1470,7 +1470,7 @@ export const PF = {
     }, 25000));
     const data = await Promise.race([this._invokeSoft(fn, { activity_id: activityId }), timeout]);
     if (data?.error) { const e = new Error(data.detail && data.detail !== data.error ? `${data.error} (${data.detail})` : data.error); e.serverReason = true; throw e; }
-    return { points: data?.points ?? [], laps: data?.laps ?? [] };
+    return { points: data?.points ?? [], laps: data?.laps ?? [], avgTemp: data?.avgTemp ?? null };
   },
   // Persiste un import manuel .TCX/.GPX (window.PFFit.parseFile → { summary, data }).
   // Upsert sur (provider, provider_activity_id) : ré-importer le même fichier ne duplique pas.
