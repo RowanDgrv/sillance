@@ -13,7 +13,7 @@
  *   - window.PF        (exposé par sillance-client.js)
  *   - window.__pf_app  (hook exposé par le <script> inline de l'app)
  * ========================================================================== */
-import { PF } from "./sillance-client.js?v=20261119a";
+import { PF } from "./sillance-client.js?v=20261122a";
 window.PF = PF;
 
 function tr(key, vars) { return window.SilI18n ? window.SilI18n.t(key, vars) : key; }
@@ -164,6 +164,9 @@ const mapActivity = (a) => ({
   np: a.raw && Number(a.raw.weighted_average_watts) > 0 ? Math.round(a.raw.weighted_average_watts) : null,
   spd: a.avg_speed != null ? Number(a.avg_speed) : null,
   maxHr: a.max_hr != null ? Math.round(a.max_hr) : null,
+  // récap de l'analyse (22/11/2026) : calories de la montre, température si capteur (Strava average_temp)
+  calories: a.calories != null ? Math.round(a.calories) : null,
+  temp: a.raw && a.raw.average_temp != null ? Math.round(a.raw.average_temp) : null,
 });
 // Jour local (YYYY-MM-DD) où placer l'activité sur le calendrier : on privilégie
 // l'horodatage local fourni par la plateforme (raw.start_date_local), sinon on
@@ -843,7 +846,8 @@ function queueFeelingPrompts(pendingRaw, gearMapped) {
 // calculer des zones sur un chiffre inventé.
 function applyAthleteRefs(refs) {
   const R = A().data.ATHLETE_REF;
-  ["ftp", "pma", "cpBike", "vma", "cv", "seuilRun", "css", "fcMax", "fcRepos", "hrvBase", "updatedAt"].forEach((k) => { R[k] = null; });
+  // 22/11/2026 : + tests du profil de performance (sprint 50 m, 50 m nage, 5 s) — valeurs de démo sinon
+  ["ftp", "pma", "cpBike", "vma", "cv", "seuilRun", "css", "fcMax", "fcRepos", "hrvBase", "updatedAt", "sprint50Run", "swim50", "p5s"].forEach((k) => { R[k] = null; });
   if (refs) A().assignObj(R, mapRefs(refs));
   // Consentement IA (0091) : null = pas d'avis, true / false = choix exprimé.
   R.aiConsent = refs && typeof refs.ai_consent === "boolean" ? refs.ai_consent : null;

@@ -1419,6 +1419,16 @@ export const PF = {
     const { data } = await q;
     return data ?? [];
   },
+  // Santé mesurée par la montre (wellness_daily, 0107) : sommeil, HRV de nuit, FC de repos.
+  // Table absente (migration pas encore appliquée) → liste vide, sans casser l'écran.
+  async getWellnessRange(athleteId, fromIso) {
+    const { data, error } = await sb.from("wellness_daily")
+      .select("date, source, sleep_score, sleep_min, deep_pct, rem_pct, awake_min, hrv_ms, hrv_low, hrv_high, hrv_baseline, hrv_eval, resting_hr")
+      .eq("athlete_id", athleteId || this.user.id).gte("date", fromIso)
+      .order("date", { ascending: true });
+    if (error) { console.warn("[PF] lecture santé montre échouée :", error.message); return []; }
+    return data ?? [];
+  },
   // Check-ins d'un athlète sur une période (écran Analyse, 19/11/2026) : sommeil,
   // fatigue, motivation, HRV, poids. RLS : soi-même ou son coach.
   async getCheckinsRange(athleteId, fromIso) {

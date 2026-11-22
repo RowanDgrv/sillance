@@ -2337,6 +2337,14 @@ body[data-athview] .planner > .library{display:none}
 .an-kpi .v{font-family:var(--font-data);font-size:18px;font-weight:700;margin-top:3px}
 .an-kpi .u{font-size:var(--fs-xs);color:var(--muted)}
 .an-section{margin-top:20px}
+.an-tabs{position:sticky;top:-1px;z-index:3;display:flex;gap:4px;margin:14px 0 4px;padding:6px 0;background:var(--panel);border-bottom:1px solid var(--line)}
+.an-tab{flex:1;min-height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:var(--fs-base);cursor:pointer}
+.an-tab:hover{color:var(--text)}
+.an-tab.on{background:var(--panel-2);color:var(--text);box-shadow:inset 0 -2px 0 var(--accent)}
+.an-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.an-page[hidden]{display:none}
+.an-kpi.na .v{color:var(--muted);font-size:13px;font-weight:600}
+@media (max-width:560px){.an-kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.an-kpi{padding:8px 4px;border-radius:9px}.an-kpi .k{font-size:8.5px;letter-spacing:.04em}.an-kpi .v{font-size:16px}.an-tab{min-height:44px}}
 .an-sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2);flex-wrap:wrap;gap:var(--space-2)}
 .an-sec-head h4{font-family:var(--font-display);font-size:var(--fs-lg);font-weight:700}
 .an-sub-h{font-family:var(--font-display);font-size:12.5px;font-weight:700;color:var(--soft);margin-bottom:6px}
@@ -4056,81 +4064,92 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
     <button class="close" id="analysisClose" aria-label="Fermer" data-i18n-attr="aria-label:modal.closeAria"><i class="ic ic-x"></i></button>
     <span class="badge" id="anBadge"></span>
     <h3 id="anTitle"></h3>
-    <div class="an-kpis" id="anKpis"></div>
-    <div class="an-section" id="anChargeWrap">
-      <div class="an-sec-head"><h4 data-i18n="charge.heading">Charge de la séance</h4><span class="an-hint" data-i18n="charge.hint">Coggan · TRIMP · Foster, au choix</span></div>
-      <div id="anCharge"></div>
+    <div class="an-tabs" id="anTabs" role="tablist">
+      <button type="button" class="an-tab on" role="tab" data-page="recap" aria-selected="true" data-i18n="anTab.recap">Récap</button>
+      <button type="button" class="an-tab" role="tab" data-page="charts" aria-selected="false" data-i18n="anTab.charts">Graphiques</button>
+      <button type="button" class="an-tab" role="tab" data-page="laps" aria-selected="false" data-i18n="anTab.laps">Laps</button>
     </div>
-    <div class="an-section" id="anImpactWrap">
-      <div class="an-sec-head"><h4><span data-i18n="perf.conditionsImpactHeading">Impact des conditions</span> <span class="an-hint" data-i18n="perf.conditionsImpactHint">ce que l'environnement t'a coûté</span></h4></div>
-      <div class="an-impact" id="anImpact"></div>
-    </div>
-    <div class="an-section">
-      <div class="an-sec-head"><h4 id="anSpeedTitle" data-i18n="chart.speedHeading">Vitesse</h4></div>
-      <svg id="anSpeed" viewBox="0 0 720 180" role="img" aria-label="Courbe de vitesse" data-i18n-attr="aria-label:chart.speedAria"></svg>
-    </div>
-    <div class="an-section" id="anPowerWrap">
-      <div class="an-sec-head"><h4>Puissance (W)</h4></div>
-      <svg id="anPower" viewBox="0 0 720 180" role="img" aria-label="Courbe de puissance" data-i18n-attr="aria-label:chart.powerAria"></svg>
-    </div>
-    <div class="an-section" id="anWbalWrap">
-      <div class="an-sec-head"><h4 data-i18n="wbal.heading">W'bal · réserve anaérobie</h4><span class="an-hint" data-i18n="wbal.hintShort">estimée, décharge/recharge en temps réel</span></div>
-      <div class="an-dc-kpi" id="anWbalKpi"></div>
-      <svg id="anWbal" viewBox="0 0 720 170" role="img" aria-label="W'bal" data-i18n-attr="aria-label:wbal.chartAria"></svg>
-    </div>
-    <div class="an-section">
-      <div class="an-sec-head"><h4 data-i18n="chart.hrHeading">Fréquence cardiaque</h4></div>
-      <svg id="anHr" viewBox="0 0 720 180" role="img" aria-label="Courbe de fréquence cardiaque" data-i18n-attr="aria-label:chart.hrCurveAria"></svg>
-    </div>
-    <div class="an-section" id="anElevWrap">
-      <div class="an-sec-head"><h4>Profil d'altitude · D+</h4></div>
-      <svg id="anElev" viewBox="0 0 720 150" role="img" aria-label="Profil d'altitude" data-i18n-attr="aria-label:chart.altitudeAria"></svg>
-    </div>
-    <div class="an-section" id="anBiomechWrap">
-      <div class="an-sec-head"><h4><span data-i18n="perf.biomechanicsHeading">Biomécanique</span> <span class="an-hint" data-i18n="perf.biomechanicsHint">dynamiques de course, si la montre les fournit</span></h4></div>
-      <div class="an-sub-sec">
-        <h5 class="an-sub-h" data-i18n="chart.cadenceHeading">Cadence</h5>
-        <svg id="anCadence" viewBox="0 0 720 150" role="img" aria-label="Cadence" data-i18n-attr="aria-label:chart.cadenceAria" style="display:none"></svg>
-        <p class="hint" id="anCadenceNA">Pas de données de cadence disponibles sur cette activité.</p>
+    <div class="an-page" data-page="recap" role="tabpanel">
+      <div class="an-kpis" id="anKpis"></div>
+      <div class="an-section" id="anChargeWrap">
+        <div class="an-sec-head"><h4 data-i18n="charge.heading">Charge de la séance</h4><span class="an-hint" data-i18n="charge.hint">Coggan · TRIMP · Foster, au choix</span></div>
+        <div id="anCharge"></div>
       </div>
-      <div class="an-sub-sec" style="margin-top:18px">
-        <h5 class="an-sub-h" data-i18n="chart.strideLenHeading">Longueur de foulée</h5>
-        <svg id="anStepLen" viewBox="0 0 720 150" role="img" aria-label="Longueur de foulée" data-i18n-attr="aria-label:chart.strideAria" style="display:none"></svg>
-        <p class="hint" id="anStepLenNA">Pas de données de longueur de foulée disponibles sur cette activité (nécessite une montre avec capteur de dynamiques de course : Coros, Garmin… ou via import .FIT).</p>
+      <div class="an-section" id="anImpactWrap">
+        <div class="an-sec-head"><h4><span data-i18n="perf.conditionsImpactHeading">Impact des conditions</span> <span class="an-hint" data-i18n="perf.conditionsImpactHint">ce que l'environnement t'a coûté</span></h4></div>
+        <div class="an-impact" id="anImpact"></div>
+      </div>
+      <div class="an-section" id="anAiWrap">
+        <div class="an-sec-head"><h4><i class="ic ic-brain"></i> Assistant IA <span class="an-hint">résumé &amp; recommandations</span></h4></div>
+        <div id="anAiBody"></div>
+      </div>
+      <div class="an-section" id="anSimilarWrap">
+        <div class="an-sec-head"><h4 data-i18n="perf.similarSessionsHeading">Séances similaires</h4><span class="an-hint" data-i18n="perf.autoComparison">comparaison automatique</span></div>
+        <div id="anSimilar"></div>
       </div>
     </div>
-    <div class="an-section" id="anBestWrap">
-      <div class="an-sec-head"><h4 data-i18n="best.heading">Meilleurs efforts &amp; records</h4><span class="an-hint" data-i18n="best.hint">puissance/allure sur les durées de référence</span></div>
-      <svg id="anBestCurve" viewBox="0 0 720 190" role="img" aria-label="Courbe des meilleurs efforts" data-i18n-attr="aria-label:best.chartAria"></svg>
-      <p class="hint" id="anBestCurveEmpty" data-i18n="best.tooShort">Séance trop courte pour une courbe de meilleurs efforts exploitable.</p>
-      <div class="best-records" id="anBestRecords"></div>
+    <div class="an-page" data-page="charts" role="tabpanel" hidden>
+      <div class="an-section">
+        <div class="an-sec-head"><h4 id="anSpeedTitle" data-i18n="chart.speedHeading">Vitesse</h4></div>
+        <svg id="anSpeed" viewBox="0 0 720 180" role="img" aria-label="Courbe de vitesse" data-i18n-attr="aria-label:chart.speedAria"></svg>
+      </div>
+      <div class="an-section" id="anPowerWrap">
+        <div class="an-sec-head"><h4>Puissance (W)</h4></div>
+        <svg id="anPower" viewBox="0 0 720 180" role="img" aria-label="Courbe de puissance" data-i18n-attr="aria-label:chart.powerAria"></svg>
+      </div>
+      <div class="an-section" id="anWbalWrap">
+        <div class="an-sec-head"><h4 data-i18n="wbal.heading">W'bal · réserve anaérobie</h4><span class="an-hint" data-i18n="wbal.hintShort">estimée, décharge/recharge en temps réel</span></div>
+        <div class="an-dc-kpi" id="anWbalKpi"></div>
+        <svg id="anWbal" viewBox="0 0 720 170" role="img" aria-label="W'bal" data-i18n-attr="aria-label:wbal.chartAria"></svg>
+      </div>
+      <div class="an-section">
+        <div class="an-sec-head"><h4 data-i18n="chart.hrHeading">Fréquence cardiaque</h4></div>
+        <svg id="anHr" viewBox="0 0 720 180" role="img" aria-label="Courbe de fréquence cardiaque" data-i18n-attr="aria-label:chart.hrCurveAria"></svg>
+      </div>
+      <div class="an-section" id="anElevWrap">
+        <div class="an-sec-head"><h4>Profil d'altitude · D+</h4></div>
+        <svg id="anElev" viewBox="0 0 720 150" role="img" aria-label="Profil d'altitude" data-i18n-attr="aria-label:chart.altitudeAria"></svg>
+      </div>
+      <div class="an-section" id="anBiomechWrap">
+        <div class="an-sec-head"><h4><span data-i18n="perf.biomechanicsHeading">Biomécanique</span> <span class="an-hint" data-i18n="perf.biomechanicsHint">dynamiques de course, si la montre les fournit</span></h4></div>
+        <div class="an-sub-sec">
+          <h5 class="an-sub-h" data-i18n="chart.cadenceHeading">Cadence</h5>
+          <svg id="anCadence" viewBox="0 0 720 150" role="img" aria-label="Cadence" data-i18n-attr="aria-label:chart.cadenceAria" style="display:none"></svg>
+          <p class="hint" id="anCadenceNA">Pas de données de cadence disponibles sur cette activité.</p>
+        </div>
+        <div class="an-sub-sec" style="margin-top:18px">
+          <h5 class="an-sub-h" data-i18n="chart.strideLenHeading">Longueur de foulée</h5>
+          <svg id="anStepLen" viewBox="0 0 720 150" role="img" aria-label="Longueur de foulée" data-i18n-attr="aria-label:chart.strideAria" style="display:none"></svg>
+          <p class="hint" id="anStepLenNA">Pas de données de longueur de foulée disponibles sur cette activité (nécessite une montre avec capteur de dynamiques de course : Coros, Garmin… ou via import .FIT).</p>
+        </div>
+      </div>
+      <div class="an-section" id="anBestWrap">
+        <div class="an-sec-head"><h4 data-i18n="best.heading">Meilleurs efforts &amp; records</h4><span class="an-hint" data-i18n="best.hint">puissance/allure sur les durées de référence</span></div>
+        <svg id="anBestCurve" viewBox="0 0 720 190" role="img" aria-label="Courbe des meilleurs efforts" data-i18n-attr="aria-label:best.chartAria"></svg>
+        <p class="hint" id="anBestCurveEmpty" data-i18n="best.tooShort">Séance trop courte pour une courbe de meilleurs efforts exploitable.</p>
+        <div class="best-records" id="anBestRecords"></div>
+      </div>
+      <div class="an-section" id="anDecoupleWrap">
+        <div class="an-sec-head"><h4><span data-i18n="chart.decouplingHeading">Découplage</span> <span class="an-hint" id="anDecoupleHint" data-i18n="chart.decouplingHint">efficacité cardiaque sur la durée</span></h4></div>
+        <div class="an-dc-kpi" id="anDecoupleKpi"></div>
+        <svg id="anDecouple" viewBox="0 0 720 170" role="img" aria-label="Courbe de découplage" data-i18n-attr="aria-label:chart.decouplingAria"></svg>
+        <div class="an-dc-trend" id="anDecoupleTrend"></div>
+      </div>
+      <div class="an-section" id="anCompareWrap">
+        <div class="an-sec-head"><h4 data-i18n="compare.heading">Comparateur — séances superposées</h4><span class="an-hint" data-i18n="compare.hint">axe temps ou distance</span></div>
+        <svg id="anCompareChart" viewBox="0 0 720 200" role="img" aria-label="Comparateur de séances en overlay" data-i18n-attr="aria-label:compare.chartAria"></svg>
+        <div id="anCompareLegend"></div>
+      </div>
     </div>
-    <div class="an-section" id="anDecoupleWrap">
-      <div class="an-sec-head"><h4><span data-i18n="chart.decouplingHeading">Découplage</span> <span class="an-hint" id="anDecoupleHint" data-i18n="chart.decouplingHint">efficacité cardiaque sur la durée</span></h4></div>
-      <div class="an-dc-kpi" id="anDecoupleKpi"></div>
-      <svg id="anDecouple" viewBox="0 0 720 170" role="img" aria-label="Courbe de découplage" data-i18n-attr="aria-label:chart.decouplingAria"></svg>
-      <div class="an-dc-trend" id="anDecoupleTrend"></div>
-    </div>
-    <div class="an-section" id="anAiWrap">
-      <div class="an-sec-head"><h4><i class="ic ic-brain"></i> Assistant IA <span class="an-hint">résumé &amp; recommandations</span></h4></div>
-      <div id="anAiBody"></div>
-    </div>
-    <div class="an-section">
-      <div class="an-sec-head"><h4>Allure &amp; FC par lap <span class="an-hint">vue graphique</span></h4></div>
-      <div class="lap-chart" id="anLapChart"></div>
-    </div>
-    <div class="an-section">
-      <div class="an-sec-head"><h4 data-i18n="perf.lapDetailHeading">Détail par lap</h4><span class="an-hint" id="anLapHint"></span></div>
-      <div class="an-laps" id="anLaps"></div>
-    </div>
-    <div class="an-section" id="anCompareWrap">
-      <div class="an-sec-head"><h4 data-i18n="compare.heading">Comparateur — séances superposées</h4><span class="an-hint" data-i18n="compare.hint">axe temps ou distance</span></div>
-      <svg id="anCompareChart" viewBox="0 0 720 200" role="img" aria-label="Comparateur de séances en overlay" data-i18n-attr="aria-label:compare.chartAria"></svg>
-      <div id="anCompareLegend"></div>
-    </div>
-    <div class="an-section" id="anSimilarWrap">
-      <div class="an-sec-head"><h4 data-i18n="perf.similarSessionsHeading">Séances similaires</h4><span class="an-hint" data-i18n="perf.autoComparison">comparaison automatique</span></div>
-      <div id="anSimilar"></div>
+    <div class="an-page" data-page="laps" role="tabpanel" hidden>
+      <div class="an-section">
+        <div class="an-sec-head"><h4>Allure &amp; FC par lap <span class="an-hint">vue graphique</span></h4></div>
+        <div class="lap-chart" id="anLapChart"></div>
+      </div>
+      <div class="an-section">
+        <div class="an-sec-head"><h4 data-i18n="perf.lapDetailHeading">Détail par lap</h4><span class="an-hint" id="anLapHint"></span></div>
+        <div class="an-laps" id="anLaps"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -4310,12 +4329,13 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <div class="tooltip" id="tooltip"></div>
 
 <script src="./sillance-i18n.js"></script>
-<script src="./sillance-i18n-app.js?v=20261119a"></script>
+<script src="./sillance-i18n-app.js?v=20261122a"></script>
 <script src="./sillance-reminder.js?v=20261113j"></script>
+<script src="./sillance-profil.js?v=2"></script>
 <script src="./sillance-ai-popup.js?v=20261107a"></script>
 <script src="./sillance-consigne.js?v=20261113e"></script>
 <script src="./sillance-ai-report.js?v=20261028i"></script>
-<script src="./sillance-fit.js?v=20261117b"></script>
+<script src="./sillance-fit.js?v=20261122a"></script>
 <script src="./sillance-workout-export.js?v=20261009a"></script>
 <script src="./sillance-club-feed.js?v=20261117h"></script>
 <script src="./sillance-blog.js?v=20261117a"></script>
@@ -4326,14 +4346,15 @@ body.ath-stats-off .analytics::after{content:'Statistiques masquées : coche la 
 <script src="./sillance-strength.js?v=20261030c"></script>
 <script src="./sillance-shoes.js?v=20261110b"></script>
 <script src="./sillance-zone-colors.js?v=20261118b"></script>
-<script src="./sillance-analyse.js?v=20261119a"></script>
-<script src="./sillance-app.core.js?v=20261119a"></script>
+<script src="./sillance-analyse.js?v=20261122a"></script>
+<script src="./sillance-app.core.js?v=20261122a"></script>
 <script src="./sillance-chart-zoom.js?v=20261117a"></script>
+<script src="./sillance-share.js?v=20261117b"></script>
 
 <!-- Sillance cloud : couche d'intégration Supabase (auth + sync).
      Importe sillance-client.js. Si non connecté → app en mode démo. -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script type="module" src="./sillance-integration.js?v=20261119a"></script>
+<script type="module" src="./sillance-integration.js?v=20261122a"></script>
 <script src="./sillance-cookies.js?v=20261028b"></script>
 <script src="./sillance-analytics.js?v=20261028b"></script>
 </body>

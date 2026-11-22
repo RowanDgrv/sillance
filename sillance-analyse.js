@@ -5,7 +5,8 @@
    2. Charge mesurée par semaine (TSS / estimation cardio).
    3. Charge ressentie par semaine (Foster 1998 : durée × RPE) + monotonie (moyenne / écart-type
       des 7 jours), affichée seulement si le RPE est noté sur toutes les séances de la semaine.
-   4. Sommeil et fatigue du check-in (1 à 10), 5. HRV (+ base), 6. poids.
+   4. Sommeil et fatigue du check-in (1 à 10), 4b. sommeil mesuré par la montre (COROS, wellness_daily),
+   5. HRV de nuit (montre, sinon check-in ; base + plage normale COROS), 5b. FC de repos, 6. poids.
    Pas de score combiné : on aligne les courbes, le coach lit (pas de poids inventés).
    Données absentes → pas de ligne inventée : points isolés, trous visibles, message vide.
    Démo (non connecté) : check-ins simulés, signalés comme tels.
@@ -21,8 +22,10 @@
     meas: 'Measured load per week', measSub: 'Power, pace or heart rate from the watch',
     felt: 'Perceived load per week', feltSub: 'Foster: duration × RPE · pale bar = RPE missing on some sessions (underestimated) · monotony shown when every session has an RPE',
     mono: 'monotony', rpeCov: 'RPE logged on {n} of {of} sessions over the period',
-    sleep: 'Sleep and fatigue', sleepSub: 'Morning check-in, 1 to 10', sleepL: 'Sleep', fatL: 'Fatigue',
-    hrv: 'HRV', hrvSub: 'rMSSD (ms) · dashed = baseline', weight: 'Weight', weightSub: 'kg, from the check-in',
+    sleep: 'Perceived sleep and fatigue', sleepSub: 'Morning check-in, 1 to 10', sleepL: 'Sleep', fatL: 'Fatigue',
+    wsleep: 'Sleep measured by the watch', wsleepSub: 'Hours asleep per night (COROS) · sleep score on hover', night: 'Night', score: 'score',
+    rhr: 'Resting heart rate', rhrSub: 'bpm, measured by the watch', emptyWatch: 'No data yet: connect a COROS watch (sleep, HRV, resting heart rate).',
+    hrv: 'Night HRV', hrvSub: 'rMSSD (ms): watch, otherwise check-in · dashed = baseline · band = COROS normal range', weight: 'Weight', weightSub: 'kg, from the check-in',
     empty: 'No data yet: the athlete fills it in the morning check-in.', emptyRpe: 'No RPE logged yet on completed sessions.',
     demo: 'Demo data', est: 'estimated from heart rate', loading: 'Loading…',
     noAct: 'No completed session'
@@ -34,15 +37,17 @@
     meas: 'Charge mesurée par semaine', measSub: 'Puissance, allure ou cardio de la montre',
     felt: 'Charge ressentie par semaine', feltSub: 'Foster : durée × RPE · barre pâle = RPE manquant sur une partie des séances (charge sous-estimée) · monotonie affichée si toutes les séances ont un RPE',
     mono: 'monotonie', rpeCov: 'RPE noté sur {n} séances sur {of} sur la période',
-    sleep: 'Sommeil et fatigue', sleepSub: 'Check-in du matin, de 1 à 10', sleepL: 'Sommeil', fatL: 'Fatigue',
-    hrv: 'HRV', hrvSub: 'rMSSD (ms) · pointillés = ta base', weight: 'Poids', weightSub: 'kg, saisi au check-in',
+    sleep: 'Sommeil et fatigue ressentis', sleepSub: 'Check-in du matin, de 1 à 10', sleepL: 'Sommeil', fatL: 'Fatigue',
+    wsleep: 'Sommeil mesuré par la montre', wsleepSub: 'Heures dormies par nuit (COROS) · score de sommeil au survol', night: 'Nuit', score: 'score',
+    rhr: 'FC de repos', rhrSub: 'bpm, mesurée par la montre', emptyWatch: 'Pas encore de données : connecte une montre COROS (sommeil, HRV, FC de repos).',
+    hrv: 'HRV de nuit', hrvSub: 'rMSSD (ms) : montre, sinon check-in · pointillés = base · bande = plage normale COROS', weight: 'Poids', weightSub: 'kg, saisi au check-in',
     empty: 'Pas encore de données : l\'athlète les renseigne dans son check-in du matin.', emptyRpe: 'Aucun RPE noté sur les séances réalisées pour l\'instant.',
     demo: 'Données de démonstration', est: 'estimée au cardio', loading: 'Chargement…',
     noAct: 'Aucune séance réalisée'
   };
   var C = { cyan: '#46C2D8', orange: '#FF9A3D', green: '#39E6A3', red: '#FF5470', violet: '#8E7FD0', grid: 'rgba(148,163,196,.14)', muted: '#94a3c4' };
   var W = 1000, PL = 44, PR = 14;
-  var state = { days: 90, daily: [], ck: {}, demo: false, idx: null };
+  var state = { days: 90, daily: [], ck: {}, wd: {}, demo: false, idx: null };
   var NS = 'http://www.w3.org/2000/svg';
   function app() { return window.__pf_app; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -85,9 +90,22 @@
       out[d.date] = {
         sommeil: Math.max(3, Math.min(9, Math.round(7.4 - tired + (r - 0.5) * 2.4))),
         fatigue: Math.max(2, Math.min(9, Math.round(3.6 + tired * 1.2 + (r - 0.5) * 2.4))),
-        hrv: Math.round(63 - tired * 4 + (r - 0.5) * 9),
         poids: +(70.8 - i * 0.004 + (r - 0.5) * 0.6).toFixed(1)
       };
+    });
+    return out;
+  }
+  function demoWatch(daily) {
+    var out = {};
+    daily.forEach(function (d, i) {
+      if (d.future) return;
+      var r = (Math.sin(i * 78.233) * 12345.678) % 1; r = r < 0 ? -r : r;
+      if (r < 0.06) return;                                // montre pas portée certaines nuits
+      var tired = Math.max(0, Math.min(3, (d.atl - d.ctl) / Math.max(d.ctl, 20) * 3));
+      var base = Math.round(64 - tired * 1.5);
+      out[d.date] = { sleep_min: Math.round(440 - tired * 25 + (r - 0.5) * 70), sleep_score: Math.round(80 - tired * 6 + (r - 0.5) * 14),
+        hrv_ms: Math.round(base + 2 - tired * 4 + (r - 0.5) * 12), hrv_baseline: base, hrv_low: base - 10, hrv_high: base + 22,
+        resting_hr: Math.round(47 + tired * 2.2 + (r - 0.5) * 3) };
     });
     return out;
   }
@@ -96,11 +114,13 @@
     var all = A.loadDaily(new Date(Date.now() + 14 * 864e5), 380);      // 2 semaines de prévu après aujourd'hui
     state.daily = all.slice(-(state.days + 14));
     state.demo = !(window.PF && window.PF.user);
-    if (state.demo) { state.ck = demoCheckins(state.daily); return Promise.resolve(); }
-    var from = state.daily[0].date;
-    return window.PF.getCheckinsRange(window.__pf_viewTarget || window.PF.user.id, from).then(function (rows) {
-      var m = {}; (rows || []).forEach(function (r) { m[r.date] = r; }); state.ck = m;
-    }).catch(function () { state.ck = {}; });
+    if (state.demo) { state.ck = demoCheckins(state.daily); state.wd = demoWatch(state.daily); return Promise.resolve(); }
+    var from = state.daily[0].date, who = window.__pf_viewTarget || window.PF.user.id;
+    var byDate = function (rows) { var m = {}; (rows || []).forEach(function (r) { m[r.date] = r; }); return m; };
+    return Promise.all([
+      window.PF.getCheckinsRange(who, from).catch(function () { return []; }),
+      window.PF.getWellnessRange ? window.PF.getWellnessRange(who, from).catch(function () { return []; }) : []
+    ]).then(function (r) { state.ck = byDate(r[0]); state.wd = byDate(r[1]); });
   }
   function weeks(daily) {
     var out = [], cur = null;
@@ -124,6 +144,7 @@
 
   // --- tracé ----------------------------------------------------------------
   function niceStep(raw) { var p = Math.pow(10, Math.floor(Math.log10(raw || 1))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+  function niceRange(mn, mx, n) { var st = niceStep((mx - mn) / (n || 3) || 1); var lo = Math.floor(mn / st) * st, hi = Math.ceil(mx / st) * st; return { lo: lo, hi: hi, n: Math.max(1, Math.round((hi - lo) / st)) }; }
   function xOf(i) { var n = state.daily.length; return PL + (i + 0.5) * (W - PL - PR) / n; }
   function frame(svg, H, min, max, ticks, fmt) {
     var P = { t: 10, b: 22 };
@@ -210,16 +231,40 @@
         series(s4, D.map(function (d, i) { var v = ck[d.date] ? ck[d.date][k[0]] : null; return { i: i, x: xOf(i), y: y4(v || 0), v: v, dot: true }; }), k[1]); });
       cursorLayer(s4, 160); }
 
-    // 5. HRV
+    // 4b. sommeil mesuré par la montre
+    var wd = state.wd, hasW = function (k) { return D.some(function (d) { return wd[d.date] && wd[d.date][k] != null; }); };
+    var c4b = card(root, T.wsleep, T.wsleepSub);
+    if (!hasW('sleep_min')) empty(c4b, T.emptyWatch);
+    else { var s4b = svgIn(c4b, 150), y4b = frame(s4b, 150, 0, 10, 2, function (v) { return v + ' h'; }), bw = Math.max(1.5, slot - 2);
+      D.forEach(function (d, i) { var w = wd[d.date]; if (!w || w.sleep_min == null) return; var h = w.sleep_min / 60;
+        mk('rect', { x: xOf(i) - bw / 2, y: y4b(Math.min(10, h)), width: bw, height: Math.max(0, y4b(0) - y4b(Math.min(10, h))), rx: Math.min(2, bw / 2), fill: C.cyan, opacity: .8 }, s4b); });
+      cursorLayer(s4b, 150); }
+
+    // 5. HRV de nuit : montre en priorité, sinon check-in
+    var hrvOf = function (d) { var w = wd[d.date], c = ck[d.date]; return (w && w.hrv_ms != null) ? w.hrv_ms : (c && c.hrv != null ? c.hrv : null); };
     var c5 = card(root, T.hrv, T.hrvSub);
-    if (!has('hrv')) empty(c5, T.empty);
-    else { var hv = D.map(function (d) { return ck[d.date] && ck[d.date].hrv; }).filter(Boolean);
-      var base = app().data.ATHLETE_REF && app().data.ATHLETE_REF.hrvBase; if (state.demo) base = 62;
-      var lo = Math.floor((Math.min.apply(null, hv.concat(base ? [base] : [])) - 5) / 5) * 5, hi = Math.ceil((Math.max.apply(null, hv.concat(base ? [base] : [])) + 5) / 5) * 5;
-      var s5 = svgIn(c5, 150), y5 = frame(s5, 150, lo, hi, 2);
-      if (base) mk('line', { x1: PL, x2: W - PR, y1: y5(base), y2: y5(base), stroke: C.green, 'stroke-dasharray': '6 5', opacity: .7 }, s5);
-      series(s5, D.map(function (d, i) { var v = ck[d.date] ? ck[d.date].hrv : null; return { i: i, x: xOf(i), y: y5(v || lo), v: v, dot: true }; }), C.cyan);
-      cursorLayer(s5, 150); }
+    var hv = D.map(hrvOf).filter(function (v) { return v != null; });
+    if (!hv.length) empty(c5, T.empty);
+    else { var fixedBase = !hasW('hrv_baseline') ? (app().data.ATHLETE_REF && app().data.ATHLETE_REF.hrvBase) : null;
+      var ext = hv.slice(); D.forEach(function (d) { var w = wd[d.date]; if (w) [w.hrv_low, w.hrv_high, w.hrv_baseline].forEach(function (v) { if (v != null) ext.push(v); }); });
+      if (fixedBase) ext.push(fixedBase);
+      var nr5 = niceRange(Math.min.apply(null, ext) - 3, Math.max.apply(null, ext) + 3, 3), lo = nr5.lo, hi = nr5.hi;
+      var s5 = svgIn(c5, 160), y5 = frame(s5, 160, lo, hi, nr5.n);
+      D.forEach(function (d, i) { var w = wd[d.date]; if (!w || w.hrv_low == null || w.hrv_high == null) return;
+        mk('rect', { x: xOf(i) - slot / 2, y: y5(w.hrv_high), width: slot, height: Math.max(0, y5(w.hrv_low) - y5(w.hrv_high)), fill: C.green, opacity: .1 }, s5); });
+      if (fixedBase) mk('line', { x1: PL, x2: W - PR, y1: y5(fixedBase), y2: y5(fixedBase), stroke: C.green, 'stroke-dasharray': '6 5', opacity: .7 }, s5);
+      else series(s5, D.map(function (d, i) { var v = wd[d.date] ? wd[d.date].hrv_baseline : null; return { i: i, x: xOf(i), y: y5(v || lo), v: v }; }), C.green, true);
+      series(s5, D.map(function (d, i) { var v = hrvOf(d); return { i: i, x: xOf(i), y: y5(v || lo), v: v, dot: true }; }), C.cyan);
+      cursorLayer(s5, 160); }
+
+    // 5b. FC de repos
+    var c5b = card(root, T.rhr, T.rhrSub);
+    if (!hasW('resting_hr')) empty(c5b, T.emptyWatch);
+    else { var rv = D.map(function (d) { return wd[d.date] && wd[d.date].resting_hr; }).filter(Boolean);
+      var nrb = niceRange(Math.min.apply(null, rv) - 2, Math.max.apply(null, rv) + 2, 2), rlo = nrb.lo, rhi = nrb.hi;
+      var s5b = svgIn(c5b, 140), y5b = frame(s5b, 140, rlo, rhi, nrb.n);
+      series(s5b, D.map(function (d, i) { var v = wd[d.date] ? wd[d.date].resting_hr : null; return { i: i, x: xOf(i), y: y5b(v || rlo), v: v, dot: true }; }), C.red);
+      cursorLayer(s5b, 140); }
 
     // 6. poids
     var c6 = card(root, T.weight, T.weightSub);
@@ -253,7 +298,10 @@
     if (f && f.n) h += item(C.violet, 'Foster', f.v);
     if (c.sommeil != null) h += item(C.cyan, T.sleepL, c.sommeil + '/10');
     if (c.fatigue != null) h += item(C.orange, T.fatL, c.fatigue + '/10');
-    if (c.hrv != null) h += item(C.cyan, 'HRV', c.hrv + ' ms');
+    var w = state.wd[d.date] || {};
+    if (w.sleep_min != null) h += item(C.cyan, T.night, Math.floor(w.sleep_min / 60) + ' h ' + String(w.sleep_min % 60).padStart(2, '0') + (w.sleep_score ? ' (' + T.score + ' ' + w.sleep_score + ')' : ''));
+    if (w.hrv_ms != null) h += item(C.cyan, 'HRV', w.hrv_ms + ' ms'); else if (c.hrv != null) h += item(C.cyan, 'HRV', c.hrv + ' ms');
+    if (w.resting_hr != null) h += item(C.red, EN ? 'Resting HR' : 'FC repos', w.resting_hr + ' bpm');
     if (c.poids != null) h += item(C.violet, T.weight, Number(c.poids).toFixed(1) + ' kg');
     document.getElementById('sanRead').innerHTML = h;
   }

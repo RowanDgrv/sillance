@@ -304,6 +304,8 @@ const ATHLETE_REF = {
   css: 98,         // critical swim speed : s/100m (1'38")
   // — FC —
   fcMax: 190, fcRepos: 47,
+  // — Tests de profil (démo) : 50 m lancé en course (s), 50 m nage (s), meilleure puissance sur 5 s (W)
+  sprint50Run: 6.9, swim50: 36, p5s: 1080,
   // — HRV (variabilité de fréquence cardiaque, rMSSD ms) — base de repos
   //   sur 7 jours, sert de référence pour détecter une chute. null = l'athlète
   //   ne suit pas le HRV. Renseignée par la montre/bracelet ou à la main.
@@ -2043,6 +2045,8 @@ function openStravaAnalysis(act, plan){
     // (ex. 15x30s actif) — illisible pour analyser la séance réellement faite.
     const res = PFFit.buildFromRaw(points, act.disc, laps||[], {ftp});
     if(!res.ok){ toast(res.error||tr('sync.analysisImpossible'), 'error'); return; }
+    // Récap (22/11/2026) : calories et température viennent du résumé de l'activité (pas des points)
+    res.data.meta={calories:act.calories??null, temp:act.temp??null, durMin:act.dur||null};
     // plan : la séance prévue liée → l'IA juge contre SA consigne (titre,
     // objectif, durée prévue) et non contre le nom donné par la montre.
     // Un plantage de l'AFFICHAGE ne doit pas se faire passer pour un échec de
@@ -2114,7 +2118,9 @@ async function refreshDeviceState(){
         dur: a.duration_s ? Math.round(a.duration_s/60) : 0,
         dist: a.distance_m ? +(a.distance_m/1000).toFixed(1) : 0,
         date: fmtActDate(a.start_time),
-        src: a.provider
+        src: a.provider,
+        calories: a.calories!=null ? Math.round(a.calories) : null,
+        temp: a.raw && a.raw.average_temp!=null ? Math.round(a.raw.average_temp) : null
       }));
     } else { stravaActivities = []; }
     renderStravaCard();
@@ -5337,6 +5343,7 @@ function renderCoachBand(){
         <button class="cb-bilan" id="caseStudyBtn" title="${tr('coachBand.caseStudyTitle')}"><i class="ic ic-sparkles"></i> ${tr('coachBand.caseStudy')}</button>
         ${a.race?`<button class="cb-bilan" id="shareSpecBtn" title="${tr('coachBand.shareRaceLinkTitle')}"><i class="ic ic-link"></i> ${tr('coachBand.shareRace')}</button>`:''}
         <button class="cb-bilan" id="zonesBtn" title="${tr('coachBand.customizeZonesTitle')}"><i class="ic ic-target"></i> ${tr('coachBand.zones')}</button>
+        <button class="cb-bilan" id="profilBtn" title="Profil de performance : vitesse ou endurance, sport par sport"><i class="ic ic-chart"></i> Profil</button>
         <button class="cb-bilan" id="profileBtn" title="${tr('coachBand.athleteProfileTitle')}"><i class="ic ic-user"></i> ${tr('coachBand.athleteProfile')}</button>
         <button class="cb-bilan" id="seasonBtn" title="${tr('season.title')}"><i class="ic ic-calendar"></i> ${tr('season.btn')}</button>
         <button class="cb-bilan" id="gearBtn" title="${tr('gear.coachAccessTitle')}"><i class="ic ic-shoe"></i> ${tr('nav.materiel')}</button>
@@ -5372,6 +5379,9 @@ function renderCoachBand(){
   const _csb=document.getElementById('caseStudyBtn'); if(_csb) _csb.onclick=()=>exportCaseStudy(a.name);
   const _ssb=document.getElementById('shareSpecBtn'); if(_ssb) _ssb.onclick=()=>openSpectatorShare(a.id);
   const _zb=document.getElementById('zonesBtn'); if(_zb) _zb.onclick=()=>openZoneEditor();
+  // Profil de performance (démo 15/11/2026) : vitesse ↔ endurance par sport, forces et points à travailler
+  const _pfb=document.getElementById('profilBtn'); if(_pfb) _pfb.onclick=()=>{ if(!window.SilProfil) return;
+    window.SilProfil.open(ATHLETE_REF, { name: a&&a.name, both:true, durability: window.PF?.user ? (ATHLETE_REF.durability||[]) : [3.4,4.9,6.1,4.2] }); };
   const _pb=document.getElementById('profileBtn'); if(_pb) _pb.onclick=()=>openAthleteProfile(a.id);
   const _seb=document.getElementById('seasonBtn'); if(_seb) _seb.onclick=()=>openSeasonCalendar(a);
   // Accès direct au matériel de l'athlète suivi (07/10/2026, demandé par
@@ -11056,7 +11066,7 @@ function openAnalysis(s){
   if(window.SilShare) SilShare.attach(s, s.disc==='hyrox' ? null : (s._realData||null), mode);
 
   // ---- cas HYROX : stations + saisie manuelle ----
-  if(s.disc==='hyrox'){ openHyroxAnalysis(s); analysisOverlay.classList.add('open'); return; }
+  if(s.disc==='hyrox'){ openHyroxAnalysis(s); anInitTabs(); analysisOverlay.classList.add('open'); return; }
 
   const data=s._realData||genSessionData(s);
   const isSwim=s.disc==='swim';
@@ -11102,8 +11112,82 @@ function openAnalysis(s){
   renderDecouple(s, data);
   // assistant IA (résumé + recos) — coach only, gaté par l'add-on
   renderAi(s, data);
+  // récap chiffré (onglet Récap)
+  renderRecapKpis(s, data);
+  anInitTabs();
 
   analysisOverlay.classList.add('open');
+}
+
+/* ============================================================
+   FENÊTRE D'ANALYSE EN 3 ONGLETS (22/11/2026)
+   Récap (chiffres de la séance + charge, conditions, IA, séances
+   similaires) · Graphiques (toutes les courbes à la suite) · Laps
+   (graphique allure/FC par lap + tableau détaillé). L'onglet choisi
+   est gardé d'une séance à l'autre pendant la visite.
+   Le récap n'affiche que des valeurs mesurées : rien d'estimé ni
+   d'inventé (pas de température sans capteur, pas de calories
+   sans la montre). Démo (non connecté) : conditions simulées.
+   ============================================================ */
+let AN_PAGE='recap';
+function anSetPage(page){
+  AN_PAGE=page;
+  document.querySelectorAll('#anTabs .an-tab').forEach(b=>{
+    const on=b.dataset.page===page; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false');
+  });
+  document.querySelectorAll('#analysisOverlay .an-page').forEach(pg=>{ pg.hidden = pg.dataset.page!==page; });
+  const m=document.querySelector('#analysisOverlay .analysis-modal'); if(m) m.scrollTop=0;
+}
+function anInitTabs(){
+  const bar=document.getElementById('anTabs'); if(!bar) return;
+  if(!bar.dataset.ready){
+    bar.dataset.ready='1';
+    bar.addEventListener('click',e=>{ const b=e.target.closest('.an-tab'); if(b) anSetPage(b.dataset.page); });
+    bar.addEventListener('keydown',e=>{
+      if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return;
+      const tabs=[...bar.querySelectorAll('.an-tab')], i=tabs.findIndex(t=>t.dataset.page===AN_PAGE);
+      const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length]; anSetPage(n.dataset.page); n.focus();
+    });
+  }
+  anSetPage(AN_PAGE);
+}
+// Température mesurée par la montre : résumé de l'activité, sinon moyenne des points (FIT). null si pas de capteur.
+function anMeasuredTemp(data){
+  if(!data) return null;
+  if(data.meta && data.meta.temp!=null) return data.meta.temp;
+  const t=(data.pts||[]).filter(p=>p.temp!=null&&isFinite(p.temp));
+  return t.length ? Math.round(t.reduce((a,p)=>a+p.temp,0)/t.length) : null;
+}
+function renderRecapKpis(s, data){
+  const box=document.getElementById('anKpis'); if(!box) return;
+  const pts=data.pts||[], disc=s.disc, real=!!s._realData, meta=data.meta||{};
+  const durMin = meta.durMin || (pts.length ? pts[pts.length-1].t : 0);
+  const dist = data.dist||0;
+  const cells=[];
+  const add=(k,v,u)=>cells.push({k,v,u:u||''});
+  if(durMin>0) add(tr('recapKpi.duration'), fmtClock(durMin));
+  if(dist>0) add(tr('recapKpi.distance'), disc==='swim' ? Math.round(dist*1000) : dist.toFixed(dist<10?2:1), disc==='swim'?'m':'km');
+  if(dist>0 && durMin>0){
+    if(disc==='run') add(tr('recapKpi.pace'), fmtPace(durMin*60/dist), '/km');
+    else if(disc==='swim') add(tr('recapKpi.pace'), fmtPace(durMin*60/(dist*10)), '/100m');
+    else add(tr('recapKpi.speed'), (dist/(durMin/60)).toFixed(1), 'km/h');
+  }
+  if(data.avgHr>0) add(tr('recapKpi.avgHr'), data.avgHr, 'bpm');
+  if(data.maxHr>0) add(tr('recapKpi.maxHr'), data.maxHr, 'bpm');
+  if(disc!=='swim' && data.dplus>0) add(tr('recapKpi.dplus'), data.dplus, 'm');
+  const pw=pts.filter(p=>p.pw>0);
+  if(pw.length>pts.length*0.5) add(tr('recapKpi.avgPower'), Math.round(pw.reduce((a,p)=>a+p.pw,0)/pw.length), 'W');
+  const cad=pts.filter(p=>p.cad>0);
+  if(cad.length>pts.length*0.5){
+    const c=cad.reduce((a,p)=>a+p.cad,0)/cad.length*(disc==='run'?2:1);
+    add(tr('recapKpi.cadence'), Math.round(c), disc==='run'?tr('analysis.stepsPerMin'):'rpm');
+  }
+  if(meta.calories>0) add(tr('recapKpi.calories'), meta.calories, 'kcal');
+  // température : capteur de la montre (résumé, sinon moyenne des points) ; démo : conditions simulées
+  const temp = anMeasuredTemp(data) ?? (!real && data.cond ? data.cond.temp : null);
+  if(temp!=null && temp!=='') add(tr('recapKpi.temp'), temp, '°C');
+  if((data.laps||[]).length) add(tr('recapKpi.laps'), data.laps.length, '');
+  box.innerHTML = cells.map(x=>`<div class="an-kpi"><div class="k">${x.k}</div><div class="v">${x.v}</div><div class="u">${x.u}</div></div>`).join('');
 }
 
 /* ============================================================
@@ -12233,7 +12317,8 @@ const LAP_COLS = [
   {key:'hrmax',get label(){return tr('refs.maxHr')}, def:0, app:'all', v:l=>`${l.maxHr}<small> bpm</small>`},
   {key:'vap',  label:'VAP', def:0, app:'!bike', v:(l,_,d)=>d==='swim'?paceFromSpeed2(l.avgGap)+'<small>/100m</small>':paceFromSpeed(l.avgGap)+'<small>/km</small>'},
   {key:'dplus',label:'D+', def:0, app:'!swim', v:l=>`${l.dplus}<small> m</small>`},
-  {key:'temp', get label(){return tr('lapCol.temp')}, def:0, app:'all', v:(l,data)=>`${data.cond.temp}<small>°C</small>`},
+  // 22/11/2026 : sur une vraie activité, température mesurée seulement (avant : 15 °C par défaut affichés comme une mesure)
+  {key:'temp', get label(){return tr('lapCol.temp')}, def:0, app:'all', v:(l,data)=>`${anMeasuredTemp(data) ?? data.cond.temp}<small>°C</small>`},
 ];
 function injectLapCss(){
   if(document.getElementById('pf-lap-css')) return;
@@ -12385,7 +12470,7 @@ function lapLactateHTML(s, l){
 function renderLaps(s, data, isSwim){
   const box=document.getElementById('anLaps'); const disc=data.disc; injectLapCss();
   document.getElementById('anLapHint').textContent = (isSwim?tr('lapCol.perSet'):tr('lapCol.autoSplits'))+' · '+tr('lapCol.chooseColumns');
-  const cols=LAP_COLS.filter(c=>colApplies(c.app,disc));
+  const cols=LAP_COLS.filter(c=>colApplies(c.app,disc) && !(c.key==='temp' && s._realData && anMeasuredTemp(data)==null));
   const sel=lapColSet(disc);
   const lbl=c=>typeof c.label==='function'?c.label(disc):c.label;
   const distCol=cols.find(c=>c.key==='dist'), speedCol=cols.find(c=>c.key==='speed');

@@ -443,6 +443,8 @@
         grade, gap, pw: r.pw || 0, cad: r.cad || 0, _sp: sp, _cum: cumKm,
         stepLen: r.stepLen != null ? r.stepLen : 0,
       };
+      // température du capteur de la montre (FIT champ 13), si le fichier la fournit
+      if (r.temp != null && isFinite(r.temp)) pt.temp = r.temp;
       pts.push(pt);
       prev = { ...r, _sp: sp, distM: r.distM, alt: r.alt != null ? r.alt : (prev ? prev.alt : null) };
     }
