@@ -28,3 +28,6 @@ prd_outputs/
 *.local.js
 *.local.png
 .publies.txt
+
+# Brouillon page coach perso (en pause, ne pas publier)
+/coach/
