@@ -1627,7 +1627,10 @@ function renderStravaCard(){
   const box=document.getElementById('stravaCard');
   if(!box) return;
   const devices = window.__pf_devices || [];
-  const isConnected = p => window.PF?.user ? devices.some(d=>d.provider===p && d.connected) : (p==='strava' && stravaConnected);
+  // 24/11/2026 : une connexion peut exister en base alors que la plateforme refuse le jeton
+  // (COROS : invalid_grant après 30 jours). La carte disait « Connecté » à tort : on affiche « À reconnecter ».
+  const needsReconnect = p => !!window.PF?.user && devices.some(d=>d.provider===p && d.connected && /invalid_grant|reconnexion requise/i.test(d.meta?.sync_error?.msg||''));
+  const isConnected = p => window.PF?.user ? devices.some(d=>d.provider===p && d.connected) && !needsReconnect(p) : (p==='strava' && stravaConnected);
   const anyConnected = DEVICE_CONNECTORS.some(p=>isConnected(p.key));
 
   const connectorsHtml = DEVICE_CONNECTORS.map(p=>{
@@ -1638,7 +1641,9 @@ function renderStravaCard(){
         <span class="dc-badge"><i class="ic ic-check"></i> ${tr('devices.connected')}</span>
         <button class="dc-sync" data-p="${p.key}" title="${tr('sync.syncLatest')}"><i class="ic ic-refresh"></i></button>
         <button class="dc-disconnect" data-p="${p.key}">${tr('sync.disconnect')}</button>`
-      : `<button class="dc-connect" data-p="${p.key}">${tr('devices.connectBtn',{name:p.name})}</button>`}
+      : needsReconnect(p.key)
+        ? `<span class="dc-badge dc-warn" style="color:var(--warn,#e8a23a)"><i class="ic ic-alert-triangle"></i> ${tr('devices.expired')}</span><button class="dc-connect" data-p="${p.key}">${tr('devices.reconnectBtn',{name:p.name})}</button>`
+        : `<button class="dc-connect" data-p="${p.key}">${tr('devices.connectBtn',{name:p.name})}</button>`}
     </div>`;
   }).join('');
 
