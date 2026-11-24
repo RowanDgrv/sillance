@@ -31,3 +31,11 @@ prd_outputs/
 
 # Brouillon page coach perso (en pause, ne pas publier)
 /coach/
+
+# SECURITY : jamais de secrets versionnés
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+serviceAccount*.json

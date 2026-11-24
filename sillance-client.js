@@ -12,7 +12,9 @@
  *  Supabase > Project Settings > API). La clé "anon" est PUBLIQUE : c'est
  *  normal, la sécurité repose sur la RLS (jamais la service_role côté front).
  * ========================================================================== */
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+// SECURITY: supabase-js est servi depuis sillance.app (compilé depuis le paquet npm officiel 2.45.0),
+// plus depuis esm.sh : un domaine qui sert n'importe quel paquet npm ne doit pas figurer dans la CSP.
+import { createClient } from "./vendor/supabase-js-2.45.0.mjs";
 
 const SUPABASE_URL = "https://onbsgohvqejccowfnrbs.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_Tiz8pcjnik-Xj85Jvahivw_dfNqf_TT";
