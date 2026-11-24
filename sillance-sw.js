@@ -21,7 +21,7 @@
    versions) — pas obligatoire à chaque déploiement grâce au
    network-first, seulement utile si un jour un bug de cache est
    suspecté. */
-const CACHE_VERSION = 'v8'; // 22/11/2026 : analyse de séance en 3 onglets, partage d'activité, profil de performance
+const CACHE_VERSION = 'v9'; // 24/11/2026 : icônes de l'app renommées (icon-anneaux-*) pour que Chrome remplace l'ancien logo
 const CACHE_NAME = `sillance-${CACHE_VERSION}`;
 const PRECACHE_URLS = [
   './', './index.html', './sillance-app.html', './sillance-calendrier.html', './sillance-review.html',
@@ -32,7 +32,7 @@ const PRECACHE_URLS = [
   // passe hors-ligne avant toute navigation aurait une coquille vide.
   './sillance-shoes.js', './sillance-chart-zoom.js', './sillance-share.js', './sillance-app.core.js', './sillance-calendrier.core.js', './sillance-review.core.js',
   './sillance-framebuster.js', './sillance-fonts-async.js',
-  './favicon.svg', './icon-192.png', './icon-512.png', './manifest.webmanifest',
+  './favicon.svg', './icon-anneaux-192.png', './icon-anneaux-512.png', './manifest.webmanifest',
 ];
 
 self.addEventListener('install', (e) => {
@@ -75,8 +75,8 @@ self.addEventListener('push', (e) => {
   catch { d = { title: 'Sillance', body: (e.data && e.data.text()) || '' }; }
   e.waitUntil(self.registration.showNotification(d.title || 'Sillance', {
     body: d.body || '',
-    icon: './icon-192.png',
-    badge: './icon-192.png',
+    icon: './icon-anneaux-192.png',
+    badge: './icon-anneaux-192.png',
     tag: 'sillance-digest',
     data: { url: d.url || './sillance-app.html' },
   }));
